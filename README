@@ -1,0 +1,8 @@
+ (c) Matteo Corti, ETH Zurich, 2007
+
+check_ssl_cert
+
+Checks an X.509 certificate:
+ - checks if the server is running and delivers a valid certificate
+ - checks if the CA matches a given pattern
+ - checks the validity

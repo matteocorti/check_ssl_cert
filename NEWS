@@ -1,0 +1,6 @@
+2007-08-31 Version 1.1.0
+           - option to enforce a given email address
+           - option to enforce a given organization
+           - temporary files cleanup upon exit
+2007-08-15 Bug fix: openssl did not close the connection cleanly
+2007-08-10 First release (1.0)

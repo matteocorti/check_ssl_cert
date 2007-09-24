@@ -1,0 +1,18 @@
+2007-09-04  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: better error messages (both the actual and the
+	expected values are displayed)
+
+2007-08-31  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: new options to enforce email and
+	organization. Temporary files are now removed before termination
+
+2007-08-15  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: openssl s_client closes the connection cleanly
+
+2007-08-10  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: initial release
+
