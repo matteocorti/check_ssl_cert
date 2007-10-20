@@ -18,7 +18,7 @@ VERSION=1.1.0
 # Prints usage information
 # Params
 #   $1 error message (optional)
-function usage {
+usage() {
 
     if [ -n "$1" ] ; then
         echo "Error: $1" 1>&2
@@ -44,7 +44,7 @@ function usage {
 
 }
 
-function cleanup {
+cleanup() {
 
     if [ -f $CERT  ] ; then rm $CERT;  fi
     if [ -f $ERROR ] ; then rm $ERROR; fi
@@ -55,7 +55,7 @@ function cleanup {
 # Exits with a critical message
 # Params
 #   $1 error message
-function critical {
+critical() {
     echo "SSL CERT CRITICAL - $1"
     cleanup;
     exit 2
@@ -65,7 +65,7 @@ function critical {
 # Exits with a warning message
 # Param
 #   $1 warning message
-function warning {
+warning() {
     echo "SSL CERT WARN - $1"
     cleanup;
     exit 1
@@ -75,7 +75,7 @@ function warning {
 # Formats a time in seconds using days minutes and seconds
 # Params
 #   $1 time in seconds
-function format_days {
+format_days() {
 
     SECONDS=$1
 
@@ -104,7 +104,7 @@ function format_days {
 # Checks if a given program is available and executable
 # Params
 #   $1 program name
-function check_prog {
+check_prog() {
 
     PROG=`which $1`
 
