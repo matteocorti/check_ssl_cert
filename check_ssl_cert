@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.2.0
+VERSION=1.2.1
 
 ################################################################################
 # Functions
@@ -141,15 +141,19 @@ trap "rm -f $CERT $ERROR" 0
 
 echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}
 
-if grep -q "Connection refused" ${ERROR} ; then
-    critical "connection refused ($HOST:$PORT)"
+if [ $? -ne 0 ] ; then
+    critical "Error: $(cat $ERROR)"
+fi
+
+if ! grep -q "CERTIFICATE" ${CERT} ; then
+    critical "No certificate returned"
 fi
 
 ################################################################################
 # parse the X.509 certificate
 
 CA=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
-DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/notAfter\=//")
+DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
 
 ################################################################################
 # check the issuer

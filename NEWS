@@ -1,3 +1,4 @@
+2008-02-25 Version 1.2.1 better error handling
 2008-02-25 Version 1.2.0 general cleanup (POSIX compliance, removed
                          nmap dependency, ...) from Dan Wallis
 2007-08-31 Version 1.1.0
