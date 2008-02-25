@@ -1,3 +1,5 @@
+2008-02-25 Version 1.2.0 general cleanup (POSIX compliance, removed
+                         nmap dependency, ...) from Dan Wallis
 2007-08-31 Version 1.1.0
            - option to enforce a given email address
            - option to enforce a given organization

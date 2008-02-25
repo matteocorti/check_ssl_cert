@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # check_ssl_cert
 #
@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.1.0
+VERSION=1.2.0
 
 ################################################################################
 # Functions
@@ -40,8 +40,9 @@ usage() {
     fi
     
     echo
-    echo "Usage: check_ssl_cert -H server [-hvw?] [-p port]"
+    echo "Usage: check_ssl_cert -H server [OPTIONS]"
     echo
+    echo "Options:"
     echo "   -d days    minimum number of days a certificate has to be valid"
     echo "   -e address pattern to match the email address contained in the certificate"
     echo "   -h, -?     this help message"
@@ -78,41 +79,12 @@ warning() {
 }
 
 ################################################################################
-# Formats a time in seconds using days minutes and seconds
-# Params
-#   $1 time in seconds
-format_days() {
-
-    SECONDS=$1
-
-    if [ $((SECONDS/86400)) -gt 0 ] ; then
-        STR="$((SECONDS/86400)) days"
-        SECONDS=$((SECONDS-(SECONDS/86400)*86400))
-    fi
-
-    if [ $((SECONDS/3600)) -gt 0 ] ; then
-        STR="$STR $((SECONDS/3600)) hours"
-        SECONDS=$((SECONDS-(SECONDS/3600)*3600))
-    fi
-
-    if [ $((SECONDS/60)) -gt 0 ] ; then
-        STR="$STR $((SECONDS/60)) minutes"
-        SECONDS=$((SECONDS-(SECONDS/60)*60))
-    fi
-
-    STR="$STR ${SECONDS} seconds"
-
-    echo $STR
-        
-}
-
-################################################################################
 # Checks if a given program is available and executable
 # Params
 #   $1 program name
 check_prog() {
 
-    PROG=`which $1`
+    PROG=$(which $1)
 
     if [ -z "$PROG" ] ; then
         critical "cannot find $1"
@@ -171,14 +143,13 @@ echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}
 
 if grep -q "Connection refused" ${ERROR} ; then
     critical "connection refused ($HOST:$PORT)"
-    return
 fi
 
 ################################################################################
 # parse the X.509 certificate
 
-CA=`$OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/.*\/O=//" | sed -r "s/\/[A-Z]+=.*//"`
-DATE=`$OPENSSL x509 -in ${CERT} -enddate -noout | sed "s/notAfter\=//"`
+CA=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
+DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/notAfter\=//")
 
 ################################################################################
 # check the issuer
@@ -198,19 +169,14 @@ if [ -n "$DAYS" ] ; then
         critical "invalid number of days ($DAYS)"
     fi
 
-    DIFF=$((`date -d "$DATE" "+%s"` - `date "+%s"`))
-    DAYS=$((DAYS * 86400))
-
-    if [ $DIFF -le 0 ] ; then
+    if ! $OPENSSL x509 -in ${CERT} -noout -checkend 0 ; then
         critical "certificate is expired (was valid until $DATE)"
     fi
 
-    if [ $DIFF -le $DAYS ] ; then
-        MESSAGE=`format_days $DIFF`
-        MESSAGE=`echo "certificate is exipring in" $MESSAGE`
-        warning "$MESSAGE"
+    if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( $DAYS * 86400 )) ; then
+        warning "certificate will expire on $DATE"
     fi
-      
+
 fi
 
 ################################################################################
@@ -218,7 +184,7 @@ fi
 
 if [ -n "$ORGANIZATION" ] ; then
 
-    ORG=`$OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" | sed -e "s/\/.*//"`
+    ORG=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
 
     if ! echo $ORG | grep -q "^$ORGANIZATION" ; then
         critical "invalid organization ($ORGANIZATION does not match $ORG)"
@@ -231,7 +197,7 @@ fi
 
 if [ -n "$ADDR" ] ; then
 
-    EMAIL=`$OPENSSL x509 -in ${CERT} -email -noout`
+    EMAIL=$($OPENSSL x509 -in ${CERT} -email -noout)
 
     if ! echo $EMAIL | grep -q "^$ADDR" ; then
         critical "invalid email ($ADDR does not match $EMAIL)"
@@ -240,7 +206,7 @@ if [ -n "$ADDR" ] ; then
 fi
 
 ################################################################################
-# If we get this far, assume all well. :)
+# If we get this far, assume all is well. :)
 echo "SSL CERT OK - X.509 certificate from $CA valid until $DATE"
 
 exit 0

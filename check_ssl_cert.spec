@@ -1,4 +1,4 @@
-%define version 1.1.0
+%define version 1.2.0
 %define release 0
 %define name    check_ssl_cert
 %define _prefix /usr/lib/nagios/plugins/contrib
@@ -40,6 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{_prefix}/check_ssl_cert
 
 %changelog
+* Mon Feb 25 2008 Matteo Corti <matteo.corti@id.ethz.ch> - 1.2.0-0
+- Dan Wallis patches (see the ChangeLog)
+
 * Mon Sep 24 2007 Matteo Corti <matteo.corti@id.ethz.ch> - 1.1.0-0
 - first rpm package
 
