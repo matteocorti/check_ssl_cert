@@ -1,6 +1,8 @@
 2008-02-25  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: [Dan Wallis patch] removed nmap dependency
+	* check_ssl_cert: [Dan Wallis patch] mktemp for the temporaries
+	* check_ssl_cert: [Dan Wallis patch] using trap to cleanup temporaries
 
 2007-09-04  Matteo Corti  <matteo.corti@id.ethz.ch>
 

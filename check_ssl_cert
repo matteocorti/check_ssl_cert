@@ -44,20 +44,12 @@ usage() {
 
 }
 
-cleanup() {
-
-    if [ -f $CERT  ] ; then rm $CERT;  fi
-    if [ -f $ERROR ] ; then rm $ERROR; fi
-
-}
-
 ################################################################################
 # Exits with a critical message
 # Params
 #   $1 error message
 critical() {
     echo "SSL CERT CRITICAL - $1"
-    cleanup;
     exit 2
 }
 
@@ -67,7 +59,6 @@ critical() {
 #   $1 warning message
 warning() {
     echo "SSL CERT WARN - $1"
-    cleanup;
     exit 1
 }
 
@@ -157,13 +148,13 @@ OPENSSL=$PROG
 ################################################################################
 # fetch the X.509 certificate
 
-CERT="/tmp/check_certs-out.$$"
-ERROR="/tmp/check_certs-errors.$$"
+CERT=$( mktemp -t "$( basename $0 )XXXXXX" )
+ERROR=$( mktemp -t "$( basename $0 )XXXXXX" )
+trap "rm -f $CERT $ERROR" 0
 
 echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}
 
 if grep -q "Connection refused" ${ERROR} ; then
-    rm -f ${CERT} ${ERROR}
     critical "connection refused ($HOST:$PORT)"
     return
 fi
@@ -234,11 +225,7 @@ if [ -n "$ADDR" ] ; then
 fi
 
 ################################################################################
-# clean up
-rm -f ${CERT} ${ERROR}
-
+# If we get this far, assume all well. :)
 echo "SSL CERT OK - X.509 certificate from $CA valid until $DATE"
-
-cleanup;
 
 exit 0
