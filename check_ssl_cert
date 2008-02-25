@@ -1,13 +1,28 @@
 #!/bin/bash
 #
-# (c) Matteo Corti, ETH Zurich, 2007
-#
 # check_ssl_cert
 #
 # Checks an X.509 certificate:
 # - checks if the server is running and delivers a valid certificate
 # - checks if the CA matches a given pattern
 # - checks the validity
+#
+# See  the INSTALL file for installation instructions
+#
+# Copyright (c) 2007, 2008 ETH Zurich.
+#
+# This module is free software; you can redistribute it and/or modify it
+# under the terms of GNU general public license (gpl) version 3.
+# See the LICENSE file for details.
+#
+# RCS information
+# enable substitution with:
+#   $ svn propset svn:keywords "Id Revision HeadURL Source Date"
+#
+#   $Id$
+#   $Revision$
+#   $HeadURL$
+#   $Date$
 
 VERSION=1.1.0
 
