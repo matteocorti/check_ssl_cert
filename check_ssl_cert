@@ -142,7 +142,7 @@ trap "rm -f $CERT $ERROR" 0
 echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}
 
 if [ $? -ne 0 ] ; then
-    critical "Error: $(cat $ERROR)"
+    critical "Error: $(cat $ERROR | head -n 1)"
 fi
 
 if ! grep -q "CERTIFICATE" ${CERT} ; then

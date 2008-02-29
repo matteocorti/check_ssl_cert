@@ -1,3 +1,8 @@
+2008-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: shortened the error message in case of no connection
+	                  (only the first line is reported)
+
 2008-02-25  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: [Dan Wallis patch] removed nmap dependency
