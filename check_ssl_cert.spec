@@ -1,4 +1,4 @@
-%define version 1.2.1
+%define version 1.2.2
 %define release 0
 %define name    check_ssl_cert
 %define _prefix /usr/lib/nagios/plugins/contrib
@@ -40,6 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{_prefix}/check_ssl_cert
 
 %changelog
+* Tue May 13 2008 Matteo Corti <matteo.corti@id.ethz.ch> - 1.2.2-0
+- Dan Wallis patch to include the CN in the messages
+
 * Mon Feb 25 2008 Matteo Corti <matteo.corti@id.ethz.ch> - 1.2.1-0
 - Dan Wallis patches (error checking, see ChangeLog)
 

@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.2.1
+VERSION=1.2.2
 
 ################################################################################
 # Functions
@@ -65,7 +65,7 @@ usage() {
 # Params
 #   $1 error message
 critical() {
-    echo "SSL CERT CRITICAL - $1"
+    echo "SSL CERT CRITICAL $CN: $1"
     exit 2
 }
 
@@ -74,7 +74,7 @@ critical() {
 # Param
 #   $1 warning message
 warning() {
-    echo "SSL CERT WARN - $1"
+    echo "SSL CERT WARN $CN: $1"
     exit 1
 }
 
@@ -154,6 +154,7 @@ fi
 
 CA=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
 DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
+CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
 
 ################################################################################
 # check the issuer
@@ -211,6 +212,6 @@ fi
 
 ################################################################################
 # If we get this far, assume all is well. :)
-echo "SSL CERT OK - X.509 certificate from $CA valid until $DATE"
+echo "SSL CERT OK - X.509 certificate for $CN from $CA valid until $DATE"
 
 exit 0

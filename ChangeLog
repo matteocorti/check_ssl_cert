@@ -1,3 +1,8 @@
+2008-05-13  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: applied a patch fom Dan Wallis to output the CN
+                          in all the messages
+
 2008-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: shortened the error message in case of no connection
