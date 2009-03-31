@@ -49,9 +49,10 @@ usage() {
     echo "   -H host    server"
     echo "   -i issuer  pattern to match the issuer of the certificate"
     echo "   -o org     pattern to match the organization of the certificate"
-    echo "   -p port    TCP port"
-    echo "   -v         verbose output"
     echo "   -P         switch to TLS and use specific protocol {smtp|pop3|imap|ftp}"
+    echo "   -p port    TCP port"
+    echo "   -t seconds timeout after the specified time (defaults to 15 seconds"
+    echo "   -v         verbose output"
     echo "   -V         version"
     echo
     echo "Report bugs to: Matteo Corti <matteo.corti@id.ethz.ch>"
