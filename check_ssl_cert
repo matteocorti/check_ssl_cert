@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.2.2
+VERSION=1.3.0
 
 ################################################################################
 # Functions
@@ -51,6 +51,7 @@ usage() {
     echo "   -o org     pattern to match the organization of the certificate"
     echo "   -p port    TCP port"
     echo "   -v         verbose output"
+    echo "   -P         switch to TLS and use specific protocol {smtp|pop3|imap|ftp}"
     echo "   -V         version"
     echo
     echo "Report bugs to: Matteo Corti <matteo.corti@id.ethz.ch>"
@@ -79,6 +80,39 @@ warning() {
 }
 
 ################################################################################
+# Exits with an 'unkown' status
+# Param
+#   $1 message
+unknown() {
+    echo "SSL CERT UNKNOWN $CN: $1"
+    exit 3
+}
+
+
+
+################################################################################
+# Executes command with a timeout
+# Params:
+#   $1 timeout in seconds
+#   $2 command
+# Returns 1 if timed out 0 otherwise
+timeout() {
+
+    time=$1
+
+    # start the command in a subshell to avoid problem with pipes
+    # (spawn accepts one command)
+    command="sh -c \"$2\""
+
+    expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"
+
+    if [ $? = 1 ] ; then
+        critical "Timeout after $TIMEOUT seconds"
+    fi
+            
+}
+
+################################################################################
 # Checks if a given program is available and executable
 # Params
 #   $1 program name
@@ -100,9 +134,12 @@ check_prog() {
 # Main
 ################################################################################
 
-# process command line options
+# default values
 PORT=443
-while getopts "vh?H:Vp:d:i:o:e:" opt; do
+TIMEOUT=15
+
+# process command line options
+while getopts "vh?H:Vp:d:i:o:e:P:t:" opt; do
     case $opt in
         d )      DAYS=$OPTARG;        ;;
         e )      ADDR=$OPTARG;        ;;
@@ -110,9 +147,11 @@ while getopts "vh?H:Vp:d:i:o:e:" opt; do
         i )      ISSUER=$OPTARG;      ;;
         o )      ORGANIZATION=$OPTARG ;;
         v )      VERBOSE=1;           ;;
+        P )      PROTOCOL=$OPTARG     ;;
         V )      echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
         H )      HOST=$OPTARG;        ;;
         p )      PORT=$OPTARG;        ;;
+        t )      TIMEOUT=$OPTARG;     ;;
     esac
 done
 shift $(($OPTIND - 1))
@@ -139,7 +178,26 @@ CERT=$( mktemp -t "$( basename $0 )XXXXXX" )
 ERROR=$( mktemp -t "$( basename $0 )XXXXXX" )
 trap "rm -f $CERT $ERROR" 0
 
-echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}
+if [ -n "${PROTOCOL}" ] ; then
+
+    case "${PROTOCOL}" in
+
+        smtp|pop3|imap|ftp)
+    
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}"
+        ;;
+    
+        *)
+
+        unknown "Error: unsupported protocol ${PROTOCOL}"
+
+    esac
+
+else
+
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}"
+    
+fi
 
 if [ $? -ne 0 ] ; then
     critical "Error: $(cat $ERROR | head -n 1)"

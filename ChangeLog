@@ -1,3 +1,11 @@
+2009-03-31  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: standard timeout of 15 seconds (can be set with the -t option)
+
+2009-03-30  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: -P option to specify the protocol
+
 2008-05-13  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: applied a patch fom Dan Wallis to output the CN

@@ -2,5 +2,9 @@ Matteo Corti <matteo.corti@id.ethz.ch>
 
 Thanks:
 
+* Many thanks to Kenny McCormack for his help on comp.unix.shell on
+  how to implement a timeout
 * Many thanks to Dan Wallis for several patches and fixes
   (see the Changelog)
+* Many thanks to Tuomas Haarala for the -P option patch to
+  check TLS certs using other protocols
