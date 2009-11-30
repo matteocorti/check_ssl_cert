@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.4.0
+VERSION=1.4.1
 
 ################################################################################
 # Functions
@@ -51,6 +51,7 @@ usage() {
     echo "   -o org     pattern to match the organization of the certificate"
     echo "   -P         switch to TLS and use specific protocol {smtp|pop3|imap|ftp}"
     echo "   -p port    TCP port"
+    echo "   -r rootcrt root cert to be used for certficate validation"
     echo "   -t seconds timeout after the specified time (defaults to 15 seconds"
     echo "   -v         verbose output"
     echo "   -V         version"
@@ -147,19 +148,20 @@ PORT=443
 TIMEOUT=15
 
 # process command line options
-while getopts "vh?H:Vp:d:i:o:e:P:t:" opt; do
+while getopts "vh?H:Vp:d:i:o:e:P:r:t:" opt; do
     case $opt in
         d )      DAYS=$OPTARG;        ;;
         e )      ADDR=$OPTARG;        ;;
+        H )      HOST=$OPTARG;        ;;
         h | \? ) usage ; exit 3;      ;;
         i )      ISSUER=$OPTARG;      ;;
         o )      ORGANIZATION=$OPTARG ;;
-        v )      VERBOSE=1;           ;;
-        P )      PROTOCOL=$OPTARG     ;;
-        V )      echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
-        H )      HOST=$OPTARG;        ;;
         p )      PORT=$OPTARG;        ;;
+        P )      PROTOCOL=$OPTARG     ;;
+        r )      ROOT_CA=$OPTARG      ;;
         t )      TIMEOUT=$OPTARG;     ;;
+        V )      echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
+        v )      VERBOSE=1;           ;;
     esac
 done
 shift $(($OPTIND - 1))
@@ -171,6 +173,13 @@ shift $(($OPTIND - 1))
 # Check options
 if [ -z "${HOST}" ] ; then
     usage "No host specified"
+fi
+
+if [ -n "${ROOT_CA}" ] ; then
+    if [ ! -r ${ROOT_CA} ] ; then
+        critical "Cannot read root certificate ${ROOT_CA}"
+    fi
+    ROOT_CA="-CAfile ${ROOT_CA}"
 fi
 
 #######################
@@ -210,7 +219,7 @@ if [ -n "${PROTOCOL}" ] ; then
 
 else
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT -verify 6 2> ${ERROR} 1> ${CERT}"
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
     
 fi
 

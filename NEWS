@@ -1,3 +1,4 @@
+2009-11-30 Version 1.4.1 -r to specify the root cert to be used for verification
 2009-11-30 Version 1.4.0 certificate chain verification
 2009-03-30 Version 1.3.0 -P option to check TLS certificates (SMTP, FTP, POP3, ...)
 2008-05-13 Version 1.2.2 include the CN in the messages (D. Wallis)
