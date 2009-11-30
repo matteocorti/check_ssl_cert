@@ -1,4 +1,4 @@
-%define version 1.3.0
+%define version 1.4.0
 %define release 0
 %define name    check_ssl_cert
 %define _prefix /usr/lib/nagios/plugins/contrib
@@ -40,6 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{_prefix}/check_ssl_cert
 
 %changelog
+* Mon Nov 30 2009 Matteo Corti <matteo.corti@id.ethz.ch> - 1.4.0-0
+- Updated to 1.4.0: verify the certificate chain
+
 * Mon Mar 30 2009 Matteo Corti <matteo.corti@id.ethz.ch> - 1.3.0-0
 - Tuomas Haarala patch: -P option
 

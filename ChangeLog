@@ -1,3 +1,9 @@
+2009-11-30  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: cleaned up error messages if the CN is not yet known
+	* check_ssl_cert: added certificate chain verification
+	* check_ssl_cert: allow backslashes escaped in the error messages (e.g., for \n used by Nagios 3)
+
 2009-03-31  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: standard timeout of 15 seconds (can be set with the -t option)
