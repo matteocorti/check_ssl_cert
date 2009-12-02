@@ -1,3 +1,7 @@
+2009-12-02  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: check if the issuer matches the O= or the CN= field of the Root Cert
+
 2009-11-30  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: cleaned up error messages if the CN is not yet known	

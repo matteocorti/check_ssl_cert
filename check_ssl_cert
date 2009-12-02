@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.4.1
+VERSION=1.4.2
 
 ################################################################################
 # Functions
@@ -245,17 +245,31 @@ fi
 ################################################################################
 # parse the X.509 certificate
 
-CA=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
 DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
 CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+
+CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
+CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
 
 ################################################################################
 # check the issuer
 
 if [ -n "$ISSUER" ] ; then
-    if ! echo $CA | grep -q "^$ISSUER$" ; then
-        critical "invalid CA ($ISSUER does not match $CA)"
+
+    ok=''
+
+    if echo $CA_CN | grep -q "^$ISSUER$" ; then
+        ok='true'
     fi
+
+    if echo $CA_O | grep -q "^$ISSUER$" ; then
+        ok='true'
+    fi
+
+    if [ -z "$ok" ] ; then
+        critical "invalid CA ($ISSUER does not match '$CA_O' or '$CA_CN')"
+    fi
+    
 fi
 
 ################################################################################
@@ -305,6 +319,6 @@ fi
 
 ################################################################################
 # If we get this far, assume all is well. :)
-echo "SSL CERT OK - X.509 certificate for '$CN' from '$CA' valid until $DATE"
+echo "SSL CERT OK - X.509 certificate for '$CN' from '$CA_CN' valid until $DATE"
 
 exit 0
