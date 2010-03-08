@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.4.2
+VERSION=1.4.3
 
 ################################################################################
 # Functions
@@ -48,6 +48,8 @@ usage() {
     echo "   -h, -?     this help message"
     echo "   -H host    server"
     echo "   -i issuer  pattern to match the issuer of the certificate"
+    echo "   -n name    pattern to match the CN of the certificate"
+    echo "   -N         match CN with the host name (will not work for wildcards)"
     echo "   -o org     pattern to match the organization of the certificate"
     echo "   -P         switch to TLS and use specific protocol {smtp|pop3|imap|ftp}"
     echo "   -p port    TCP port"
@@ -148,23 +150,31 @@ PORT=443
 TIMEOUT=15
 
 # process command line options
-while getopts "vh?H:Vp:d:i:o:e:P:r:t:" opt; do
+while getopts "vh?H:Vp:d:i:o:e:P:r:t:n:N" opt; do
     case $opt in
-        d )      DAYS=$OPTARG;        ;;
-        e )      ADDR=$OPTARG;        ;;
-        H )      HOST=$OPTARG;        ;;
-        h | \? ) usage ; exit 3;      ;;
-        i )      ISSUER=$OPTARG;      ;;
-        o )      ORGANIZATION=$OPTARG ;;
-        p )      PORT=$OPTARG;        ;;
-        P )      PROTOCOL=$OPTARG     ;;
-        r )      ROOT_CA=$OPTARG      ;;
-        t )      TIMEOUT=$OPTARG;     ;;
+        d )      DAYS=$OPTARG;           ;;
+        e )      ADDR=$OPTARG;           ;;
+        H )      HOST=$OPTARG;           ;;
+        h | \? ) usage ; exit 3;         ;;
+        i )      ISSUER=$OPTARG;         ;;
+        n )      COMMON_NAME=$OPTARG;    ;;
+        N )      COMMON_NAME="__HOST__"; ;;
+        o )      ORGANIZATION=$OPTARG    ;;
+        p )      PORT=$OPTARG;           ;;
+        P )      PROTOCOL=$OPTARG        ;;
+        r )      ROOT_CA=$OPTARG         ;;
+        t )      TIMEOUT=$OPTARG;        ;;
         V )      echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
-        v )      VERBOSE=1;           ;;
+        v )      VERBOSE=1;              ;;
     esac
 done
 shift $(($OPTIND - 1))
+
+################################################################################
+# Set COMMON_NAME to hostname if -N was given as argument
+if [ "$COMMON_NAME" == "__HOST__" ]; then
+    COMMON_NAME=$(hostname)
+fi
 
 ################################################################################
 # sanity checks
@@ -250,6 +260,23 @@ CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[
 
 CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
 CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+
+################################################################################
+# check the CN (this will not work as expected with wildcard certificates)
+
+if [ -n "$COMMON_NAME" ] ; then
+
+    ok=''
+
+    if echo $CN | grep -q "^$COMMON_NAME$" ; then
+        ok='true'
+    fi
+
+    if [ -z "$ok" ] ; then
+        critical "invalid CN ($CN does not match '$COMMON_NAME')"
+    fi
+    
+fi
 
 ################################################################################
 # check the issuer

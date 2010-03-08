@@ -1,3 +1,7 @@
+2010-03-08  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: applied patch from Marcus Rejås with the -n and -N options
+
 2009-12-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: check if the issuer matches the O= or the CN= field of the Root Cert
