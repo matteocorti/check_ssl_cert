@@ -273,7 +273,7 @@ if [ -n "$COMMON_NAME" ] ; then
     fi
 
     if [ -z "$ok" ] ; then
-        critical "invalid CN ($CN does not match '$COMMON_NAME')"
+        critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
     fi
     
 fi
@@ -294,7 +294,7 @@ if [ -n "$ISSUER" ] ; then
     fi
 
     if [ -z "$ok" ] ; then
-        critical "invalid CA ($ISSUER does not match '$CA_O' or '$CA_CN')"
+        critical "invalid CA ('$ISSUER' does not match '$CA_O' or '$CA_CN')"
     fi
     
 fi
@@ -326,7 +326,7 @@ if [ -n "$ORGANIZATION" ] ; then
     ORG=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
 
     if ! echo $ORG | grep -q "^$ORGANIZATION" ; then
-        critical "invalid organization ($ORGANIZATION does not match $ORG)"
+        critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
     fi
 
 fi
