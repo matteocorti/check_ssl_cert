@@ -1,4 +1,4 @@
- (c) Matteo Corti, ETH Zurich, 2007
+ (c) Matteo Corti, ETH Zurich, 2007-2010
 
 check_ssl_cert
 
@@ -6,6 +6,21 @@ A Nagios plugin to check an X.509 certificate:
  - checks if the server is running and delivers a valid certificate
  - checks if the CA matches a given pattern
  - checks the validity
+
+
+Notes:
+
+the root certificate corresponding to the checked certificate must be available to openssl or specified with the '-r cabundle' option.
+
+On Mac OS X the root certificates bundle is storen in the Keychain and openssl will complain with:
+
+   verification error: unable to get local issuer certificate
+
+The bundle can be extracted with:
+
+$ sudo security find-certificate -a \
+  -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
+
 
 
 # File version information:
