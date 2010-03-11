@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.4.3
+%define version 1.4.4
 %define release 0
 %define name    check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 
 %changelog
+* Thu Mar 11 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.4.4-0
+- updated to 1.4.4 (bug fix release)
+
 * Tue Mar  9 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.4.3-0
 - updated to 1.4.3 (-n and -N options)
 
