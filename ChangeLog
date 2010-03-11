@@ -1,3 +1,7 @@
+2010-03-11  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: fixed the == bashism
+
 2010-03-08  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: applied patch from Marcus Rejås with the -n and -N options

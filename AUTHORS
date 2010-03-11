@@ -9,6 +9,7 @@ Thanks:
 * Many thanks to Tuomas Haarala for the -P option patch to
   check TLS certs using other protocols
 * Many thanks to Marcus Rejås for the -N and -n patches
+* Many thanks to Marc Fournier for the == bashism fix
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

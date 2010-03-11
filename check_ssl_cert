@@ -24,7 +24,7 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.4.3
+VERSION=1.4.4
 
 ################################################################################
 # Functions
@@ -172,7 +172,7 @@ shift $(($OPTIND - 1))
 
 ################################################################################
 # Set COMMON_NAME to hostname if -N was given as argument
-if [ "$COMMON_NAME" == "__HOST__" ]; then
+if [ "$COMMON_NAME" = "__HOST__" ]; then
     COMMON_NAME=$(hostname)
 fi
 
