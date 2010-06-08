@@ -24,7 +24,11 @@
 #   $HeadURL$
 #   $Date$
 
-VERSION=1.4.4
+################################################################################
+# Constants
+
+VERSION=1.5.0
+SHORTNAME="SSL_CERT"
 
 ################################################################################
 # Functions
@@ -53,6 +57,7 @@ usage() {
     echo "   -o org     pattern to match the organization of the certificate"
     echo "   -P         switch to TLS and use specific protocol {smtp|pop3|imap|ftp}"
     echo "   -p port    TCP port"
+    echo "   -s         allows self-signed certificates"
     echo "   -r rootcrt root cert to be used for certficate validation"
     echo "   -t seconds timeout after the specified time (defaults to 15 seconds"
     echo "   -v         verbose output"
@@ -73,7 +78,7 @@ critical() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "SSL CERT CRITICAL$tmp: $1\n"
+    printf "${SHORTNAME} CRITICAL$tmp: $1\n"
     exit 2
 }
 
@@ -82,7 +87,7 @@ critical() {
 # Param
 #   $1 warning message
 warning() {
-    printf "SSL CERT WARN$tmp: $1\n"
+    printf "${SHORTNAME} WARN$tmp: $1\n"
     exit 1
 }
 
@@ -91,7 +96,7 @@ warning() {
 # Param
 #   $1 message
 unknown() {
-    printf "SSL CERT UNKNOWN$tmp: $1\n"
+    printf "${SHORTNAME} UNKNOWN$tmp: $1\n"
     exit 3
 }
 
@@ -129,7 +134,7 @@ timeout() {
 # Returns 1 if the program exists and is executable
 check_required_prog() {
 
-    PROG=$(which $1)
+    PROG=$(which $1 2> /dev/null)
 
     if [ -z "$PROG" ] ; then
         critical "cannot find $1"
@@ -150,7 +155,7 @@ PORT=443
 TIMEOUT=15
 
 # process command line options
-while getopts "vh?H:Vp:d:i:o:e:P:r:t:n:N" opt; do
+while getopts "vh?H:Vp:d:i:o:e:P:r:t:n:Ns" opt; do
     case $opt in
         d )      DAYS=$OPTARG;           ;;
         e )      ADDR=$OPTARG;           ;;
@@ -164,6 +169,7 @@ while getopts "vh?H:Vp:d:i:o:e:P:r:t:n:N" opt; do
         P )      PROTOCOL=$OPTARG        ;;
         r )      ROOT_CA=$OPTARG         ;;
         t )      TIMEOUT=$OPTARG;        ;;
+        s )      SELFSIGNED=1            ;;
         V )      echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
         v )      VERBOSE=1;              ;;
     esac
@@ -198,7 +204,7 @@ fi
 check_required_prog openssl
 OPENSSL=$PROG
 
-EXPECT=$(which expect)
+EXPECT=$(which expect 2> /dev/null)
 if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
     echo "Expect not found: disabling timeouts"
 fi
@@ -243,12 +249,25 @@ fi
 
 ################################################################################
 # Check if the certificate was verified
+
 if grep -q '^verify\ error:' ${ERROR} ; then
 
-    # process errors
-    details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+    if grep -q '^verify\ error:num=18:self\ signed\ certificate' ${ERROR} ; then
 
-    critical "Cannot verify certificate\n${details}"
+        if [ -z "${SELFSIGNED}" ] ; then
+            critical "Cannot verify certificate\nself signed certificate"
+        else
+            SELFSIGNEDCERT="self signed "
+        fi
+
+    else 
+
+        # process errors
+        details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+
+        critical "Cannot verify certificate\n${details}"
+
+    fi
     
 fi
 
@@ -346,6 +365,6 @@ fi
 
 ################################################################################
 # If we get this far, assume all is well. :)
-echo "SSL CERT OK - X.509 certificate for '$CN' from '$CA_CN' valid until $DATE"
+echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '$CN' from '$CA_CN' valid until $DATE"
 
 exit 0
