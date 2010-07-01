@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.5.0
+VERSION=1.5.1
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -87,6 +87,9 @@ critical() {
 # Param
 #   $1 warning message
 warning() {
+    if [ -n "${CN}" ] ; then
+        tmp=" ${CN}"
+    fi
     printf "${SHORTNAME} WARN$tmp: $1\n"
     exit 1
 }
@@ -96,6 +99,9 @@ warning() {
 # Param
 #   $1 message
 unknown() {
+    if [ -n "${CN}" ] ; then
+        tmp=" ${CN}"
+    fi
     printf "${SHORTNAME} UNKNOWN$tmp: $1\n"
     exit 3
 }
@@ -303,19 +309,26 @@ fi
 if [ -n "$ISSUER" ] ; then
 
     ok=''
+    CA_ISSUER_MATCHED=''
 
     if echo $CA_CN | grep -q "^$ISSUER$" ; then
         ok='true'
+        CA_ISSUER_MATCHED="${CA_CN}"
     fi
 
     if echo $CA_O | grep -q "^$ISSUER$" ; then
         ok='true'
+        CA_ISSUER_MATCHED="${CA_O}"
     fi
 
     if [ -z "$ok" ] ; then
         critical "invalid CA ('$ISSUER' does not match '$CA_O' or '$CA_CN')"
     fi
     
+else
+
+    CA_ISSUER_MATCHED="${CA_CN}"
+
 fi
 
 ################################################################################
@@ -365,6 +378,6 @@ fi
 
 ################################################################################
 # If we get this far, assume all is well. :)
-echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '$CN' from '$CA_CN' valid until $DATE"
+echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '$CN' from '$CA_ISSUER_MATCHED' valid until $DATE"
 
 exit 0
