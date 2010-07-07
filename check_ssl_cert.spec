@@ -46,7 +46,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, 0644)
-%doc AUTHORS ChangeLog NEWS README INSTALL TODO COPYING VERSION
+%doc AUTHORS ChangeLog NEWS README INSTALL TODO COPYING VERSION COPYRIGHT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 
 %changelog
