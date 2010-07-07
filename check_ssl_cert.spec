@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.5.1
+%define version 1.5.2
 %define release 0
 %define name    check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -50,8 +50,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 
 %changelog
+* Wed Jul  7 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.5.2-0
+- updated to version 1.5.2 (Wolfgang Schricker patch, see ChangeLog)
+
 * Thu Jul  1 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.5.1-0
-- updated to version 1.5.0 (Yannick Gravel patch, see ChangeLog)
+- updated to version 1.5.1 (Yannick Gravel patch, see ChangeLog)
 
 * Tue Jun  8 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.5.0-0
 - updated to version 1.5.0 (-s option to allow self signed certificates)

@@ -1,9 +1,15 @@
+2010-07-07  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: [Wolfgang Schricker patch] Add -f to check local files
+
 2010-07-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: [Yannick Gravel patch] Restore diplaying the CN in every messages: a previous patch changed
-                                                 something and only critical were adjusted.
-	* check_ssl_cert: [Yannick Gravel patch] Adjust what is displayed after the from in the OK message to display
-                                                 the matched ISSUER (CN or O).
+	* check_ssl_cert: [Yannick Gravel patch] Restore diplaying the CN in every messages:
+	                                         a previous patch changed something and only
+	                                         critical were adjusted.
+	* check_ssl_cert: [Yannick Gravel patch] Adjust what is displayed after the from in
+	                                         the OK message to display the matched ISSUER
+	                                         (CN or O).
 
 2010-06-08  Matteo Corti  <matteo.corti@id.ethz.ch>
 

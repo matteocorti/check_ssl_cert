@@ -9,7 +9,7 @@
 #
 # See  the INSTALL file for installation instructions
 #
-# Copyright (c) 2007, 2008 ETH Zurich.
+# Copyright (c) 2007-2010 ETH Zurich.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.5.1
+VERSION=1.5.2
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -49,6 +49,7 @@ usage() {
     echo "Options:"
     echo "   -d days    minimum number of days a certificate has to be valid"
     echo "   -e address pattern to match the email address contained in the certificate"
+    echo "   -f file    local file path (works with -H localhost only)"
     echo "   -h, -?     this help message"
     echo "   -H host    server"
     echo "   -i issuer  pattern to match the issuer of the certificate"
@@ -161,10 +162,11 @@ PORT=443
 TIMEOUT=15
 
 # process command line options
-while getopts "vh?H:Vp:d:i:o:e:P:r:t:n:Ns" opt; do
+while getopts "vh?H:Vp:d:i:o:e:f:P:r:t:n:Ns" opt; do
     case $opt in
         d )      DAYS=$OPTARG;           ;;
         e )      ADDR=$OPTARG;           ;;
+        f )      FILE="$OPTARG"          ;;
         H )      HOST=$OPTARG;           ;;
         h | \? ) usage ; exit 3;         ;;
         i )      ISSUER=$OPTARG;         ;;
@@ -238,6 +240,18 @@ if [ -n "${PROTOCOL}" ] ; then
         unknown "Error: unsupported protocol ${PROTOCOL}"
 
     esac
+
+elif [ -n "${FILE}" ] ; then
+
+    if [ "${HOST}" = "localhost" ] ; then
+
+        timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+
+    else
+
+        unknown "Error: option 'file' works with -H localhost only"
+
+    fi
 
 else
 

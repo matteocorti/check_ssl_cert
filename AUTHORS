@@ -10,7 +10,9 @@ Thanks:
   check TLS certs using other protocols
 * Many thanks to Marcus Rejås for the -N and -n patches
 * Many thanks to Marc Fournier for the == bashism fix
-* Many thanks to Wolfgang Schricker for the selfsigned bug report and cleanup fixes
+* Many thanks to Wolfgang Schricker for
+  - the selfsigned bug report and cleanup fixes
+  - the patch adding the possibility to check local files (-f option)
 * Many thanks to Yannick Gravel for the patch fixing the plugin output
 
 # File version information:
