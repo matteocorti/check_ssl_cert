@@ -13,8 +13,8 @@ dist: version_check
 install:
 	mkdir -p $(DESTDIR)
 	install -m 755 $(PLUGIN) $(DESTDIR)
-	mkdir -p ${MANDIR}
-	install -n 644 ${PLUGIN}.1 ${MANDIR}/man1/
+	mkdir -p ${MANDIR}/man1
+	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
 
 version_check:
 	VERSION=`cat VERSION`

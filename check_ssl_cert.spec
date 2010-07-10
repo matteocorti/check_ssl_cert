@@ -39,7 +39,7 @@ Checks an X.509 certificate:
 %build
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT%{nagiospluginsdir} MANDIR=%{_mandir} install
+make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
