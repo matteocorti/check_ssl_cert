@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.5.2
+%define version 1.6.0
 %define release 0
 %define name    check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -39,17 +39,21 @@ Checks an X.509 certificate:
 %build
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT%{nagiospluginsdir} install
+make DESTDIR=$RPM_BUILD_ROOT%{nagiospluginsdir} MANDIR=%{_mandir} install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-, root, root, 0644)
+%defattr(-,root,root,-)
 %doc AUTHORS ChangeLog NEWS README INSTALL TODO COPYING VERSION COPYRIGHT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
+%{_mandir}/man1/%{name}.1*
 
 %changelog
+* Fri Jul  9 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.6.0-0
+- updated to version 1.6.0 (long options, --critical and --warning, man page)
+
 * Wed Jul  7 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.5.2-0
 - updated to version 1.5.2 (Wolfgang Schricker patch, see ChangeLog)
 

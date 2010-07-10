@@ -1,0 +1,83 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH "check_ssl_cert" 1 "July, 2010" "1.6.0" "USER COMMANDS"
+.SH NAME
+check_ssl_cert \- checks the validity of X.509 certificates
+.SH SYNOPSIS
+.BR "check_ssl_cert " "-H host [OPTIONS]"
+.SH DESCRIPTION
+.B check_ssl_cert
+A Nagios plugin to check an X.509 certificate:
+ - checks if the server is running and delivers a valid certificate
+ - checks if the CA matches a given pattern
+ - checks the validity
+.SH ARGUMENTS
+.TP
+.BR "-H,--host" " host"
+server
+.SH OPTIONS
+.TP
+.BR "-c,--critical" " days"
+minimum number of days a certificate has to be valid to issue a critical status
+.TP
+.BR "-e,--email" " address"
+pattern to match the email address contained in the certificate
+.TP
+.BR "-f,--file" " file"
+local file path (works with -H localhost only)
+.TP
+.BR "-h,--help,-?"
+this help message
+.TP
+.BR "-i,--issuer" " issuer"
+pattern to match the issuer of the certificate
+.TP
+.BR "-n,---cn" " name"
+pattern to match the CN of the certificate
+.TP
+.BR "-N,--host-cn"
+match CN with the host name (will not work for wildcards)
+.TP
+.BR "-o,--org" " org"
+pattern to match the organization of the certificate
+.TP
+.BR "-p,--port" " port"
+TCP port
+.TP
+.BR "-P,--protocol" " protocol"
+switch to TLS and use specific protocol {smtp|pop3|imap|ftp}
+.TP
+.BR "-s,--selfsigned"
+allows self-signed certificates
+.TP
+.BR "-r,--rootcert" " cert"
+root cert to be used for certficate validation
+.TP
+.BR "-t,--timeout"
+seconds timeout after the specified time (defaults to 15 seconds)
+.TP
+.BR "-v,--verbose"
+verbose output
+.TP
+.BR "-V,--version"
+version
+.TP
+.BR "-w,--warning" " days"
+minimum number of days a certificate has to be valid to issue a warning status
+.SH DEPRECATED OPTIONS
+.TP
+.BR "-d,--days" " days"
+minimum number of days a certificate has to be valid (see --critical and --warning)
+
+.SH "SEE ALSO"
+x509(1), openssl(1)
+.SH "EXIT STATUS"
+check_ssl_cert returns a zero exist status if it finds no errors, 1 for warnings, 2 for a critical errors and 3 for unknown problems
+.SH BUGS
+Please report bugs to: Matteo Corti (matteo.corti (at) id.ethz.ch)
+
+.SH AUTHOR
+Matteo Corti (matteo.corti (at) id.ethz.ch)
+See the AUTHORS file for the complete list of contributors
+

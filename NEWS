@@ -1,3 +1,5 @@
+2010-07-09 Version 1.6.0 Added long command line options and substituted --days with --critical and --warning
+2010-07-07 Version 1.5.2 Added the -f option to check a local file
 2010-07-01 Version 1.5.1 Fixed the plugin output
 2010-03-11 Version 1.4.4 Fixed bug #64 (== bashism)
 2010-03-09 Version 1.4.3 -N and -n options to compare the CN to an hostname

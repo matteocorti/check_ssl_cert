@@ -1,3 +1,10 @@
+2010-07-09  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added a "long" version for all the command line options
+	* check_ssl_cert: added a critical and warning option for the certificate validity (in days)
+	* check_ssl_cert: the plugin always issues a critical warning if the certificate is expired
+	* check_ssl_cert: added a man page
+
 2010-07-07  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: [Wolfgang Schricker patch] Add -f to check local files
