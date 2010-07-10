@@ -1,3 +1,8 @@
+2010-07-10  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: improved the error messages
+	* check_ssl_cert: checks for certificates without email addresses (if -e is specified)
+
 2010-07-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added a "long" version for all the command line options

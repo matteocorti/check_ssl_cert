@@ -205,88 +205,88 @@ while true; do
         -c|--critical) if [ $# -gt 1 ]; then
               CRITICAL=$2; shift 2             
             else 
-              critical "-c,--critical requires an argument"
+              unknown "-c,--critical requires an argument"
               fi ;;
 
         # deprecated option: used to be as --warning
         -d|--days) if [ $# -gt 1 ]; then
               WARNING=$2; shift 2             
             else 
-              critical "-d,--days requires an argument"
+              unknown "-d,--days requires an argument"
             fi ;;
 
         -e|--email) if [ $# -gt 1 ]; then
               ADDR=$2; shift 2             
             else 
-              critical "-e,--email requires an argument"
+              unknown "-e,--email requires an argument"
             fi ;;
 
         -f|--file) if [ $# -gt 1 ]; then
               FILE=$2; shift 2
             else 
-              critical "-f,--file requires an argument"
+              unknown "-f,--file requires an argument"
             fi ;;
             
         -H|--host) if [ $# -gt 1 ]; then
               HOST=$2; shift 2
             else 
-              critical "-H,--host requires an argument"
+              unknown "-H,--host requires an argument"
             fi ;;
 
         -i|--issuer) if [ $# -gt 1 ]; then
               ISSUER=$2; shift 2
             else 
-              critical "-i,--issuer requires an argument"
+              unknown "-i,--issuer requires an argument"
             fi ;;
 
         -n|--cn) if [ $# -gt 1 ]; then
               COMMON_NAME=$2; shift 2
             else 
-              critical "-n,--cn requires an argument"
+              unknown "-n,--cn requires an argument"
             fi ;;
 
 
         -o|--org) if [ $# -gt 1 ]; then
               ORGANIZATION=$2; shift 2
             else 
-              critical "-o,--org requires an argument"
+              unknown "-o,--org requires an argument"
             fi ;;
 
         -p|--port) if [ $# -gt 1 ]; then
               PORT=$2; shift 2
             else 
-              critical "-p,--port requires an argument"
+              unknown "-p,--port requires an argument"
             fi ;;
 
         -P|--protocol) if [ $# -gt 1 ]; then
               PROTOCOL=$2; shift 2
             else 
-              critical "-P,--protocol requires an argument"
+              unknown "-P,--protocol requires an argument"
             fi ;;
 
         -r|--rootcert) if [ $# -gt 1 ]; then
               ROOT_CA=$2; shift 2
             else 
-              critical "-r,--rootcert requires an argument"
+              unknown "-r,--rootcert requires an argument"
             fi ;;
 
         -t|--timeout) if [ $# -gt 1 ]; then
               TIMEOUT=$2; shift 2
             else 
-              critical "-t,--timeout requires an argument"
+              unknown "-t,--timeout requires an argument"
             fi ;;
 
         -w|--warning) if [ $# -gt 1 ]; then
               WARNING=$2; shift 2             
             else 
-              critical "-w,--warning requires an argument"
+              unknown "-w,--warning requires an argument"
             fi ;;
 
         ########################################
         # special
         
         --) shift; break;;
-        -*) critical "invalid option: $1" ;;
+        -*) unknown "invalid option: $1" ;;
         *)  break;;
         
     esac
@@ -310,25 +310,27 @@ fi
 
 if [ -n "${ROOT_CA}" ] ; then
     if [ ! -r ${ROOT_CA} ] ; then
-        critical "Cannot read root certificate ${ROOT_CA}"
+        unknown "Cannot read root certificate ${ROOT_CA}"
     fi
     ROOT_CA="-CAfile ${ROOT_CA}"
 fi
 
 if [ -n "${CRITICAL}" ] ; then
-    if ! echo "${CRITICAL}" | grep -q [1-9][0-9]* ; then
-        critical "invalid number of days ${CRITICAL}"
+    if ! echo "${CRITICAL}" | grep -q [0-9][0-9]* ; then
+        unknown "invalid number of days ${CRITICAL}"
     fi
 fi
 
 if [ -n "${WARNING}" ] ; then
-    if ! echo ${WARNING} | grep -q [1-9][0-9]* ; then
-        critical "invalid number of days ${WARNING}"
+    if ! echo ${WARNING} | grep -q [0-9][0-9]* ; then
+        unknown "invalid number of days ${WARNING}"
     fi
 fi
 
-if [ -n "${WARNING}" -a -n "${CRITICAL}" ] ; then # ${WARNING} -gt ${CRITICAL} ] ; then
-    critical "--critical (${CRITICAL}) is less than or equal to --warning (${WARNING})"
+if [ -n "${CRITICAL}" -a -n "${WARNING}" ] ; then
+    if [ ${WARNING} -le ${CRITICAL} ] ; then
+        unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
+    fi
 fi
 
 #######################
@@ -356,8 +358,8 @@ if [ -n "${PROTOCOL}" ] ; then
     case "${PROTOCOL}" in
 
         smtp|pop3|imap|ftp)
-    
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT 2> ${ERROR} 1> ${CERT}"
+
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT  -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
         ;;
     
         *)
@@ -389,7 +391,11 @@ if [ $? -ne 0 ] ; then
 fi
 
 if ! grep -q "CERTIFICATE" ${CERT} ; then
-    critical "No certificate returned"
+    if [ -n "${FILE}" ] ; then
+        critical "'${FILE}' is not a valid certificate file"
+    else
+        critical "No certificate returned"
+    fi
 fi
 
 ################################################################################
@@ -489,7 +495,7 @@ fi
 if [ -n "${WARNING}" ] ; then
 
     if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${WARNING} * 86400 )) ; then
-        critical "certificate will expire on $DATE"
+        warning "certificate will expire on $DATE"
     fi
 
 fi
@@ -513,6 +519,14 @@ fi
 if [ -n "$ADDR" ] ; then
 
     EMAIL=$($OPENSSL x509 -in ${CERT} -email -noout)
+
+    if [ -n "${VERBOSE}" ] ; then
+        echo "checking email (${ADDR}): ${EMAIL}"
+    fi
+
+    if [ -z "${EMAIL}" ] ; then
+        critical "the certficate does not contain an email address"
+    fi
 
     if ! echo $EMAIL | grep -q "^$ADDR" ; then
         critical "invalid email ($ADDR does not match $EMAIL)"
