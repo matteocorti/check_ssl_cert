@@ -71,6 +71,7 @@ usage() {
     echo "   -r,--rootcert cert     root cert to be used for certficate validation"
     echo "   -t,--timeout           seconds timeout after the specified time"
     echo "                          (defaults to 15 seconds)"
+    echo "      --temp dir          directory where to store the temporary files"
     echo "   -v,--verbose           verbose output"
     echo "   -V,--version           version"
     echo "   -w,--warning days      minimum number of days a certificate has to be valid"
