@@ -9,12 +9,14 @@ Thanks:
 * Many thanks to Tuomas Haarala for the -P option patch to
   check TLS certs using other protocols
 * Many thanks to Marcus Rejås for the -N and -n patches
-* Many thanks to Marc Fournier for the == bashism fix
+* Many thanks to Marc Fournier for
+  - the == bashism fix
+  - the mktemp error handling patch
 * Many thanks to Wolfgang Schricker for
   - the selfsigned bug report and cleanup fixes
   - the patch adding the possibility to check local files (-f option)
 * Many thanks to Yannick Gravel for the patch fixing the plugin output
-* Many thanks to the anonymous reporter for the --critical and --warning hints
+* Many thanks to Scott Worthington for the --critical and --warning hints
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

@@ -1,6 +1,8 @@
 
  (c) Matteo Corti, ETH Zurich, 2007-2010
 
+  see AUTHORS for the complete list of contributors
+
 check_ssl_cert
 
 A Nagios plugin to check an X.509 certificate:
@@ -8,12 +10,48 @@ A Nagios plugin to check an X.509 certificate:
  - checks if the CA matches a given pattern
  - checks the validity
 
+Usage:
+======
+
+check_ssl_cert -H host [OPTIONS]
+
+Arguments:
+   -H,--host host         server
+
+Options:
+   -c,--critical days     minimum number of days a certificate has to be valid
+                          to issue a critical status
+   -e,--email address     pattern to match the email address contained in the
+                          certificate
+   -f,--file file         local file path (works with -H localhost only)
+   -h,--help,-?           this help message
+   -i,--issuer issuer     pattern to match the issuer of the certificate
+   -n,---cn name          pattern to match the CN of the certificate
+   -N,--host-cn           match CN with the host name
+                          (will not work for wildcards)
+   -o,--org org           pattern to match the organization of the certificate
+   -p,--port port         TCP port
+   -P,--protocol protocol switch to TLS and use specific protocol
+                          {smtp|pop3|imap|ftp}
+   -s,--selfsigned        allows self-signed certificates
+   -r,--rootcert cert     root cert to be used for certficate validation
+   -t,--timeout           seconds timeout after the specified time
+                          (defaults to 15 seconds)
+   -v,--verbose           verbose output
+   -V,--version           version
+   -w,--warning days      minimum number of days a certificate has to be valid
+                          to issue a warning status
+
+Deprecated options:
+   -d,--days days         minimum number of days a certificate has to be valid
+                          (see --critical and --warning)
 
 Notes:
 ======
 
 the root certificate corresponding to the checked certificate must be
-available to openssl or specified with the '-r cabundle' option.
+available to openssl or specified with the '-r cabundle' or
+'--rootcert cabundle' option.
 
 On Mac OS X the root certificates bundle is stored in the Keychain and
 openssl will complain with:
@@ -25,7 +63,10 @@ The bundle can be extracted with:
 $ sudo security find-certificate -a \
   -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
 
+Bugs:
+=====
 
+Report bugs to: Matteo Corti <matteo.corti@id.ethz.ch>
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

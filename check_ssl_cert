@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.6.0
+VERSION=1.6.1
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -177,6 +177,11 @@ check_required_prog() {
 PORT=443
 TIMEOUT=15
 
+# set the default temp dir if not set
+if [ -z "${TMPDIR}" ] ; then
+    TMPDIR="/tmp"
+fi
+
 ################################################################################
 # process command line options
 #
@@ -276,6 +281,13 @@ while true; do
               unknown "-t,--timeout requires an argument"
             fi ;;
 
+        --temp) if [ $# -gt 1 ] ; then
+              # override TMPDIR
+              TMPDIR=$2; shift 2
+            else
+              unknown "--temp requires an argument"
+            fi ;;
+
         -w|--warning) if [ $# -gt 1 ]; then
               WARNING=$2; shift 2             
             else 
@@ -333,6 +345,15 @@ if [ -n "${CRITICAL}" -a -n "${WARNING}" ] ; then
     fi
 fi
 
+if [ -n "${TMPDIR}" ] ; then
+    if [ ! -d ${TMPDIR} ] ; then
+        unknown "${TMPDIR} is not a directory";
+    fi
+    if [ ! -w ${TMPDIR} ] ; then
+        unknown "${TMPDIR} is not writable";
+    fi
+fi
+
 #######################
 # Check needed programs
 
@@ -348,9 +369,21 @@ fi
 # fetch the X.509 certificate
 
 # temporary storage for the certificate and the errors
-CERT=$( mktemp -t "$( basename $0 )XXXXXX" )
-ERROR=$( mktemp -t "$( basename $0 )XXXXXX" )
 
+CERT=$(  mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+if [ -z "${CERT}" ] || [ ! -w "${CERT}" ] ; then
+    unknown 'temporary file creation failure.'
+fi
+
+ERROR=$( mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+if [ -z "${ERROR}" ] || [ ! -w "${ERROR}" ] ; then
+    unknown 'temporary file creation failure.'
+fi
+
+if [ -n "${VERBOSE}" ] ; then
+    echo "downloading certificate to ${TMPDIR}"
+fi
+    
 trap "rm -f $CERT $ERROR" 0
 
 if [ -n "${PROTOCOL}" ] ; then

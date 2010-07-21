@@ -1,3 +1,8 @@
+2010-07-21  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added a patch from Marc Fournier to check the creation of the temporary files
+	* check_ssl_cert: added the --temp option to specify where to store the temporary files
+
 2010-07-10  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: improved the error messages

@@ -1,3 +1,4 @@
+2010-07-21 Version 1.6.1 Added an option to specify where to temporarily store the certificate
 2010-07-09 Version 1.6.0 Added long command line options and substituted --days with --critical and --warning
 2010-07-07 Version 1.5.2 Added the -f option to check a local file
 2010-07-01 Version 1.5.1 Fixed the plugin output

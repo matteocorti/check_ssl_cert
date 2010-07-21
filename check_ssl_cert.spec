@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.6.0
+%define version 1.6.1
 %define release 0
 %define name    check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Jul 21 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.6.1-0
+- updated to 1.6.0 (--temp option)
+
 * Fri Jul  9 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.6.0-0
 - updated to version 1.6.0 (long options, --critical and --warning, man page)
 
