@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.0
+VERSION=1.7.2
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -369,6 +369,7 @@ check_required_prog openssl
 OPENSSL=$PROG
 
 EXPECT=$(which expect 2> /dev/null)
+test -x "${EXPECT}" || EXPECT=""
 if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
     echo "Expect not found: disabling timeouts"
 fi
@@ -400,7 +401,7 @@ if [ -n "${PROTOCOL}" ] ; then
 
         smtp|pop3|imap|ftp)
 
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT   ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
         ;;
     
         *)
@@ -423,12 +424,12 @@ elif [ -n "${FILE}" ] ; then
 
 else
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT  ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
     
 fi
 
 if [ $? -ne 0 ] ; then
-    critical "Error: $(cat $ERROR | head -n 1)"
+    critical "Error: $(head -n 1 ${ERROR})"
 fi
 
 if ! grep -q "CERTIFICATE" ${CERT} ; then
