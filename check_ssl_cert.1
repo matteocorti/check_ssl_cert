@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "July, 2010" "1.6.1" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "August, 2010" "1.7.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -52,7 +52,7 @@ switch to TLS and use specific protocol {smtp|pop3|imap|ftp}
 allows self-signed certificates
 .TP
 .BR "-r,--rootcert" " cert"
-root cert to be used for certficate validation
+root certificate or directory to be used for certficate validation (passed to openssl's -CAfile or -CApath)
 .TP
 .BR "-t,--timeout"
 seconds timeout after the specified time (defaults to 15 seconds)

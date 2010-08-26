@@ -1,3 +1,8 @@
+2010-08-26  Dan Wallis
+
+	* check_ssl_cert: overloads --rootcert for use with directories as
+                          well as files (-CApath versus -CAfile)
+
 2010-07-21  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added a patch from Marc Fournier to check the creation of the temporary files

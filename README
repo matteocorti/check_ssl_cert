@@ -34,7 +34,8 @@ Options:
    -P,--protocol protocol switch to TLS and use specific protocol
                           {smtp|pop3|imap|ftp}
    -s,--selfsigned        allows self-signed certificates
-   -r,--rootcert cert     root cert to be used for certficate validation
+   -r,--rootcert path     root certificate or directory to be used for
+                          certficate validation
    -t,--timeout           seconds timeout after the specified time
                           (defaults to 15 seconds)
    -v,--verbose           verbose output
@@ -51,7 +52,8 @@ Notes:
 
 the root certificate corresponding to the checked certificate must be
 available to openssl or specified with the '-r cabundle' or
-'--rootcert cabundle' option.
+'--rootcert cabundle' option, where cabundle is either a file for -CAfile
+or a directory for -CApath.
 
 On Mac OS X the root certificates bundle is stored in the Keychain and
 openssl will complain with:

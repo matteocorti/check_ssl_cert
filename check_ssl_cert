@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.6.1
+VERSION=1.7.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -68,7 +68,8 @@ usage() {
     echo "   -P,--protocol protocol switch to TLS and use specific protocol"
     echo "                          {smtp|pop3|imap|ftp}"
     echo "   -s,--selfsigned        allows self-signed certificates"
-    echo "   -r,--rootcert cert     root cert to be used for certficate validation"
+    echo "   -r,--rootcert path     root certificate or directory to be used for"
+    echo "                          certficate validation"
     echo "   -t,--timeout           seconds timeout after the specified time"
     echo "                          (defaults to 15 seconds)"
     echo "      --temp dir          directory where to store the temporary files"
@@ -303,7 +304,7 @@ while true; do
         *)  break;;
         
     esac
-    
+
 done
 
 ################################################################################
@@ -325,7 +326,13 @@ if [ -n "${ROOT_CA}" ] ; then
     if [ ! -r ${ROOT_CA} ] ; then
         unknown "Cannot read root certificate ${ROOT_CA}"
     fi
-    ROOT_CA="-CAfile ${ROOT_CA}"
+    if [ -d ${ROOT_CA} ] ; then
+      ROOT_CA="-CApath ${ROOT_CA}"
+    elif [ -f ${ROOT_CA} ] ; then
+      ROOT_CA="-CAfile ${ROOT_CA}"
+    else
+      unknown "Root certificate of unknown type $(file ${ROOT_CA} 2> /dev/null)"
+    fi
 fi
 
 if [ -n "${CRITICAL}" ] ; then
@@ -393,7 +400,7 @@ if [ -n "${PROTOCOL}" ] ; then
 
         smtp|pop3|imap|ftp)
 
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT  -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT   ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
         ;;
     
         *)
@@ -416,7 +423,7 @@ elif [ -n "${FILE}" ] ; then
 
 else
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT  ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
     
 fi
 
