@@ -1,3 +1,7 @@
+2010-09-15  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: fixed option processing (bug #78)
+
 2010-08-26  Dan Wallis
 
 	* check_ssl_cert: overloads --rootcert for use with directories as

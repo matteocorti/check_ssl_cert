@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.2
+VERSION=1.7.3
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -198,11 +198,11 @@ while true; do
         
         -h|--help|-\?)   usage;     exit 0 ;;
 
-        -N,--host-cn)    COMMON_NAME="__HOST__"; ;;
+        -N|--host-cn)    COMMON_NAME="__HOST__"; shift ;;
 
-        -s|--selfsigned) SELFSIGNED=1            ;;
+        -s|--selfsigned) SELFSIGNED=1;           shift ;;
                 
-        -v|--verbose)    VERBOSE=1; shift  ;;
+        -v|--verbose)    VERBOSE=1;              shift ;;
         
         -V|--version)    echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
 
