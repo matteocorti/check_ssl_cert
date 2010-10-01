@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "August, 2010" "1.7.3" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "August, 2010" "1.7.4" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -17,6 +17,9 @@ A Nagios plugin to check an X.509 certificate:
 .BR "-H,--host" " host"
 server
 .SH OPTIONS
+.TP
+.BR "-A,--noauth"
+ignore authority warnings (expiration only)
 .TP
 .BR "-c,--critical" " days"
 minimum number of days a certificate has to be valid to issue a critical status

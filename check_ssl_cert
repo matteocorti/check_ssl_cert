@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.3
+VERSION=1.7.4
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -53,6 +53,7 @@ usage() {
     echo "   -H,--host host         server"
     echo
     echo "Options:"
+    echo "   -A,--noauth            ignore authority warnings (expiration only)"
     echo "   -c,--critical days     minimum number of days a certificate has to be valid"
     echo "                          to issue a critical status"
     echo "   -e,--email address     pattern to match the email address contained in the"
@@ -195,14 +196,16 @@ while true; do
 
         ########################################
         # options without arguments
-        
-        -h|--help|-\?)   usage;     exit 0 ;;
 
-        -N|--host-cn)    COMMON_NAME="__HOST__"; shift ;;
+        -A|--noauth)     NOAUTH=1;               shift  ;;
 
-        -s|--selfsigned) SELFSIGNED=1;           shift ;;
+        -h|--help|-\?)   usage;                  exit 0 ;;
+
+        -N|--host-cn)    COMMON_NAME="__HOST__"; shift  ;;
+
+        -s|--selfsigned) SELFSIGNED=1;           shift  ;;
                 
-        -v|--verbose)    VERBOSE=1;              shift ;;
+        -v|--verbose)    VERBOSE=1;              shift  ;;
         
         -V|--version)    echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
 
@@ -443,7 +446,7 @@ fi
 ################################################################################
 # Check if the certificate was verified
 
-if grep -q '^verify\ error:' ${ERROR} ; then
+if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
 
     if grep -q '^verify\ error:num=18:self\ signed\ certificate' ${ERROR} ; then
 

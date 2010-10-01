@@ -1,3 +1,4 @@
+2010-10-01 Version 1.7.4 Applied a patch from Lawren Quigley-Jones adding the -A option
 2010-09-15 Version 1.7.3 Fixed a bug in the option processing
 2010-08-26 Version 1.7.2 Removes useless use of cat, better test for expect utility
 2010-08-26 Version 1.7.1 Replaces "-verify 6" which was erroneously removed in previous version
