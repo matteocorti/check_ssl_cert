@@ -17,6 +17,7 @@ Thanks:
   - the patch adding the possibility to check local files (-f option)
 * Many thanks to Yannick Gravel for the patch fixing the plugin output
 * Many thanks to Scott Worthington for the --critical and --warning hints
+* Many thanks to Lawren Quigley-Jones for the -A,--noauth patch
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
