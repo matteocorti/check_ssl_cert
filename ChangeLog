@@ -1,6 +1,13 @@
+2010-10-14  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added a patch from Yannick Gravel putting the
+                          chain verification at the end of the tests
+
 2010-10-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a patch from Lawren Quigley-Jones which implements a new command line argument (-A) to disable the certificate chain check
+	* check_ssl_cert: added a patch from Lawren Quigley-Jones which
+                          implements a new command line argument (-A) to disable the
+                          certificate chain check
 
 2010-09-15  Matteo Corti  <matteo.corti@id.ethz.ch>
 

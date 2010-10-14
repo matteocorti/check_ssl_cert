@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.4
+VERSION=1.7.5
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -444,30 +444,6 @@ if ! grep -q "CERTIFICATE" ${CERT} ; then
 fi
 
 ################################################################################
-# Check if the certificate was verified
-
-if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
-
-    if grep -q '^verify\ error:num=18:self\ signed\ certificate' ${ERROR} ; then
-
-        if [ -z "${SELFSIGNED}" ] ; then
-            critical "Cannot verify certificate\nself signed certificate"
-        else
-            SELFSIGNEDCERT="self signed "
-        fi
-
-    else 
-
-        # process errors
-        details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
-
-        critical "Cannot verify certificate\n${details}"
-
-    fi
-    
-fi
-
-################################################################################
 # parse the X.509 certificate
 
 DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
@@ -577,6 +553,30 @@ if [ -n "$ADDR" ] ; then
         critical "invalid email ($ADDR does not match $EMAIL)"
     fi
 
+fi
+
+################################################################################
+# Check if the certificate was verified
+
+if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
+
+    if grep -q '^verify\ error:num=18:self\ signed\ certificate' ${ERROR} ; then
+
+        if [ -z "${SELFSIGNED}" ] ; then
+            critical "Cannot verify certificate\nself signed certificate"
+        else
+            SELFSIGNEDCERT="self signed "
+        fi
+
+    else 
+
+        # process errors
+        details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+
+        critical "Cannot verify certificate\n${details}"
+
+    fi
+    
 fi
 
 ################################################################################

@@ -15,7 +15,8 @@ Thanks:
 * Many thanks to Wolfgang Schricker for
   - the selfsigned bug report and cleanup fixes
   - the patch adding the possibility to check local files (-f option)
-* Many thanks to Yannick Gravel for the patch fixing the plugin output
+* Many thanks to Yannick Gravel for the patch fixing the plugin output and the fix
+  on the test order
 * Many thanks to Scott Worthington for the --critical and --warning hints
 * Many thanks to Lawren Quigley-Jones for the -A,--noauth patch
 
