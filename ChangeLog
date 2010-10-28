@@ -1,3 +1,7 @@
+2010-10-28  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: trap on more signals (thanks to Lawren Quigley-Jones)
+
 2010-10-14  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added a patch from Yannick Gravel putting the

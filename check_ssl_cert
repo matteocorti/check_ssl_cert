@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.5
+VERSION=1.7.6
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -43,7 +43,7 @@ usage() {
         echo "Error: $1" 1>&2
     fi
 
-    #### The following line is 80 characters long (helps to fit the help text in a standard terminal
+    #### The following line is 80 characters long (helps to fit the help text in a standard terminal)
     ######--------------------------------------------------------------------------------
         
     echo
@@ -395,8 +395,10 @@ fi
 if [ -n "${VERBOSE}" ] ; then
     echo "downloading certificate to ${TMPDIR}"
 fi
-    
-trap "rm -f $CERT $ERROR" 0
+
+# cleanup before program termination
+# using named signals to be POSIX compliant
+trap "rm -f $CERT $ERROR" EXIT UP INT QUIT TERM
 
 if [ -n "${PROTOCOL}" ] ; then
 

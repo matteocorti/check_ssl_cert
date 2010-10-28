@@ -1,3 +1,4 @@
+2010-10-14 Version 1.7.6 Better temporary file clean up (thanks to Lawren Quigley-Jones)
 2010-10-14 Version 1.7.5 Applied a patch from Yannick Gravel fixing the test order
 2010-10-01 Version 1.7.4 Applied a patch from Lawren Quigley-Jones adding the -A option
 2010-09-15 Version 1.7.3 Fixed a bug in the option processing
