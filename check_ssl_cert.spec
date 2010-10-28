@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.7.6
+%define version 1.7.7
 %define release 0
 %define name    check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Thu Oct 28 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.7.7-0
+- Fixed a bug in the signal specification
+
 * Thu Oct 28 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.7.6-0
 - better temporary file clean up
 

@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.6
+VERSION=1.7.7
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -398,7 +398,7 @@ fi
 
 # cleanup before program termination
 # using named signals to be POSIX compliant
-trap "rm -f $CERT $ERROR" EXIT UP INT QUIT TERM
+trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
 
 if [ -n "${PROTOCOL}" ] ; then
 
