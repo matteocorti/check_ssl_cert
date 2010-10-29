@@ -1,3 +1,7 @@
+2010-10-29  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* README: specifies that expect is needed for timeouts
+
 2010-10-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: trap on more signals (thanks to Lawren Quigley-Jones)

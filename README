@@ -37,7 +37,7 @@ Options:
    -r,--rootcert path     root certificate or directory to be used for
                           certficate validation
    -t,--timeout           seconds timeout after the specified time
-                          (defaults to 15 seconds)
+                          (defaults to 15 seconds and requires 'expect')
    -v,--verbose           verbose output
    -V,--version           version
    -w,--warning days      minimum number of days a certificate has to be valid
@@ -46,6 +46,12 @@ Options:
 Deprecated options:
    -d,--days days         minimum number of days a certificate has to be valid
                           (see --critical and --warning)
+
+Expect:
+=======
+
+check_ssl_cert requires 'expect' to enable timouts. If expect is not
+present on your system timeouts will be disabled.
 
 Notes:
 ======
