@@ -1,5 +1,7 @@
 Simply copy the plugin to your nagios plugin directory
 
+In order to use timeouts the plugin needs 'expect' in the current PATH
+See: http://en.wikipedia.org/wiki/Expect
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

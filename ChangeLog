@@ -1,3 +1,7 @@
+2010-11-02  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* INSTALL: specifies that expect is needed for timeouts
+
 2010-10-29  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* README: specifies that expect is needed for timeouts

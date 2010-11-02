@@ -53,6 +53,8 @@ Expect:
 check_ssl_cert requires 'expect' to enable timouts. If expect is not
 present on your system timeouts will be disabled.
 
+See: http://en.wikipedia.org/wiki/Expect
+
 Notes:
 ======
 
