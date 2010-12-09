@@ -18,6 +18,7 @@
 Summary:   A Nagios plugin to check X.509 certificates
 Name:      %{packagename}
 Version:   %{version}
+Obsoletes: check_ssl_cert
 Release:   %{release}%{?dist}
 License:   GPLv3+
 Packager:  Matteo Corti <matteo.corti@id.ethz.ch>
