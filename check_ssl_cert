@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.7.7
+VERSION=1.8.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -378,6 +378,22 @@ if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
 fi
 
 ################################################################################
+# check if openssl s_client supports the -servername option
+#
+#   openssl s_client does not have a -help option
+#   => we supply an invalid command line option to get the help
+#      on standard error
+#
+SERVERNAME=
+if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
+    SERVERNAME="-servername ${HOST}"
+else
+    if [ -n "${VERBOSE}" ] ; then
+        echo "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
+    fi
+fi
+
+################################################################################
 # fetch the X.509 certificate
 
 # temporary storage for the certificate and the errors
@@ -406,7 +422,7 @@ if [ -n "${PROTOCOL}" ] ; then
 
         smtp|pop3|imap|ftp)
 
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
         ;;
     
         *)
@@ -429,7 +445,7 @@ elif [ -n "${FILE}" ] ; then
 
 else
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
     
 fi
 

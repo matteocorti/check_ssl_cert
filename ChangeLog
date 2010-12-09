@@ -1,3 +1,10 @@
+2010-12-09  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert.spec: standardized the RPM package name
+
+	* check_ssl_cert: added support for the TLS servername extension
+                          (thanks to Matthias Fuhrmeister)
+
 2010-11-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* INSTALL: specifies that expect is needed for timeouts
@@ -53,7 +60,7 @@
 
 2010-07-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: [Yannick Gravel patch] Restore diplaying the CN in every messages:
+	* check_ssl_cert: [Yannick Gravel patch] Restore displaying the CN in every messages:
 	                                         a previous patch changed something and only
 	                                         critical were adjusted.
 	* check_ssl_cert: [Yannick Gravel patch] Adjust what is displayed after the from in
@@ -93,7 +100,7 @@
 
 2008-05-13  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: applied a patch fom Dan Wallis to output the CN
+	* check_ssl_cert: applied a patch from Dan Wallis to output the CN
                           in all the messages
 
 2008-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>

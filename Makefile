@@ -19,7 +19,7 @@ install:
 version_check:
 	VERSION=`cat VERSION`
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
-	grep -q "^%define\ version\ $(VERSION)" $(PLUGIN).spec
+	grep -q "^%define\ version\ *$(VERSION)" $(PLUGIN).spec
 	grep -q -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q "${VERSION}" NEWS

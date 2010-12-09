@@ -6,24 +6,25 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version 1.7.7
-%define release 0
-%define name    check_ssl_cert
+%define version          1.8.0
+%define release          0
+%define sourcename       check_ssl_cert
+%define packagename      nagios-plugins-check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
 
 # No binaries in this package
 %define debug_package %{nil}
 
 Summary:   A Nagios plugin to check X.509 certificates
-Name:      %{name}
+Name:      %{packagename}
 Version:   %{version}
 Release:   %{release}%{?dist}
 License:   GPLv3+
 Packager:  Matteo Corti <matteo.corti@id.ethz.ch>
 Group:     Applications/System
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://trac.id.ethz.ch/projects/nagios_plugins/wiki/check_ssl_cert
-Source:    https://trac.id.ethz.ch/projects/nagios_plugins/downloads/%{name}-%{version}.tar.gz
+Source:    https://trac.id.ethz.ch/projects/nagios_plugins/downloads/%{sourcename}-%{version}.tar.gz
 
 Requires:  nagios-plugins
 
@@ -34,7 +35,7 @@ Checks an X.509 certificate:
  - checks the validity
 
 %prep
-%setup -q
+%setup -q -n %{sourcename}-%{version}
 
 %build
 
@@ -48,9 +49,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog NEWS README INSTALL TODO COPYING VERSION COPYRIGHT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
-%{_mandir}/man1/%{name}.1*
+%{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Thu Dec  9 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.8.0-0
+- added support for TLS servername extension
+
 * Thu Oct 28 2010 Matteo Corti <matteo.corti@id.ethz.ch> - 1.7.7-0
 - Fixed a bug in the signal specification
 
@@ -117,5 +121,5 @@ rm -rf $RPM_BUILD_ROOT
 - Dan Wallis patches (see the ChangeLog)
 
 * Mon Sep 24 2007 Matteo Corti <matteo.corti@id.ethz.ch> - 1.1.0-0
-- first rpm package
+- first RPM package
 

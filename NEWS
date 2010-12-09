@@ -1,3 +1,4 @@
+2010-12-08 Version 1.8.0 Added support for TLS servername extension in ClientHello
 2010-10-28 Version 1.7.7 Fixed a bug in the signal specification introduced in 1.7.6
 2010-10-28 Version 1.7.6 Better temporary file clean up (thanks to Lawren Quigley-Jones)
 2010-10-14 Version 1.7.5 Applied a patch from Yannick Gravel fixing the test order
