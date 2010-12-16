@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.8.0
+VERSION=1.8.1
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -179,6 +179,7 @@ check_required_prog() {
 # default values
 PORT=443
 TIMEOUT=15
+VERBOSE=""
 
 # set the default temp dir if not set
 if [ -z "${TMPDIR}" ] ; then
@@ -339,13 +340,13 @@ if [ -n "${ROOT_CA}" ] ; then
 fi
 
 if [ -n "${CRITICAL}" ] ; then
-    if ! echo "${CRITICAL}" | grep -q [0-9][0-9]* ; then
+    if ! echo "${CRITICAL}" | grep -q '[0-9][0-9]*' ; then
         unknown "invalid number of days ${CRITICAL}"
     fi
 fi
 
 if [ -n "${WARNING}" ] ; then
-    if ! echo ${WARNING} | grep -q [0-9][0-9]* ; then
+    if ! echo ${WARNING} | grep -q '[0-9][0-9]*' ; then
         unknown "invalid number of days ${WARNING}"
     fi
 fi

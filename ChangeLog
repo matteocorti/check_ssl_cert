@@ -1,3 +1,8 @@
+2010-12-16  Dan Wallis
+
+	* check_ssl_cert: Sets $VERBOSE to avoid using value supplied by Nagios
+	* check_ssl_cert: Quotes regular expression for grep to avoid shell globbing
+
 2010-12-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert.spec: standardized the RPM package name
