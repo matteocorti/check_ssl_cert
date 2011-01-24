@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version          1.8.1
+%define version          1.9.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Mon Jan 24 2011 Matteo Corti <matteo.corti@id.ethz.ch> - 1.9.0-0
+- updated to 1.9.0: --openssl option
+
 * Thu Dec 16 2010 Dan Wallis - 1.8.1-0
 - Fixed bugs with environment bleeding & shell globbing
 

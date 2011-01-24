@@ -1,3 +1,4 @@
+2011-01-24 Version 1.9.0 Added an option to specify the openssl executable
 2010-12-16 Version 1.8.1 Fixed bugs with environment bleeding & shell globbing
 2010-12-08 Version 1.8.0 Added support for TLS servername extension in ClientHello
 2010-10-28 Version 1.7.7 Fixed a bug in the signal specification introduced in 1.7.6

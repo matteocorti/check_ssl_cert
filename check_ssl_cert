@@ -9,7 +9,7 @@
 #
 # See  the INSTALL file for installation instructions
 #
-# Copyright (c) 2007-2010 ETH Zurich.
+# Copyright (c) 2007-2011 ETH Zurich.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.8.1
+VERSION=1.9.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -65,6 +65,7 @@ usage() {
     echo "   -N,--host-cn           match CN with the host name"
     echo "                          (will not work for wildcards)"
     echo "   -o,--org org           pattern to match the organization of the certificate"
+    echo "      --openssl path      path of the openssl binary to be used"
     echo "   -p,--port port         TCP port"
     echo "   -P,--protocol protocol switch to TLS and use specific protocol"
     echo "                          {smtp|pop3|imap|ftp}"
@@ -180,6 +181,7 @@ check_required_prog() {
 PORT=443
 TIMEOUT=15
 VERBOSE=""
+OPENSSL=""
 
 # set the default temp dir if not set
 if [ -z "${TMPDIR}" ] ; then
@@ -261,6 +263,12 @@ while true; do
               ORGANIZATION=$2; shift 2
             else 
               unknown "-o,--org requires an argument"
+            fi ;;
+
+        --openssl) if [ $# -gt 1 ]; then
+              OPENSSL=$2; shift 2
+            else
+              unknown "--openssl requires an argument"
             fi ;;
 
         -p|--port) if [ $# -gt 1 ]; then
@@ -366,11 +374,23 @@ if [ -n "${TMPDIR}" ] ; then
     fi
 fi
 
+if [ -n "${OPENSSL}" ] ; then
+    if [ ! -x ${OPENSSL} ] ; then
+        unknown "${OPENSSL} ist not an executable"
+    fi
+    if [ $(basename ${OPENSSL}) != 'openssl' ] ; then
+        unknown "${OPENSSL} ist not an openssl executable"
+    fi
+fi
+    
+
 #######################
 # Check needed programs
 
-check_required_prog openssl
-OPENSSL=$PROG
+if [ -z "${OPENSSL}" ] ; then
+    check_required_prog openssl
+    OPENSSL=$PROG
+fi
 
 EXPECT=$(which expect 2> /dev/null)
 test -x "${EXPECT}" || EXPECT=""

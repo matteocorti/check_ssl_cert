@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "October, 2010" "1.8.1" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "January, 2011" "1.9.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -45,6 +45,9 @@ match CN with the host name (will not work for wildcards)
 .BR "-o,--org" " org"
 pattern to match the organization of the certificate
 .TP
+.BR "   --openssl" " path"
+path of the openssl binary to be used
+.TP
 .BR "-p,--port" " port"
 TCP port
 .TP
@@ -77,7 +80,7 @@ minimum number of days a certificate has to be valid to issue a warning status
 minimum number of days a certificate has to be valid (see --critical and --warning)
 
 .SH "SEE ALSO"
-x509(1), openssl(1)
+x509(1), openssl(1), expect(1)
 .SH "EXIT STATUS"
 check_ssl_cert returns a zero exist status if it finds no errors, 1 for warnings, 2 for a critical errors and 3 for unknown problems
 .SH BUGS
