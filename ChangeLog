@@ -1,3 +1,10 @@
+2011-03-10  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: allows http to specified as protocol
+	                  (thanks to Raphael Thoma)
+	* check_ssl_cert: fixes the -N check for certs with wildcards
+	                  (thanks to Raphael Thoma)
+
 2011-01-24  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added an option to specify the openssl executable

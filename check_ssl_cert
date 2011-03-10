@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.9.0
+VERSION=1.9.1
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -63,12 +63,12 @@ usage() {
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
     echo "   -n,---cn name          pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
-    echo "                          (will not work for wildcards)"
     echo "   -o,--org org           pattern to match the organization of the certificate"
     echo "      --openssl path      path of the openssl binary to be used"
     echo "   -p,--port port         TCP port"
-    echo "   -P,--protocol protocol switch to TLS and use specific protocol"
-    echo "                          {smtp|pop3|imap|ftp}"
+    echo "   -P,--protocol protocol use the specific protocol {http|smtp|pop3|imap|ftp}"
+    echo "                          http:               default"
+    echo "                          smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned        allows self-signed certificates"
     echo "   -r,--rootcert path     root certificate or directory to be used for"
     echo "                          certficate validation"
@@ -437,7 +437,8 @@ fi
 # using named signals to be POSIX compliant
 trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
 
-if [ -n "${PROTOCOL}" ] ; then
+# check if a protocol was specified (if not HTTP switch to TLS)
+if [ -n "${PROTOCOL}" -a "${PROTOCOL}" != "http" -a "${PROTOCOL}" != "https" ] ; then
 
     case "${PROTOCOL}" in
 
@@ -498,9 +499,9 @@ if [ -n "$COMMON_NAME" ] ; then
 
     ok=''
 
-    if echo $CN | grep -q "^$COMMON_NAME$" ; then
-        ok='true'
-    fi
+    case $COMMON_NAME in
+        $CN) ok='true';;
+    esac
 
     if [ -z "$ok" ] ; then
         critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
