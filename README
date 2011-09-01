@@ -19,6 +19,9 @@ Arguments:
    -H,--host host         server
 
 Options:
+   -A,--noauth            ignore authority warnings (expiration only)
+   -C,--clientcert path   use client certificate to authenticate
+      --clientpass phrase set passphrase for client certificate.
    -c,--critical days     minimum number of days a certificate has to be valid
                           to issue a critical status
    -e,--email address     pattern to match the email address contained in the
@@ -28,16 +31,18 @@ Options:
    -i,--issuer issuer     pattern to match the issuer of the certificate
    -n,---cn name          pattern to match the CN of the certificate
    -N,--host-cn           match CN with the host name
-                          (will not work for wildcards)
    -o,--org org           pattern to match the organization of the certificate
+      --openssl path      path of the openssl binary to be used
    -p,--port port         TCP port
-   -P,--protocol protocol switch to TLS and use specific protocol
-                          {smtp|pop3|imap|ftp}
+   -P,--protocol protocol use the specific protocol {http|smtp|pop3|imap|ftp}
+                          http:               default
+                          smtp,pop3,imap,ftp: switch to TLS
    -s,--selfsigned        allows self-signed certificates
    -r,--rootcert path     root certificate or directory to be used for
                           certficate validation
    -t,--timeout           seconds timeout after the specified time
-                          (defaults to 15 seconds and requires 'expect')
+                          (defaults to 15 seconds)
+      --temp dir          directory where to store the temporary files
    -v,--verbose           verbose output
    -V,--version           version
    -w,--warning days      minimum number of days a certificate has to be valid

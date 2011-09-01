@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version          1.9.1
+%define version          1.10.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Thu Sep  1 2011 Matteo Corti <matteo.corti@id.ethz.ch> - 1.10.0-0
+- apllied patch from Sven Nierlein for client certificate authentication
+
 * Thu Mar 10 2011 Matteo Corti <matteo.corti@id.ethz.ch> - 1.9.1-0
 - updated to 1.9.1: allows http as protocol and fixes -N with wildcards
 

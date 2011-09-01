@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.9.1
+VERSION=1.10.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -54,6 +54,8 @@ usage() {
     echo
     echo "Options:"
     echo "   -A,--noauth            ignore authority warnings (expiration only)"
+    echo "   -C,--clientcert path   use client certificate to authenticate"
+    echo "      --clientpass phrase set passphrase for client certificate."
     echo "   -c,--critical days     minimum number of days a certificate has to be valid"
     echo "                          to issue a critical status"
     echo "   -e,--email address     pattern to match the email address contained in the"
@@ -289,6 +291,18 @@ while true; do
               unknown "-r,--rootcert requires an argument"
             fi ;;
 
+        -C|--clientcert) if [ $# -gt 1 ]; then
+              CLIENT_CERT=$2; shift 2
+            else
+              unknown "-c,--clientcert requires an argument"
+            fi ;;
+
+        --clientpass) if [ $# -gt 1 ]; then
+              CLIENT_PASS=$2; shift 2
+            else
+              unknown "--clientpass requires an argument"
+            fi ;;
+
         -t|--timeout) if [ $# -gt 1 ]; then
               TIMEOUT=$2; shift 2
             else 
@@ -344,6 +358,12 @@ if [ -n "${ROOT_CA}" ] ; then
       ROOT_CA="-CAfile ${ROOT_CA}"
     else
       unknown "Root certificate of unknown type $(file ${ROOT_CA} 2> /dev/null)"
+    fi
+fi
+
+if [ -n "${CLIENT_CERT}" ] ; then
+    if [ ! -r ${CLIENT_CERT} ] ; then
+        unknown "Cannot read client certificate ${CLIENT_CERT}"
     fi
 fi
 
@@ -433,6 +453,16 @@ if [ -n "${VERBOSE}" ] ; then
     echo "downloading certificate to ${TMPDIR}"
 fi
 
+CLIENT=""
+if [ -n "${CLIENT_CERT}" ] ; then
+    CLIENT="-cert ${CLIENT_CERT}"
+fi
+
+CLIENTPASS=""
+if [ -n "${CLIENT_PASS}" ] ; then
+    CLIENTPASS="-pass pass:${CLIENT_PASS}"
+fi
+
 # cleanup before program termination
 # using named signals to be POSIX compliant
 trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
@@ -444,7 +474,7 @@ if [ -n "${PROTOCOL}" -a "${PROTOCOL}" != "http" -a "${PROTOCOL}" != "https" ] ;
 
         smtp|pop3|imap|ftp)
 
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
         ;;
     
         *)
@@ -467,7 +497,7 @@ elif [ -n "${FILE}" ] ; then
 
 else
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
     
 fi
 

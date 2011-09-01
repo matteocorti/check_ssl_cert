@@ -24,6 +24,7 @@ Thanks:
 * Many thanks to Matthias Fuhrmeister for the -servername patch
 * Many thanks to Raphael Thoma for the patch allowing HTTP to be
   specified as protocol and the fix on -N with wildcards
+* Many thanks to Sven Nierlein for the client certificate authentication patch
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
