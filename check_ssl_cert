@@ -338,7 +338,7 @@ done
 
 ################################################################################
 # Set COMMON_NAME to hostname if -N was given as argument
-if [ "$COMMON_NAME" = "__HOST__" ]; then
+if [ "$COMMON_NAME" = "__HOST__" ] ; then
     COMMON_NAME=$(hostname)
 fi
 
@@ -669,6 +669,13 @@ fi
 
 ################################################################################
 # If we get this far, assume all is well. :)
+
+# if --altnames was specified we show the specified CN instead of
+# the certificate CN
+if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
+    CN=${COMMON_NAME}
+fi
+
 echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '$CN' from '$CA_ISSUER_MATCHED' valid until $DATE"
 
 exit 0
