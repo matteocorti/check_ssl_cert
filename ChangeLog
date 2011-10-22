@@ -1,3 +1,8 @@
+2011-10-22  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added a --altnames option to match the CN to alternative
+                          names
+
 2011-09-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: applied a patch from Sven Nierlein

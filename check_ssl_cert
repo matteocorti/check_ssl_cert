@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.10.0
+VERSION=1.11.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -54,6 +54,7 @@ usage() {
     echo
     echo "Options:"
     echo "   -A,--noauth            ignore authority warnings (expiration only)"
+    echo "      --altnames          matches the pattern specified in -n with alternate names too"
     echo "   -C,--clientcert path   use client certificate to authenticate"
     echo "      --clientpass phrase set passphrase for client certificate."
     echo "   -c,--critical days     minimum number of days a certificate has to be valid"
@@ -63,7 +64,7 @@ usage() {
     echo "   -f,--file file         local file path (works with -H localhost only)"
     echo "   -h,--help,-?           this help message"
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
-    echo "   -n,---cn name          pattern to match the CN of the certificate"
+    echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
     echo "   -o,--org org           pattern to match the organization of the certificate"
     echo "      --openssl path      path of the openssl binary to be used"
@@ -203,6 +204,8 @@ while true; do
         # options without arguments
 
         -A|--noauth)     NOAUTH=1;               shift  ;;
+
+        --altnames)      ALTNAMES=1;             shift  ;;
 
         -h|--help|-\?)   usage;                  exit 0 ;;
 
@@ -346,6 +349,10 @@ fi
 # Check options
 if [ -z "${HOST}" ] ; then
     usage "No host specified"
+fi
+
+if [ -n "${ALTNAMES}" -a -z "${COMMON_NAME}" ] ; then
+    unknown "--altnames requires a common name to match (--cn or --host-cn)"
 fi
 
 if [ -n "${ROOT_CA}" ] ; then
@@ -530,8 +537,19 @@ if [ -n "$COMMON_NAME" ] ; then
     ok=''
 
     case $COMMON_NAME in
-        $CN) ok='true';;
+        $CN) ok='true' ;;
     esac
+
+    # check alterante names
+    if [ -n "${ALTNAMES}" ] ; then
+        for alt_name in $( $OPENSSL x509 -in ${CERT} -text | \
+            grep --after-context=1 '509v3 Subject Alternative Name:' | \
+            tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g" ) ; do
+            case $COMMON_NAME in
+                $alt_name) ok='true' ;;
+            esac
+        done
+    fi
 
     if [ -z "$ok" ] ; then
         critical "invalid CN ('$CN' does not match '$COMMON_NAME')"

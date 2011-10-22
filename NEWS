@@ -1,3 +1,4 @@
+YYYY-MM-DD Version 1.11.0 --altname option
 2011-09-01 Version 1.10.0 Applied a patch from Sven Nierlein to authenicate
                           using a client certificate
 2011-03-10 Version  1.9.1 Allows HTTP as protocol and fixes -N with wildcards

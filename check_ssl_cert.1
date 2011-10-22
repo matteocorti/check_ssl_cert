@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "January, 2011" "1.10.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "January, 2011" "1.11.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -20,6 +20,9 @@ server
 .TP
 .BR "-A,--noauth"
 ignore authority warnings (expiration only)
+.TP
+.BR "   --altnames"
+matches the pattern specified in -n with alternate names too
 .TP
 .BR "-C,--clientcert" " path"
 use client certificate to authenticate
