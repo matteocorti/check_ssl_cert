@@ -425,6 +425,13 @@ if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
     echo "Expect not found: disabling timeouts"
 fi
 
+# check if openssl s_client supports the -servername option
+
+SERVERNAME=
+if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
+    SERVERNAME="-servername ${HOST}"
+fi
+
 ################################################################################
 # check if openssl s_client supports the -servername option
 #
