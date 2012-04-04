@@ -9,7 +9,7 @@
 #
 # See  the INSTALL file for installation instructions
 #
-# Copyright (c) 2007-2011 ETH Zurich.
+# Copyright (c) 2007-2012 ETH Zurich.
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.11.0
+VERSION=1.12.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -54,7 +54,8 @@ usage() {
     echo
     echo "Options:"
     echo "   -A,--noauth            ignore authority warnings (expiration only)"
-    echo "      --altnames          matches the pattern specified in -n with alternate names too"
+    echo "      --altnames          matches the pattern specified in -n with alternate"
+    echo "                          names too"
     echo "   -C,--clientcert path   use client certificate to authenticate"
     echo "      --clientpass phrase set passphrase for client certificate."
     echo "   -c,--critical days     minimum number of days a certificate has to be valid"
@@ -655,7 +656,7 @@ fi
 
 if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
 
-    if grep -q '^verify\ error:num=18:self\ signed\ certificate' ${ERROR} ; then
+    if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' ${ERROR} ; then
 
         if [ -z "${SELFSIGNED}" ] ; then
             critical "Cannot verify certificate\nself signed certificate"
