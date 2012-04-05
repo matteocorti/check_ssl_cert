@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version          1.12.0
+%define version          1.13.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Thu Apr  5 2012 Matteo Corti <matteo.corti@id.ethz.ch> - 1.13.0-0
+- updated to 1.13.0
+
 * Wed Apr  4 2012 Matteo Corti <matteo.corti@id.ethz.ch> - 1.12.0-0
 - updated to 1.12.0 (bug fix release)
 

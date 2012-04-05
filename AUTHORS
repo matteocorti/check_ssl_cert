@@ -25,6 +25,8 @@ Thanks:
 * Many thanks to Raphael Thoma for the patch allowing HTTP to be
   specified as protocol and the fix on -N with wildcards
 * Many thanks to Sven Nierlein for the client certificate authentication patch
+* Many thanks to Rob Yamry for the help in debugging a problem with
+  certain versions of OpenSSL and TLS extensions
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

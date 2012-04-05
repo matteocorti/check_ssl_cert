@@ -1,3 +1,5 @@
+2012-04-05 Version 1.13.0 The plugin will now try to fetch the certificate without
+                          without TLS extensions in case of error
 2012-04-04 Version 1.12.0 Fixed a bug in the chain verification (hard coded error number)
 2011-10-22 Version 1.11.0 --altname option
 2011-09-01 Version 1.10.0 Applied a patch from Sven Nierlein to authenicate

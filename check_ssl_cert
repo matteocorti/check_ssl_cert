@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.12.0
+VERSION=1.13.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -176,6 +176,53 @@ check_required_prog() {
     fi
 
 }
+
+################################################################################
+# Tries to fetch the certificate
+
+fetch_certificate() {
+
+    # check if a protocol was specified (if not HTTP switch to TLS)
+    if [ -n "${PROTOCOL}" -a "${PROTOCOL}" != "http" -a "${PROTOCOL}" != "https" ] ; then
+        
+        case "${PROTOCOL}" in
+            
+            smtp|pop3|imap|ftp)
+
+timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+;;
+
+*)
+
+unknown "Error: unsupported protocol ${PROTOCOL}"
+
+esac
+
+elif [ -n "${FILE}" ] ; then
+
+if [ "${HOST}" = "localhost" ] ; then
+    
+    timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+    
+else
+    
+    unknown "Error: option 'file' works with -H localhost only"
+    
+fi
+
+else
+
+timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+
+fi
+
+if [ $? -ne 0 ] ; then
+    critical "Error: $(head -n 1 ${ERROR})"
+fi
+
+
+}
+
 
 ################################################################################
 # Main
@@ -482,42 +529,29 @@ fi
 # using named signals to be POSIX compliant
 trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
 
-# check if a protocol was specified (if not HTTP switch to TLS)
-if [ -n "${PROTOCOL}" -a "${PROTOCOL}" != "http" -a "${PROTOCOL}" != "https" ] ; then
+fetch_certificate
 
-    case "${PROTOCOL}" in
+if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
 
-        smtp|pop3|imap|ftp)
+    if [ -n "${SERVERNAME}" ] ; then
 
-        timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
-        ;;
-    
-        *)
-
-        unknown "Error: unsupported protocol ${PROTOCOL}"
-
-    esac
-
-elif [ -n "${FILE}" ] ; then
-
-    if [ "${HOST}" = "localhost" ] ; then
-
-        timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
-
-    else
-
-        unknown "Error: option 'file' works with -H localhost only"
+        # some OpenSSL versions have problems with the -servername option
+        # we try without
+        if [ -n "${VERBOSE}" ] ; then
+            echo "'${OPENSSL} s_client' returned an error: trying without '-servername'"
+        fi
+        
+        SERVERNAME=
+        fetch_certificate
 
     fi
 
-else
+    if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
 
-    timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
-    
-fi
+        critical "cannot fetch certificate: OpenSSL got an unexpected message"
 
-if [ $? -ne 0 ] ; then
-    critical "Error: $(head -n 1 ${ERROR})"
+    fi
+
 fi
 
 if ! grep -q "CERTIFICATE" ${CERT} ; then
