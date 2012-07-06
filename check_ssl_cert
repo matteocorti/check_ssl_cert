@@ -30,6 +30,8 @@
 VERSION=1.14.0
 SHORTNAME="SSL_CERT"
 
+VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
+
 ################################################################################
 # Functions
 
@@ -64,6 +66,12 @@ usage() {
     echo "                          certificate"
     echo "   -f,--file file         local file path (works with -H localhost only)"
     echo "   -h,--help,-?           this help message"
+    echo "      --long-output list  append the specified comma separated (no spaces) list"
+    echo "                          of attributes to the plugin output on additiona lines."
+    echo "                          Valid attributes are:"
+    echo "                            enddate, startdate, subject, issuer, modulus, serial,"
+    echo "                            hash, email, ocsp_uri and fingerprint."
+    echo "                          'all' will include all the available attributes."
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
     echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
@@ -103,7 +111,7 @@ critical() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} CRITICAL$tmp: $1${PERFORMANCE_DATA}\n"
+    printf "${SHORTNAME} CRITICAL$tmp: $1${PERFORMANCE_DATA}${LONG_OUTPUT}\n"
     exit 2
 }
 
@@ -115,7 +123,7 @@ warning() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} WARN$tmp: $1${PERFORMANCE_DATA}\n"
+    printf "${SHORTNAME} WARN$tmp: $1${PERFORMANCE_DATA}${LONG_OUTPUT}\n"
     exit 1
 }
 
@@ -303,6 +311,12 @@ while true; do
               ISSUER=$2; shift 2
             else 
               unknown "-i,--issuer requires an argument"
+            fi ;;
+
+        --long-output) if [ $# -gt 1 ]; then
+              LONG_OUTPUT_ATTR=$2; shift 2
+            else
+              unknown "--long-output requires an argument"
             fi ;;
 
         -n|--cn) if [ $# -gt 1 ]; then
@@ -585,6 +599,32 @@ CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/
 
 
 ################################################################################
+# Generate the long output
+if [ -n "${LONG_OUTPUT_ATTR}" ] ; then
+
+    check_attr() {
+        ATTR=$1
+        if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
+            unknown "Invalid certificate attribute: ${ATTR}"
+        else       
+            value=$(${OPENSSL} x509 -in ${CERT} -noout -${ATTR} | sed -e "s/.*=//")
+            LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
+       fi
+       
+    }
+    
+    # split on comma
+    if [ "${LONG_OUTPUT_ATTR}" = "all" ] ; then
+        LONG_OUTPUT_ATTR=${VALID_ATTRIBUTES}
+    fi
+    attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\n" )
+    for attribute in $attributes ; do
+        check_attr ${attribute}
+    done
+
+fi
+
+################################################################################
 # compute for how many days the certificate will be valid
 
 if [ -n "${PERL}" ] ; then
@@ -770,6 +810,6 @@ if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
     CN=${COMMON_NAME}
 fi
 
-echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${PERFORMANCE_DATA}"
+echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
 
 exit 0

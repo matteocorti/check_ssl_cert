@@ -1,6 +1,7 @@
 2012-07-06  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: performance data in days
+	* check_ssl_cert: long output (certificate attributes)
 
 2012-04-05  Matteo Corti  <matteo.corti@id.ethz.ch>
 
