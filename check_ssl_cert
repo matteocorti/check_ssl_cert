@@ -502,8 +502,10 @@ if [ -z "${PERL}" -a -n "${VERBOSE}" ] ; then
     echo "Perl not found: disabling date computations"    
 fi
 if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
-    echo "Perl module Date::Parse not installed: disabling date computations"
-    PERL=
+    if [ -n "${VERBOSE}" ] ; then
+        echo "Perl module Date::Parse not installed: disabling date computations"
+    fi
+    PERL=        
 fi
 
 ################################################################################
@@ -629,8 +631,7 @@ fi
 
 if [ -n "${PERL}" ] ; then
 
-    export CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate |
-        sed -e "s/.*=//")
+    export CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
     
     DAYS_VALID=$( perl <<-'EOF'
     
