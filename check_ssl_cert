@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.13.0
+VERSION=1.14.0
 SHORTNAME="SSL_CERT"
 
 ################################################################################
@@ -103,7 +103,7 @@ critical() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} CRITICAL$tmp: $1\n"
+    printf "${SHORTNAME} CRITICAL$tmp: $1${PERFORMANCE_DATA}\n"
     exit 2
 }
 
@@ -115,7 +115,7 @@ warning() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} WARN$tmp: $1\n"
+    printf "${SHORTNAME} WARN$tmp: $1${PERFORMANCE_DATA}\n"
     exit 1
 }
 
@@ -462,22 +462,34 @@ fi
 #######################
 # Check needed programs
 
+# OpenSSL
 if [ -z "${OPENSSL}" ] ; then
     check_required_prog openssl
     OPENSSL=$PROG
 fi
 
+# check if openssl s_client supports the -servername option
+SERVERNAME=
+if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
+    SERVERNAME="-servername ${HOST}"
+fi
+
+# Expect (optional)
 EXPECT=$(which expect 2> /dev/null)
 test -x "${EXPECT}" || EXPECT=""
 if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
     echo "Expect not found: disabling timeouts"
 fi
 
-# check if openssl s_client supports the -servername option
-
-SERVERNAME=
-if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-    SERVERNAME="-servername ${HOST}"
+# Perl with Date::Parse (optional)
+PERL=$(which perl 2> /dev/null)
+test -x "${PERL}" || PERL=""
+if [ -z "${PERL}" -a -n "${VERBOSE}" ] ; then
+    echo "Perl not found: disabling date computations"    
+fi
+if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
+    echo "Perl module Date::Parse not installed: disabling date computations"
+    PERL=
 fi
 
 ################################################################################
@@ -570,6 +582,46 @@ CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[
 
 CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
 CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+
+
+################################################################################
+# compute for how many days the certificate will be valid
+
+if [ -n "${PERL}" ] ; then
+
+    export CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate |
+        sed -e "s/.*=//")
+    
+    DAYS_VALID=$( perl <<-'EOF'
+    
+    use strict;
+    use warnings;
+
+    use Date::Parse;
+    
+    my $cert_date = str2time( $ENV{'CERT_END_DATE'} );
+
+    my $days = int (( $cert_date - time ) / 86400 + 0.5);
+
+    print "$days\n";
+    
+EOF
+)
+
+    if [ -n "${VERBOSE}" ] ; then
+        if [ ${DAYS_VALID} -ge 0 ] ; then
+            echo "The certificate will expire in ${DAYS_VALID} day(s)"
+        else
+            echo "The certificate expired "$((- DAYS_VALID))" day(s) ago"
+        fi
+        
+    fi
+    
+    PERFORMANCE_DATA="|days=$DAYS_VALID;${WARNING};${CRITICAL};;"
+
+fi
+
+
 
 ################################################################################
 # check the CN (this will not work as expected with wildcard certificates)
@@ -718,6 +770,6 @@ if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
     CN=${COMMON_NAME}
 fi
 
-echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '$CN' from '$CA_ISSUER_MATCHED' valid until $DATE"
+echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${PERFORMANCE_DATA}"
 
 exit 0
