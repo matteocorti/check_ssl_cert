@@ -1,5 +1,5 @@
 2012-07-06 Version 1.14.0 The status now includes performance data in days until
-                          expirtation (requires perl with Date::Parse).
+                          expiration (requires perl with Date::Parse).
                           It is now possible to print additional information in
                           the plugins long output (multiline, Nagios 3 only)
 2012-04-05 Version 1.13.0 The plugin will now try to fetch the certificate without
