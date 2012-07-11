@@ -1,3 +1,7 @@
+2012-07-11  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: fixed a bug with Perl date computation on some systems
+
 2012-07-06  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: performance data in days

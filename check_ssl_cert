@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.0
+VERSION=1.14.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -631,16 +631,16 @@ fi
 
 if [ -n "${PERL}" ] ; then
 
-    export CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
-    
-    DAYS_VALID=$( perl <<-'EOF'
+    CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
+
+    DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
     
     use strict;
     use warnings;
 
     use Date::Parse;
-    
-    my $cert_date = str2time( $ENV{'CERT_END_DATE'} );
+
+    my $cert_date = str2time( $ARGV[0] );
 
     my $days = int (( $cert_date - time ) / 86400 + 0.5);
 
