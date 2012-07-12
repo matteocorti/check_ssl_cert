@@ -67,7 +67,7 @@ usage() {
     echo "   -f,--file file         local file path (works with -H localhost only)"
     echo "   -h,--help,-?           this help message"
     echo "      --long-output list  append the specified comma separated (no spaces) list"
-    echo "                          of attributes to the plugin output on additiona lines."
+    echo "                          of attributes to the plugin output on additional lines."
     echo "                          Valid attributes are:"
     echo "                            enddate, startdate, subject, issuer, modulus, serial,"
     echo "                            hash, email, ocsp_uri and fingerprint."
