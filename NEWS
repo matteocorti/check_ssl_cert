@@ -1,3 +1,5 @@
+2012-07-13 Version 1.14.2 Added the name since or to expiration in the plugin
+                          output.
 2012-07-11 Version 1.14.1 FIxed a bug with Perl date computation on some systems
 2012-07-06 Version 1.14.0 The status now includes performance data in days until
                           expiration (requires perl with Date::Parse).

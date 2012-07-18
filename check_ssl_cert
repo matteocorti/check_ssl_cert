@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.1
+VERSION=1.14.2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -157,7 +157,7 @@ timeout() {
         expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"    
 
         if [ $? = 1 ] ; then
-            critical "Timeout after $TIMEOUT seconds"
+            critical "Timeout after ${time} seconds"
         fi
 
     else
@@ -811,6 +811,21 @@ if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
     CN=${COMMON_NAME}
 fi
 
-echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+if [ -n "${DAYS_VALID}" ] ; then
+    # nicer formatting
+    if [ ${DAYS_VALID} -gt 1 ] ; then
+        DAYS_VALID=" (expires in ${DAYS_VALID} days)"
+    elif [ ${DAYS_VALID} -eq 1 ] ; then
+        DAYS_VALID=" (expires tomorrow)"
+    elif [ ${DAYS_VALID} -eq 0 ] ; then
+        DAYS_VALID=" (expires today)"
+    elif [ ${DAYS_VALID} -eq -1 ] ; then
+        DAYS_VALID=" (expired yesterday)"
+    else
+        DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
+    fi
+fi
+
+echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${PERFORMANCE_DATA}${LONG_OUTPUT}"
 
 exit 0

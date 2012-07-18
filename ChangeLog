@@ -1,3 +1,8 @@
+2012-07-13  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added the number of days from or to expiration in the
+			  plugin output
+
 2012-07-11  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: fixed a bug with Perl date computation on some systems
