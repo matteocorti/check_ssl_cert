@@ -1,3 +1,7 @@
+2012-09-19  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: improved the "No certificate returned" error message
+
 2012-07-13  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added the number of days from or to expiration in the

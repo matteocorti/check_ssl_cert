@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.2
+VERSION=1.14.3
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -586,7 +586,23 @@ if ! grep -q "CERTIFICATE" ${CERT} ; then
     if [ -n "${FILE}" ] ; then
         critical "'${FILE}' is not a valid certificate file"
     else
-        critical "No certificate returned"
+
+        # See
+        # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
+        # 
+        # - create a branch label via :a
+        # - the N command appends a newline and and the next line of the input
+        #   file to the pattern space
+        # - if we are before the last line, branch to the created label $!ba
+        #   ($! means not to do it on the last line (as there should be one final newline))
+        # - finally the substitution replaces every newline with a space on
+        #   the pattern space 
+    
+        ERROR_MESSAGE=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' ${ERROR})
+        if [ -n "${VERBOSE}" ] ; then
+            echo "Error: ${ERROR_MESSAGE}"
+        fi
+        critical "No certificate returned (${ERROR_MESSAGE})"
     fi
 fi
 
