@@ -28,7 +28,10 @@ version_check:
 clean:
 	rm -f *~
 
-.PHONY: install clean
+test:
+	( cd test && ./unit_tests.sh )
+
+.PHONY: install clean test
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

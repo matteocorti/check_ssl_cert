@@ -482,12 +482,6 @@ if [ -z "${OPENSSL}" ] ; then
     OPENSSL=$PROG
 fi
 
-# check if openssl s_client supports the -servername option
-SERVERNAME=
-if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-    SERVERNAME="-servername ${HOST}"
-fi
-
 # Expect (optional)
 EXPECT=$(which expect 2> /dev/null)
 test -x "${EXPECT}" || EXPECT=""

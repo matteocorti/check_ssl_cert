@@ -1,3 +1,7 @@
+2012-10-11  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* added some unit tests with shUnit2
+
 2012-09-19  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: improved the "No certificate returned" error message
