@@ -643,21 +643,22 @@ main() {
     
         CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
     
-        DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
+	DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
         
-        use strict;
-        use warnings;
+use strict;
+use warnings;
     
-        use Date::Parse;
+use Date::Parse;
     
-        my $cert_date = str2time( $ARGV[0] );
+my $cert_date = str2time( $ARGV[0] );
     
-        my $days = int (( $cert_date - time ) / 86400 + 0.5);
+my $days = int (( $cert_date - time ) / 86400 + 0.5);
     
-        print "$days\n";
+print "$days\n";
         
-    EOF
-    )
+EOF
+
+	)
     
         if [ -n "${VERBOSE}" ] ; then
             if [ ${DAYS_VALID} -ge 0 ] ; then
