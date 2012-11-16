@@ -1,3 +1,7 @@
+2012-11-16  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* simplified the sourcing of the script file for testing
+
 2012-10-11  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* added some unit tests with shUnit2

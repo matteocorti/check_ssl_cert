@@ -232,610 +232,616 @@ fi
 }
 
 
-################################################################################
-# Main
-################################################################################
+main() {
+    
+    ################################################################################
+    # Main
+    ################################################################################
 
-# default values
-PORT=443
-TIMEOUT=15
-VERBOSE=""
-OPENSSL=""
+    # default values
+    PORT=443
+    TIMEOUT=15
+    VERBOSE=""
+    OPENSSL=""
 
-# set the default temp dir if not set
-if [ -z "${TMPDIR}" ] ; then
-    TMPDIR="/tmp"
-fi
+    # set the default temp dir if not set
+    if [ -z "${TMPDIR}" ] ; then
+        TMPDIR="/tmp"
+    fi
 
-################################################################################
-# process command line options
-#
-#   we do no use getopts since it is unable to process long options
+    ################################################################################
+    # process command line options
+    #
+    #   we do no use getopts since it is unable to process long options
 
-while true; do
+    while true; do
 
-    case "$1" in
+        case "$1" in
 
-        ########################################
-        # options without arguments
+            ########################################
+            # options without arguments
 
-        -A|--noauth)     NOAUTH=1;               shift  ;;
+            -A|--noauth)     NOAUTH=1;               shift  ;;
 
-        --altnames)      ALTNAMES=1;             shift  ;;
+            --altnames)      ALTNAMES=1;             shift  ;;
 
-        -h|--help|-\?)   usage;                  exit 0 ;;
+            -h|--help|-\?)   usage;                  exit 0 ;;
 
-        -N|--host-cn)    COMMON_NAME="__HOST__"; shift  ;;
+            -N|--host-cn)    COMMON_NAME="__HOST__"; shift  ;;
 
-        -s|--selfsigned) SELFSIGNED=1;           shift  ;;
+            -s|--selfsigned) SELFSIGNED=1;           shift  ;;
                 
-        -v|--verbose)    VERBOSE=1;              shift  ;;
+            -v|--verbose)    VERBOSE=1;              shift  ;;
         
-        -V|--version)    echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
+            -V|--version)    echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
 
-        ########################################
-        # options with arguments
+            ########################################
+            # options with arguments
         
-        -c|--critical) if [ $# -gt 1 ]; then
-              CRITICAL=$2; shift 2             
-            else 
-              unknown "-c,--critical requires an argument"
-              fi ;;
+            -c|--critical) if [ $# -gt 1 ]; then
+                    CRITICAL=$2; shift 2             
+                else 
+                    unknown "-c,--critical requires an argument"
+                fi ;;
 
-        # deprecated option: used to be as --warning
-        -d|--days) if [ $# -gt 1 ]; then
-              WARNING=$2; shift 2             
-            else 
-              unknown "-d,--days requires an argument"
-            fi ;;
+            # deprecated option: used to be as --warning
+            -d|--days) if [ $# -gt 1 ]; then
+                    WARNING=$2; shift 2             
+                else 
+                    unknown "-d,--days requires an argument"
+                fi ;;
 
-        -e|--email) if [ $# -gt 1 ]; then
-              ADDR=$2; shift 2             
+            -e|--email) if [ $# -gt 1 ]; then
+                ADDR=$2; shift 2             
             else 
               unknown "-e,--email requires an argument"
             fi ;;
 
-        -f|--file) if [ $# -gt 1 ]; then
-              FILE=$2; shift 2
+            -f|--file) if [ $# -gt 1 ]; then
+                FILE=$2; shift 2
             else 
-              unknown "-f,--file requires an argument"
+                unknown "-f,--file requires an argument"
             fi ;;
             
-        -H|--host) if [ $# -gt 1 ]; then
-              HOST=$2; shift 2
+            -H|--host) if [ $# -gt 1 ]; then
+                HOST=$2; shift 2
             else 
-              unknown "-H,--host requires an argument"
+                unknown "-H,--host requires an argument"
             fi ;;
 
-        -i|--issuer) if [ $# -gt 1 ]; then
-              ISSUER=$2; shift 2
+            -i|--issuer) if [ $# -gt 1 ]; then
+                ISSUER=$2; shift 2
             else 
-              unknown "-i,--issuer requires an argument"
+                unknown "-i,--issuer requires an argument"
             fi ;;
 
-        --long-output) if [ $# -gt 1 ]; then
-              LONG_OUTPUT_ATTR=$2; shift 2
+            --long-output) if [ $# -gt 1 ]; then
+                LONG_OUTPUT_ATTR=$2; shift 2
             else
-              unknown "--long-output requires an argument"
+                unknown "--long-output requires an argument"
             fi ;;
 
-        -n|--cn) if [ $# -gt 1 ]; then
-              COMMON_NAME=$2; shift 2
+            -n|--cn) if [ $# -gt 1 ]; then
+                COMMON_NAME=$2; shift 2
             else 
-              unknown "-n,--cn requires an argument"
+                unknown "-n,--cn requires an argument"
             fi ;;
 
-
-        -o|--org) if [ $# -gt 1 ]; then
-              ORGANIZATION=$2; shift 2
+            -o|--org) if [ $# -gt 1 ]; then
+                ORGANIZATION=$2; shift 2
             else 
-              unknown "-o,--org requires an argument"
+                unknown "-o,--org requires an argument"
             fi ;;
 
-        --openssl) if [ $# -gt 1 ]; then
-              OPENSSL=$2; shift 2
+            --openssl) if [ $# -gt 1 ]; then
+                OPENSSL=$2; shift 2
             else
-              unknown "--openssl requires an argument"
+                unknown "--openssl requires an argument"
             fi ;;
 
-        -p|--port) if [ $# -gt 1 ]; then
-              PORT=$2; shift 2
+            -p|--port) if [ $# -gt 1 ]; then
+                PORT=$2; shift 2
             else 
-              unknown "-p,--port requires an argument"
+                unknown "-p,--port requires an argument"
             fi ;;
 
-        -P|--protocol) if [ $# -gt 1 ]; then
-              PROTOCOL=$2; shift 2
+            -P|--protocol) if [ $# -gt 1 ]; then
+                PROTOCOL=$2; shift 2
             else 
-              unknown "-P,--protocol requires an argument"
+                unknown "-P,--protocol requires an argument"
             fi ;;
 
-        -r|--rootcert) if [ $# -gt 1 ]; then
-              ROOT_CA=$2; shift 2
+            -r|--rootcert) if [ $# -gt 1 ]; then
+                ROOT_CA=$2; shift 2
             else 
-              unknown "-r,--rootcert requires an argument"
+                unknown "-r,--rootcert requires an argument"
             fi ;;
 
-        -C|--clientcert) if [ $# -gt 1 ]; then
-              CLIENT_CERT=$2; shift 2
+            -C|--clientcert) if [ $# -gt 1 ]; then
+                CLIENT_CERT=$2; shift 2
             else
-              unknown "-c,--clientcert requires an argument"
+                unknown "-c,--clientcert requires an argument"
             fi ;;
 
-        --clientpass) if [ $# -gt 1 ]; then
-              CLIENT_PASS=$2; shift 2
+            --clientpass) if [ $# -gt 1 ]; then
+                CLIENT_PASS=$2; shift 2
             else
-              unknown "--clientpass requires an argument"
+                unknown "--clientpass requires an argument"
             fi ;;
 
-        -t|--timeout) if [ $# -gt 1 ]; then
-              TIMEOUT=$2; shift 2
+            -t|--timeout) if [ $# -gt 1 ]; then
+                TIMEOUT=$2; shift 2
             else 
               unknown "-t,--timeout requires an argument"
             fi ;;
 
-        --temp) if [ $# -gt 1 ] ; then
-              # override TMPDIR
-              TMPDIR=$2; shift 2
+            --temp) if [ $# -gt 1 ] ; then
+                # override TMPDIR
+                TMPDIR=$2; shift 2
             else
-              unknown "--temp requires an argument"
+               unknown "--temp requires an argument"
             fi ;;
 
-        -w|--warning) if [ $# -gt 1 ]; then
-              WARNING=$2; shift 2             
+            -w|--warning) if [ $# -gt 1 ]; then
+                WARNING=$2; shift 2             
             else 
-              unknown "-w,--warning requires an argument"
+                unknown "-w,--warning requires an argument"
             fi ;;
 
-        ########################################
-        # special
+            ########################################
+            # special
         
-        --) shift; break;;
-        -*) unknown "invalid option: $1" ;;
-        *)  break;;
+            --) shift; break;;
+            -*) unknown "invalid option: $1" ;;
+            *)  break;;
         
-    esac
+        esac
 
-done
-
-################################################################################
-# Set COMMON_NAME to hostname if -N was given as argument
-if [ "$COMMON_NAME" = "__HOST__" ] ; then
-    COMMON_NAME=$(hostname)
-fi
-
-################################################################################
-# sanity checks
-
-###############
-# Check options
-if [ -z "${HOST}" ] ; then
-    usage "No host specified"
-fi
-
-if [ -n "${ALTNAMES}" -a -z "${COMMON_NAME}" ] ; then
-    unknown "--altnames requires a common name to match (--cn or --host-cn)"
-fi
-
-if [ -n "${ROOT_CA}" ] ; then
-    if [ ! -r ${ROOT_CA} ] ; then
-        unknown "Cannot read root certificate ${ROOT_CA}"
-    fi
-    if [ -d ${ROOT_CA} ] ; then
-      ROOT_CA="-CApath ${ROOT_CA}"
-    elif [ -f ${ROOT_CA} ] ; then
-      ROOT_CA="-CAfile ${ROOT_CA}"
-    else
-      unknown "Root certificate of unknown type $(file ${ROOT_CA} 2> /dev/null)"
-    fi
-fi
-
-if [ -n "${CLIENT_CERT}" ] ; then
-    if [ ! -r ${CLIENT_CERT} ] ; then
-        unknown "Cannot read client certificate ${CLIENT_CERT}"
-    fi
-fi
-
-if [ -n "${CRITICAL}" ] ; then
-    if ! echo "${CRITICAL}" | grep -q '[0-9][0-9]*' ; then
-        unknown "invalid number of days ${CRITICAL}"
-    fi
-fi
-
-if [ -n "${WARNING}" ] ; then
-    if ! echo ${WARNING} | grep -q '[0-9][0-9]*' ; then
-        unknown "invalid number of days ${WARNING}"
-    fi
-fi
-
-if [ -n "${CRITICAL}" -a -n "${WARNING}" ] ; then
-    if [ ${WARNING} -le ${CRITICAL} ] ; then
-        unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
-    fi
-fi
-
-if [ -n "${TMPDIR}" ] ; then
-    if [ ! -d ${TMPDIR} ] ; then
-        unknown "${TMPDIR} is not a directory";
-    fi
-    if [ ! -w ${TMPDIR} ] ; then
-        unknown "${TMPDIR} is not writable";
-    fi
-fi
-
-if [ -n "${OPENSSL}" ] ; then
-    if [ ! -x ${OPENSSL} ] ; then
-        unknown "${OPENSSL} ist not an executable"
-    fi
-    if [ $(basename ${OPENSSL}) != 'openssl' ] ; then
-        unknown "${OPENSSL} ist not an openssl executable"
-    fi
-fi
-    
-
-#######################
-# Check needed programs
-
-# OpenSSL
-if [ -z "${OPENSSL}" ] ; then
-    check_required_prog openssl
-    OPENSSL=$PROG
-fi
-
-# Expect (optional)
-EXPECT=$(which expect 2> /dev/null)
-test -x "${EXPECT}" || EXPECT=""
-if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
-    echo "Expect not found: disabling timeouts"
-fi
-
-# Perl with Date::Parse (optional)
-PERL=$(which perl 2> /dev/null)
-test -x "${PERL}" || PERL=""
-if [ -z "${PERL}" -a -n "${VERBOSE}" ] ; then
-    echo "Perl not found: disabling date computations"    
-fi
-if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
-    if [ -n "${VERBOSE}" ] ; then
-        echo "Perl module Date::Parse not installed: disabling date computations"
-    fi
-    PERL=        
-fi
-
-################################################################################
-# check if openssl s_client supports the -servername option
-#
-#   openssl s_client does not have a -help option
-#   => we supply an invalid command line option to get the help
-#      on standard error
-#
-SERVERNAME=
-if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-    SERVERNAME="-servername ${HOST}"
-else
-    if [ -n "${VERBOSE}" ] ; then
-        echo "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
-    fi
-fi
-
-################################################################################
-# fetch the X.509 certificate
-
-# temporary storage for the certificate and the errors
-
-CERT=$(  mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
-if [ -z "${CERT}" ] || [ ! -w "${CERT}" ] ; then
-    unknown 'temporary file creation failure.'
-fi
-
-ERROR=$( mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
-if [ -z "${ERROR}" ] || [ ! -w "${ERROR}" ] ; then
-    unknown 'temporary file creation failure.'
-fi
-
-if [ -n "${VERBOSE}" ] ; then
-    echo "downloading certificate to ${TMPDIR}"
-fi
-
-CLIENT=""
-if [ -n "${CLIENT_CERT}" ] ; then
-    CLIENT="-cert ${CLIENT_CERT}"
-fi
-
-CLIENTPASS=""
-if [ -n "${CLIENT_PASS}" ] ; then
-    CLIENTPASS="-pass pass:${CLIENT_PASS}"
-fi
-
-# cleanup before program termination
-# using named signals to be POSIX compliant
-trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
-
-fetch_certificate
-
-if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
-
-    if [ -n "${SERVERNAME}" ] ; then
-
-        # some OpenSSL versions have problems with the -servername option
-        # we try without
-        if [ -n "${VERBOSE}" ] ; then
-            echo "'${OPENSSL} s_client' returned an error: trying without '-servername'"
-        fi
-        
-        SERVERNAME=
-        fetch_certificate
-
-    fi
-
-    if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
-
-        critical "cannot fetch certificate: OpenSSL got an unexpected message"
-
-    fi
-
-fi
-
-if ! grep -q "CERTIFICATE" ${CERT} ; then
-    if [ -n "${FILE}" ] ; then
-        critical "'${FILE}' is not a valid certificate file"
-    else
-
-        # See
-        # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
-        # 
-        # - create a branch label via :a
-        # - the N command appends a newline and and the next line of the input
-        #   file to the pattern space
-        # - if we are before the last line, branch to the created label $!ba
-        #   ($! means not to do it on the last line (as there should be one final newline))
-        # - finally the substitution replaces every newline with a space on
-        #   the pattern space 
-    
-        ERROR_MESSAGE=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' ${ERROR})
-        if [ -n "${VERBOSE}" ] ; then
-            echo "Error: ${ERROR_MESSAGE}"
-        fi
-        critical "No certificate returned (${ERROR_MESSAGE})"
-    fi
-fi
-
-################################################################################
-# parse the X.509 certificate
-
-DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
-CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
-
-CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
-CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
-
-
-################################################################################
-# Generate the long output
-if [ -n "${LONG_OUTPUT_ATTR}" ] ; then
-
-    check_attr() {
-        ATTR=$1
-        if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
-            unknown "Invalid certificate attribute: ${ATTR}"
-        else       
-            value=$(${OPENSSL} x509 -in ${CERT} -noout -${ATTR} | sed -e "s/.*=//")
-            LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
-       fi
-       
-    }
-    
-    # split on comma
-    if [ "${LONG_OUTPUT_ATTR}" = "all" ] ; then
-        LONG_OUTPUT_ATTR=${VALID_ATTRIBUTES}
-    fi
-    attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\n" )
-    for attribute in $attributes ; do
-        check_attr ${attribute}
     done
 
-fi
+    ################################################################################
+    # Set COMMON_NAME to hostname if -N was given as argument
+    if [ "$COMMON_NAME" = "__HOST__" ] ; then
+        COMMON_NAME=$(hostname)
+    fi
 
-################################################################################
-# compute for how many days the certificate will be valid
+    ################################################################################
+    # sanity checks
 
-if [ -n "${PERL}" ] ; then
+    ###############
+    # Check options
+    if [ -z "${HOST}" ] ; then
+        usage "No host specified"
+    fi
 
-    CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
+    if [ -n "${ALTNAMES}" -a -z "${COMMON_NAME}" ] ; then
+        unknown "--altnames requires a common name to match (--cn or --host-cn)"
+    fi
 
-    DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
-    
-    use strict;
-    use warnings;
-
-    use Date::Parse;
-
-    my $cert_date = str2time( $ARGV[0] );
-
-    my $days = int (( $cert_date - time ) / 86400 + 0.5);
-
-    print "$days\n";
-    
-EOF
-)
-
-    if [ -n "${VERBOSE}" ] ; then
-        if [ ${DAYS_VALID} -ge 0 ] ; then
-            echo "The certificate will expire in ${DAYS_VALID} day(s)"
+    if [ -n "${ROOT_CA}" ] ; then
+        if [ ! -r ${ROOT_CA} ] ; then
+            unknown "Cannot read root certificate ${ROOT_CA}"
+        fi
+        if [ -d ${ROOT_CA} ] ; then
+            ROOT_CA="-CApath ${ROOT_CA}"
+        elif [ -f ${ROOT_CA} ] ; then
+            ROOT_CA="-CAfile ${ROOT_CA}"
         else
-            echo "The certificate expired "$((- DAYS_VALID))" day(s) ago"
+            unknown "Root certificate of unknown type $(file ${ROOT_CA} 2> /dev/null)"
+        fi
+    fi
+    
+    if [ -n "${CLIENT_CERT}" ] ; then
+        if [ ! -r ${CLIENT_CERT} ] ; then
+            unknown "Cannot read client certificate ${CLIENT_CERT}"
+        fi
+    fi
+    
+    if [ -n "${CRITICAL}" ] ; then
+        if ! echo "${CRITICAL}" | grep -q '[0-9][0-9]*' ; then
+            unknown "invalid number of days ${CRITICAL}"
+        fi
+    fi
+    
+    if [ -n "${WARNING}" ] ; then
+        if ! echo ${WARNING} | grep -q '[0-9][0-9]*' ; then
+            unknown "invalid number of days ${WARNING}"
+        fi
+    fi
+    
+    if [ -n "${CRITICAL}" -a -n "${WARNING}" ] ; then
+        if [ ${WARNING} -le ${CRITICAL} ] ; then
+            unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
+        fi
+    fi
+    
+    if [ -n "${TMPDIR}" ] ; then
+        if [ ! -d ${TMPDIR} ] ; then
+            unknown "${TMPDIR} is not a directory";
+        fi
+        if [ ! -w ${TMPDIR} ] ; then
+            unknown "${TMPDIR} is not writable";
+        fi
+    fi
+    
+    if [ -n "${OPENSSL}" ] ; then
+        if [ ! -x ${OPENSSL} ] ; then
+            unknown "${OPENSSL} ist not an executable"
+        fi
+        if [ $(basename ${OPENSSL}) != 'openssl' ] ; then
+            unknown "${OPENSSL} ist not an openssl executable"
+        fi
+    fi
+    
+    #######################
+    # Check needed programs
+
+    # OpenSSL
+    if [ -z "${OPENSSL}" ] ; then
+        check_required_prog openssl
+        OPENSSL=$PROG
+    fi
+
+    # Expect (optional)
+    EXPECT=$(which expect 2> /dev/null)
+    test -x "${EXPECT}" || EXPECT=""
+    if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
+        echo "Expect not found: disabling timeouts"
+    fi
+
+    # Perl with Date::Parse (optional)
+    PERL=$(which perl 2> /dev/null)
+    test -x "${PERL}" || PERL=""
+    if [ -z "${PERL}" -a -n "${VERBOSE}" ] ; then
+        echo "Perl not found: disabling date computations"    
+    fi
+    if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
+        if [ -n "${VERBOSE}" ] ; then
+            echo "Perl module Date::Parse not installed: disabling date computations"
+        fi
+        PERL=        
+    fi
+    
+    ################################################################################
+    # check if openssl s_client supports the -servername option
+    #
+    #   openssl s_client does not have a -help option
+    #   => we supply an invalid command line option to get the help
+    #      on standard error
+    #
+    SERVERNAME=
+    if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
+        SERVERNAME="-servername ${HOST}"
+    else
+        if [ -n "${VERBOSE}" ] ; then
+            echo "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
+        fi
+    fi
+    
+    ################################################################################
+    # fetch the X.509 certificate
+    
+    # temporary storage for the certificate and the errors
+    
+    CERT=$(  mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+    if [ -z "${CERT}" ] || [ ! -w "${CERT}" ] ; then
+        unknown 'temporary file creation failure.'
+    fi
+    
+    ERROR=$( mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+    if [ -z "${ERROR}" ] || [ ! -w "${ERROR}" ] ; then
+        unknown 'temporary file creation failure.'
+    fi
+    
+    if [ -n "${VERBOSE}" ] ; then
+        echo "downloading certificate to ${TMPDIR}"
+    fi
+    
+    CLIENT=""
+    if [ -n "${CLIENT_CERT}" ] ; then
+        CLIENT="-cert ${CLIENT_CERT}"
+    fi
+    
+    CLIENTPASS=""
+    if [ -n "${CLIENT_PASS}" ] ; then
+        CLIENTPASS="-pass pass:${CLIENT_PASS}"
+    fi
+    
+    # cleanup before program termination
+    # using named signals to be POSIX compliant
+    trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
+    
+    fetch_certificate
+    
+    if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
+    
+        if [ -n "${SERVERNAME}" ] ; then
+    
+            # some OpenSSL versions have problems with the -servername option
+            # we try without
+            if [ -n "${VERBOSE}" ] ; then
+                echo "'${OPENSSL} s_client' returned an error: trying without '-servername'"
+            fi
+            
+            SERVERNAME=
+            fetch_certificate
+    
+        fi
+    
+        if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
+    
+            critical "cannot fetch certificate: OpenSSL got an unexpected message"
+    
+        fi
+    
+    fi
+    
+    if ! grep -q "CERTIFICATE" ${CERT} ; then
+        if [ -n "${FILE}" ] ; then
+            critical "'${FILE}' is not a valid certificate file"
+        else
+    
+            # See
+            # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
+            # 
+            # - create a branch label via :a
+            # - the N command appends a newline and and the next line of the input
+            #   file to the pattern space
+            # - if we are before the last line, branch to the created label $!ba
+            #   ($! means not to do it on the last line (as there should be one final newline))
+            # - finally the substitution replaces every newline with a space on
+            #   the pattern space 
+        
+            ERROR_MESSAGE=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' ${ERROR})
+            if [ -n "${VERBOSE}" ] ; then
+                echo "Error: ${ERROR_MESSAGE}"
+            fi
+            critical "No certificate returned (${ERROR_MESSAGE})"
+        fi
+    fi
+    
+    ################################################################################
+    # parse the X.509 certificate
+    
+    DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
+    CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    
+    CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
+    CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    
+    
+    ################################################################################
+    # Generate the long output
+    if [ -n "${LONG_OUTPUT_ATTR}" ] ; then
+    
+        check_attr() {
+            ATTR=$1
+            if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
+                unknown "Invalid certificate attribute: ${ATTR}"
+            else       
+                value=$(${OPENSSL} x509 -in ${CERT} -noout -${ATTR} | sed -e "s/.*=//")
+                LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
+           fi
+           
+        }
+        
+        # split on comma
+        if [ "${LONG_OUTPUT_ATTR}" = "all" ] ; then
+            LONG_OUTPUT_ATTR=${VALID_ATTRIBUTES}
+        fi
+        attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\n" )
+        for attribute in $attributes ; do
+            check_attr ${attribute}
+        done
+    
+    fi
+    
+    ################################################################################
+    # compute for how many days the certificate will be valid
+    
+    if [ -n "${PERL}" ] ; then
+    
+        CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
+    
+        DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
+        
+        use strict;
+        use warnings;
+    
+        use Date::Parse;
+    
+        my $cert_date = str2time( $ARGV[0] );
+    
+        my $days = int (( $cert_date - time ) / 86400 + 0.5);
+    
+        print "$days\n";
+        
+    EOF
+    )
+    
+        if [ -n "${VERBOSE}" ] ; then
+            if [ ${DAYS_VALID} -ge 0 ] ; then
+                echo "The certificate will expire in ${DAYS_VALID} day(s)"
+            else
+                echo "The certificate expired "$((- DAYS_VALID))" day(s) ago"
+            fi
+            
+        fi
+        
+        PERFORMANCE_DATA="|days=$DAYS_VALID;${WARNING};${CRITICAL};;"
+    
+    fi
+    
+    
+    
+    ################################################################################
+    # check the CN (this will not work as expected with wildcard certificates)
+    
+    if [ -n "$COMMON_NAME" ] ; then
+    
+        ok=''
+    
+        case $COMMON_NAME in
+            $CN) ok='true' ;;
+        esac
+    
+        # check alterante names
+        if [ -n "${ALTNAMES}" ] ; then
+            for alt_name in $( $OPENSSL x509 -in ${CERT} -text | \
+                grep --after-context=1 '509v3 Subject Alternative Name:' | \
+                tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g" ) ; do
+                case $COMMON_NAME in
+                    $alt_name) ok='true' ;;
+                esac
+            done
+        fi
+    
+        if [ -z "$ok" ] ; then
+            critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
         fi
         
     fi
     
-    PERFORMANCE_DATA="|days=$DAYS_VALID;${WARNING};${CRITICAL};;"
-
-fi
-
-
-
-################################################################################
-# check the CN (this will not work as expected with wildcard certificates)
-
-if [ -n "$COMMON_NAME" ] ; then
-
-    ok=''
-
-    case $COMMON_NAME in
-        $CN) ok='true' ;;
-    esac
-
-    # check alterante names
-    if [ -n "${ALTNAMES}" ] ; then
-        for alt_name in $( $OPENSSL x509 -in ${CERT} -text | \
-            grep --after-context=1 '509v3 Subject Alternative Name:' | \
-            tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g" ) ; do
-            case $COMMON_NAME in
-                $alt_name) ok='true' ;;
-            esac
-        done
-    fi
-
-    if [ -z "$ok" ] ; then
-        critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
-    fi
+    ################################################################################
+    # check the issuer
     
-fi
-
-################################################################################
-# check the issuer
-
-if [ -n "$ISSUER" ] ; then
-
-    ok=''
-    CA_ISSUER_MATCHED=''
-
-    if echo $CA_CN | grep -q "^$ISSUER$" ; then
-        ok='true'
-        CA_ISSUER_MATCHED="${CA_CN}"
-    fi
-
-    if echo $CA_O | grep -q "^$ISSUER$" ; then
-        ok='true'
-        CA_ISSUER_MATCHED="${CA_O}"
-    fi
-
-    if [ -z "$ok" ] ; then
-        critical "invalid CA ('$ISSUER' does not match '$CA_O' or '$CA_CN')"
-    fi
+    if [ -n "$ISSUER" ] ; then
     
-else
-
-    CA_ISSUER_MATCHED="${CA_CN}"
-
-fi
-
-################################################################################
-# check the validity
-
-# we always check expired certificates
-if ! $OPENSSL x509 -in ${CERT} -noout -checkend 0 ; then
-    critical "certificate is expired (was valid until $DATE)"
-fi
-
-if [ -n "${CRITICAL}" ] ; then
-
-    if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${CRITICAL} * 86400 )) ; then
-        critical "certificate will expire on $DATE"
-    fi
-
-fi
-
-if [ -n "${WARNING}" ] ; then
-
-    if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${WARNING} * 86400 )) ; then
-        warning "certificate will expire on $DATE"
-    fi
-
-fi
-
-################################################################################
-# check the organization
-
-if [ -n "$ORGANIZATION" ] ; then
-
-    ORG=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
-
-    if ! echo $ORG | grep -q "^$ORGANIZATION" ; then
-        critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
-    fi
-
-fi
-
-################################################################################
-# check the organization
-
-if [ -n "$ADDR" ] ; then
-
-    EMAIL=$($OPENSSL x509 -in ${CERT} -email -noout)
-
-    if [ -n "${VERBOSE}" ] ; then
-        echo "checking email (${ADDR}): ${EMAIL}"
-    fi
-
-    if [ -z "${EMAIL}" ] ; then
-        critical "the certficate does not contain an email address"
-    fi
-
-    if ! echo $EMAIL | grep -q "^$ADDR" ; then
-        critical "invalid email ($ADDR does not match $EMAIL)"
-    fi
-
-fi
-
-################################################################################
-# Check if the certificate was verified
-
-if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
-
-    if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' ${ERROR} ; then
-
-        if [ -z "${SELFSIGNED}" ] ; then
-            critical "Cannot verify certificate\nself signed certificate"
-        else
-            SELFSIGNEDCERT="self signed "
+        ok=''
+        CA_ISSUER_MATCHED=''
+    
+        if echo $CA_CN | grep -q "^$ISSUER$" ; then
+            ok='true'
+            CA_ISSUER_MATCHED="${CA_CN}"
         fi
-
-    else 
-
-        # process errors
-        details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
-
-        critical "Cannot verify certificate\n${details}"
-
+    
+        if echo $CA_O | grep -q "^$ISSUER$" ; then
+            ok='true'
+            CA_ISSUER_MATCHED="${CA_O}"
+        fi
+    
+        if [ -z "$ok" ] ; then
+            critical "invalid CA ('$ISSUER' does not match '$CA_O' or '$CA_CN')"
+        fi
+        
+    else
+    
+        CA_ISSUER_MATCHED="${CA_CN}"
+    
     fi
     
-fi
-
-################################################################################
-# If we get this far, assume all is well. :)
-
-# if --altnames was specified we show the specified CN instead of
-# the certificate CN
-if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
-    CN=${COMMON_NAME}
-fi
-
-if [ -n "${DAYS_VALID}" ] ; then
-    # nicer formatting
-    if [ ${DAYS_VALID} -gt 1 ] ; then
-        DAYS_VALID=" (expires in ${DAYS_VALID} days)"
-    elif [ ${DAYS_VALID} -eq 1 ] ; then
-        DAYS_VALID=" (expires tomorrow)"
-    elif [ ${DAYS_VALID} -eq 0 ] ; then
-        DAYS_VALID=" (expires today)"
-    elif [ ${DAYS_VALID} -eq -1 ] ; then
-        DAYS_VALID=" (expired yesterday)"
-    else
-        DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
+    ################################################################################
+    # check the validity
+    
+    # we always check expired certificates
+    if ! $OPENSSL x509 -in ${CERT} -noout -checkend 0 ; then
+        critical "certificate is expired (was valid until $DATE)"
     fi
+    
+    if [ -n "${CRITICAL}" ] ; then
+    
+        if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${CRITICAL} * 86400 )) ; then
+            critical "certificate will expire on $DATE"
+        fi
+    
+    fi
+    
+    if [ -n "${WARNING}" ] ; then
+    
+        if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${WARNING} * 86400 )) ; then
+            warning "certificate will expire on $DATE"
+        fi
+    
+    fi
+    
+    ################################################################################
+    # check the organization
+    
+    if [ -n "$ORGANIZATION" ] ; then
+    
+        ORG=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
+    
+        if ! echo $ORG | grep -q "^$ORGANIZATION" ; then
+            critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
+        fi
+    
+    fi
+    
+    ################################################################################
+    # check the organization
+    
+    if [ -n "$ADDR" ] ; then
+    
+        EMAIL=$($OPENSSL x509 -in ${CERT} -email -noout)
+    
+        if [ -n "${VERBOSE}" ] ; then
+            echo "checking email (${ADDR}): ${EMAIL}"
+        fi
+    
+        if [ -z "${EMAIL}" ] ; then
+            critical "the certficate does not contain an email address"
+        fi
+    
+        if ! echo $EMAIL | grep -q "^$ADDR" ; then
+            critical "invalid email ($ADDR does not match $EMAIL)"
+        fi
+    
+    fi
+    
+    ################################################################################
+    # Check if the certificate was verified
+    
+    if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
+    
+        if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' ${ERROR} ; then
+    
+            if [ -z "${SELFSIGNED}" ] ; then
+                critical "Cannot verify certificate\nself signed certificate"
+            else
+                SELFSIGNEDCERT="self signed "
+            fi
+    
+        else 
+    
+            # process errors
+            details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+    
+            critical "Cannot verify certificate\n${details}"
+    
+        fi
+        
+    fi
+    
+    ################################################################################
+    # If we get this far, assume all is well. :)
+    
+    # if --altnames was specified we show the specified CN instead of
+    # the certificate CN
+    if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
+        CN=${COMMON_NAME}
+    fi
+    
+    if [ -n "${DAYS_VALID}" ] ; then
+        # nicer formatting
+        if [ ${DAYS_VALID} -gt 1 ] ; then
+            DAYS_VALID=" (expires in ${DAYS_VALID} days)"
+        elif [ ${DAYS_VALID} -eq 1 ] ; then
+            DAYS_VALID=" (expires tomorrow)"
+        elif [ ${DAYS_VALID} -eq 0 ] ; then
+            DAYS_VALID=" (expires today)"
+        elif [ ${DAYS_VALID} -eq -1 ] ; then
+            DAYS_VALID=" (expired yesterday)"
+        else
+            DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
+        fi
+    fi
+    
+    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    
+    exit 0
+    
+}
+    
+if [ "${1}" != "--source-only" ]; then
+    main "${@}"
 fi
-
-echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${PERFORMANCE_DATA}${LONG_OUTPUT}"
-
-exit 0
