@@ -1,7 +1,12 @@
 Simply copy the plugin to your nagios plugin directory
 
+Optional installs:
+
 In order to use timeouts the plugin needs 'expect' in the current PATH
 See: http://en.wikipedia.org/wiki/Expect
+
+In order to perform date computations the plugin needs a Perl
+interpreter and the module Date::Parse
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

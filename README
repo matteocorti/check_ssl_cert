@@ -60,6 +60,14 @@ present on your system timeouts will be disabled.
 
 See: http://en.wikipedia.org/wiki/Expect
 
+Perl and Date::Parse:
+=====================
+
+If perl and Date::Parse are available the plugin will also compute for
+how many days the certificate will be valid and put the information in
+the performance data. If perl or Date::Parse are not available the
+information will not be available.
+
 Virtual servers:
 ================
 
