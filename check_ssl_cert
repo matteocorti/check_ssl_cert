@@ -191,7 +191,7 @@ check_required_prog() {
 fetch_certificate() {
 
     # check if a protocol was specified (if not HTTP switch to TLS)
-    if [ -n "${PROTOCOL}" -a "${PROTOCOL}" != "http" -a "${PROTOCOL}" != "https" ] ; then
+    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
         
         case "${PROTOCOL}" in
             
@@ -414,7 +414,7 @@ main() {
         usage "No host specified"
     fi
 
-    if [ -n "${ALTNAMES}" -a -z "${COMMON_NAME}" ] ; then
+    if [ -n "${ALTNAMES}" ] && [ -z "${COMMON_NAME}" ] ; then
         unknown "--altnames requires a common name to match (--cn or --host-cn)"
     fi
 
@@ -449,7 +449,7 @@ main() {
         fi
     fi
     
-    if [ -n "${CRITICAL}" -a -n "${WARNING}" ] ; then
+    if [ -n "${CRITICAL}" ] && [ -n "${WARNING}" ] ; then
         if [ ${WARNING} -le ${CRITICAL} ] ; then
             unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
         fi
@@ -485,14 +485,14 @@ main() {
     # Expect (optional)
     EXPECT=$(which expect 2> /dev/null)
     test -x "${EXPECT}" || EXPECT=""
-    if [ -z "${EXPECT}" -a -n "${VERBOSE}" ] ; then
+    if [ -z "${EXPECT}" ] && [ -n "${VERBOSE}" ] ; then
         echo "Expect not found: disabling timeouts"
     fi
 
     # Perl with Date::Parse (optional)
     PERL=$(which perl 2> /dev/null)
     test -x "${PERL}" || PERL=""
-    if [ -z "${PERL}" -a -n "${VERBOSE}" ] ; then
+    if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
         echo "Perl not found: disabling date computations"    
     fi
     if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
@@ -818,7 +818,7 @@ EOF
     
     # if --altnames was specified we show the specified CN instead of
     # the certificate CN
-    if [ -n "${ALTNAMES}" -a -n "${COMMON_NAME}" ] ; then
+    if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] ; then
         CN=${COMMON_NAME}
     fi
     
