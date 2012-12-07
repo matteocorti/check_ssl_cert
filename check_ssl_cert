@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.3
+VERSION=1.14.4
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -402,7 +402,7 @@ main() {
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument
     if [ "$COMMON_NAME" = "__HOST__" ] ; then
-        COMMON_NAME=$(hostname)
+        COMMON_NAME=${HOST}
     fi
 
     ################################################################################
