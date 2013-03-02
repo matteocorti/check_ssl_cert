@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.4
+VERSION=1.14.5
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -511,7 +511,13 @@ main() {
     #
     SERVERNAME=
     if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-        SERVERNAME="-servername ${HOST}"
+
+        if [ -n "${COMMON_NAME}" ] ; then
+            SERVERNAME="-servername ${COMMON_NAME}"
+        else
+            SERVERNAME="-servername ${HOST}"
+        fi
+
     else
         if [ -n "${VERBOSE}" ] ; then
             echo "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"

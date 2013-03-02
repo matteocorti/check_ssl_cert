@@ -1,3 +1,5 @@
+2013-03-02 Version 1.14.5 Fixed a bug occuring with TLS and multiple names in
+                          the certificate
 2012-12-07 Version 1.14.4 Fixed a bug causing -N to always compare the CN
                           with 'localhost'
 2012-09-19 Version 1.14.3 Improved the error message in case of a failure in

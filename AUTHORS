@@ -28,6 +28,7 @@ Thanks:
 * Many thanks to Rob Yamry for the help in debugging a problem with
   certain versions of OpenSSL and TLS extensions
 * Many thanks to Jim Hopp for the "No certificate returned" enhancement patch
+* Many thanks to Javier Gonel for the TLS servername patch
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
