@@ -154,9 +154,11 @@ exec_with_timeout() {
     command="/bin/sh -c \"$2\""
 
     if [ -n "${TIMEOUT_BIN}" ] ; then
+    
         eval "${TIMEOUT_BIN} $time $command"
 
     elif [ -n "${EXPECT}" ] ; then
+
         expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"    
 
         if [ $? = 1 ] ; then
