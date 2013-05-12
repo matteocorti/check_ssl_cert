@@ -488,19 +488,23 @@ main() {
     # Expect (optional)
     EXPECT=$(which expect 2> /dev/null)
     test -x "${EXPECT}" || EXPECT=""
-    if [ -z "${EXPECT}" ] && [ -n "${VERBOSE}" ] ; then
-        echo "expect not available"
-    else
-        echo "expect available (${EXPECT})"
+    if [  -n "${VERBOSE}" ] ; then
+        if [ -z "${EXPECT}" ] ; then
+            echo "expect not available"
+        else
+            echo "expect available (${EXPECT})"
+        fi
     fi
 
     # Timeout (optional)
     TIMEOUT_BIN=$(which timeout 2> /dev/null)
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
-    if [ -z "${TIMEOUT_BIN}" ] && [ -n "${VERBOSE}" ] ; then
-        echo "timeout not available"
-    else
-        echo "timeout available (${TIMEOUT_BIN})"
+    if [  -n "${VERBOSE}" ] ; then
+        if [ -z "${TIMEOUT_BIN}" ] ; then
+            echo "timeout not available"
+        else
+            echo "timeout available (${TIMEOUT_BIN})"
+        fi
     fi
 
     if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ] && [ -n "${VERBOSE}" ] ; then
