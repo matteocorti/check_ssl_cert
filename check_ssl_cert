@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.14.5
+VERSION=1.14.6
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -78,7 +78,7 @@ usage() {
     echo "   -o,--org org           pattern to match the organization of the certificate"
     echo "      --openssl path      path of the openssl binary to be used"
     echo "   -p,--port port         TCP port"
-    echo "   -P,--protocol protocol use the specific protocol {http|smtp|pop3|imap|ftp}"
+    echo "   -P,--protocol protocol use the specific protocol {http|smtp|pop3|imap|ftp|xmpp}"
     echo "                          http:               default"
     echo "                          smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned        allows self-signed certificates"
@@ -145,7 +145,7 @@ unknown() {
 #   $1 timeout in seconds
 #   $2 command
 # Returns 1 if timed out 0 otherwise
-timeout() {
+exec_with_timeout() {
 
     time=$1
 
@@ -153,7 +153,10 @@ timeout() {
     # (spawn accepts one command)
     command="/bin/sh -c \"$2\""
 
-    if [ -n "${EXPECT}" ] ; then
+    if [ -n "${TIMEOUT_BIN}" ] ; then
+        eval "${TIMEOUT_BIN} $time $command"
+
+    elif [ -n "${EXPECT}" ] ; then
         expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"    
 
         if [ $? = 1 ] ; then
@@ -195,9 +198,9 @@ fetch_certificate() {
         
         case "${PROTOCOL}" in
             
-            smtp|pop3|imap|ftp)
+            smtp|pop3|imap|ftp|xmpp)
 
-timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+exec_with_timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
 ;;
 
 *)
@@ -210,7 +213,7 @@ elif [ -n "${FILE}" ] ; then
 
 if [ "${HOST}" = "localhost" ] ; then
     
-    timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+    exec_with_timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
     
 else
     
@@ -220,7 +223,7 @@ fi
 
 else
 
-timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
+exec_with_timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} 2> ${ERROR} 1> ${CERT}"
 
 fi
 
@@ -486,7 +489,22 @@ main() {
     EXPECT=$(which expect 2> /dev/null)
     test -x "${EXPECT}" || EXPECT=""
     if [ -z "${EXPECT}" ] && [ -n "${VERBOSE}" ] ; then
-        echo "Expect not found: disabling timeouts"
+        echo "expect not available"
+    else
+        echo "expect available (${EXPECT})"
+    fi
+
+    # Timeout (optional)
+    TIMEOUT_BIN=$(which timeout 2> /dev/null)
+    test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
+    if [ -z "${TIMEOUT_BIN}" ] && [ -n "${VERBOSE}" ] ; then
+        echo "timeout not available"
+    else
+        echo "timeout available (${TIMEOUT_BIN})"
+    fi
+
+    if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ] && [ -n "${VERBOSE}" ] ; then
+        echo "disabling timeouts"
     fi
 
     # Perl with Date::Parse (optional)
