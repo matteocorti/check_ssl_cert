@@ -1,12 +1,12 @@
 PLUGIN=check_ssl_cert
 VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
-DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
+DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
-	cp $(DIST_FILES) $(DIST_DIR)
+	cp -r $(DIST_FILES) $(DIST_DIR)
 	tar cfz $(DIST_DIR).tar.gz  $(DIST_DIR)
 	tar cfj $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
