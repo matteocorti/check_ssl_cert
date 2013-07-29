@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version          1.14.6
+%define version          1.15.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Mon Jul 29 2013 Matteo Corti <matteo.corti@id.ethz.ch> - 1.15.0-0
+- Updated to 1.15.0 (force SSL version)
+
 * Sun May 12 2013 Matteo Corti <matteo.corti@id.ethz.ch> - 1.14.6-0
 - Updated to 1.16.6 (timeout and XMPP support)
 

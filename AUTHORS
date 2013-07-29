@@ -31,6 +31,7 @@ Thanks:
 * Many thanks to Javier Gonel for the TLS servername patch
 * Many thanks to Christian Ruppert for the XMPP patch
 * Many thanks to Robin H. Johnson for the 'timeout' patch
+* Many thanks to Max Winterstein for the SSL version patch
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

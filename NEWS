@@ -1,3 +1,5 @@
+2013-07-29 Version 1.15.0 Added an option to force a certain SSL version (thanks
+                          to Max Winterstein)
 2013-05-12 Version 1.14.6 Added XMPP and timeout support (thanks to Christian
                           Ruppert and Robin H. Johnson)
 2013-03-02 Version 1.14.5 Fixed a bug occuring with TLS and multiple names in
