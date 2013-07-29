@@ -1,3 +1,7 @@
+2013-07-29  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: Added an option to force a given SSL version
+
 2013-03-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: Fixed a bug occuring with TLS and multiple names in
