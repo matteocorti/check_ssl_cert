@@ -1,3 +1,7 @@
+2013-10-01  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: fixes with shellcheck (quoting)
+
 2013-07-29  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: Added an option to force a given SSL version

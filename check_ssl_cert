@@ -634,7 +634,7 @@ main() {
             # - finally the substitution replaces every newline with a space on
             #   the pattern space 
         
-            ERROR_MESSAGE=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' ${ERROR})
+            ERROR_MESSAGE=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")
             if [ -n "${VERBOSE}" ] ; then
                 echo "Error: ${ERROR_MESSAGE}"
             fi
@@ -645,11 +645,11 @@ main() {
     ################################################################################
     # parse the X.509 certificate
     
-    DATE=$($OPENSSL x509 -in ${CERT} -enddate -noout | sed -e "s/^notAfter=//")
-    CN=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    DATE=$($OPENSSL x509 -in "${CERT}" -enddate -noout | sed -e "s/^notAfter=//")
+    CN=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
     
-    CA_O=$($OPENSSL x509 -in ${CERT} -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
-    CA_CN=$($OPENSSL x509 -in ${CERT} -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
+    CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
     
     
     ################################################################################
@@ -661,7 +661,7 @@ main() {
             if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else       
-                value=$(${OPENSSL} x509 -in ${CERT} -noout -${ATTR} | sed -e "s/.*=//")
+                value=$(${OPENSSL} x509 -in "${CERT}" -noout -"${ATTR}" | sed -e "s/.*=//")
                 LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
            fi
            
@@ -673,7 +673,7 @@ main() {
         fi
         attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\n" )
         for attribute in $attributes ; do
-            check_attr ${attribute}
+            check_attr "${attribute}"
         done
     
     fi
@@ -683,7 +683,7 @@ main() {
     
     if [ -n "${PERL}" ] ; then
     
-        CERT_END_DATE=$($OPENSSL x509 -in ${CERT} -noout -enddate | sed -e "s/.*=//")
+        CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
     
 	DAYS_VALID=$( perl - "${CERT_END_DATE}" <<-"EOF"
         
@@ -703,7 +703,7 @@ EOF
 	)
     
         if [ -n "${VERBOSE}" ] ; then
-            if [ ${DAYS_VALID} -ge 0 ] ; then
+            if [ "${DAYS_VALID}" -ge 0 ] ; then
                 echo "The certificate will expire in ${DAYS_VALID} day(s)"
             else
                 echo "The certificate expired "$((- DAYS_VALID))" day(s) ago"
@@ -730,7 +730,7 @@ EOF
     
         # check alterante names
         if [ -n "${ALTNAMES}" ] ; then
-            for alt_name in $( $OPENSSL x509 -in ${CERT} -text | \
+            for alt_name in $( $OPENSSL x509 -in "${CERT}" -text | \
                 grep --after-context=1 '509v3 Subject Alternative Name:' | \
                 tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g" ) ; do
                 case $COMMON_NAME in
@@ -753,12 +753,12 @@ EOF
         ok=''
         CA_ISSUER_MATCHED=''
     
-        if echo $CA_CN | grep -q "^$ISSUER$" ; then
+        if echo "$CA_CN" | grep -q "^$ISSUER$" ; then
             ok='true'
             CA_ISSUER_MATCHED="${CA_CN}"
         fi
     
-        if echo $CA_O | grep -q "^$ISSUER$" ; then
+        if echo "$CA_O" | grep -q "^$ISSUER$" ; then
             ok='true'
             CA_ISSUER_MATCHED="${CA_O}"
         fi
@@ -777,13 +777,13 @@ EOF
     # check the validity
     
     # we always check expired certificates
-    if ! $OPENSSL x509 -in ${CERT} -noout -checkend 0 ; then
+    if ! $OPENSSL x509 -in "${CERT}" -noout -checkend 0 ; then
         critical "certificate is expired (was valid until $DATE)"
     fi
     
     if [ -n "${CRITICAL}" ] ; then
     
-        if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${CRITICAL} * 86400 )) ; then
+        if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) ; then
             critical "certificate will expire on $DATE"
         fi
     
@@ -791,7 +791,7 @@ EOF
     
     if [ -n "${WARNING}" ] ; then
     
-        if ! $OPENSSL x509 -in ${CERT} -noout -checkend $(( ${WARNING} * 86400 )) ; then
+        if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) ; then
             warning "certificate will expire on $DATE"
         fi
     
@@ -802,9 +802,9 @@ EOF
     
     if [ -n "$ORGANIZATION" ] ; then
     
-        ORG=$($OPENSSL x509 -in ${CERT} -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
+        ORG=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
     
-        if ! echo $ORG | grep -q "^$ORGANIZATION" ; then
+        if ! echo "$ORG" | grep -q "^$ORGANIZATION" ; then
             critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
         fi
     
@@ -815,7 +815,7 @@ EOF
     
     if [ -n "$ADDR" ] ; then
     
-        EMAIL=$($OPENSSL x509 -in ${CERT} -email -noout)
+        EMAIL=$($OPENSSL x509 -in "${CERT}" -email -noout)
     
         if [ -n "${VERBOSE}" ] ; then
             echo "checking email (${ADDR}): ${EMAIL}"
@@ -825,7 +825,7 @@ EOF
             critical "the certficate does not contain an email address"
         fi
     
-        if ! echo $EMAIL | grep -q "^$ADDR" ; then
+        if ! echo "$EMAIL" | grep -q "^$ADDR" ; then
             critical "invalid email ($ADDR does not match $EMAIL)"
         fi
     
@@ -834,9 +834,9 @@ EOF
     ################################################################################
     # Check if the certificate was verified
     
-    if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' ${ERROR} ; then
+    if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' "${ERROR}" ; then
     
-        if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' ${ERROR} ; then
+        if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' "${ERROR}" ; then
     
             if [ -z "${SELFSIGNED}" ] ; then
                 critical "Cannot verify certificate\nself signed certificate"
@@ -847,7 +847,7 @@ EOF
         else 
     
             # process errors
-            details=$(grep  '^verify\ error:' ${ERROR} | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+            details=$(grep  '^verify\ error:' "${ERROR}" | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
     
             critical "Cannot verify certificate\n${details}"
     
@@ -866,13 +866,13 @@ EOF
     
     if [ -n "${DAYS_VALID}" ] ; then
         # nicer formatting
-        if [ ${DAYS_VALID} -gt 1 ] ; then
+        if [ "${DAYS_VALID}" -gt 1 ] ; then
             DAYS_VALID=" (expires in ${DAYS_VALID} days)"
-        elif [ ${DAYS_VALID} -eq 1 ] ; then
+        elif [ "${DAYS_VALID}" -eq 1 ] ; then
             DAYS_VALID=" (expires tomorrow)"
-        elif [ ${DAYS_VALID} -eq 0 ] ; then
+        elif [ "${DAYS_VALID}" -eq 0 ] ; then
             DAYS_VALID=" (expires today)"
-        elif [ ${DAYS_VALID} -eq -1 ] ; then
+        elif [ "${DAYS_VALID}" -eq -1 ] ; then
             DAYS_VALID=" (expired yesterday)"
         else
             DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
