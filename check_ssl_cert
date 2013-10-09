@@ -112,7 +112,7 @@ critical() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} CRITICAL$tmp: $1${PERFORMANCE_DATA}${LONG_OUTPUT}\n"
+    printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 2
 }
 
@@ -124,7 +124,7 @@ warning() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} WARN$tmp: $1${PERFORMANCE_DATA}${LONG_OUTPUT}\n"
+    printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 1
 }
 
@@ -136,7 +136,7 @@ unknown() {
     if [ -n "${CN}" ] ; then
         tmp=" ${CN}"
     fi
-    printf "${SHORTNAME} UNKNOWN$tmp: $1\n"
+    printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     exit 3
 }
 
@@ -167,7 +167,7 @@ exec_with_timeout() {
         fi
 
     else
-        eval ${command}
+        eval "${command}"
     fi
             
 }
@@ -179,7 +179,7 @@ exec_with_timeout() {
 # Returns 1 if the program exists and is executable
 check_required_prog() {
 
-    PROG=$(which $1 2> /dev/null)
+    PROG=$(which "$1" 2> /dev/null)
 
     if [ -z "$PROG" ] ; then
         critical "cannot find $1"
@@ -249,7 +249,6 @@ main() {
     TIMEOUT=15
     VERBOSE=""
     OPENSSL=""
-    SSLVERSION=""
 
     # set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -436,20 +435,20 @@ main() {
     fi
 
     if [ -n "${ROOT_CA}" ] ; then
-        if [ ! -r ${ROOT_CA} ] ; then
+        if [ ! -r "${ROOT_CA}" ] ; then
             unknown "Cannot read root certificate ${ROOT_CA}"
         fi
-        if [ -d ${ROOT_CA} ] ; then
+        if [ -d "${ROOT_CA}" ] ; then
             ROOT_CA="-CApath ${ROOT_CA}"
-        elif [ -f ${ROOT_CA} ] ; then
+        elif [ -f "${ROOT_CA}" ] ; then
             ROOT_CA="-CAfile ${ROOT_CA}"
         else
-            unknown "Root certificate of unknown type $(file ${ROOT_CA} 2> /dev/null)"
+            unknown "Root certificate of unknown type $(file "${ROOT_CA}" 2> /dev/null)"
         fi
     fi
     
     if [ -n "${CLIENT_CERT}" ] ; then
-        if [ ! -r ${CLIENT_CERT} ] ; then
+        if [ ! -r "${CLIENT_CERT}" ] ; then
             unknown "Cannot read client certificate ${CLIENT_CERT}"
         fi
     fi
@@ -461,31 +460,31 @@ main() {
     fi
     
     if [ -n "${WARNING}" ] ; then
-        if ! echo ${WARNING} | grep -q '[0-9][0-9]*' ; then
+        if ! echo "${WARNING}" | grep -q '[0-9][0-9]*' ; then
             unknown "invalid number of days ${WARNING}"
         fi
     fi
     
     if [ -n "${CRITICAL}" ] && [ -n "${WARNING}" ] ; then
-        if [ ${WARNING} -le ${CRITICAL} ] ; then
+        if [ "${WARNING}" -le "${CRITICAL}" ] ; then
             unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
         fi
     fi
     
     if [ -n "${TMPDIR}" ] ; then
-        if [ ! -d ${TMPDIR} ] ; then
+        if [ ! -d "${TMPDIR}" ] ; then
             unknown "${TMPDIR} is not a directory";
         fi
-        if [ ! -w ${TMPDIR} ] ; then
+        if [ ! -w "${TMPDIR}" ] ; then
             unknown "${TMPDIR} is not writable";
         fi
     fi
     
     if [ -n "${OPENSSL}" ] ; then
-        if [ ! -x ${OPENSSL} ] ; then
+        if [ ! -x "${OPENSSL}" ] ; then
             unknown "${OPENSSL} ist not an executable"
         fi
-        if [ $(basename ${OPENSSL}) != 'openssl' ] ; then
+        if [ "${OPENSSL##*/}" != 'openssl' ] ; then
             unknown "${OPENSSL} ist not an openssl executable"
         fi
     fi
@@ -535,7 +534,7 @@ main() {
         if [ -n "${VERBOSE}" ] ; then
             echo "Perl module Date::Parse not installed: disabling date computations"
         fi
-        PERL=        
+        PERL=""
     fi
     
     ################################################################################
@@ -564,13 +563,13 @@ main() {
     # fetch the X.509 certificate
     
     # temporary storage for the certificate and the errors
-    
-    CERT=$(  mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+
+    CERT=$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )
     if [ -z "${CERT}" ] || [ ! -w "${CERT}" ] ; then
         unknown 'temporary file creation failure.'
     fi
     
-    ERROR=$( mktemp -t "$( basename $0 )XXXXXX" 2> /dev/null )
+    ERROR=$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )
     if [ -z "${ERROR}" ] || [ ! -w "${ERROR}" ] ; then
         unknown 'temporary file creation failure.'
     fi
@@ -591,11 +590,11 @@ main() {
     
     # cleanup before program termination
     # using named signals to be POSIX compliant
-    trap "rm -f $CERT $ERROR" EXIT HUP INT QUIT TERM
+    trap 'rm -f $CERT $ERROR' EXIT HUP INT QUIT TERM
     
     fetch_certificate
     
-    if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
+    if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
     
         if [ -n "${SERVERNAME}" ] ; then
     
@@ -610,7 +609,7 @@ main() {
     
         fi
     
-        if grep -q 'sslv3\ alert\ unexpected\ message' ${ERROR} ; then
+        if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
     
             critical "cannot fetch certificate: OpenSSL got an unexpected message"
     
@@ -618,7 +617,7 @@ main() {
     
     fi
     
-    if ! grep -q "CERTIFICATE" ${CERT} ; then
+    if ! grep -q "CERTIFICATE" "${CERT}" ; then
         if [ -n "${FILE}" ] ; then
             critical "'${FILE}' is not a valid certificate file"
         else
@@ -646,10 +645,10 @@ main() {
     # parse the X.509 certificate
     
     DATE=$($OPENSSL x509 -in "${CERT}" -enddate -noout | sed -e "s/^notAfter=//")
-    CN=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    CN=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
     
-    CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*$//")
-    CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*$//")
+    CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")
+    CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
     
     
     ################################################################################
@@ -753,12 +752,12 @@ EOF
         ok=''
         CA_ISSUER_MATCHED=''
     
-        if echo "$CA_CN" | grep -q "^$ISSUER$" ; then
+        if echo "$CA_CN" | grep -q "^${ISSUER}\$" ; then
             ok='true'
             CA_ISSUER_MATCHED="${CA_CN}"
         fi
     
-        if echo "$CA_O" | grep -q "^$ISSUER$" ; then
+        if echo "$CA_O" | grep -q "^${ISSUER}\$" ; then
             ok='true'
             CA_ISSUER_MATCHED="${CA_O}"
         fi
