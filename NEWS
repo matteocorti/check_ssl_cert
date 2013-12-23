@@ -1,3 +1,4 @@
+2013-12-23 Version 1.16.0 Added an option to force TLS version 1
 2013-07-29 Version 1.15.0 Added an option to force a certain SSL version (thanks
                           to Max Winterstein)
 2013-05-12 Version 1.14.6 Added XMPP and timeout support (thanks to Christian

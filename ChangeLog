@@ -1,3 +1,7 @@
+2013-12-23  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* check_ssl_cert: added the --tls1 option to force TLS 1
+
 2013-10-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: whole script reviewed with shellcheck

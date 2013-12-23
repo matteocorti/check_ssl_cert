@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.15.0
+VERSION=1.16.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -88,6 +88,7 @@ usage() {
     echo "   -t,--timeout           seconds timeout after the specified time"
     echo "                          (defaults to 15 seconds)"
     echo "      --temp dir          directory where to store the temporary files"
+    echo "      --tls1              force TLS version 1"
     echo "   -v,--verbose           verbose output"
     echo "   -V,--version           version"
     echo "   -w,--warning days      minimum number of days a certificate has to be valid"
@@ -203,7 +204,7 @@ fetch_certificate() {
             
             smtp|pop3|imap|ftp|xmpp)
 
-exec_with_timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
+exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
 ;;
 
 *)
@@ -216,7 +217,7 @@ elif [ -n "${FILE}" ] ; then
 
 if [ "${HOST}" = "localhost" ] ; then
     
-    exec_with_timeout $TIMEOUT "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+    exec_with_timeout "$TIMEOUT" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
     
 else
     
@@ -226,7 +227,7 @@ fi
 
 else
 
-exec_with_timeout $TIMEOUT "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
+exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
 
 fi
 
@@ -276,6 +277,8 @@ main() {
             -N|--host-cn)    COMMON_NAME="__HOST__"; shift  ;;
 
             -s|--selfsigned) SELFSIGNED=1;           shift  ;;
+
+            --tls1)          SSL_VERSION="-tls1";    shift  ;;
                 
             -v|--verbose)    VERBOSE=1;              shift  ;;
         
@@ -396,7 +399,7 @@ main() {
                 TMPDIR=$2; shift 2
             else
                unknown "--temp requires an argument"
-            fi ;;
+            fi ;;            
 
             -w|--warning) if [ $# -gt 1 ]; then
                 WARNING=$2; shift 2             
