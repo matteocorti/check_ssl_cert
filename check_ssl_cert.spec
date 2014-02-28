@@ -7,7 +7,7 @@
 ################################################################################
 
 %define version          1.16.0
-%define release          0
+%define release          1
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -53,6 +53,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Fri Feb 28 2014 Matteo Corti <matteo.corti@id.ethz.ch> - 1.16.0-1
+- Updated to 1.16.1 (rpm make target)
+
 * Mon Dec 23 2013 Matteo Corti <matteo.corti@id.ethz.ch> - 1.16.0-0
 - Udated to 1.16.0 (force TLS)
 

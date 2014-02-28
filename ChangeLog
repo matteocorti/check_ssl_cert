@@ -1,3 +1,7 @@
+2014-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
+
+	* Makefile: added a target to build an rpm
+
 2013-12-23  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: added the --tls1 option to force TLS 1

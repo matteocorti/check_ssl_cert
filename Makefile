@@ -27,11 +27,17 @@ version_check:
 
 clean:
 	rm -f *~
+	rm -rf rpmroot
 
 test:
 	( cd test && ./unit_tests.sh )
 
-.PHONY: install clean test
+rpm: dist
+	mkdir -p rpmroot/SOURCES rpmroot/BUILD
+	cp $(DIST_DIR).tar.gz rpmroot/SOURCES
+	rpmbuild --define "_topdir `pwd`/rpmroot" -ba check_ssl_cert.spec
+
+.PHONY: install clean test rpm
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
