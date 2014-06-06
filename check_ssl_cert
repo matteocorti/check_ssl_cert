@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.16.1
+VERSION=1.16.2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -552,8 +552,6 @@ main() {
 
         if [ -n "${COMMON_NAME}" ] ; then
             SERVERNAME="-servername ${COMMON_NAME}"
-        else
-            SERVERNAME="-servername ${HOST}"
         fi
 
     else

@@ -6,7 +6,7 @@
 # $Date: 2010-02-16 21:06:11 +0100 (Tue, 16 Feb 2010) $
 ################################################################################
 
-%define version          1.16.1
+%define version          1.16.2
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -27,7 +27,7 @@ BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://trac.id.ethz.ch/projects/nagios_plugins/wiki/check_ssl_cert
 Source:    https://trac.id.ethz.ch/projects/nagios_plugins/downloads/%{sourcename}-%{version}.tar.gz
 
-Requires:  nagios-plugins
+Requires:  nagios-plugins expect perl(Date::Parse)
 
 %description
 Checks an X.509 certificate:
@@ -53,6 +53,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Fri Jun  6 2014 Matteo Corti <matteo.corti@id.ethz.ch> - 1.16.2-0
+- updated to 1.16.2
+
+* Thu May 22 2014 Andreas Dijkman <andreas.dijkman@cygnis.nl> - 1.16.1-1
+- Added noarch as buildarch
+- Added expect and perl(Date::Parse) dependency
+
 * Fri Feb 28 2014 Matteo Corti <matteo.corti@id.ethz.ch> - 1.16.1-0
 - Updated to 1.16.1 (rpm make target)
 
