@@ -1,3 +1,8 @@
+2014-10-21  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added a patch to check revocation via OCSP (thanks
+	                  to Ryan Nowakowski)
+
 2014-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* Makefile: added a target to build an rpm

@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "May, 2013" "1.16.2" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "October, 2014" "1.17.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -54,6 +54,9 @@ pattern to match the CN of the certificate
 .TP
 .BR "-N,--host-cn"
 match CN with the host name
+.TP
+.BR "--ocsp"
+check revocation via OCSP
 .TP
 .BR "-o,--org" " org"
 pattern to match the organization of the certificate

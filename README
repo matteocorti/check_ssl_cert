@@ -31,6 +31,7 @@ Options:
    -i,--issuer issuer     pattern to match the issuer of the certificate
    -n,---cn name          pattern to match the CN of the certificate
    -N,--host-cn           match CN with the host name
+      --ocsp              check revocation via OCSP
    -o,--org org           pattern to match the organization of the certificate
       --openssl path      path of the openssl binary to be used
    -p,--port port         TCP port
@@ -96,7 +97,7 @@ $ sudo security find-certificate -a \
 Bugs:
 =====
 
-Report bugs to: Matteo Corti <matteo.corti@id.ethz.ch>
+Report bugs to: Matteo Corti <matteo@corti.li>
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.16.2
+VERSION=1.17.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -75,6 +75,7 @@ usage() {
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
     echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
+    echo "      --ocsp              check revocation via OCSP"
     echo "   -o,--org org           pattern to match the organization of the certificate"
     echo "      --openssl path      path of the openssl binary to be used"
     echo "   -p,--port port         TCP port"
@@ -98,7 +99,7 @@ usage() {
     echo "   -d,--days days         minimum number of days a certificate has to be valid"
     echo "                          (see --critical and --warning)"
     echo
-    echo "Report bugs to: Matteo Corti <matteo.corti@id.ethz.ch>"
+    echo "Report bugs to: Matteo Corti <matteo@corti.li>"
     echo
 
     exit 3
@@ -279,6 +280,8 @@ main() {
             -s|--selfsigned) SELFSIGNED=1;           shift  ;;
 
             --tls1)          SSL_VERSION="-tls1";    shift  ;;
+
+            --ocsp)          OCSP=1;                 shift  ;;
                 
             -v|--verbose)    VERBOSE=1;              shift  ;;
         
@@ -575,6 +578,13 @@ main() {
         unknown 'temporary file creation failure.'
     fi
     
+    if [ -n "${OCSP}" ] ; then
+        ISSUER_CERT=$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )
+        if [ -z "${ISSUER_CERT}" ] || [ ! -w "${ISSUER_CERT}" ] ; then
+            unknown 'temporary file creation failure.'
+        fi
+    fi
+
     if [ -n "${VERBOSE}" ] ; then
         echo "downloading certificate to ${TMPDIR}"
     fi
@@ -591,7 +601,7 @@ main() {
     
     # cleanup before program termination
     # using named signals to be POSIX compliant
-    trap 'rm -f $CERT $ERROR' EXIT HUP INT QUIT TERM
+    trap 'rm -f $CERT $ERROR $ISSUER_CERT' EXIT HUP INT QUIT TERM
     
     fetch_certificate
     
@@ -651,6 +661,8 @@ main() {
     CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")
     CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
     
+    OCSP_URI=$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)
+    ISSUER_URI=$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | sed -e "s/^.*CA Issuers - URI://")
     
     ################################################################################
     # Generate the long output
@@ -797,6 +809,16 @@ EOF
     
     fi
     
+    ################################################################################
+    # check revocation via OCSP
+
+    if [ -n "${OCSP}" ]; then
+        curl -s ${ISSUER_URI} > ${ISSUER_CERT}
+        if ! $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -url ${OCSP_URI} -CAfile ${ISSUER_CERT} 2>&1 | grep -q "Response verify OK" ; then
+            critical "certificate is revoked"
+        fi
+    fi
+
     ################################################################################
     # check the organization
     

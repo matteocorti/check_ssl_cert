@@ -1,4 +1,4 @@
-Matteo Corti <matteo.corti@id.ethz.ch>
+Matteo Corti <matteo@corti.li>
 
 Thanks:
 
@@ -35,6 +35,7 @@ Thanks:
 * Many thanks to Colin Smith for the RPM build Makefile patch
 * Many thanks to Andreas Dijkman for the RPM dependencies patch
 * Many thanks to Lawren Quigley-Jones for the common name patch
+* Many thanks to Ryan Nowakowski for the OCSP patch
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
