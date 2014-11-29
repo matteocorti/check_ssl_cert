@@ -821,14 +821,7 @@ EOF
             openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
         fi
 
-        echo "200 ----------------------------------------"
-        echo "$OPENSSL" ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${ROOT_CA}" 2>&1
-        echo "201 ----------------------------------------"
-        "$OPENSSL" ocsp "${ROOT_CA}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1
-#"${ROOT_CA}"
-        exit
-
-        if "$OPENSSL" ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${ROOT_CA}" 2>&1 | grep -qi "revoked" ; then
+        if "$OPENSSL" ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 | grep -qi "revoked" ; then
             critical "certificate is revoked"
         fi
         
