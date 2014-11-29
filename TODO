@@ -1,5 +1,6 @@
 * Nagios performance data (e.g., missing days)
 * IPv6 support (e.g., through gnutls-cli)
+* test for https://revoked.grc.com (should give a critical status)
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $

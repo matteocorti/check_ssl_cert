@@ -579,7 +579,7 @@ main() {
     fi
     
     if [ -n "${OCSP}" ] ; then
-        ISSUER_CERT=$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )
+        ISSUER_CERT=$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )        
         if [ -z "${ISSUER_CERT}" ] || [ ! -w "${ISSUER_CERT}" ] ; then
             unknown 'temporary file creation failure.'
         fi
@@ -662,6 +662,7 @@ main() {
     CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
     
     OCSP_URI=$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)
+
     ISSUER_URI=$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | sed -e "s/^.*CA Issuers - URI://")
     
     ################################################################################
@@ -813,10 +814,24 @@ EOF
     # check revocation via OCSP
 
     if [ -n "${OCSP}" ]; then
-        curl -s ${ISSUER_URI} > ${ISSUER_CERT}
-        if ! $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -url ${OCSP_URI} -CAfile ${ISSUER_CERT} 2>&1 | grep -q "Response verify OK" ; then
+
+        curl --silent "${ISSUER_URI}" > "${ISSUER_CERT}"
+
+        if file "${ISSUER_CERT}" | grep -q ': data' ; then
+            openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
+        fi
+
+        echo "200 ----------------------------------------"
+        echo "$OPENSSL" ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${ROOT_CA}" 2>&1
+        echo "201 ----------------------------------------"
+        "$OPENSSL" ocsp "${ROOT_CA}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1
+#"${ROOT_CA}"
+        exit
+
+        if "$OPENSSL" ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${ROOT_CA}" 2>&1 | grep -qi "revoked" ; then
             critical "certificate is revoked"
         fi
+        
     fi
 
     ################################################################################
