@@ -1,3 +1,4 @@
+2015-04-07 Version 1.17.1 Fixed the check on the openssl binary
 2014-10-21 Version 1.17.0 Added an option to check revocation via OCSP
 2014-06-06 Version 1.16.2 Fixed a problem with -servername when -n was not specified
 2014-02-28 Version 1.16.1 Added a Make target for the RPM package

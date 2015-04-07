@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.17.0
+VERSION=1.17.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -490,7 +490,7 @@ main() {
         if [ ! -x "${OPENSSL}" ] ; then
             unknown "${OPENSSL} ist not an executable"
         fi
-        if [ "${OPENSSL##*/}" != 'openssl' ] ; then
+        if ! "${OPENSSL}" list-standard-commands | grep -q s_client ; then
             unknown "${OPENSSL} ist not an openssl executable"
         fi
     fi

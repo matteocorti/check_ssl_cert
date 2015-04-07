@@ -1,6 +1,7 @@
 2015-04-07  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
+	* check_ssl_cert: removed check on the openssl binary name
 
 2014-10-21  Matteo Corti  <matteo@corti.li>
 
