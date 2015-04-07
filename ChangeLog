@@ -1,3 +1,7 @@
+2015-04-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
+
 2014-10-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added a patch to check revocation via OCSP (thanks

@@ -36,6 +36,7 @@ Thanks:
 * Many thanks to Andreas Dijkman for the RPM dependencies patch
 * Many thanks to Lawren Quigley-Jones for the common name patch
 * Many thanks to Ryan Nowakowski for the OCSP patch
+* Many thanks to Jérémy Lecour for the review and corrections
 
 # File version information:
 # $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
