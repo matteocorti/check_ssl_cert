@@ -27,7 +27,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.17.2
+VERSION=1.17.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -825,7 +825,10 @@ EOF
         if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
             critical "certificate is revoked"
         elif ! $(echo "${OCSP_RESP}" | grep -qi "good") ; then
-            echo "### ${OCSP_RESP}"
+
+            # DEBUG
+            $OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}"
+        
             warning "${OCSP_RESP}"
         fi
 
