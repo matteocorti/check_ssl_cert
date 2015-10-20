@@ -1,5 +1,6 @@
 
  (c) Matteo Corti, ETH Zurich, 2007-2012
+ (c) Matteo Corti, 2007-2015
 
   see AUTHORS for the complete list of contributors
 
@@ -98,9 +99,3 @@ Bugs:
 =====
 
 Report bugs to: Matteo Corti <matteo@corti.li>
-
-# File version information:
-# $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
-# $Revision: 1103 $
-# $HeadURL: https://svn.id.ethz.ch/nagios_plugins/check_updates/AUTHORS $
-# $Date: 2009-12-07 08:49:19 +0100 (Mon, 07 Dec 2009) $

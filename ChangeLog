@@ -1,3 +1,7 @@
+2015-10-20  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: fixex a problem with OCSP paths w/o URLs
+
 2015-04-07  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
@@ -240,9 +244,3 @@
 2007-08-10  Matteo Corti  <matteo.corti@id.ethz.ch>
 
 	* check_ssl_cert: initial release
-
-# File version information:
-# $Id: AUTHORS 1103 2009-12-07 07:49:19Z corti $
-# $Revision: 1103 $
-# $HeadURL: https://svn.id.ethz.ch/nagios_plugins/check_updates/AUTHORS $
-# $Date: 2009-12-07 08:49:19 +0100 (Mon, 07 Dec 2009) $
