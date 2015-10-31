@@ -18,10 +18,10 @@
 ################################################################################
 # Constants
 
-VERSION=1.17.2
+VERSION=1.18.0
 SHORTNAME="SSL_CERT"
 
-VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
+VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
 
 ################################################################################
 # Functions
@@ -74,6 +74,7 @@ usage() {
     echo "                          http:               default"
     echo "                          smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned        allows self-signed certificates"
+    echo "      --serial serialnum  pattern to match the serial number"
     echo "   -S,--ssl version       force SSL version (2,3)"
     echo "   -r,--rootcert path     root certificate or directory to be used for"
     echo "                          certificate validation"
@@ -314,6 +315,12 @@ main() {
 
             -i|--issuer) if [ $# -gt 1 ]; then
                 ISSUER=$2; shift 2
+            else 
+                unknown "-i,--issuer requires an argument"
+            fi ;;
+
+            --serial) if [ $# -gt 1 ]; then
+                SERIAL_LOCK=$2; shift 2
             else 
                 unknown "-i,--issuer requires an argument"
             fi ;;
@@ -651,6 +658,8 @@ main() {
     
     CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")
     CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
+
+    SERIAL=$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")
     
     OCSP_URI=$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)
 
@@ -774,6 +783,29 @@ EOF
     else
     
         CA_ISSUER_MATCHED="${CA_CN}"
+    
+    fi
+
+    ################################################################################
+    # check the serial number
+    
+    if [ -n "$SERIAL_LOCK" ] ; then
+    
+        ok=''
+        SERIAL_MATCHED=''
+    
+        if echo "$SERIAL" | grep -q "^${SERIAL_LOCK}\$" ; then
+            ok='true'
+            SERIAL_MATCHED="${SERIAL}"
+        fi
+    
+        if [ -z "$ok" ] ; then
+            critical "invalid serial number ('$SERIAL' does not match '$SERIAL_LOCK')"
+        fi
+        
+    else
+    
+        SERIAL_MATCHED="${SERIAL}"
     
     fi
     

@@ -1,3 +1,8 @@
+2015-10-31  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added a patch to check the certificate's serial number
+	                  (thanks to Milan Koudelka)
+
 2015-10-20  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixex a problem with OCSP paths w/o URLs

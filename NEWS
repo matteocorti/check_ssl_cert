@@ -1,3 +1,5 @@
+2015-10-31 Version 1.18.0 Added an option to check the certificate's serial number
+                          (thanks to Milan Koudelka)
 2015-10-20 Version 1.17.2 Fixed a bug with OCSP
 2015-04-07 Version 1.17.1 Fixed the check on the openssl binary
 2014-10-21 Version 1.17.0 Added an option to check revocation via OCSP
