@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 if [ -z "${SHUNIT2}" ] ; then
     cat <<EOF
 To be able to run the unit test you need a copy of shUnit2
