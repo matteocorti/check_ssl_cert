@@ -1,4 +1,4 @@
-language: bash
+language: sh
 
 before_script:
     - curl -L "http://downloads.sourceforge.net/shunit2/shunit2-2.0.3.tgz" | tar zx

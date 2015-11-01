@@ -197,36 +197,36 @@ fetch_certificate() {
             
             smtp|pop3|imap|ftp|xmpp)
 
-exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
-;;
+		exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
+		;;
+	    
+	    *)
 
-*)
+		unknown "Error: unsupported protocol ${PROTOCOL}"
+		
+	esac
+	
+    elif [ -n "${FILE}" ] ; then
 
-unknown "Error: unsupported protocol ${PROTOCOL}"
+	if [ "${HOST}" = "localhost" ] ; then
+	    
+	    exec_with_timeout "$TIMEOUT" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+	    
+	else
+	    
+	    unknown "Error: option 'file' works with -H localhost only"
+	    
+	fi
 
-esac
+    else
 
-elif [ -n "${FILE}" ] ; then
+	exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
 
-if [ "${HOST}" = "localhost" ] ; then
+    fi
     
-    exec_with_timeout "$TIMEOUT" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
-    
-else
-    
-    unknown "Error: option 'file' works with -H localhost only"
-    
-fi
-
-else
-
-exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
-
-fi
-
-if [ $? -ne 0 ] ; then
-    critical "Error: $(head -n 1 ${ERROR})"
-fi
+    if [ $? -ne 0 ] ; then
+	critical "Error: $(head -n 1 ${ERROR})"
+    fi
 
 
 }
