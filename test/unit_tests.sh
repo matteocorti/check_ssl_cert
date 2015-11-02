@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -x
-
 if [ -z "${SHUNIT2}" ] ; then
     cat <<EOF
 To be able to run the unit test you need a copy of shUnit2
@@ -46,8 +44,11 @@ testUsage() {
     assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "$?"
 }    
 
+# the script will exit without executing main
+export SOURCE_ONLY='test'
+
 # source the script.
-. ${SCRIPT}  --source-only
+. ${SCRIPT}
 
 # run shUnit: it will execute all the tests in this file
 # (e.g., functions beginning with 'test'
