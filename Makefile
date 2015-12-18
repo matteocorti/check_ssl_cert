@@ -30,7 +30,7 @@ clean:
 	rm -rf rpmroot
 
 test:
-	( cd test && ./unit_tests.sh ; echo "Exit code = "$$? )
+	( cd test && ./unit_tests.sh ; echo "Exit code (make) = "$$? )
 
 rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD

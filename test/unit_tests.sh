@@ -53,3 +53,5 @@ export SOURCE_ONLY='test'
 # run shUnit: it will execute all the tests in this file
 # (e.g., functions beginning with 'test'
 . ${SHUNIT2}
+
+echo "Exit code (script) = "$?
