@@ -40,8 +40,9 @@ testCertificate() {
 }
 
 testUsage() {
-    ${SCRIPT} > /dev/null 2>&1 
-    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "$?"
+    ${SCRIPT} > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
 }    
 
 # the script will exit without executing main
@@ -50,8 +51,8 @@ export SOURCE_ONLY='test'
 # source the script.
 . ${SCRIPT}
 
+unset SOURCE_ONLY
+
 # run shUnit: it will execute all the tests in this file
 # (e.g., functions beginning with 'test'
 . ${SHUNIT2}
-
-echo "Exit code (script) = "$?
