@@ -19,30 +19,25 @@
     </section>
 
     <section class="main-content">
-      <p>(c) Matteo Corti, ETH Zurich, 2007-2012
- (c) Matteo Corti, 2007-2015</p>
 
-<p>see AUTHORS for the complete list of contributors</p>
+      <p>A Nagios plugin to check an X.509 certificate:</p>
 
-<p>check_ssl_cert</p>
+      <ul>
+	<li>checks if the server is running and delivers a valid certificate</li>
+	<li>checks if the CA matches a given pattern</li>
+	<li>checks the validity</li>
+      </ul>
 
-<p>A Nagios plugin to check an X.509 certificate:</p>
+      <h1>
+	<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage:</h1>
 
-<ul>
-<li>checks if the server is running and delivers a valid certificate</li>
-<li>checks if the CA matches a given pattern</li>
-<li>checks the validity</li>
-</ul>
+      <code>
+check_ssl_cert -H host [OPTIONS]
 
-<h1>
-<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage:</h1>
+Arguments:
+   -H,--host host         server
 
-<p>check_ssl_cert -H host [OPTIONS]</p>
-
-<p>Arguments:
-   -H,--host host         server</p>
-
-<p>Options:
+Options:
    -A,--noauth            ignore authority warnings (expiration only)
       --altnames          matches the pattern specified in -n with alternate
                           names too
@@ -82,7 +77,10 @@
    -v,--verbose           verbose output
    -V,--version           version
    -w,--warning days      minimum number of days a certificate has to be valid
-                          to issue a warning status</p>
+  to issue a warning status
+
+      </code>
+
 
 <h1>
 <a id="expect" class="anchor" href="#expect" aria-hidden="true"><span class="octicon octicon-link"></span></a>Expect:</h1>
