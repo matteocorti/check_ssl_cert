@@ -31,7 +31,7 @@
       <h1>
 	<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage:</h1>
 
-      <code>
+      <pre>
 check_ssl_cert -H host [OPTIONS]
 
 Arguments:
@@ -79,34 +79,34 @@ Options:
    -w,--warning days      minimum number of days a certificate has to be valid
   to issue a warning status
 
-      </code>
+      </pre>
 
 
-<h1>
-<a id="expect" class="anchor" href="#expect" aria-hidden="true"><span class="octicon octicon-link"></span></a>Expect:</h1>
+      <h1>
+	<a id="expect" class="anchor" href="#expect" aria-hidden="true"><span class="octicon octicon-link"></span></a>Expect</h1>
 
-<p>check_ssl_cert requires 'expect' to enable timouts. If expect is not
-present on your system timeouts will be disabled.</p>
+      <p>check_ssl_cert requires 'expect' to enable timouts. If expect is not
+	present on your system timeouts will be disabled.</p>
 
-<p>See: <a href="http://en.wikipedia.org/wiki/Expect">http://en.wikipedia.org/wiki/Expect</a></p>
+      <p>See: <a href="http://en.wikipedia.org/wiki/Expect">http://en.wikipedia.org/wiki/Expect</a></p>
 
-<h1>
-<a id="perl-and-dateparse" class="anchor" href="#perl-and-dateparse" aria-hidden="true"><span class="octicon octicon-link"></span></a>Perl and Date::Parse:</h1>
+      <h1>
+	<a id="perl-and-dateparse" class="anchor" href="#perl-and-dateparse" aria-hidden="true"><span class="octicon octicon-link"></span></a>Perl and Date::Parse</h1>
+      
+      <p>If perl and Date::Parse are available the plugin will also compute for
+	how many days the certificate will be valid and put the information in
+	the performance data. If perl or Date::Parse are not available the
+	information will not be available.</p>
+      
+      <h1>
+	<a id="virtual-servers" class="anchor" href="#virtual-servers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Virtual servers</h1>
+      
+      <p>check_ssl_client supports the servername TLS extension in ClientHello
+	if the installed openssl version provides it. This is needed if you
+	are checking a machine with virtual hosts.</p>
 
-<p>If perl and Date::Parse are available the plugin will also compute for
-how many days the certificate will be valid and put the information in
-the performance data. If perl or Date::Parse are not available the
-information will not be available.</p>
-
-<h1>
-<a id="virtual-servers" class="anchor" href="#virtual-servers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Virtual servers:</h1>
-
-<p>check_ssl_client supports the servername TLS extension in ClientHello
-if the installed openssl version provides it. This is needed if you
-are checking a machine with virtual hosts.</p>
-
-<h1>
-<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes:</h1>
+      <h1>
+	<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes</h1>
 
 <p>the root certificate corresponding to the checked certificate must be
 available to openssl or specified with the '-r cabundle' or
@@ -120,13 +120,11 @@ openssl will complain with:</p>
 
 <p>The bundle can be extracted with:</p>
 
-<p>$ sudo security find-certificate -a \
-  -p /System/Library/Keychains/SystemRootCertificates.keychain &gt; cabundle.crt</p>
+<pre>
+$ sudo security find-certificate -a \
+    -p /System/Library/Keychains/SystemRootCertificates.keychain &gt; cabundle.crt
+</pre>
 
-<h1>
-<a id="bugs" class="anchor" href="#bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs:</h1>
-
-<p>Report bugs to: Matteo Corti <a href="mailto:matteo@corti.li">matteo@corti.li</a></p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/matteocorti/check_ssl_cert">Check ssl cert</a> is maintained by <a href="https://github.com/matteocorti">matteocorti</a>.</span>
