@@ -3,7 +3,10 @@ language: bash
 os:
     - linux
     - osx
-  
+
+install:
+    -  ./shell-ci-build/install.sh
+
 before_script:
     - curl -L "http://downloads.sourceforge.net/shunit2/shunit2-2.0.3.tgz" | tar zx
     - chmod +x $(pwd)/shunit2-2.0.3/src/shell/shunit2
@@ -11,3 +14,4 @@ before_script:
 script:
     - export SHUNIT2=$(pwd)/shunit2-2.0.3/src/shell/shunit2
     - make test
+    - ./shell-ci-build/build.sh
