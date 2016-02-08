@@ -1,5 +1,7 @@
 language: bash
 
+sudo: required
+
 os:
     - linux
     - osx
