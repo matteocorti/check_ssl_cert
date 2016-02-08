@@ -225,7 +225,7 @@ fetch_certificate() {
     fi
     
     if [ $? -ne 0 ] ; then
-	critical "Error: $(head -n 1 ${ERROR})"
+	critical "Error: $(head -n 1 "${ERROR}")"
     fi
 
 
@@ -792,21 +792,15 @@ EOF
     if [ -n "$SERIAL_LOCK" ] ; then
     
         ok=''
-        SERIAL_MATCHED=''
     
         if echo "$SERIAL" | grep -q "^${SERIAL_LOCK}\$" ; then
             ok='true'
-            SERIAL_MATCHED="${SERIAL}"
         fi
     
         if [ -z "$ok" ] ; then
             critical "invalid serial number ('$SERIAL' does not match '$SERIAL_LOCK')"
         fi
         
-    else
-    
-        SERIAL_MATCHED="${SERIAL}"
-    
     fi
     
     ################################################################################
@@ -843,11 +837,11 @@ EOF
         if file "${ISSUER_CERT}" | grep -q ': data' ; then
             openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
         fi
-        OCSP_HOST=$(echo ${OCSP_URI} | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g")
+        OCSP_HOST=$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g")
         OCSP_RESP=$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")
         if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
             critical "certificate is revoked"
-        elif ! $(echo "${OCSP_RESP}" | grep -qi "good") ; then
+        elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 
             # DEBUG
             $OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}"
