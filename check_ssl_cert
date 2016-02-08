@@ -380,7 +380,7 @@ main() {
             fi ;;
 
             -S|--ssl) if [ $# -gt 1 ]; then
-                if [ "$2" = "2" -o "$2" = "3" ] ; then
+                if [ "$2" = "2" ] || [ "$2" = "3" ] ; then
                     SSL_VERSION="-ssl$2" ; shift 2
                 else
                     unknown "invalid argument for --ssl"
