@@ -16,4 +16,4 @@ before_script:
 script:
     - export SHUNIT2=$(pwd)/shunit2-2.0.3/src/shell/shunit2
     - make test
-    - ./shell-ci-build/build.sh
+    - ./shell-ci-build.sh
