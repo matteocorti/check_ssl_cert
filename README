@@ -105,4 +105,4 @@ $ sudo security find-certificate -a \
 Bugs:
 =====
 
-Report bugs to: Matteo Corti <matteo@corti.li>
+Report bugs to https://github.com/matteocorti/check_ssl_cert/issues

@@ -104,6 +104,9 @@ minimum number of days a certificate has to be valid to issue a warning status
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
 
+.SH MULTIPLE CERTIFICATES
+If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Idetificator) with the -N (or --host-cn) option.
+
 .SH "SEE ALSO"
 x509(1), openssl(1), expect(1), timeout(1)
 .SH "EXIT STATUS"
