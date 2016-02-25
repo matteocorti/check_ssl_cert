@@ -1,5 +1,5 @@
 %define version          1.19.0
-%define release          0
+%define release          1
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -17,7 +17,7 @@ Packager:  Matteo Corti <matteo@corti.li>
 Group:     Applications/System
 BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://github.com/matteocorti/check_ssl_cert
-Source:    https://github.com/matteocorti/check_ssl_cert/archive/v1.18.0.tar.gz
+Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v1.19.0/check_ssl_cert-1.19.0.tar.gz
 
 Requires:  nagios-plugins expect perl(Date::Parse)
 
