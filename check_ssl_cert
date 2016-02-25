@@ -59,13 +59,14 @@ usage() {
     echo "   -f,--file file         local file path (works with -H localhost only)"
     echo "   -h,--help,-?           this help message"
     echo "      --long-output list  append the specified comma separated (no spaces) list"
-    echo "                          of attributes to the plugin output on additional lines."
+    echo "                          of attributes to the plugin output on additional lines"
     echo "                          Valid attributes are:"
-    echo "                            enddate, startdate, subject, issuer, modulus, serial,"
-    echo "                            hash, email, ocsp_uri and fingerprint."
+    echo "                            enddate, startdate, subject, issuer, modulus,"
+    echo "                            serial, hash, email, ocsp_uri and fingerprint."
     echo "                          'all' will include all the available attributes."
     echo "      --ignore-exp        ignore expiration date"
     echo "      --ignore-sig-alg    do not check if the certificate was signed with SHA1"
+    echo "                          or MD5"
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
     echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
@@ -672,13 +673,25 @@ main() {
 
     ISSUER_URI=$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | sed -e "s/^.*CA Issuers - URI://")
 
-    if $OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1 | grep -q sha1 ; then
+    SIGNATURE_ALGORITHM=$($OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)
+    
+    if echo "${SIGNATURE_ALGORITHM}" | grep -q sha1 ; then
 	if [ -n "${NOSIGALG}" ] ; then
 	    if [ -n "${VERBOSE}" ] ; then
 		echo 'Certificate is signed with SHA-1'
 	    fi
 	else
 	    critical 'Certificate is signed with SHA-1'
+	fi
+    fi
+
+    if echo "${SIGNATURE_ALGORITHM}" | grep -qi md5 ; then
+	if [ -n "${NOSIGALG}" ] ; then
+	    if [ -n "${VERBOSE}" ] ; then
+		echo 'Certificate is signed with MD5'
+	    fi
+	else
+	    critical 'Certificate is signed with MD5'
 	fi
     fi
     
