@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.18.0
+VERSION=1.19.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -64,6 +64,7 @@ usage() {
     echo "                            enddate, startdate, subject, issuer, modulus, serial,"
     echo "                            hash, email, ocsp_uri and fingerprint."
     echo "                          'all' will include all the available attributes."
+    echo "      --ignore-sig-alg    do not check if the certificate was signed with SHA1"
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
     echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
@@ -262,23 +263,25 @@ main() {
             ########################################
             # options without arguments
 
-            -A|--noauth)     NOAUTH=1;               shift  ;;
+            -A|--noauth)      NOAUTH=1;               shift  ;;
 
-            --altnames)      ALTNAMES=1;             shift  ;;
+            --altnames)       ALTNAMES=1;             shift  ;;
 
-            -h|--help|-\?)   usage;                  exit 0 ;;
+            -h|--help|-\?)    usage;                  exit 0 ;;
 
-            -N|--host-cn)    COMMON_NAME="__HOST__"; shift  ;;
+	    --ignore-sig-alg) NOSIGALG=1;             shift  ;;
+	    
+            -N|--host-cn)     COMMON_NAME="__HOST__"; shift  ;;
 
-            -s|--selfsigned) SELFSIGNED=1;           shift  ;;
+            -s|--selfsigned)  SELFSIGNED=1;           shift  ;;
 
-            --tls1)          SSL_VERSION="-tls1";    shift  ;;
+            --tls1)           SSL_VERSION="-tls1";    shift  ;;
 
-            --ocsp)          OCSP=1;                 shift  ;;
+            --ocsp)           OCSP=1;                 shift  ;;
                 
-            -v|--verbose)    VERBOSE=1;              shift  ;;
+            -v|--verbose)     VERBOSE=1;              shift  ;;
         
-            -V|--version)    echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
+            -V|--version)     echo "check_ssl_cert version ${VERSION}"; exit 3; ;;
 
             ########################################
             # options with arguments
@@ -665,6 +668,16 @@ main() {
     OCSP_URI=$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)
 
     ISSUER_URI=$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | sed -e "s/^.*CA Issuers - URI://")
+
+    if $OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1 | grep -q sha1 ; then
+	if [ -n "${NOSIGALG}" ] ; then
+	    if [ -n "${VERBOSE}" ] ; then
+		echo 'Certificate is signed with SHA-1'
+	    fi
+	else
+	    critical 'Certificate is signed with SHA-1'
+	fi
+    fi
     
     ################################################################################
     # Generate the long output
