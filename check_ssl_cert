@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.19.0
+VERSION=1.20.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -54,6 +54,7 @@ usage() {
     echo "      --clientpass phrase set passphrase for client certificate."
     echo "   -c,--critical days     minimum number of days a certificate has to be valid"
     echo "                          to issue a critical status"
+    echo "   -d,--debug             produces debugging output"
     echo "   -e,--email address     pattern to match the email address contained in the"
     echo "                          certificate"
     echo "   -f,--file file         local file path (works with -H localhost only)"
@@ -147,11 +148,15 @@ unknown() {
 exec_with_timeout() {
 
     time=$1
-
+    
     # start the command in a subshell to avoid problem with pipes
     # (spawn accepts one command)
     command="/bin/sh -c \"$2\""
 
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] executing: $2"
+    fi
+    
     if [ -n "${TIMEOUT_BIN}" ] ; then
     
         eval "${TIMEOUT_BIN} $time $command"
@@ -229,7 +234,14 @@ fetch_certificate() {
     fi
     
     if [ $? -ne 0 ] ; then
-	critical "Error: $(head -n 1 "${ERROR}")"
+
+	if [ -n "${DEBUG}" ] ; then	    
+	    
+	    sed 's/^/[DBG] SSL error: /' "${ERROR}"
+	    
+	fi
+	
+	critical "SSL error: $( grep ':error:' "${ERROR}" )"
     fi
 
 
@@ -243,10 +255,11 @@ main() {
     ################################################################################
 
     # default values
+    DEBUG=""
+    OPENSSL=""
     PORT=443
     TIMEOUT=15
     VERBOSE=""
-    OPENSSL=""
 
     # set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -269,6 +282,8 @@ main() {
 
             --altnames)       ALTNAMES=1;             shift  ;;
 
+	    -d|--debug)       DEBUG=1;                shift  ;;
+	    
             -h|--help|-\?)    usage;                  exit 0 ;;
 
 	    --ignore-exp)     NOEXP;                  shift  ;;
