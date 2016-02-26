@@ -240,8 +240,19 @@ fetch_certificate() {
 	    sed 's/^/[DBG] SSL error: /' "${ERROR}"
 	    
 	fi
+
+	# try to clean up the error message
+	# - remove the 'verify and depth' lines
+	# - take the 1st line (seems OK with the use cases I tested)
 	
-	critical "SSL error: $( grep ':error:' "${ERROR}" )"
+	ERROR_MESSAGE=$(
+	    grep -v '^depth' "${ERROR}" |
+		grep -v '^verify' |
+		head -n 1
+		     )
+	
+	critical "SSL error: ${ERROR_MESSAGE}"
+	
     fi
 
 
