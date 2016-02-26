@@ -1,4 +1,7 @@
 2016-02-26 Version 1.20.0 Added debugging output (-d or --debug)
+                          Improved the handling of OpenSSL error messages
+			  Does not stop the validation if the server requires a
+			  client certificate
 2016-02-25 Version 1.19.0 Added a check for certificates signed with SHA-1 or MD5
                           Added an option to disable the expiration date check
 2015-10-31 Version 1.18.0 Added an option to check the certificate's serial number

@@ -241,17 +241,29 @@ fetch_certificate() {
 	    
 	fi
 
-	# try to clean up the error message
-	# - remove the 'verify and depth' lines
-	# - take the 1st line (seems OK with the use cases I tested)
+	# s_client could because the server requires a client certificate
+
+	if grep -q '^Acceptable client certificate CA names' "${CERT}" ; then
+	    
+	    if [ -n "${VERBOSE}" ] ; then
+		echo 'The server requires a client certificate'
+	    fi
+
+	else
 	
-	ERROR_MESSAGE=$(
-	    grep -v '^depth' "${ERROR}" |
-		grep -v '^verify' |
-		head -n 1
-		     )
-	
-	critical "SSL error: ${ERROR_MESSAGE}"
+	    # try to clean up the error message
+	    # - remove the 'verify and depth' lines
+	    # - take the 1st line (seems OK with the use cases I tested)
+	    
+	    ERROR_MESSAGE=$(
+		grep -v '^depth' "${ERROR}" |
+		    grep -v '^verify' |
+		    head -n 1
+			 )
+	    
+	    critical "SSL error: ${ERROR_MESSAGE}"
+
+	fi
 	
     fi
 
