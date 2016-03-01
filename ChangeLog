@@ -1,3 +1,7 @@
+2016-03-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fixed a bug which prevented the check on the expiration
+
 2015-10-31  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added a patch to check the certificate's serial number

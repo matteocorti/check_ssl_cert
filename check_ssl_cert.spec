@@ -1,4 +1,4 @@
-%define version          1.20.0
+%define version          1.21.0
 %define release          1
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -17,7 +17,7 @@ Packager:  Matteo Corti <matteo@corti.li>
 Group:     Applications/System
 BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://github.com/matteocorti/check_ssl_cert
-Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v1.19.0/check_ssl_cert-1.20.0.tar.gz
+Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v%{version}/check_ssl_cert-%{version}.tar.gz
 
 Requires:  nagios-plugins expect perl(Date::Parse)
 
@@ -45,6 +45,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Tue Mar  1 2016 Matteo Corti <matteo@corti.li> - 1.21.0-0
+- Updated to 1.21.0
+
 * Fri Feb 26 2016 Matteo Corti <matteo@corti.li> - 1.20.0-0
 - Updated to 1.20.0
 
