@@ -1,3 +1,7 @@
+2016-03-03  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Initial support for SSL Labs checks
+
 2016-03-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a bug which prevented the check on the expiration

@@ -84,6 +84,17 @@ check_ssl_client supports the servername TLS extension in ClientHello
 if the installed openssl version provides it. This is needed if you
 are checking a machine with virtual hosts.
 
+SSL Labs:
+=========
+
+If -L or --check-ssl-labs are specified the plugin will check the
+cached status using the SSL Labs Assessment API (see
+https://www.ssllabs.com/about/terms.html).
+
+The plugin will ask for a cached result (maximum age 1 day) to avoid
+to many checks. The first time you issue the check you could therefore
+get an outdated result.
+
 Notes:
 ======
 

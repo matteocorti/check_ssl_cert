@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.21.0
+VERSION=1.22.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -69,6 +69,8 @@ usage() {
     echo "      --ignore-sig-alg    do not check if the certificate was signed with SHA1"
     echo "                          or MD5"
     echo "   -i,--issuer issuer     pattern to match the issuer of the certificate"
+    echo "   -L,--check-ssl-labs    SSL Labs assestment"
+    echo "                          (please check https://www.ssllabs.com/about/terms.html)"
     echo "   -n,--cn name           pattern to match the CN of the certificate"
     echo "   -N,--host-cn           match CN with the host name"
     echo "      --ocsp              check revocation via OCSP"
@@ -192,6 +194,35 @@ check_required_prog() {
         critical "$PROG is not executable"
     fi
 
+}
+
+################################################################################
+# Converts SSL Labs grades to a numeric value
+#   (see https://www.ssllabs.com/downloads/SSL_Server_Rating_Guide.pdf)
+# Params
+#   $1 program name
+# Sets NUMERIC_SSL_LAB_GRADE
+convert_ssl_lab_grade() {
+
+    GRADE="$1"
+
+    unset NUMERIC_SSL_LAB_GRADE
+    
+    case "${GRADE}" in
+	'A+') NUMERIC_SSL_LAB_GRADE=85; shift;; # value not in document
+	A) NUMERIC_SSL_LAB_GRADE=80; shift;;
+	'A-') NUMERIC_SSL_LAB_GRADE=75; shift;; # value not in document
+	B) NUMERIC_SSL_LAB_GRADE=65; shift;;
+	C) NUMERIC_SSL_LAB_GRADE=50; shift;;
+	D) NUMERIC_SSL_LAB_GRADE=35; shift;;
+	E) NUMERIC_SSL_LAB_GRADE=20; shift;;
+	F) NUMERIC_SSL_LAB_GRADE=0; shift;;
+	T) NUMERIC_SSL_LAB_GRADE=0; shift;; # no trust: value not in document
+	M) NUMERIC_SSL_LAB_GRADE=0; shift;; # certificate name mismatch: value not in document
+	*)
+	    unknown "Connot convert SSL Lab grade ${GRADE}"
+    esac
+    
 }
 
 ################################################################################
@@ -329,134 +360,140 @@ main() {
             # options with arguments
         
             -c|--critical) if [ $# -gt 1 ]; then
-                    CRITICAL=$2; shift 2             
-                else 
-                    unknown "-c,--critical requires an argument"
-                fi ;;
-
+			       CRITICAL=$2; shift 2             
+			   else 
+			       unknown "-c,--critical requires an argument"
+			   fi ;;
+	    
             # deprecated option: used to be as --warning
             -d|--days) if [ $# -gt 1 ]; then
-                    WARNING=$2; shift 2             
-                else 
-                    unknown "-d,--days requires an argument"
-                fi ;;
-
+			   WARNING=$2; shift 2             
+                       else 
+			   unknown "-d,--days requires an argument"
+                       fi ;;
+	    
             -e|--email) if [ $# -gt 1 ]; then
-                ADDR=$2; shift 2             
-            else 
-              unknown "-e,--email requires an argument"
-            fi ;;
-
+			    ADDR=$2; shift 2             
+			else 
+			    unknown "-e,--email requires an argument"
+			fi ;;
+	    
             -f|--file) if [ $# -gt 1 ]; then
-                FILE=$2; shift 2
-            else 
-                unknown "-f,--file requires an argument"
-            fi ;;
+			   FILE=$2; shift 2
+		       else 
+			   unknown "-f,--file requires an argument"
+		       fi ;;
             
             -H|--host) if [ $# -gt 1 ]; then
-                HOST=$2; shift 2
-            else 
-                unknown "-H,--host requires an argument"
-            fi ;;
-
+			   HOST=$2; shift 2
+		       else 
+			   unknown "-H,--host requires an argument"
+		       fi ;;
+	    
             -i|--issuer) if [ $# -gt 1 ]; then
-                ISSUER=$2; shift 2
-            else 
-                unknown "-i,--issuer requires an argument"
-            fi ;;
-
+			     ISSUER=$2; shift 2
+			 else 
+			     unknown "-i,--issuer requires an argument"s
+			 fi ;;
+	    
+	    -L|--check-ssl-labs) if [ $# -gt 1 ]; then
+				     SSL_LAB_ASSESTMENT=$2; shift 2
+				 else
+				     unknown "-L|--check-ssl-labs requires an argument"
+				 fi ;;
+	    
             --serial) if [ $# -gt 1 ]; then
-                SERIAL_LOCK=$2; shift 2
-            else 
-                unknown "-i,--issuer requires an argument"
-            fi ;;
-
+			  SERIAL_LOCK=$2; shift 2
+		      else 
+			  unknown "-i,--issuer requires an argument"
+		      fi ;;
+	    
             --long-output) if [ $# -gt 1 ]; then
-                LONG_OUTPUT_ATTR=$2; shift 2
-            else
-                unknown "--long-output requires an argument"
-            fi ;;
-
+			       LONG_OUTPUT_ATTR=$2; shift 2
+			   else
+			       unknown "--long-output requires an argument"
+			   fi ;;
+	    
             -n|--cn) if [ $# -gt 1 ]; then
-                COMMON_NAME=$2; shift 2
-            else 
-                unknown "-n,--cn requires an argument"
-            fi ;;
-
+			 COMMON_NAME=$2; shift 2
+		     else 
+			 unknown "-n,--cn requires an argument"
+		     fi ;;
+	    
             -o|--org) if [ $# -gt 1 ]; then
-                ORGANIZATION=$2; shift 2
-            else 
-                unknown "-o,--org requires an argument"
-            fi ;;
-
+			  ORGANIZATION=$2; shift 2
+		      else 
+			  unknown "-o,--org requires an argument"
+		      fi ;;
+	    
             --openssl) if [ $# -gt 1 ]; then
-                OPENSSL=$2; shift 2
-            else
-                unknown "--openssl requires an argument"
-            fi ;;
-
+			   OPENSSL=$2; shift 2
+		       else
+			   unknown "--openssl requires an argument"
+		       fi ;;
+	    
             -p|--port) if [ $# -gt 1 ]; then
-                PORT=$2; shift 2
-            else 
-                unknown "-p,--port requires an argument"
-            fi ;;
-
+			   PORT=$2; shift 2
+		       else 
+			   unknown "-p,--port requires an argument"
+		       fi ;;
+	    
             -P|--protocol) if [ $# -gt 1 ]; then
-                PROTOCOL=$2; shift 2
-            else 
-                unknown "-P,--protocol requires an argument"
-            fi ;;
-
+			       PROTOCOL=$2; shift 2
+			   else 
+			       unknown "-P,--protocol requires an argument"
+			   fi ;;
+	    
             -r|--rootcert) if [ $# -gt 1 ]; then
-                ROOT_CA=$2; shift 2
-            else 
-                unknown "-r,--rootcert requires an argument"
-            fi ;;
-
+			       ROOT_CA=$2; shift 2
+			   else 
+			       unknown "-r,--rootcert requires an argument"
+			   fi ;;
+	    
             -C|--clientcert) if [ $# -gt 1 ]; then
-                CLIENT_CERT=$2; shift 2
-            else
-                unknown "-c,--clientcert requires an argument"
-            fi ;;
-
+				 CLIENT_CERT=$2; shift 2
+			     else
+				 unknown "-c,--clientcert requires an argument"
+			     fi ;;
+	    
             --clientpass) if [ $# -gt 1 ]; then
-                CLIENT_PASS=$2; shift 2
-            else
-                unknown "--clientpass requires an argument"
-            fi ;;
-
+			      CLIENT_PASS=$2; shift 2
+			  else
+			      unknown "--clientpass requires an argument"
+			  fi ;;
+	    
             -S|--ssl) if [ $# -gt 1 ]; then
-                if [ "$2" = "2" ] || [ "$2" = "3" ] ; then
-                    SSL_VERSION="-ssl$2" ; shift 2
-                else
-                    unknown "invalid argument for --ssl"
-                fi
-            else
-                unknown "--ssl requires an argument"
-            fi ;;
-
+			  if [ "$2" = "2" ] || [ "$2" = "3" ] ; then
+			      SSL_VERSION="-ssl$2" ; shift 2
+			  else
+			      unknown "invalid argument for --ssl"
+			  fi
+		      else
+			  unknown "--ssl requires an argument"
+		      fi ;;
+	    
             -t|--timeout) if [ $# -gt 1 ]; then
-                TIMEOUT=$2; shift 2
-            else 
-              unknown "-t,--timeout requires an argument"
-            fi ;;
-
+			      TIMEOUT=$2; shift 2
+			  else 
+			      unknown "-t,--timeout requires an argument"
+			  fi ;;
+	    
             --temp) if [ $# -gt 1 ] ; then
-                # override TMPDIR
-                TMPDIR=$2; shift 2
-            else
-               unknown "--temp requires an argument"
-            fi ;;            
-
+			# override TMPDIR
+			TMPDIR=$2; shift 2
+		    else
+			unknown "--temp requires an argument"
+		    fi ;;            
+	    
             -w|--warning) if [ $# -gt 1 ]; then
-                WARNING=$2; shift 2             
-            else 
-                unknown "-w,--warning requires an argument"
-            fi ;;
-
+			      WARNING=$2; shift 2             
+			  else 
+			      unknown "-w,--warning requires an argument"
+			  fi ;;
+	    
             ########################################
             # special
-        
+            
             --) shift; break;;
             -*) unknown "invalid option: $1" ;;
             *)  break;;
@@ -537,6 +574,11 @@ main() {
         if ! "${OPENSSL}" list-standard-commands | grep -q s_client ; then
             unknown "${OPENSSL} ist not an openssl executable"
         fi
+    fi
+
+    if [ -n "${SSL_LAB_ASSESTMENT}" ] ; then
+	convert_ssl_lab_grade "${SSL_LAB_ASSESTMENT}"
+	SSL_LAB_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
     
     #######################
@@ -911,6 +953,73 @@ EOF
 	fi
 
     fi
+
+    ################################################################################
+    # check SSL Labs
+
+    if [ -n "${SSL_LAB_ASSESTMENT}" ] ; then
+
+	if [ -n "${VERBOSE}" ] ; then
+	    echo "Checking SSL Labs assestment"
+	fi	    
+	
+	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}&fromCache=on&maxAge=24")
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] SSL Labs JSON: ${JSON}"
+	fi
+
+	SSL_LABS_HOST_STATUS=$( echo "${JSON}" |
+				      tr '\n' ' ' |
+				      sed 's/.*"status":"\([^"]*\)".*/\1/'
+			    )
+	
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] SSL Labs status: ${SSL_LABS_HOST_STATUS}"
+	fi
+	
+	if [ "${SSL_LABS_HOST_STATUS}" = 'ERROR' ] ; then
+	    
+	    critical "Error checking SSL Labs: ${JSON}"
+	    
+	else
+	    
+	    if [ "${SSL_LABS_HOST_STATUS}" = 'READY' ] ; then
+		
+		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
+					     tr '\n' ' ' |
+					     sed 's/.*"grade":"\([^"]*\)".*/\1/'
+				   )
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+		fi
+		
+		if [ -n "${VERBOSE}" ] ; then
+		    echo "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+		fi
+
+		convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
+		SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+
+		# check the grade
+		if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESTMENT_NUMERIC}" ] ; then
+		    critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESTMENT})"
+		fi
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
+		fi
+		
+	    else
+		
+		critical "Cannot check status on SSL Labs: ${JSON}"
+		
+	    fi
+	    
+	fi
+
+    fi
     
     ################################################################################
     # check revocation via OCSP
@@ -1017,8 +1126,12 @@ EOF
             DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
         fi
     fi
+
+    if [ -n "${SSL_LABS_HOST_GRADE}" ] ; then
+	SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+    fi
     
-    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
     
     exit 0
     
