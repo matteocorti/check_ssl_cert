@@ -976,9 +976,9 @@ EOF
 
 	SSL_LABS_HOST_STATUS=$( echo "${JSON}" |
 				      tr '\n' ' ' |
-				      sed 's/.*"status":"\([^"]*\)".*/\1/'
+				      sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/'
 			    )
-	
+
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 	fi
@@ -993,7 +993,7 @@ EOF
 		
 		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
 					     tr '\n' ' ' |
-					     sed 's/.*"grade":"\([^"]*\)".*/\1/'
+					     sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/'
 				   )
 		
 		if [ -n "${DEBUG}" ] ; then
@@ -1017,8 +1017,17 @@ EOF
 		fi
 		
 	    else
+
+		if [ "${SSL_LABS_HOST_STATUS}" = 'IN_PROGRESS' ] ; then
+		    
+		    # data not yet available: warn and continue
+		    echo "Warning: no cached data by SSL Labs, check initiated, please check later"
+
+		else
 		
-		critical "Cannot check status on SSL Labs: ${JSON}"
+		    critical "Cannot check status on SSL Labs: ${JSON}"
+
+		fi
 		
 	    fi
 	    
