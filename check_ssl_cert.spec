@@ -1,5 +1,5 @@
 %define version          1.22.0
-%define release          1
+%define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
