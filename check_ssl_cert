@@ -976,7 +976,6 @@ EOF
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 	fi
-	
 
 	case "${SSL_LABS_HOST_STATUS}" in
 	    
@@ -993,7 +992,7 @@ EOF
 	    
 	    'READY' )
 
-		if ! echo "${JSON}" | grep 'grade' ; then
+		if ! echo "${JSON}" | grep -q 'grade' ; then
 
 		    # something went wrong
 		    SSL_LABS_STATUS_MESSAGE=$( echo "${JSON}" |
@@ -1003,7 +1002,7 @@ EOF
 		    critical "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
 
 		else
-		
+
 		    SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
 						 sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/'
 				       )
