@@ -987,31 +987,44 @@ EOF
 		;;
 	    
 	    'READY' )
-		
-		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
-					     sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/'
-				   )
-		
-		if [ -n "${DEBUG}" ] ; then
-		    echo "[DBG] SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
-		fi
-		
-		if [ -n "${VERBOSE}" ] ; then
-		    echo "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
-		fi
 
-		convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
-		SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+		if ! echo "${JSON}" | grep 'grade' ; then
 
-		# check the grade
-		if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESTMENT_NUMERIC}" ] ; then
-		    critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESTMENT})"
-		fi
+		    # something went wrong
+		    SSL_LABS_STATUS_MESSAGE=$( echo "${JSON}" |
+					     sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/'
+					   )
+
+		    critical "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
+
+		else
 		
-		if [ -n "${DEBUG}" ] ; then
-		    echo "[DBG] SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
-		fi
+		    SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
+						 sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/'
+				       )
+		
+		    if [ -n "${DEBUG}" ] ; then
+			echo "[DBG] SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+		    fi
+		    
+		    if [ -n "${VERBOSE}" ] ; then
+			echo "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+		    fi
+		    
+		    convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
+		    SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+		    
+		    # check the grade
+		    if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESTMENT_NUMERIC}" ] ; then
+			critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESTMENT})"
+		    fi
+		    
+		    if [ -n "${DEBUG}" ] ; then
+			echo "[DBG] SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
+		    fi
 
+		fi
+		    
 		;;
 		
 	    'IN_PROGRESS' )
