@@ -963,7 +963,7 @@ EOF
 	    echo "Checking SSL Labs assestment"
 	fi	    
 	
-	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}&fromCache=on&maxAge=24")
+	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}")
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] SSL Labs JSON: ${JSON}"
@@ -978,13 +978,16 @@ EOF
 	    echo "[DBG] SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 	fi
 	
-	if [ "${SSL_LABS_HOST_STATUS}" = 'ERROR' ] ; then
+
+	case "${SSL_LABS_HOST_STATUS}" in
 	    
-	    critical "Error checking SSL Labs: ${JSON}"
+	
+	    'ERROR' )
 	    
-	else
+		critical "Error checking SSL Labs: ${JSON}"
+		;;
 	    
-	    if [ "${SSL_LABS_HOST_STATUS}" = 'READY' ] ; then
+	    'READY' )
 		
 		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
 					     tr '\n' ' ' |
@@ -1010,24 +1013,30 @@ EOF
 		if [ -n "${DEBUG}" ] ; then
 		    echo "[DBG] SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
 		fi
-		
-	    else
 
-		if [ "${SSL_LABS_HOST_STATUS}" = 'IN_PROGRESS' ] ; then
+		;;
+		
+	    'IN_PROGRESS' )
 		    
-		    # data not yet available: warn and continue
+		# data not yet available: warn and continue
+		if [ -n "${VERBOSE}" ] ; then
 		    echo "Warning: no cached data by SSL Labs, check initiated, please check later"
-
-		else
-		
-		    critical "Cannot check status on SSL Labs: ${JSON}"
-
 		fi
-		
-	    fi
-	    
-	fi
 
+		;;
+
+	    'DNS' ) 
+
+		critical 'SSL Labs cannot resolve the domain name'
+
+		;;
+
+	    * )
+		
+		critical "Cannot check status on SSL Labs: ${JSON}"
+
+	esac
+	    
     fi
     
     ################################################################################
