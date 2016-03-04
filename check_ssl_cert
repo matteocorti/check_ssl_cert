@@ -983,7 +983,12 @@ EOF
 	
 	    'ERROR' )
 	    
-		critical "Error checking SSL Labs: ${JSON}"
+		SSL_LABS_STATUS_MESSAGE=$( echo "${JSON}" |
+						 sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/'
+				       )
+
+		critical "Error checking SSL Labs: ${STATUS_MESSAGE}"
+		
 		;;
 	    
 	    'READY' )
