@@ -963,14 +963,13 @@ EOF
 	    echo "Checking SSL Labs assestment"
 	fi	    
 	
-	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}")
+	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}" | tr '\n' ' ' )
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] SSL Labs JSON: ${JSON}"
 	fi
 
 	SSL_LABS_HOST_STATUS=$( echo "${JSON}" |
-				      tr '\n' ' ' |
 				      sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/'
 			    )
 
@@ -990,7 +989,6 @@ EOF
 	    'READY' )
 		
 		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
-					     tr '\n' ' ' |
 					     sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/'
 				   )
 		
