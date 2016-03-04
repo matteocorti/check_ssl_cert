@@ -340,7 +340,7 @@ main() {
 	    
             -h|--help|-\?)    usage;                  exit 0 ;;
 
-	    --ignore-exp)     NOEXP;                  shift  ;;
+	    --ignore-exp)     NOEXP=1;                shift  ;;
 	    
 	    --ignore-sig-alg) NOSIGALG=1;             shift  ;;
 	    
