@@ -747,7 +747,7 @@ main() {
     # parse the X.509 certificate
     
     DATE=$($OPENSSL x509 -in "${CERT}" -enddate -noout | sed -e "s/^notAfter=//")
-    CN=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
+    CN=$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb | sed -e "s/^.*\sCN\s=\s//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
     
     CA_O=$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")
     CA_CN=$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")
@@ -789,7 +789,7 @@ main() {
             if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else       
-                value=$(${OPENSSL} x509 -in "${CERT}" -noout -"${ATTR}" | sed -e "s/.*=//")
+                value=$(${OPENSSL} x509 -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb -"${ATTR}" | sed -e "s/.*=//")
                 LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
            fi
            
@@ -963,7 +963,7 @@ EOF
 	    echo "Checking SSL Labs assestment"
 	fi	    
 	
-	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}")
+	JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}&fromCache=on&maxAge=24")
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] SSL Labs JSON: ${JSON}"
@@ -978,16 +978,13 @@ EOF
 	    echo "[DBG] SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 	fi
 	
-
-	case "${SSL_LABS_HOST_STATUS}" in
+	if [ "${SSL_LABS_HOST_STATUS}" = 'ERROR' ] ; then
 	    
-	
-	    'ERROR' )
+	    critical "Error checking SSL Labs: ${JSON}"
 	    
-		critical "Error checking SSL Labs: ${JSON}"
-		;;
+	else
 	    
-	    'READY' )
+	    if [ "${SSL_LABS_HOST_STATUS}" = 'READY' ] ; then
 		
 		SSL_LABS_HOST_GRADE=$( echo "${JSON}" |
 					     tr '\n' ' ' |
@@ -1013,30 +1010,24 @@ EOF
 		if [ -n "${DEBUG}" ] ; then
 		    echo "[DBG] SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
 		fi
-
-		;;
 		
-	    'IN_PROGRESS' )
+	    else
+
+		if [ "${SSL_LABS_HOST_STATUS}" = 'IN_PROGRESS' ] ; then
 		    
-		# data not yet available: warn and continue
-		if [ -n "${VERBOSE}" ] ; then
+		    # data not yet available: warn and continue
 		    echo "Warning: no cached data by SSL Labs, check initiated, please check later"
-		fi
 
-		;;
-
-	    'DNS' ) 
-
-		critical 'SSL Labs cannot resolve the domain name'
-
-		;;
-
-	    * )
+		else
 		
-		critical "Cannot check status on SSL Labs: ${JSON}"
+		    critical "Cannot check status on SSL Labs: ${JSON}"
 
-	esac
+		fi
+		
+	    fi
 	    
+	fi
+
     fi
     
     ################################################################################
