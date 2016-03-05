@@ -1,4 +1,5 @@
 2016-03-03 Version 1.22.0 Initial support for SSL Labs checks
+	   	   	  Support for UTF output (thanks to Konstantin Shalygin)
 2016-03-01 Version 1.21.0 Fixed a bug which prevented the check on the expiration date
 2016-02-26 Version 1.20.0 Added debugging output (-d or --debug)
                           Improved the handling of OpenSSL error messages
