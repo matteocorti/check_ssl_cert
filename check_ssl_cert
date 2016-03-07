@@ -646,6 +646,8 @@ main() {
 
         if [ -n "${COMMON_NAME}" ] ; then
             SERVERNAME="-servername ${COMMON_NAME}"
+        else
+            SERVERNAME="-servername ${HOST}"
         fi
 
     else
