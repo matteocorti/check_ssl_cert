@@ -1038,11 +1038,17 @@ EOF
 		    echo "Warning: no cached data by SSL Labs, check initiated, please check later"
 		fi
 
+		SSL_LABS_COMMENT=' SSL Labs test still in progess'
+		
 		;;
 
 	    'DNS' ) 
 
-		critical 'SSL Labs cannot resolve the domain name'
+		if [ -n "${VERBOSE}" ] ; then
+		    echo 'SSL Labs cannot resolve the domain name, try again later'
+		fi
+
+		SSL_LABS_COMMENT=' SSL Labs result not cached'
 
 		;;
 
@@ -1164,7 +1170,7 @@ EOF
 	SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
     fi
     
-    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${SSL_LABS_COMMENT}${PERFORMANCE_DATA}${LONG_OUTPUT}"
     
     exit 0
     
