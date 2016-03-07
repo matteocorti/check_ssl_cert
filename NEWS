@@ -1,3 +1,5 @@
+2016-03-07 Version 1.23.0 Supports SNI even when not checking CN and does not
+  	   	   	  issue a critical when SSL Labs is still checkin a host
 2016-03-03 Version 1.22.0 Initial support for SSL Labs checks
 	   	   	  Support for UTF output (thanks to Konstantin Shalygin)
 2016-03-01 Version 1.21.0 Fixed a bug which prevented the check on the expiration date
