@@ -1,3 +1,8 @@
+2016-03-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: DNS errors by SSL Labs are ignored (as they are just
+			  a sign that the result is not cached)
+
 2016-03-03  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Initial support for SSL Labs checks
