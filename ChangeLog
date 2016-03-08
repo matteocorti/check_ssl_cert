@@ -1,3 +1,8 @@
+2016-03-08  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Tries to extract an error message from SSL Labs
+			  if no status is returned
+
 2016-03-07  Sam Richards
 	* check_ssl_cert: Support SNI even when we don't want to check cn
 

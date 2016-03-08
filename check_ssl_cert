@@ -1055,8 +1055,19 @@ EOF
 		;;
 
 	    * )
+
+		# try to extract a message
+		SSL_LABS_ERROR_MESSAGE=$( echo "${JSON}" |
+						sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/'
+				      )
+
+		if [ -z "${SSL_LABS_ERROR_MESSAGE}" ] ; then
+		    
+		    SSL_LABS_ERROR_MESSAGE="${JSON}"
+
+		fi
 		
-		critical "Cannot check status on SSL Labs: ${JSON}"
+		critical "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
 
 	esac
 	    
