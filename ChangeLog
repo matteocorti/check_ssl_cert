@@ -1,6 +1,7 @@
 2016-03-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (convert_ssl_lab_grade): accepts lowercase letters for SSL Labs grades
+	* check_ssl_cert (check_attr): waits for SSL Labs results
 
 2016-03-08  Matteo Corti  <matteo@corti.li>
 
