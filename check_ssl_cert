@@ -209,16 +209,16 @@ convert_ssl_lab_grade() {
     unset NUMERIC_SSL_LAB_GRADE
     
     case "${GRADE}" in
-	'A+') NUMERIC_SSL_LAB_GRADE=85; shift;; # value not in document
-	A) NUMERIC_SSL_LAB_GRADE=80; shift;;
-	'A-') NUMERIC_SSL_LAB_GRADE=75; shift;; # value not in document
-	B) NUMERIC_SSL_LAB_GRADE=65; shift;;
-	C) NUMERIC_SSL_LAB_GRADE=50; shift;;
-	D) NUMERIC_SSL_LAB_GRADE=35; shift;;
-	E) NUMERIC_SSL_LAB_GRADE=20; shift;;
-	F) NUMERIC_SSL_LAB_GRADE=0; shift;;
-	T) NUMERIC_SSL_LAB_GRADE=0; shift;; # no trust: value not in document
-	M) NUMERIC_SSL_LAB_GRADE=0; shift;; # certificate name mismatch: value not in document
+	'A+'|'a+') NUMERIC_SSL_LAB_GRADE=85; shift;; # value not in document
+	A|a) NUMERIC_SSL_LAB_GRADE=80; shift;;
+	'A-'|'a-') NUMERIC_SSL_LAB_GRADE=75; shift;; # value not in document
+	B|b) NUMERIC_SSL_LAB_GRADE=65; shift;;
+	C|c) NUMERIC_SSL_LAB_GRADE=50; shift;;
+	D|d) NUMERIC_SSL_LAB_GRADE=35; shift;;
+	E|e) NUMERIC_SSL_LAB_GRADE=20; shift;;
+	F|f) NUMERIC_SSL_LAB_GRADE=0; shift;;
+	T|t) NUMERIC_SSL_LAB_GRADE=0; shift;; # no trust: value not in document
+	M|m) NUMERIC_SSL_LAB_GRADE=0; shift;; # certificate name mismatch: value not in document
 	*)
 	    unknown "Connot convert SSL Lab grade ${GRADE}"
     esac
