@@ -261,7 +261,7 @@ fetch_certificate() {
     else
 
 	exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
-
+	
     fi
     
     if [ $? -ne 0 ] ; then
@@ -1155,11 +1155,11 @@ EOF
             fi
     
         else 
-    
+	    
             # process errors
-            details=$(grep  '^verify\ error:' "${ERROR}" | sed -e "s/verify\ error:num=[0-9]*:/verification error: /" )
+            details=$( grep  '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g' )
     
-            critical "Cannot verify certificate\n${details}"
+            critical "Cannot verify certificate: ${details}"
     
         fi
         

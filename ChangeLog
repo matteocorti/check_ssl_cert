@@ -1,3 +1,7 @@
+2016-03-10  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): Better handling of verification errors
+
 2016-03-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (convert_ssl_lab_grade): accepts lowercase letters for SSL Labs grades

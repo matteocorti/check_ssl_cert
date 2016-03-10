@@ -2,4 +2,4 @@
 * IPv6 support (e.g., through gnutls-cli)
 * test for https://revoked.grc.com (should give a critical status)
 * fix OCSP checks
-* https://www.ssllabs.com/projects/ssllabs-apis/
+* Use nmap --script ssl-enum-ciphers  instead of SSL Labs? 
