@@ -853,10 +853,16 @@ EOF
     if [ -n "$COMMON_NAME" ] ; then
     
         ok=''
-    
-        case $COMMON_NAME in
-            $CN) ok='true' ;;
-        esac
+
+        if echo "$CN" | grep -q "^\*\." ; then
+            if echo "$COMMON_NAME" | grep -q "$(echo "$CN" | cut -c 3-)\$" ; then
+                ok='true'
+            fi
+        else
+            case $COMMON_NAME in
+                $CN) ok='true' ;;
+            esac
+        fi
     
         # check alterante names
         if [ -n "${ALTNAMES}" ] ; then
