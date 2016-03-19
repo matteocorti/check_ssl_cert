@@ -1,3 +1,11 @@
+2016-03-19  Matteo Corti  <corti@mac-mini-1.home>
+
+	* check_ssl_cert: fixed CN parsing on non-GNU systems
+
+2016-03-19  Sergei https://github.com/sshmanko
+
+	* check_ssl_cert: handle wildcard certificates
+
 2016-03-10  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): Better handling of verification errors
