@@ -857,13 +857,32 @@ EOF
         ok=''
 
 	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] CN=${CN}"
+	    echo "[DBG] CN = ${CN}"
 	fi
-	
+
         if echo "${CN}" | grep -q "^\*\." ; then
-            if echo "${COMMON_NAME}" | grep -q "$(echo "${CN}" | cut -c 3-)\$" ; then
+
+	    # match the domain
+	    if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | cut -c 3-)\$" ; then
+
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
+		fi
+
+		ok='true'
+            fi
+
+	    # or the literal with the wildcard
+	    if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[*]/' )\$" ; then
+
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[*]/' )\$"
+		fi
+		
                 ok='true'
             fi
+	    
+	    
         else
             case ${COMMON_NAME} in
                 ${CN}) ok='true' ;;
