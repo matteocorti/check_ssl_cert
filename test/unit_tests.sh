@@ -46,7 +46,7 @@ testUsage() {
 }    
 
 testGoogle() {
-    ${SCRIPT} -H www.google.com --cn www.google.com > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --cn www.google.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
