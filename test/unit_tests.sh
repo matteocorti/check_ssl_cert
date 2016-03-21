@@ -52,14 +52,14 @@ testGoogle() {
 }
 
 testGoogleWildCard() {
-    ${SCRIPT} -H translate.google.com --cn google.com > /dev/null 2>&1
+    ${SCRIPT} -H translate.google.com --cn google.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testGoogleWithSSLLabs() {
     # we assume Google gets at least a C
-    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }

@@ -30,7 +30,7 @@ clean:
 	rm -rf rpmroot
 
 test:
-	( cd test && ./unit_tests.sh )
+	( cd test && ./unit_tests.sh && echo "Test results: $?")
 
 rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
