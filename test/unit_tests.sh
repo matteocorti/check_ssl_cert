@@ -78,9 +78,16 @@ testIMAP() {
 }
 
 testSMTP() {
-    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25 -v -d
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    # Travis CI blocks port 25
+    if [ -z "${TRAVIS+x}" ] ; then
+
+	${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    fi	
+	
 }
 
 # the script will exit without executing main
