@@ -1200,7 +1200,7 @@ EOF
         else 
 
 	    if [ -n "${DEBUG}" ] ; then
-		echo "${ERROR}" | sed 's/^/[DBG] Error: /'
+		sed 's/^/[DBG] Error: /' "${ERROR}"
 	    fi
 	    
             # process errors
