@@ -1198,6 +1198,10 @@ EOF
             fi
     
         else 
+
+	    if [ -n "${DEBUG}" ] ; then
+		echo "${ERROR}" | sed 's/^/[DBG] Error: /'
+	    fi
 	    
             # process errors
             details=$( grep  '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g' )
