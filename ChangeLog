@@ -1,3 +1,8 @@
+2016-03-21  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (exec_with_timeout): issues a critical status
+	when using the 'timout' utility
+
 2016-03-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixed CN parsing on non-GNU systems

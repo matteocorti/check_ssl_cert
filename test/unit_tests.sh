@@ -24,8 +24,8 @@ fi
 # constants
 
 NAGIOS_OK=0
-NAGIOS_CRITICAL=1
-NAGIOS_WARNING=2
+NAGIOS_WARNING=1
+NAGIOS_CRITICAL=2
 NAGIOS_UNKNOWN=3
 
 testDependencies() {
@@ -62,7 +62,25 @@ testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a C
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testTimeOut() {
+    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol imap --port 993 --timeout  1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testIMAP() {
+    ${SCRIPT} --rootcert cabundle.crt -H corti.li --port 993
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testSMTP() {
+    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25 
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 # the script will exit without executing main
