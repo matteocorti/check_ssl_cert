@@ -861,7 +861,7 @@ EOF
         ok=''
 
 	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] CN = ${CN}"
+	    echo "[DBG] check CN: ${CN}"
 	fi
 
         if echo "${CN}" | grep -q "^\*\." ; then
@@ -907,7 +907,11 @@ EOF
         if [ -z "$ok" ] ; then
             critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
         fi
-        
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] CN check finished"
+	fi
+	
     fi
     
     ################################################################################
@@ -915,6 +919,10 @@ EOF
     
     if [ -n "$ISSUER" ] ; then
     
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] check ISSUER: ${ISSUER}"
+	fi
+
         ok=''
         CA_ISSUER_MATCHED=''
     
