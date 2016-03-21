@@ -1,4 +1,4 @@
-                   1.25.0 Fixes a bug on CN parsing on non-GNU systems
+2016-03-21 Version 1.25.0 Fixes a bug on CN parsing on non-GNU systems
                           Handle wildcard certificates
 2016-03-09 Version 1.24.0 Waits for SSL Labs Results
 2016-03-07 Version 1.23.0 Supports SNI even when not checking CN and does not

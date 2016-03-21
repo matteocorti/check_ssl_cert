@@ -1,4 +1,4 @@
-2016-03-19  Matteo Corti  <corti@mac-mini-1.home>
+2016-03-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixed CN parsing on non-GNU systems
 

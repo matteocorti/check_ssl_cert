@@ -45,6 +45,25 @@ testUsage() {
     assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
 }    
 
+testGoogle() {
+    ${SCRIPT} -H www.google.com --cn www.google.com > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
+testGoogleWildCard() {
+    ${SCRIPT} -H translate.google.com --cn google.com > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
+testGoogleWithSSLLabs() {
+    # we assume Google gets at least a C
+    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
