@@ -78,7 +78,7 @@ testIMAP() {
 }
 
 testSMTP() {
-    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25 
+    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25 -v -d
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
