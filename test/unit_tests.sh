@@ -75,3 +75,5 @@ unset SOURCE_ONLY
 # run shUnit: it will execute all the tests in this file
 # (e.g., functions beginning with 'test'
 . ${SHUNIT2}
+
+echo "DBG: $?"
