@@ -581,6 +581,10 @@ main() {
 	SSL_LAB_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
     
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] ROOT_CA = ${ROOT_CA}"
+    fi
+
     #######################
     # Check needed programs
 

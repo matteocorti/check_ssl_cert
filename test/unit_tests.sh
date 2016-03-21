@@ -48,7 +48,8 @@ testUsage() {
 testGoogle() {
     # debugging: to be removed
     pwd
-    find .
+    ls -l cabundle.crt
+    echo
     ${SCRIPT} -H www.google.com --cn www.google.com --rootcert cabundle.crt -v -d
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
