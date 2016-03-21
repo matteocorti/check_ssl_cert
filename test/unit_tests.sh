@@ -86,6 +86,10 @@ testSMTP() {
 	EXIT_CODE=$?
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
+    else
+
+	echo "Skipping SMTP tests on Travis CI"
+
     fi	
 	
 }
