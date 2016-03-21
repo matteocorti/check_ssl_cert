@@ -47,23 +47,20 @@ testUsage() {
 
 testGoogle() {
     # debugging: to be removed
-    pwd
-    ls -l cabundle.crt
-    echo
-    ${SCRIPT} -H www.google.com --cn www.google.com --rootcert cabundle.crt -v -d
+    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testGoogleWildCard() {
-    ${SCRIPT} -H translate.google.com --cn google.com --rootcert cabundle.crt
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testGoogleWithSSLLabs() {
     # we assume Google gets at least a C
-    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C --rootcert cabundle.crt
+    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
