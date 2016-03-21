@@ -45,21 +45,21 @@ testUsage() {
     assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
 }    
 
-testGoogle() {
+testETHZ() {
     # debugging: to be removed
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
-testGoogleWildCard() {
+testETHZWildCard() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
-testGoogleWithSSLLabs() {
-    # we assume Google gets at least a C
+testETHZWithSSLLabs() {
+    # we assume www.ethz.ch gets at least a C
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
