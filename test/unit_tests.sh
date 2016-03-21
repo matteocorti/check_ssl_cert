@@ -46,20 +46,20 @@ testUsage() {
 }    
 
 testGoogle() {
-    ${SCRIPT} -H www.google.com --cn www.google.com
+    ${SCRIPT} -H www.google.com --cn www.google.com --rootcert test/cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testGoogleWildCard() {
-    ${SCRIPT} -H translate.google.com --cn google.com
+    ${SCRIPT} -H translate.google.com --cn google.com --rootcert test/cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testGoogleWithSSLLabs() {
     # we assume Google gets at least a C
-    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C
+    ${SCRIPT} -H www.google.com --cn www.google.com --check-ssl-labs C --rootcert test/cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
