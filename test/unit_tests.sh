@@ -58,6 +58,19 @@ testETHZWildCard() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testAltNames() {
+    ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
+testAltNames2() {
+    # should fail: inf.ethz.ch has the same ip as www.inf.ethz.ch but inf.ethz.ch is not in the certificate
+    ${SCRIPT} -H inf.ethz.ch --cn inf.ethz.ch --rootcert cabundle.crt --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
+}
+
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a C
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt
