@@ -885,10 +885,10 @@ EOF
             fi
 
 	    # or the literal with the wildcard
-	    if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[*]/' )\$" ; then
+	    if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
 
 		if [ -n "${DEBUG}" ] ; then
-		    echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[*]/' )\$"
+		    echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
 		fi
 		
                 ok='true'
