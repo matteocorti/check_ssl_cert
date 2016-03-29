@@ -1,3 +1,7 @@
+2016-03-29  Sergei Shmanko
+
+	* check_ssl_cert: Fix wildcard match regex, add additional unit tests
+
 2016-03-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): issues a critical status
