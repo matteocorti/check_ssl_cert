@@ -64,6 +64,14 @@ testETHZWildCardSub() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testValidity() {
+    # Tests bug #8
+    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
+}
+    
+
 testAltNames() {
     ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
