@@ -1,3 +1,7 @@
+2016-04-05  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: In case of an s_client error does not output the full (ugly) error. The error is shown in verbose mode
+
 2016-03-29  Sergei Shmanko
 
 	* check_ssl_cert: Fix wildcard match regex, add additional unit tests

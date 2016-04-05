@@ -709,7 +709,7 @@ main() {
     trap 'rm -f $CERT $ERROR $ISSUER_CERT' EXIT HUP INT QUIT TERM
     
     fetch_certificate
-    
+
     if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
     
         if [ -n "${SERVERNAME}" ] ; then
@@ -726,7 +726,7 @@ main() {
         fi
     
         if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
-    
+a    
             critical "cannot fetch certificate: OpenSSL got an unexpected message"
     
         fi
@@ -734,6 +734,7 @@ main() {
     fi
     
     if ! grep -q "CERTIFICATE" "${CERT}" ; then
+	
         if [ -n "${FILE}" ] ; then
             critical "'${FILE}' is not a valid certificate file"
         else
@@ -753,10 +754,15 @@ main() {
             if [ -n "${VERBOSE}" ] ; then
                 echo "Error: ${ERROR_MESSAGE}"
             fi
-            critical "No certificate returned (${ERROR_MESSAGE})"
+            critical "No certificate returned"
         fi
+	
     fi
-    
+
+    if [ -n "${VERBOSE}" ] ; then
+	echo "Parsing the certificate file"
+    fi
+
     ################################################################################
     # parse the X.509 certificate
     
