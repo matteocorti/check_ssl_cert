@@ -271,6 +271,13 @@ fetch_certificate() {
 	exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} 2> ${ERROR} 1> ${CERT}"
 	
     fi
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] storing a copy of the retrieved certificate in ${HOST}.crt"
+	cp "${CERT}" "${HOST}.crt"
+	echo "[DBG] storing a copy of the OpenSSL errors in ${HOST}.error"
+	cp "${ERROR}" "${HOST}.error"
+    fi
     
     if [ $? -ne 0 ] ; then
 
