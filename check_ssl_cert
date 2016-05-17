@@ -321,8 +321,8 @@ main() {
     OPENSSL=""
     PORT=443
     TIMEOUT=15
-    VERBOSE=""
-
+    VERBOSE=""    
+    
     # set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
         TMPDIR="/tmp"
@@ -344,7 +344,7 @@ main() {
 
             --altnames)       ALTNAMES=1;             shift  ;;
 
-	    -d|--debug)       DEBUG=1;                shift  ;;
+	    -d|--debug)       DEBUG=1; VERBOSE=1      shift  ;;
 	    
             -h|--help|-\?)    usage;                  exit 0 ;;
 
@@ -645,6 +645,13 @@ main() {
 	    echo "Perl module Date::Parse installed: enabling date computations"
         fi
     fi
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] check_ssl_version: ${VERSION}"
+	echo "[DBG] OpenSSL binary: ${OPENSSL}" 
+	echo "[DBG] OpenSSL version: $( ${OPENSSL} version )"
+	echo "[DBG] System info: $( uname -a )"
+    fi
     
     ################################################################################
     # check if openssl s_client supports the -servername option
@@ -909,12 +916,23 @@ EOF
     
         # check alterante names
         if [ -n "${ALTNAMES}" ] ; then
+
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] checking altnames"
+	    fi
+	    
             for alt_name in $( $OPENSSL x509 -in "${CERT}" -text | \
                 grep --after-context=1 '509v3 Subject Alternative Name:' | \
                 tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g" ) ; do
+
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG]   ${alt_name}"
+		fi
+		
                 case $COMMON_NAME in
-                    $alt_name) ok='true' ;;
+                    "$alt_name") ok='true' ;;
                 esac
+		
             done
         fi
     
