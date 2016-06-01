@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "March, 2016" "1.27.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "June, 2016" "1.28.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -64,6 +64,21 @@ Valid attributes are: enddate, startdate, subject, issuer, modulus, serial, hash
 .BR "-n,---cn" " name"
 pattern to match the CN of the certificate
 .TP
+.BR "   --no_ssl2"
+disable SSL version 2
+.TP
+.BR "   --no_ssl3"
+disable SSL version 3
+.TP
+.BR "   --no_tls1"
+disable TLS version 1
+.TP
+.BR "   --no_tls1_1"
+disable TLS version 1.1
+.TP
+.BR "   --no_tls1_2"
+disable TLS version 1.2
+.TP
 .BR "-N,--host-cn"
 match CN with the host name
 .TP
@@ -89,7 +104,13 @@ allows self-signed certificates
 pattern to match the serial number
 .TP
 .BR "-S,--ssl" " version"
-force SSL version (2,3)
+force SSL version (2,3) (obsolete: use --ss2 or --ssl3 instead)
+.TP
+.BR "   --ssl2"
+force SSL version 2
+.TP
+.BR "   --ssl3"
+force SSL version 3
 .TP
 .BR "-r,--rootcert" " cert"
 root certificate or directory to be used for certficate validation (passed to openssl's -CAfile or -CApath)

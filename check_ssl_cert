@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.27.0
+VERSION=1.28.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -87,7 +87,9 @@ usage() {
     echo "                             smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned           allows self-signed certificates"
     echo "      --serial serialnum     pattern to match the serial number"
-    echo "   -S,--ssl version          force SSL version (2,3)"
+    echo "   -S,--ssl version          force SSL version (2,3) (obsolete: use --ss2 or --ssl3 instead)"
+    echo "      --ssl2                 force SSL version 2"
+    echo "      --ssl3                 force SSL version 3"
     echo "   -r,--rootcert path        root certificate or directory to be used for"
     echo "                             certificate validation"
     echo "   -t,--timeout              seconds timeout after the specified time"
@@ -366,25 +368,29 @@ main() {
 	    
 	    --ignore-sig-alg) NOSIGALG=1;             shift  ;;
 
-            --no_ssl2)           SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_ssl2";    shift  ;;
+            --no_ssl2)        SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_ssl2";    shift  ;;
 
-            --no_ssl3)           SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_ssl3";    shift  ;;
+            --no_ssl3)        SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_ssl3";    shift  ;;
 
-            --no_tls1)           SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1";    shift  ;;
+            --no_tls1)        SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1";    shift  ;;
 
-            --no_tls1_1)           SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1_1";    shift  ;;
+            --no_tls1_1)      SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1_1";  shift  ;;
 
-            --no_tls1_2)           SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1_2";    shift  ;;
+            --no_tls1_2)      SSL_VERSION_DISABLED=$SSL_VERSION_DISABLED" -no_tls1_2";  shift  ;;
 	    
             -N|--host-cn)     COMMON_NAME="__HOST__"; shift  ;;
 
             -s|--selfsigned)  SELFSIGNED=1;           shift  ;;
 
+            --ssl2)           SSL_VERSION="-ssl2";    shift  ;;
+
+            --ssl3)           SSL_VERSION="-ssl3";    shift  ;;
+
             --tls1)           SSL_VERSION="-tls1";    shift  ;;
 
-            --tls1_1)           SSL_VERSION="-tls1_1";    shift  ;;
+            --tls1_1)         SSL_VERSION="-tls1_1";  shift  ;;
 
-            --tls1_2)           SSL_VERSION="-tls1_2";    shift  ;;
+            --tls1_2)         SSL_VERSION="-tls1_2";  shift  ;;
 
             --ocsp)           OCSP=1;                 shift  ;;
                 
