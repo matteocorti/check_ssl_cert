@@ -103,9 +103,6 @@ allows self-signed certificates
 .BR "   --serial serialnum"
 pattern to match the serial number
 .TP
-.BR "-S,--ssl" " version"
-force SSL version (2,3) (obsolete: use --ss2 or --ssl3 instead)
-.TP
 .BR "   --ssl2"
 force SSL version 2
 .TP
@@ -136,6 +133,9 @@ minimum number of days a certificate has to be valid to issue a warning status
 .TP
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
+.TP
+.BR "-S,--ssl" " version"
+force SSL version (2,3) (see: --ss2 or --ssl3)
 
 .SH MULTIPLE CERTIFICATES
 If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Idetificator) with the -N (or --host-cn) option.

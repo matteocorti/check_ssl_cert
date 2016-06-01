@@ -87,7 +87,6 @@ usage() {
     echo "                             smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned           allows self-signed certificates"
     echo "      --serial serialnum     pattern to match the serial number"
-    echo "   -S,--ssl version          force SSL version (2,3) (obsolete: use --ss2 or --ssl3 instead)"
     echo "      --ssl2                 force SSL version 2"
     echo "      --ssl3                 force SSL version 3"
     echo "   -r,--rootcert path        root certificate or directory to be used for"
@@ -104,8 +103,10 @@ usage() {
     echo "                             to issue a warning status"
     echo
     echo "Deprecated options:"
-    echo "   -d,--days days           minimum number of days a certificate has to be valid"
-    echo "                            (see --critical and --warning)"
+    echo "   -d,--days days            minimum number of days a certificate has to be valid"
+    echo "                             (see --critical and --warning)"
+    echo "   -S,--ssl version          force SSL version (2,3)"
+    echo "                             (see: --ss2 or --ssl3)"
     echo
     echo "Report bugs to: Matteo Corti <matteo@corti.li>"
     echo
