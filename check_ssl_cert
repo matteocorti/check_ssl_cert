@@ -297,7 +297,7 @@ fetch_certificate() {
 	    
 	fi
 
-	# s_client could because the server requires a client certificate
+	# s_client could verify the server certificate because the server requires a client certificate
 
 	if grep -q '^Acceptable client certificate CA names' "${CERT}" ; then
 	    

@@ -2,6 +2,10 @@
 
 	* check_ssl_cert: Increase control over which SSL/TLS versions to use
 
+2016-05-17  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added more debugging info (-v is automatic if -d is spefied, system info and cert written to a file)
+
 2016-04-27  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixes a bug in the OpenSSL error parsing
