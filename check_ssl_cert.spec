@@ -57,10 +57,10 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Mar 21 2016 Matteo Corti <matteo@corti.li> - 1.25.0-0
 - Updated to 1.25.0
 
-* Thu Mar  9 2016 Matteo Corti <matteo@corti.li> - 1.24.0-0
+* Wed Mar  9 2016 Matteo Corti <matteo@corti.li> - 1.24.0-0
 - Updated to 1.24.0
 
-* Thu Mar  7 2016 Matteo Corti <matteo@corti.li> - 1.23.0-0
+* Mon Mar  7 2016 Matteo Corti <matteo@corti.li> - 1.23.0-0
 - Updated to 1.23.0
 
 * Thu Mar  3 2016 Matteo Corti <matteo@corti.li> - 1.22.0-0
@@ -75,7 +75,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Feb 25 2016 Matteo Corti <matteo@corti.li> - 1.19.0-0
 - Updated to 1.19.0
 
-* Tue Oct 31 2015 Matteo Corti <matteo@corti.li> - 1.18.0-0
+* Sat Oct 31 2015 Matteo Corti <matteo@corti.li> - 1.18.0-0
 - Updated to 1.18.0
 
 * Tue Oct 20 2015 Matteo Corti <matteo@corti.li> - 1.17.2-0

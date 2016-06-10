@@ -1084,7 +1084,7 @@ EOF
 	    JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}" | tr '\n' ' ' )
 	    
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] Executing: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+		echo "[DBG] Checking SSL Labs: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
 		echo "[DBG] SSL Labs JSON: ${JSON}"
 	    fi
 
