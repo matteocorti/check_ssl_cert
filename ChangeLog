@@ -1,3 +1,7 @@
+2016-06-10  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added an option to clear the cached result at SSLLabs
+
 2016-06-01  juckerf (https://github.com/juckerf)
 
 	* check_ssl_cert: Increase control over which SSL/TLS versions to use

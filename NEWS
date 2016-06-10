@@ -1,3 +1,5 @@
+New option to clear the cached value at SSL Labs
+
 2016-06-01 Version 1.28.0 Increased control over which SSL/TLS versions to use
 2016-03-29 Version 1.27.0 Fixes a bug in the OpenSSL error parsing
 2016-03-29 Version 1.26.0 Fixes a bug in wildcard match
