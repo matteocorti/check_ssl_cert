@@ -83,7 +83,7 @@ usage() {
     echo "   -o,--org org               pattern to match the organization of the certificate"
     echo "      --openssl path          path of the openssl binary to be used"
     echo "   -p,--port port             TCP port"
-    echo "   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp}"
+    echo "   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc}"
     echo "                              http:               default"
     echo "                              smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned            allows self-signed certificates"
@@ -253,8 +253,18 @@ fetch_certificate() {
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
         
         case "${PROTOCOL}" in
-            
-            smtp|pop3|imap|ftp|xmpp)
+
+            smtp)
+
+		exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+		;;
+
+            irc)
+
+		exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+		;;
+
+            pop3|imap|ftp|xmpp)
 
 		exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
 		;;
