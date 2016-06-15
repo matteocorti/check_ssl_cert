@@ -1081,8 +1081,21 @@ EOF
 
 	while true; do
 
-	    JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}" | tr '\n' ' ' )
+	    JSON=$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")
+	    CURL_RETURN_CODE=$?
 	    
+	    if [ ${CURL_RETURN_CODE} -ne 0 ] ; then
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] curl returned ${CURL_RETURN_CODE}: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+		fi
+
+		unknown "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
+		
+	    fi		
+	    
+	    JSON=$(printf '%s' "${JSON}" | tr '\n' ' ' )
+ 	    
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] Checking SSL Labs: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
 		echo "[DBG] SSL Labs JSON: ${JSON}"

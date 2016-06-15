@@ -1,3 +1,7 @@
+2016-06-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Better curl error handling
+
 2016-06-10  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added an option to clear the cached result at SSLLabs
