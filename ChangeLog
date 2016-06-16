@@ -80,7 +80,7 @@
 
 2015-04-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
+	* check_ssl_cert: corrected some typos (thanks to JÃ©rÃ©my Lecour)
 	* check_ssl_cert: removed check on the openssl binary name
 
 2014-10-21  Matteo Corti  <matteo@corti.li>
@@ -260,7 +260,7 @@
 
 2010-03-08  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: applied patch from Marcus Rejås with the -n and -N options
+	* check_ssl_cert: applied patch from Marcus RejÃ¥s with the -n and -N options
 
 2009-12-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
