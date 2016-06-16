@@ -45,3 +45,4 @@ Thanks:
   certificate patch
 * Many thanks to juckerf (https://github.com/juckerf) for patch to increase
   control over which SSL/TLS versions to use
+* Many thanks to Rolf Eike Beer for the IRC and SMTP check patch

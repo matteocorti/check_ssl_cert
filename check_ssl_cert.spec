@@ -1,4 +1,4 @@
-%define version          1.28.0
+%define version          1.29.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -40,11 +40,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog NEWS README INSTALL TODO COPYING VERSION COPYRIGHT
+%doc AUTHORS ChangeLog NEWS README TODO COPYING VERSION COPYRIGHT
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Wed Jun 15 2016 Matteo Corti <matteo@corti.li> - 1.29.0-0
+- Updated to 1.29.0
+
 * Wed Jun 01 2016 Matteo Corti <matteo@corti.li> - 1.28.0-0
 - Updated to 1.28.0
 
