@@ -64,7 +64,7 @@ usage() {
     echo "                              or MD5"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
     echo "   -L,--check-ssl-labs grade  SSL Labs assestment"
-    echo "                             (please check https://www.ssllabs.com/about/terms.html)"
+    echo "                              (please check https://www.ssllabs.com/about/terms.html)"
     echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "      --long-output list      append the specified comma separated (no spaces) list"
     echo "                              of attributes to the plugin output on additional lines"
