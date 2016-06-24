@@ -1,3 +1,7 @@
+2016-06-24  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_certe: Fixed OCSP host
+
 2016-06-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Better curl error handling

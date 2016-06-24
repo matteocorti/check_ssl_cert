@@ -1342,15 +1342,38 @@ main() {
     # Check revocation via OCSP
     if [ -n "${OCSP}" ]; then
 
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT}"
+	fi
+	
         curl --silent "${ISSUER_URI}" > "${ISSUER_CERT}"
-
+	
         if file "${ISSUER_CERT}" | grep -q ': data' ; then
+
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
+	    fi
+	    
             openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
         fi
 
-        OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g")"
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${ISSUER_URI##*/}"
+	    cp "${ISSUER_CERT}" "${ISSUER_URI##*/}"
+	fi
+	
+        OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g" | sed 's/^http:\/\///' )"
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] OCSP: host = ${OCSP_HOST}"	
+	fi
+	    
         OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
 
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] OCSP: response = ${OCSP_RESP}"	
+	fi
+	
         if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
             critical "certificate is revoked"
         elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
