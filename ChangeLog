@@ -1,3 +1,7 @@
+2016-06-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: fixed OSCP header on old OpenSSL versions
+
 2016-06-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: OCSP is now default

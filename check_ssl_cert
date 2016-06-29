@@ -1371,10 +1371,17 @@ main() {
         OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
 	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: host = ${OCSP_HOST}"	
+	    echo "[DBG] OCSP: host = ${OCSP_HOST}"
+	    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} -header HOST ${OCSP_HOST}"
+	fi
+
+	# check if -header is supported
+	OCSP_HEADER=""
+	if "${OPENSSL}" ocsp 2>&1 | grep -q -- -header ; then
+	    OCSP_HEADER="-header HOST ${OCSP_HOST}"
 	fi
 	    
-        OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+        OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 | grep -i "ssl_cert")"
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] OCSP: response = ${OCSP_RESP}"	
