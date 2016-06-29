@@ -1372,29 +1372,43 @@ main() {
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] OCSP: host = ${OCSP_HOST}"
-	    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} -header HOST ${OCSP_HOST}"
 	fi
 
 	# check if -header is supported
 	OCSP_HEADER=""
 	if "${OPENSSL}" ocsp 2>&1 | grep -q -- -header ; then
-	    OCSP_HEADER="-header HOST ${OCSP_HOST}"
-	fi
+
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] openssl ocsp support the -header option"
+	    fi
 	    
-        OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 | grep -i "ssl_cert")"
-
-	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: response = ${OCSP_RESP}"	
-	fi
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+	    fi
 	
-        if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
-            critical "certificate is revoked"
-        elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
+            OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+	    
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] OCSP: response = ${OCSP_RESP}"	
+	    fi
+	    
+            if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
+		critical "certificate is revoked"
+            elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then	    
+	    
+		OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+		critical "${OCSP_RESP}"
+	    
+	    fi
+	    
+	else
+	    
+	    if [ -n "${VERBOSE}" ] ; then
+		echo "openssl ocsp does not support the -header option: disabling OCSP checks"
+	    fi
 
-            $OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST" "${OCSP_HOST}"
-            critical "${OCSP_RESP}"
+	fi
 
-        fi
 
     fi
 
