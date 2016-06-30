@@ -86,6 +86,7 @@ Options:
       --ignore-exp           ignore expiration date
       --ignore-sig-alg       do not check if the certificate was signed with SHA1
                              or MD5
+      --ignore-ocsp          do not check revocation with OCSP
    -i,--issuer issuer        pattern to match the issuer of the certificate
    -L,--check-ssl-labs grade SSL Labs assestment
                              (please check https://www.ssllabs.com/about/terms.html)
@@ -102,7 +103,6 @@ Options:
       --no_tls1_1            disable TLS version 1.1
       --no_tls1_2            disable TLS version 1.2
    -N,--host-cn              match CN with the host name
-      --ocsp                 check revocation via OCSP
    -o,--org org              pattern to match the organization of the certificate
       --openssl path         path of the openssl binary to be used
    -p,--port port            TCP port
@@ -129,6 +129,7 @@ Options:
 Deprecated options:
    -d,--days days            minimum number of days a certificate has to be valid
                              (see --critical and --warning)
+      --ocsp                 check revocation via OCSP
    -S,--ssl version          force SSL version (2,3)
                              (see: --ss2 or --ssl3)
       </pre>
