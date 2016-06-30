@@ -1,3 +1,4 @@
+2016-06-30 Version 1.30.0 OCSP check is fixed and enabled by default
 2016-06-15 Version 1.29.0 New option to clear the cached value at SSL Labs
                           IRC support
 2016-06-01 Version 1.28.0 Increased control over which SSL/TLS versions to use

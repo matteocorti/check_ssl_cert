@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "June, 2016" "1.29.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "June, 2016" "1.30.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -51,6 +51,9 @@ ignore expiration date
 .BR "   --ignore-sig-alg"
 do not check if the certificate was signed with SHA1 or MD5
 .TP
+.BR "   --ignore-ocsp"
+do not check revocation with OCSP
+.TP
 .BR "-i,--issuer" " issuer"
 pattern to match the issuer of the certificate
 .TP
@@ -84,9 +87,6 @@ disable TLS version 1.2
 .TP
 .BR "-N,--host-cn"
 match CN with the host name
-.TP
-.BR "   --ocsp"
-check revocation via OCSP
 .TP
 .BR "-o,--org" " org"
 pattern to match the organization of the certificate
@@ -136,6 +136,9 @@ minimum number of days a certificate has to be valid to issue a warning status
 .TP
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
+.TP
+.BR "   --ocsp"
+check revocation via OCSP
 .TP
 .BR "-S,--ssl" " version"
 force SSL version (2,3) (see: --ss2 or --ssl3)
