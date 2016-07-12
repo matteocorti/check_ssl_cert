@@ -59,9 +59,20 @@ testETHZWildCard() {
 }
 
 testCNWithComma() {
-    ${SCRIPT} -H mx.unixadm.org -p 25 -P smtp -N -s
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+
+    # Travis CI blocks port 25
+    if [ -z "${TRAVIS+x}" ] ; then
+
+	${SCRIPT} -H mx.unixadm.org -p 25 -P smtp -N -s
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+
+    else
+
+	echo "Skipping SMTP tests on Travis CI"
+
+    fi	
+	
 }
 
 testETHZWildCardSub() {
