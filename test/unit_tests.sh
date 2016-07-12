@@ -58,6 +58,12 @@ testETHZWildCard() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testCNWithComma() {
+    ${SCRIPT} -H mx.unixadm.org -p 25 -P smtp -N -s
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 testETHZWildCardSub() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?

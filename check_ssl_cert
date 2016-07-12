@@ -979,6 +979,17 @@ main() {
 
     SIGNATURE_ALGORITHM="$($OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] " $($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)
+	echo "[DBG] CN         = ${CN}"
+	echo "[DBG] CA_O       = ${CA_O}"
+	echo "[DBG] CA_CN      = ${CA_CN}"
+	echo "[DBG] SERIAL     = ${SERIAL}"
+	echo "[DBG] OCSP_URI   = ${OCSP_URI}"
+	echo "[DBG] ISSUER_URI = ${ISSUER_URI}"
+	echo "[DBG] ${SIGNATURE_ALGORITHM}"
+    fi
+    
     if echo "${SIGNATURE_ALGORITHM}" | grep -q "sha1" ; then
 
         if [ -n "${NOSIGALG}" ] ; then
