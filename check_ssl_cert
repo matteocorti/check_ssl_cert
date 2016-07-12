@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.30.0
+VERSION=1.31.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -964,8 +964,9 @@ main() {
     # Parse the X.509 certificate
     DATE="$($OPENSSL x509 -in "${CERT}" -enddate -noout | sed -e "s/^notAfter=//")"
 
+    # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
     CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
-        sed -e "s/^.*[[:space:]]CN[[:space:]]=[[:space:]]//" -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//")"
+        sed -e "s/^.*[[:space:]]CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
     CA_O="$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")"
     CA_CN="$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")"
