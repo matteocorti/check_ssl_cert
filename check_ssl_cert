@@ -813,24 +813,35 @@ main() {
         echo "disabling timeouts"
     fi
 
-    # Perl with Date::Parse (optional)
     PERL="$(which perl 2> /dev/null)"
-    test -x "${PERL}" || PERL=""
-    if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
-        echo "Perl not found: disabling date computations"
-    fi
-
-    if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
-
-        if [ -n "${VERBOSE}" ] ; then
-            echo "Perl module Date::Parse not installed: disabling date computations"
+    DATEBIN="$(which date 2> /dev/null)"
+    if ! $DATEBIN +%s >/dev/null 2>&1; then
+        DATEBIN=""
+        # Perl with Date::Parse (optional)
+        test -x "${PERL}" || PERL=""
+        if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
+            echo "Perl not found: disabling date computations"
         fi
-        PERL=""
+
+        if ! ${PERL} -e "use Date::Parse;" > /dev/null 2>&1 ; then
+
+            if [ -n "${VERBOSE}" ] ; then
+                echo "Perl module Date::Parse not installed: disabling date computations"
+            fi
+           PERL=""
+
+        else
+
+            if [ -n "${VERBOSE}" ] ; then
+                echo "Perl module Date::Parse installed: enabling date computations"
+            fi
+
+        fi
 
     else
 
         if [ -n "${VERBOSE}" ] ; then
-            echo "Perl module Date::Parse installed: enabling date computations"
+            echo "Found date with timestamp support: enabling date computations"
         fi
 
     fi
@@ -1050,23 +1061,30 @@ main() {
 
     ################################################################################
     # Compute for how many days the certificate will be valid
-    if [ -n "${PERL}" ] ; then
+    if [ -n "${PERL}" ] || [ -n "${DATEBIN}" ]; then
 
         CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
 
-        DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
-			use strict;
-			use warnings;
+        if [ -x "${DATEBIN}" ]; then
 
-			use Date::Parse;
+            DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
 
-			my $cert_date = str2time( $ARGV[0] );
+        else
+        
+            DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
+			    use strict;
+			    use warnings;
 
-			my $days = int (( $cert_date - time ) / 86400 + 0.5);
+			    use Date::Parse;
 
-			print "$days\n";
-		EOF
-        )
+			    my $cert_date = str2time( $ARGV[0] );
+
+			    my $days = int (( $cert_date - time ) / 86400 + 0.5);
+
+			    print "$days\n";
+			EOF
+            )
+        fi
 
         if [ -n "${VERBOSE}" ] ; then
 
