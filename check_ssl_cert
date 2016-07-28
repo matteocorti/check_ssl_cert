@@ -1065,7 +1065,7 @@ main() {
 
         CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
 
-        if [ -x "${DATEBIN}" ]; then
+        if [ -n "${DATEBIN}" ]; then
 
             DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
 
