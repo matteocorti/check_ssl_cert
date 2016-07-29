@@ -825,14 +825,10 @@ main() {
 	echo "[DBG] date available: ${DATEBIN}"
     fi
 
-    if ! $DATEBIN +%s >/dev/null 2>&1 || "${DATEBIN}" -v 1d > /dev/null 2>&1 ;  then
-	
-        DATEBIN=""
+    DATETYPE=""
 
-	if [ -n "${VERBOSE}" ] ; then
-	    echo "no GNU date found: trying with Perl"
-	fi
-	
+    if ! "${DATEBIN}" +%s >/dev/null 2>&1  ;  then
+		
         # Perl with Date::Parse (optional)
         test -x "${PERL}" || PERL=""
         if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
@@ -844,21 +840,30 @@ main() {
             if [ -n "${VERBOSE}" ] ; then
                 echo "Perl module Date::Parse not installed: disabling date computations"
             fi
-           PERL=""
+
+	    PERL=""
 
         else
 
             if [ -n "${VERBOSE}" ] ; then
                 echo "Perl module Date::Parse installed: enabling date computations"
-            fi
+            fi	   
+
+            DATETYPE="PERL"
 
         fi
 
     else
 
-        if [ -n "${VERBOSE}" ] ; then
-            echo "Found date with timestamp support: enabling date computations"
-        fi
+	if $DATEBIN --version >/dev/null 2>&1 ; then
+            DATETYPE="GNU"
+	else
+            DATETYPE="BSD"
+	fi
+
+	if [ -n "${VERBOSE}" ] ; then
+            echo "found ${DATETYPE} date with timestamp support: enabling date computations"
+	fi
 
     fi
 
@@ -1077,30 +1082,40 @@ main() {
 
     ################################################################################
     # Compute for how many days the certificate will be valid
-    if [ -n "${PERL}" ] || [ -n "${DATEBIN}" ]; then
+    if [ -n "${DATETYPE}" ]; then
 
         CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
 
-        if [ -n "${DATEBIN}" ]; then
-	    
-            DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+        OLDLANG=$LANG
+        LANG=en_US
 
-        else
-        
-            DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
-			    use strict;
-			    use warnings;
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] Date computations: ${DATETYPE}"
+	fi
 
-			    use Date::Parse;
+        case "${DATETYPE}" in
+            "BSD")
+                DAYS_VALID=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+                ;;
 
-			    my $cert_date = str2time( $ARGV[0] );
+            "GNU")
+                DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+                ;;
 
-			    my $days = int (( $cert_date - time ) / 86400 + 0.5);
+            "PERL")
+				DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
+					use strict;
+					use warnings;
+					use Date::Parse;
+					my $cert_date = str2time( $ARGV[0] );
+					my $days = int (( $cert_date - time ) / 86400 + 0.5);
+					print "$days\n";
+				EOF
+				)
+				;;
+        esac
 
-			    print "$days\n";
-			EOF
-            )
-        fi
+        LANG=$OLDLANG
 
         if [ -n "${VERBOSE}" ] ; then
 
