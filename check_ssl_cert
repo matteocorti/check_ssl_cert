@@ -1406,7 +1406,10 @@ main() {
 
 	# check if -header is supported
 	OCSP_HEADER=""
-	if "${OPENSSL}" ocsp 2>&1 | grep -q -- -header ; then
+
+	# oscp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
+	# so we check if the major version is greater than 0
+	if [ $( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )  -gt 0 ]; then
 
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] openssl ocsp support the -header option"
