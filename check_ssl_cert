@@ -814,9 +814,25 @@ main() {
     fi
 
     PERL="$(which perl 2> /dev/null)"
+
+    if [ -n "${DEBUG}" ] && [ -n "${PERL}" ] ; then
+	echo "[DBG] perl available: ${PERL}"
+    fi
+    
     DATEBIN="$(which date 2> /dev/null)"
-    if ! $DATEBIN +%s >/dev/null 2>&1; then
+    
+    if [ -n "${DEBUG}" ] && [ -n "${DATEBIN}" ] ; then
+	echo "[DBG] date available: ${DATEBIN}"
+    fi
+
+    if ! $DATEBIN +%s >/dev/null 2>&1 || "${DATEBIN}" -v 1d > /dev/null 2>&1 ;  then
+	
         DATEBIN=""
+
+	if [ -n "${VERBOSE}" ] ; then
+	    echo "no GNU date found: trying with Perl"
+	fi
+	
         # Perl with Date::Parse (optional)
         test -x "${PERL}" || PERL=""
         if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
@@ -968,7 +984,7 @@ main() {
     fi
 
     if [ -n "${VERBOSE}" ] ; then
-        echo "Parsing the certificate file"
+        echo "parsing the certificate file"
     fi
 
     ################################################################################
@@ -1066,7 +1082,7 @@ main() {
         CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
 
         if [ -n "${DATEBIN}" ]; then
-
+	    
             DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
 
         else
