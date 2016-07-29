@@ -1,3 +1,7 @@
+2016-07-29  https://github.com/bb-Ricardo
+
+	* check_ssl_cert: calculate expiration primary with date
+
 2016-07-12  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixed the parsing of the CN field
