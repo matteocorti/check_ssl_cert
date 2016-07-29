@@ -357,6 +357,18 @@ fetch_certificate() {
 
 }
 
+################################################################################
+# Adds metric to performance data
+# Params
+#   $1 performance data in nagios plugin format,
+#      see https://nagios-plugins.org/doc/guidelines.html#AEN200
+add_performance_data() {
+    if [ -z "${PERFORMANCE_DATA}" ]; then
+        PERFORMANCE_DATA="|${1}"
+    else 
+        PERFORMANCE_DATA="${PERFORMANCE_DATA} $1"
+    fi
+}
 
 ################################################################################
 # Main
@@ -1126,7 +1138,7 @@ main() {
             fi
 
         fi
-        PERFORMANCE_DATA="|days=$DAYS_VALID;${WARNING};${CRITICAL};;"
+        add_performance_data "days=$DAYS_VALID;${WARNING};${CRITICAL};;"
 
     fi
 
@@ -1354,6 +1366,8 @@ main() {
 
                         convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
                         SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+
+                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_ASSESTMENT_NUMERIC}"
 
                         # Check the grade
                         if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESTMENT_NUMERIC}" ] ; then
