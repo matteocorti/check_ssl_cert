@@ -1133,17 +1133,19 @@ main() {
     ################################################################################
     # Check the CN
     if [ -n "$COMMON_NAME" ] ; then
-
+	
         ok=""
 
         if [ -n "${DEBUG}" ] ; then
             echo "[DBG] check CN: ${CN}"
         fi
 
-        if echo "${CN}" | grep -q "^\*\." ; then
+	# Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
+	
+        if echo "${CN}" | grep -q -i "^\*\." ; then
 
             # Match the domain
-            if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | cut -c 3-)\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | cut -c 3-)\$" ; then
 
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
@@ -1152,7 +1154,7 @@ main() {
             fi
 
             # Or the literal with the wildcard
-            if echo "${COMMON_NAME}" | grep -q "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
 
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
@@ -1162,12 +1164,10 @@ main() {
 
         else
 
-            case "${COMMON_NAME}" in
-                ${CN})
-                    ok="true"
-                    ;;
-            esac
-
+	    if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
+                ok="true"
+	    fi
+	    
         fi
 
         # Check alterante names
@@ -1185,11 +1185,9 @@ main() {
                     echo "[DBG]   ${alt_name}"
                 fi
 
-                case "$COMMON_NAME" in
-                    "$alt_name")
-                        ok="true"
-                        ;;
-                esac
+		if echo "${COMMON_NAME}" | grep -q -i "^${alt_name}$" ; then
+                    ok="true"
+		fi
 
             done
 

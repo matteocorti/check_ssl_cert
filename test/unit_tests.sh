@@ -52,31 +52,33 @@ testETHZ() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testETHZCaseInsensitive() {
+    # debugging: to be removed
+    ${SCRIPT} -H www.ethz.ch --cn WWW.ETHZ.CH --rootcert cabundle.crt
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 testETHZWildCard() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
-testCNWithComma() {
-
-    # Travis CI blocks port 25
-    if [ -z "${TRAVIS+x}" ] ; then
-
-	${SCRIPT} -H mx.unixadm.org -p 25 -P smtp -N -s
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
-
-    else
-
-	echo "Skipping SMTP tests on Travis CI"
-
-    fi	
-	
+testETHZWildCardCaseInsensitive() {
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --rootcert cabundle.crt
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --rootcert cabundle.crt
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
+testETHZWildCardSubCaseInsensitive() {
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
@@ -95,9 +97,23 @@ testAltNames() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+
+testAltNamesCaseInsensitve() {
+    ${SCRIPT} -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --rootcert cabundle.crt --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 testAltNames2() {
     # should fail: inf.ethz.ch has the same ip as www.inf.ethz.ch but inf.ethz.ch is not in the certificate
     ${SCRIPT} -H inf.ethz.ch --cn inf.ethz.ch --rootcert cabundle.crt --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
+}
+
+testAltNames2CaseInsensitive() {
+    # should fail: inf.ethz.ch has the same ip as www.inf.ethz.ch but inf.ethz.ch is not in the certificate
+    ${SCRIPT} -H inf.ethz.ch --cn INF.ETHZ.CH --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
 }

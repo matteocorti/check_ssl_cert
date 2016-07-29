@@ -1,4 +1,5 @@
-Version 1.32.0: added support for date with timestamp calculation
+2016-07-29 Version 1.32.0: added support for date with timestamp calculation and
+                           fixed case sensitive comparison of CN
 2016-07-12 Version 1.31.0 Fixed the parsing of the CN field
 2016-06-30 Version 1.30.0 OCSP check is fixed and enabled by default
 2016-06-15 Version 1.29.0 New option to clear the cached value at SSL Labs
