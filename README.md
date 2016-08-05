@@ -1,18 +1,18 @@
 
  (c) Matteo Corti, ETH Zurich, 2007-2012
 
-(c) Matteo Corti, 2007-2016
+ (c) Matteo Corti, 2007-2016
 
   see AUTHORS for the complete list of contributors
 
-check_ssl_cert
+# check_ssl_cert
 
 A Nagios plugin to check an X.509 certificate:
  - checks if the server is running and delivers a valid certificate
  - checks if the CA matches a given pattern
  - checks the validity
 
-# Usage:
+## Usage:
 
 ```
 check_ssl_cert -H host [OPTIONS]
@@ -84,20 +84,20 @@ Deprecated options:
 
 ```
 
-# Expect:
+## Expect
 
 check_ssl_cert requires 'expect' to enable timouts. If expect is not
 present on your system timeouts will be disabled.
 
 See: http://en.wikipedia.org/wiki/Expect
 
-# Virtual servers:
+## Virtual servers
 
 check_ssl_client supports the servername TLS extension in ClientHello
 if the installed openssl version provides it. This is needed if you
 are checking a machine with virtual hosts.
 
-# SSL Labs:
+## SSL Labs
 
 If `-L` or `--check-ssl-labs` are specified the plugin will check the
 cached status using the SSL Labs Assessment API (see
@@ -107,7 +107,7 @@ The plugin will ask for a cached result (maximum age 1 day) to avoid
 to many checks. The first time you issue the check you could therefore
 get an outdated result.
 
-# Notes:
+## Notes
 
 the root certificate corresponding to the checked certificate must be
 available to openssl or specified with the `-r cabundle` or
@@ -126,6 +126,6 @@ $ sudo security find-certificate -a \
   -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
 ```
 
-# Bugs:
+## Bugs
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
