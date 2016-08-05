@@ -91,13 +91,6 @@ present on your system timeouts will be disabled.
 
 See: http://en.wikipedia.org/wiki/Expect
 
-# Perl and Date::Parse:
-
-If perl and Date::Parse are available the plugin will also compute for
-how many days the certificate will be valid and put the information in
-the performance data. If perl or Date::Parse are not available the
-information will not be available.
-
 # Virtual servers:
 
 check_ssl_client supports the servername TLS extension in ClientHello
@@ -106,7 +99,7 @@ are checking a machine with virtual hosts.
 
 # SSL Labs:
 
-If -L or --check-ssl-labs are specified the plugin will check the
+If `-L` or `--check-ssl-labs` are specified the plugin will check the
 cached status using the SSL Labs Assessment API (see
 https://www.ssllabs.com/about/terms.html).
 
@@ -117,9 +110,9 @@ get an outdated result.
 # Notes:
 
 the root certificate corresponding to the checked certificate must be
-available to openssl or specified with the '-r cabundle' or
-'--rootcert cabundle' option, where cabundle is either a file for -CAfile
-or a directory for -CApath.
+available to openssl or specified with the `-r cabundle` or
+`--rootcert cabundle` option, where cabundle is either a file for `-CAfile`
+or a directory for `-CApath`.
 
 On Mac OS X the root certificates bundle is stored in the Keychain and
 openssl will complain with:
@@ -128,8 +121,10 @@ openssl will complain with:
 
 The bundle can be extracted with:
 
+```
 $ sudo security find-certificate -a \
   -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
+```
 
 # Bugs:
 
