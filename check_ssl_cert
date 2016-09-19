@@ -1469,7 +1469,11 @@ main() {
 		echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
 	    fi
 	
-            OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+            if [ -n "${HTTP_PROXY:-}" ] ; then
+                OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+            else
+                OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+            fi
 	    
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] OCSP: response = ${OCSP_RESP}"	
@@ -1479,7 +1483,11 @@ main() {
 		critical "certificate is revoked"
             elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then	    
 	    
-		OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                if [ -n "${HTTP_PROXY:-}" ] ; then
+                    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                else
+                    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                fi
 		critical "${OCSP_RESP}"
 	    
 	    fi
