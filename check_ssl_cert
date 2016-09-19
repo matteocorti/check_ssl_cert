@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.33.0
+VERSION=1.34.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1433,14 +1433,29 @@ main() {
 	fi
 	
         curl --silent "${ISSUER_URI}" > "${ISSUER_CERT}"
-	
-        if file "${ISSUER_CERT}" | grep -q ': data' ; then
 
-	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] OCSP: issuer certificate type: $(file "${ISSUER_CERT}" | sed 's/.*://' )"
+	fi
+	
+	# check the result
+	if ! file "${ISSUER_CERT}" | grep -q ': ASCII' ; then
+	
+            if file "${ISSUER_CERT}" | grep -q ': data' ; then
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
+		fi
+		
+		openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
+
+	    else
+
+		unknown "Unable to fetch OCSP issuer certificate."
+
 	    fi
-	    
-            openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
+		
+		
         fi
 
 	if [ -n "${DEBUG}" ] ; then
@@ -1465,14 +1480,29 @@ main() {
 		echo "[DBG] openssl ocsp support the -header option"
 	    fi
 	    
-	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+	    # http_proxy is sometimes lower- and sometimes uppercase. Programs usually check both
+	    # shellcheck disable=SC2154
+	    if [ -n "${http_proxy}" ] ; then
+		HTTP_PROXY="${http_proxy}"
 	    fi
-	
+
             if [ -n "${HTTP_PROXY:-}" ] ; then
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+		fi
+
                 OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+
             else
+		
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+		fi
+
                 OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 | grep -i "ssl_cert")"
+
+
             fi
 	    
 	    if [ -n "${DEBUG}" ] ; then

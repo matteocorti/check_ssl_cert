@@ -1,3 +1,7 @@
+2016-09-19  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: enabling proxy support in the OCSP check (thanks to Leynos)
+
 2016-08-04  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: disabling OCSP checks when no issuer URI is found

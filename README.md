@@ -12,7 +12,7 @@ A Nagios plugin to check an X.509 certificate:
  - checks if the CA matches a given pattern
  - checks the validity
 
-## Usage:
+## Usage
 
 ```
 check_ssl_cert -H host [OPTIONS]
