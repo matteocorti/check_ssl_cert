@@ -33,12 +33,6 @@ testDependencies() {
     assertNotNull 'openssl not found' "${PROG}"
 }
 
-# FIXME use a series of certificates to test valid/invalid data
-testCertificate() {
-    ${SCRIPT} --host localhost --file cacert.crt > /dev/null
-    assertEquals "wrong exit code" ${NAGIOS_OK} "$?"
-}
-
 testUsage() {
     ${SCRIPT} > /dev/null 2>&1
     EXIT_CODE=$?
