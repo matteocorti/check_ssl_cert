@@ -92,6 +92,8 @@ usage() {
     echo "      --ssl3                  force SSL version 3"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
+	echo "      --rsa                   cipher selection: force RSA authentication"
+	echo "      --ecdsa                 cipher selection: force ECDSA authentication"
     echo "   -t,--timeout               seconds timeout after the specified time"
     echo "                              (defaults to 15 seconds)"
     echo "      --temp dir              directory where to store the temporary files"
@@ -292,13 +294,13 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 ;;
             irc)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 ;;
             pop3|imap|ftp|xmpp)
-                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 ;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"
@@ -315,7 +317,7 @@ fetch_certificate() {
 
     else
 
-        exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
 
     fi
 
@@ -456,6 +458,14 @@ main() {
                 SELFSIGNED=1
                 shift
                 ;;
+			--rsa)
+				SSL_AU="-cipher aRSA"
+				shift
+				;;
+			--ecdsa)
+				SSL_AU="-cipher aECDSA"
+				shift
+				;;
             --ssl2)
                 SSL_VERSION="-ssl2"
                 shift
