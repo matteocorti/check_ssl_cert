@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.34.0
+VERSION=1.35.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -57,6 +57,7 @@ usage() {
     echo "   -d,--debug                 produces debugging output"
     echo "   -e,--email address         pattern to match the email address contained in the"
     echo "                              certificate"
+    echo "       --ecdsa                cipher selection: force ECDSA authentication"
     echo "   -f,--file file             local file path (works with -H localhost only)"
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
@@ -92,8 +93,7 @@ usage() {
     echo "      --ssl3                  force SSL version 3"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
-	echo "      --rsa                   cipher selection: force RSA authentication"
-	echo "      --ecdsa                 cipher selection: force ECDSA authentication"
+    echo "       --rsa                  cipher selection: force RSA authentication"
     echo "   -t,--timeout               seconds timeout after the specified time"
     echo "                              (defaults to 15 seconds)"
     echo "      --temp dir              directory where to store the temporary files"
@@ -458,14 +458,14 @@ main() {
                 SELFSIGNED=1
                 shift
                 ;;
-			--rsa)
-				SSL_AU="-cipher aRSA"
-				shift
-				;;
-			--ecdsa)
-				SSL_AU="-cipher aECDSA"
-				shift
-				;;
+	    --rsa)
+		SSL_AU="-cipher aRSA"
+		shift
+		;;
+	    --ecdsa)
+		SSL_AU="-cipher aECDSA"
+		shift
+		;;
             --ssl2)
                 SSL_VERSION="-ssl2"
                 shift

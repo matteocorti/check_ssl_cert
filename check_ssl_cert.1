@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "July, 2016" "1.34.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "July, 2016" "1.35.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -35,6 +35,9 @@ minimum number of days a certificate has to be valid to issue a critical status
 .TP
 .BR "-d,--debug"
 produces debugging output
+.TP
+.BR "   --ecdsa"
+cipher selection: force ECDSA authentication
 .TP
 .BR "-e,--email" " address"
 pattern to match the email address contained in the certificate
@@ -114,6 +117,9 @@ force SSL version 3
 .TP
 .BR "-r,--rootcert" " cert"
 root certificate or directory to be used for certficate validation (passed to openssl's -CAfile or -CApath)
+.TP
+.BR "   --rsa"
+cipher selection: force RSA authentication
 .TP
 .BR "-t,--timeout"
 seconds timeout after the specified time (defaults to 15 seconds)

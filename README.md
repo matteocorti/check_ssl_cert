@@ -31,6 +31,7 @@ Options:
    -d,--debug                produces debugging output
    -e,--email address        pattern to match the email address contained in the
                              certificate
+      --ecdsa                cipher selection: force ECDSA authentication
    -f,--file file            local file path (works with -H localhost only)
    -h,--help,-?              this help message
       --ignore-exp           ignore expiration date
@@ -66,7 +67,6 @@ Options:
    -r,--rootcert path        root certificate or directory to be used for
                              certificate validation
       --rsa                  cipher selection: force RSA authentication
-      --ecdsa                cipher selection: force ECDSA authentication
    -t,--timeout              seconds timeout after the specified time
                              (defaults to 15 seconds)
       --temp dir             directory where to store the temporary files

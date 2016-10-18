@@ -51,3 +51,4 @@ Thanks:
 * Many thanks to Ricardo (https://github.com/bb-Ricardo) and xert (https://github.com/xert) for the date timestamp patch
 * Many thanks to xert for the SSLLabs patch
 * Many thanks to Leynos (https://github.com/leynos) for the OCSP proxy patch
+* Many thanks to Philippe Kueck for the selection of the cipher authentication

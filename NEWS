@@ -1,3 +1,4 @@
+2016-10-18 Version 1.35.0: added support for the selection of the cipher authentication
 2016-09-19 Version 1.34.0: added proxy support for the OCSP checks (thanks to Leynos)
 2016-08-04 Version 1.33.0: disabling OCSP checks when no issuer URI is found
 2016-07-29 Version 1.32.0: added support for date with timestamp calculation and
