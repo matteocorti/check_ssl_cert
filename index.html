@@ -79,6 +79,7 @@ Options:
    -c,--critical days        minimum number of days a certificate has to be valid
                              to issue a critical status
    -d,--debug                produces debugging output
+      --ecdsa                cipher selection: force ECDSA authentication
    -e,--email address        pattern to match the email address contained in the
                              certificate
    -f,--file file            local file path (works with -H localhost only)
@@ -115,6 +116,7 @@ Options:
       --ssl3                 force SSL version 3
    -r,--rootcert path        root certificate or directory to be used for
                              certificate validation
+      --rsa                  cipher selection: force RSA authentication
    -t,--timeout              seconds timeout after the specified time
                              (defaults to 15 seconds)
       --temp dir             directory where to store the temporary files
