@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.35.0
+VERSION=1.36.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -59,6 +59,7 @@ usage() {
     echo "                              certificate"
     echo "       --ecdsa                cipher selection: force ECDSA authentication"
     echo "   -f,--file file             local file path (works with -H localhost only)"
+    echo "      --file-bin path         path of the file binary to be used"
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
     echo "      --ignore-sig-alg        do not check if the certificate was signed with SHA1"
@@ -380,6 +381,7 @@ main() {
     # Default values
     DEBUG=""
     OPENSSL=""
+    FILE_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
     TIMEOUT="15"
@@ -535,6 +537,14 @@ main() {
                     shift 2
                 else
                     unknown "-f,--file requires an argument"
+                fi
+                ;;
+            --file-bin)
+                if [ $# -gt 1 ]; then
+                    FILE_BIN="$2"
+                    shift 2
+                else
+                    unknown "--file-bin requires an argument"
                 fi
                 ;;
             -H|--host)
@@ -805,6 +815,12 @@ main() {
     if [ -z "${OPENSSL}" ] ; then
         check_required_prog openssl
         OPENSSL=$PROG
+    fi
+
+    # file
+    if [ -z "${FILE_BIN}" ] ; then
+        check_required_prog file
+        FILE_BIN=$PROG
     fi
 
     # Expect (optional)
@@ -1445,13 +1461,13 @@ main() {
         curl --silent "${ISSUER_URI}" > "${ISSUER_CERT}"
 
 	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: issuer certificate type: $(file "${ISSUER_CERT}" | sed 's/.*://' )"
+	    echo "[DBG] OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT}" | sed 's/.*://' )"
 	fi
 	
 	# check the result
-	if ! file "${ISSUER_CERT}" | grep -q ': ASCII' ; then
+	if ! "${FILE_BIN}" "${ISSUER_CERT}" | grep -q ': (ASCII|PEM)' ; then
 	
-            if file "${ISSUER_CERT}" | grep -q ': data' ; then
+            if "${FILE_BIN}" "${ISSUER_CERT}" | grep -q ': data' ; then
 		
 		if [ -n "${DEBUG}" ] ; then
 		    echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
