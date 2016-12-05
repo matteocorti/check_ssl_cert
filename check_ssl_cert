@@ -290,18 +290,23 @@ convert_ssl_lab_grade() {
 
 fetch_certificate() {
 
+    RET=0
+    
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
 
         case "${PROTOCOL}" in
             smtp)
                 exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+		RET=$?
                 ;;
             irc)
                 exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+		RET=$?
                 ;;
             pop3|imap|ftp|xmpp)
                 exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+		RET=$?
                 ;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"
@@ -312,6 +317,7 @@ fetch_certificate() {
 
         if [ "${HOST}" = "localhost" ] ; then
             exec_with_timeout "$TIMEOUT" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+	    RET=$?
         else
             unknown "Error: option 'file' works with -H localhost only"
         fi
@@ -319,6 +325,7 @@ fetch_certificate() {
     else
 
         exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+	RET=$?
 
     fi
 
@@ -329,7 +336,7 @@ fetch_certificate() {
         cp "${ERROR}" "${HOST}.error"
     fi
 
-    if [ $? -ne 0 ] ; then
+    if [ "${RET}" -ne 0 ] ; then
 
         if [ -n "${DEBUG}" ] ; then
             sed 's/^/[DBG] SSL error: /' "${ERROR}"
