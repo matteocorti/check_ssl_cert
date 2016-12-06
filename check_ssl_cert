@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.36.0
+VERSION=1.36.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1197,22 +1197,39 @@ main() {
         if echo "${CN}" | grep -q -i "^\*\." ; then
 
             # Match the domain
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] the common name ${CN} begins with a '*'"
+		echo "[DBG] checking if the common name matches ^$(echo "${CN}" | cut -c 3-)\$"
+            fi	    
             if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | cut -c 3-)\$" ; then
-
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
                 fi
                 ok="true"
+
             fi
 
             # Or the literal with the wildcard
+            if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
+            fi
             if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
-
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                 fi
                 ok="true"
             fi
+
+	    # Or if both are exactly the same
+            if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] checking if the common name matches ^${CN}\$"
+            fi
+	    if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$" ; then
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] the common name ${COMMON_NAME} matches ^${CN}\$"
+                fi
+                ok="true"
+            fi	    
 
         else
 

@@ -1,4 +1,4 @@
-%define version          1.36.0
+%define version          1.36.1
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -45,6 +45,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Tue Dec 06 2016 Matteo Corti <matteo@corti.li> - 1.36.1-0
+- Updated to 1.36.1
+
 * Sun Dec 04 2016 Matteo Corti <matteo@corti.li> - 1.36.0-0
 - Updated to 1.36.0
 
