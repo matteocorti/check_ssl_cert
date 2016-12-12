@@ -113,7 +113,7 @@ usage() {
     echo "   -S,--ssl version           force SSL version (2,3)"
     echo "                              (see: --ss2 or --ssl3)"
     echo
-    echo "Report bugs to: Matteo Corti <matteo@corti.li>"
+    echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
 
     exit 3
