@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.36.1
+VERSION=1.36.2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1509,8 +1509,16 @@ main() {
         fi
 
 	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${ISSUER_URI##*/}"
-	    cp "${ISSUER_CERT}" "${ISSUER_URI##*/}"
+
+	    # remove trailing /
+	    FILE_NAME=${ISSUER_URI%/}
+
+	    # remove everything up to the last slash
+	    FILE_NAME=${FILE_NAME##*/}
+	    
+	    echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
+	    
+	    cp "${ISSUER_CERT}" "${FILE_NAME}"
 	fi
 	
         OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
