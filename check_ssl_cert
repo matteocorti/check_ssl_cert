@@ -933,7 +933,7 @@ main() {
     SERVERNAME=
     if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
 
-        if [ -n "${COMMON_NAME}" ] ; then
+        if [ -n "${COMMON_NAME}" ] && [ "${COMMON_NAME}" == "${COMMON_NAME// /}" ] ; then
             SERVERNAME="-servername ${COMMON_NAME}"
         else
             SERVERNAME="-servername ${HOST}"
