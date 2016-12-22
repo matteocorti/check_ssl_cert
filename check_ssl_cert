@@ -596,7 +596,11 @@ main() {
                ;;
             -n|--cn)
                 if [ $# -gt 1 ]; then
-                    COMMON_NAME="${COMMON_NAME} ${2}"
+		    if [ -n "${COMMON_NAME}" ]; then
+		      COMMON_NAME="${COMMON_NAME} ${2}"
+		    else
+                      COMMON_NAME="${2}"
+		    fi
                     shift 2
                 else
                     unknown "-n,--cn requires an argument"
