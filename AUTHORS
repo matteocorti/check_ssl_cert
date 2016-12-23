@@ -53,3 +53,4 @@ Thanks:
 * Many thanks to Leynos (https://github.com/leynos) for the OCSP proxy patch
 * Many thanks to Philippe Kueck for the selection of the cipher authentication
 * Many thanks to Jalonet (https://github.com/jalonet) for the file/PEM patch
+* Many thanks to Sander Cornelissen (https://github.com/scornelissen85) for the multiple CNs patch

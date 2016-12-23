@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.36.2
+VERSION=1.37.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -75,7 +75,8 @@ usage() {
     echo "                                enddate, startdate, subject, issuer, modulus,"
     echo "                                serial, hash, email, ocsp_uri and fingerprint."
     echo "                              'all' will include all the available attributes."
-    echo "   -n,--cn name               pattern to match the CN of the certificate"
+    echo "   -n,--cn name               pattern to match the CN of the certificate (can be"
+    echo "                              specified multiple times)"
     echo "      --no_ssl2               disable SSL version 2"
     echo "      --no_ssl3               disable SSL version 3"
     echo "      --no_tls1               disable TLS version 1"
@@ -932,13 +933,18 @@ main() {
     #
     SERVERNAME=
     if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-
-        if [ -n "${COMMON_NAME}" ] && [ "${COMMON_NAME}" = "$(echo "${COMMON_NAME}" | tr -d' ')" ] ; then
+	
+        if [ -n "${COMMON_NAME}" ] && [ "${COMMON_NAME}" = "$(echo "${COMMON_NAME}" | tr -d ' ')" ] ; then
             SERVERNAME="-servername ${COMMON_NAME}"
         else
             SERVERNAME="-servername ${HOST}"
         fi
 
+	if [ -n "${DEBUG}" ] ; then
+            echo "[DBG] '${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"
+	fi
+
+	
     else
 
         if [ -n "${VERBOSE}" ] ; then

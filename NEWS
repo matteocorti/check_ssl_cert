@@ -1,3 +1,4 @@
+2016-12-23 Version 1.37.0: Added a patch to specify multiple CNs
 2016-12-13 Version 1.36.2: fixed a minor problem with --debug
 2016-12-06 Version 1.36.1: fixed a problem when specifying a CN beginning with *
 2016-12-04 Version 1.36.0: fixed problem when file is returing PEM certificate on newer

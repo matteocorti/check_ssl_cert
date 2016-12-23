@@ -1,3 +1,7 @@
+2016-12-23  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35) 
+
 2016-12-13  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixed a minor problem with --debug
