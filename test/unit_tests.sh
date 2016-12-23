@@ -183,7 +183,7 @@ unset SOURCE_ONLY
 # We clone to output to pass it to grep as shunit does always return 0
 # We parse the output to check if a test failed
 #
-if ! . "${SHUNIT2}" | tee /dev/tty | grep -q 'success rate: 100%' ; then
+if ! . "${SHUNIT2}" | tee /dev/tty | grep -q 'tests\ total:\ *[0-9]*\ 100%' ; then
     # at least one of the tests failed
     exit 1
 fi
