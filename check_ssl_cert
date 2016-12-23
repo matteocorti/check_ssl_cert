@@ -596,7 +596,11 @@ main() {
                ;;
             -n|--cn)
                 if [ $# -gt 1 ]; then
-                    COMMON_NAME="$2"
+		    if [ -n "${COMMON_NAME}" ]; then
+		      COMMON_NAME="${COMMON_NAME} ${2}"
+		    else
+                      COMMON_NAME="${2}"
+		    fi
                     shift 2
                 else
                     unknown "-n,--cn requires an argument"
@@ -929,7 +933,7 @@ main() {
     SERVERNAME=
     if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
 
-        if [ -n "${COMMON_NAME}" ] ; then
+        if [ -n "${COMMON_NAME}" ] && [ "${COMMON_NAME}" = "$(echo "${COMMON_NAME}" | tr -d' ')" ] ; then
             SERVERNAME="-servername ${COMMON_NAME}"
         else
             SERVERNAME="-servername ${HOST}"
@@ -1242,24 +1246,39 @@ main() {
         # Check alterante names
         if [ -n "${ALTNAMES}" ] ; then
 
-            if [ -n "${DEBUG}" ] ; then
-                echo "[DBG] checking altnames"
-            fi
+            for cn in ${COMMON_NAME} ; do
 
-            for alt_name in $($OPENSSL x509 -in "${CERT}" -text \
-                | grep --after-context=1 "509v3 Subject Alternative Name:" \
-                | tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g") ; do
+                ok=""
 
                 if [ -n "${DEBUG}" ] ; then
-                    echo "[DBG]   ${alt_name}"
+                    echo "[DBG] checking altnames against ${cn}"
                 fi
 
-		if echo "${COMMON_NAME}" | grep -q -i "^${alt_name}$" ; then
-                    ok="true"
-		fi
+                for alt_name in $($OPENSSL x509 -in "${CERT}" -text \
+                    | grep --after-context=1 "509v3 Subject Alternative Name:" \
+                    | tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g") ; do
+
+                    if [ -n "${DEBUG}" ] ; then
+                        echo "[DBG]   ${alt_name}"
+                    fi
+
+		    if echo "${cn}" | grep -q -i "^${alt_name}$" ; then
+                        ok="true"
+		    fi
+
+                done
+
+                if [ -z "$ok" ] ; then
+                    fail=$cn
+                    break;
+                fi
 
             done
 
+        fi
+
+        if [ -n "$fail" ] ; then
+           critical "invalid CN ('$CN' does not match '$fail')"
         fi
 
         if [ -z "$ok" ] ; then
