@@ -98,6 +98,17 @@ testWildcardAltNames1() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+#Check for wildcard support in Alternative Names
+testWildcardAltNames2() {
+    ${SCRIPT} -H sherlock.sp.ethz.ch \
+        --cn somehost.spapps.ethz.ch \
+        --cn otherhost.sPaPPs.ethz.ch \
+        --cn spapps.ethz.ch \
+        --rootcert cabundle.crt --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 testAltNamesCaseInsensitve() {
     ${SCRIPT} -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
