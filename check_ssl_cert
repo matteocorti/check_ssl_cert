@@ -66,6 +66,7 @@ usage() {
     echo "                              or MD5"
     echo "      --ignore-ocsp           do not check revocation with OCSP"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
+    echo "      --issuer-cert-cache dir directory where to store issuer certificates cache"
     echo "   -L,--check-ssl-labs grade  SSL Labs assestment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
     echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
@@ -571,6 +572,14 @@ main() {
                     unknown "-i,--issuer requires an argument"s
                 fi
                 ;;
+            --issuer-cert-cache)
+                if [ $# -gt 1 ]; then
+                    ISSUER_CERT_CACHE="$2"
+                    shift 2
+                else
+                    unknown "--issuer-cert-cache requires an argument"
+                fi
+                ;;
             -L|--check-ssl-labs)
                 if [ $# -gt 1 ]; then
                     SSL_LAB_ASSESTMENT="$2"
@@ -969,8 +978,8 @@ main() {
 
     if [ -n "${OCSP}" ] ; then
 
-        ISSUER_CERT="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-        if [ -z "${ISSUER_CERT}" ] || [ ! -w "${ISSUER_CERT}" ] ; then
+        ISSUER_CERT_TMP="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
+        if [ -z "${ISSUER_CERT_TMP}" ] || [ ! -w "${ISSUER_CERT_TMP}" ] ; then
             unknown 'temporary file creation failure.'
         fi
 
@@ -992,7 +1001,7 @@ main() {
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
-    trap 'rm -f $CERT $ERROR $ISSUER_CERT' EXIT HUP INT QUIT TERM
+    trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP' EXIT HUP INT QUIT TERM
 
     fetch_certificate
 
@@ -1549,49 +1558,87 @@ main() {
     # Check revocation via OCSP
     if [ -n "${OCSP}" ]; then
 
-	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT}"
-	fi
-	
-        curl --silent "${ISSUER_URI}" > "${ISSUER_CERT}"
+        ISSUER_HASH="$($OPENSSL x509 -in "${CERT}" -noout -issuer_hash)"
 
-	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT}" | sed 's/.*://' )"
-	fi
-	
-	# check the result
-	if ! "${FILE_BIN}" "${ISSUER_CERT}" | grep -q ': (ASCII|PEM)' ; then
-	
-            if "${FILE_BIN}" "${ISSUER_CERT}" | grep -q ': data' ; then
-		
-		if [ -n "${DEBUG}" ] ; then
-		    echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
-		fi
-		
-		openssl x509 -inform DER -outform PEM -in "${ISSUER_CERT}" -out "${ISSUER_CERT}"
-
-	    else
-
-		unknown "Unable to fetch OCSP issuer certificate."
-
-	    fi
-		
-		
+        if [ -z "${ISSUER_HASH}" ] ; then
+            unknown 'unable to find issuer certificate hash.'
         fi
 
-	if [ -n "${DEBUG}" ] ; then
+        if [ -n "${ISSUER_CERT_CACHE}" ] ; then
 
-	    # remove trailing /
-	    FILE_NAME=${ISSUER_URI%/}
+            if [ -r "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt" ]; then
 
-	    # remove everything up to the last slash
-	    FILE_NAME=${FILE_NAME##*/}
-	    
-	    echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
-	    
-	    cp "${ISSUER_CERT}" "${FILE_NAME}"
-	fi
-	
+                echo "[DBG] Found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                ISSUER_CERT="${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+            else
+
+                echo "[DBG] Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+            fi
+
+        fi
+
+        if [ -z "${ISSUER_CERT}" ]; then
+
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
+            fi
+
+            curl --silent "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
+
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+            fi
+
+            # check the result
+            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -q ': (ASCII|PEM)' ; then
+
+                if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -q ': data' ; then
+
+                    if [ -n "${DEBUG}" ] ; then
+                        echo "[DBG] OCSP: converting issuer certificate from DER to PEM"
+                    fi
+
+                    $OPENSSL x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP}" -out "${ISSUER_CERT_TMP}"
+
+                else
+
+                    unknown "Unable to fetch OCSP issuer certificate."
+
+                fi
+
+            fi
+
+            if [ -n "${DEBUG}" ] ; then
+
+                # remove trailing /
+                FILE_NAME=${ISSUER_URI%/}
+
+                # remove everything up to the last slash
+                FILE_NAME=${FILE_NAME##*/}
+
+                echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
+
+                cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
+            fi
+
+            if [ -n "${ISSUER_CERT_CACHE}" ] ; then
+                if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
+
+                    unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writeable!"
+
+                fi
+
+                echo "[DBG] Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+            fi
+
+            ISSUER_CERT=${ISSUER_CERT_TMP}
+
+        fi
         OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
 	if [ -n "${DEBUG}" ] ; then
