@@ -1250,7 +1250,7 @@ main() {
         fi
 
         # Check alterante names
-        if [ -n "${ALTNAMES}" ] ; then
+        if [ -n "${ALTNAMES}" ] && [ -z "$ok" ]; then
 
             for cn in ${COMMON_NAME} ; do
 
