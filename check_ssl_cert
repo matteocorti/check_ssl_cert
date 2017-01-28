@@ -113,7 +113,7 @@ usage() {
     echo "                              (see --critical and --warning)"
     echo "      --ocsp                  check revocation via OCSP"
     echo "   -S,--ssl version           force SSL version (2,3)"
-    echo "                              (see: --ss2 or --ssl3)"
+    echo "                              (see: --ssl2 or --ssl3)"
     echo
     echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
@@ -147,7 +147,7 @@ warning() {
 }
 
 ################################################################################
-# Exits with an 'unkown' status
+# Exits with an 'unknown' status
 # Param
 #   $1 message
 unknown() {
@@ -1258,7 +1258,7 @@ main() {
 	    
         fi
 
-        # Check alterante names
+        # Check alternate names
         if [ -n "${ALTNAMES}" ] && [ -z "$ok" ]; then
 
             for cn in ${COMMON_NAME} ; do
@@ -1654,7 +1654,7 @@ main() {
 	# check if -header is supported
 	OCSP_HEADER=""
 
-	# oscp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
+	# ocsp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
 	# so we check if the major version is greater than 0
 	if [ "$( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )"  -gt 0 ]; then
 
