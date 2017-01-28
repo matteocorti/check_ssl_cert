@@ -1568,12 +1568,16 @@ main() {
 
             if [ -r "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt" ]; then
 
-                echo "[DBG] Found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] Found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                fi
                 ISSUER_CERT="${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
 
             else
 
-                echo "[DBG] Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                fi
 
             fi
 
@@ -1630,7 +1634,9 @@ main() {
 
                 fi
 
-                echo "[DBG] Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                fi
 
                 cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
 
