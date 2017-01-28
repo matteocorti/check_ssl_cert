@@ -54,3 +54,5 @@ Thanks:
 * Many thanks to Philippe Kueck for the selection of the cipher authentication
 * Many thanks to Jalonet (https://github.com/jalonet) for the file/PEM patch
 * Many thanks to Sander Cornelissen (https://github.com/scornelissen85) for the multiple CNs patch
+* Many thanks to Pavel Rochnyat (https://github.com/rpv-tomsk) for the issuer certificate cache patch and
+  the wildcard support in alternative names
