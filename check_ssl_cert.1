@@ -63,6 +63,9 @@ do not check revocation with OCSP
 .BR "-i,--issuer" " issuer"
 pattern to match the issuer of the certificate
 .TP
+.BR "   --issuer-cert-cache" " dir"
+directory where to store issuer certificates cache
+.TP
 .BR "-L,--check-ssl-labs grade"
 SSL Labs assestment (please check https://www.ssllabs.com/about/terms.html)
 .TP
@@ -133,6 +136,12 @@ directory where to store the temporary files
 .BR "   --tls1"
 force TLS version 1
 .TP
+.BR "   --tls1_1"
+force TLS version 1.1
+.TP
+.BR "   --tls1_2"
+force TLS version 1.2
+.TP
 .BR "-v,--verbose"
 verbose output
 .TP
@@ -160,8 +169,9 @@ x509(1), openssl(1), expect(1), timeout(1)
 .SH "EXIT STATUS"
 check_ssl_cert returns a zero exist status if it finds no errors, 1 for warnings, 2 for a critical errors and 3 for unknown problems
 .SH BUGS
-Please report bugs to: Matteo Corti (matteo (at) corti.li )
+Please report bugs to:
 
+https://github.com/matteocorti/check_ssl_cert/issues
 .SH AUTHOR
 Matteo Corti (matteo (at) corti.li )
 See the AUTHORS file for the complete list of contributors
