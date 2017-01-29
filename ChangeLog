@@ -1,3 +1,8 @@
+2017-01-29  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added patches from Pavel Rochnyak for the issuer certificate cache patch
+	                  and the wildcard support in alternative names
+
 2016-12-23  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35) 
