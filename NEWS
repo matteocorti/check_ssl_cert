@@ -1,4 +1,5 @@
 2017-01-29 Version 1.38.1: Small corrections in the documentation
+2017-01-28 Version 1.38.0: Added support for wildcards in alternative names and caching of the issuer certificate
 2016-12-23 Version 1.37.0: Added a patch to specify multiple CNs
 2016-12-13 Version 1.36.2: fixed a minor problem with --debug
 2016-12-06 Version 1.36.1: fixed a problem when specifying a CN beginning with *
