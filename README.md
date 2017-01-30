@@ -70,7 +70,7 @@ Options:
       --ssl3                  force SSL version 3
    -r,--rootcert path         root certificate or directory to be used for
                               certificate validation
-       --rsa                  cipher selection: force RSA authentication
+      --rsa                   cipher selection: force RSA authentication
    -t,--timeout               seconds timeout after the specified time
                               (defaults to 15 seconds)
       --temp dir              directory where to store the temporary files
