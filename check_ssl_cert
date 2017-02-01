@@ -723,6 +723,9 @@ main() {
                 unknown "invalid option: ${1}"
                 ;;
             *)
+		if [ -n "$1" ] ; then
+		    unknown "invalid option: ${1}"
+		fi
                 break
                 ;;
         esac
