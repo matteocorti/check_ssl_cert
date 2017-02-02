@@ -121,10 +121,12 @@ available to openssl or specified with the `-r cabundle` or
 `--rootcert cabundle` option, where cabundle is either a file for `-CAfile`
 or a directory for `-CApath`.
 
-On Mac OS X the root certificates bundle is stored in the Keychain and
+On macOS the root certificates bundle is stored in the Keychain and
 openssl will complain with:
 
-   verification error: unable to get local issuer certificate
+```
+verification error: unable to get local issuer certificate
+```
 
 The bundle can be extracted with:
 
