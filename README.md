@@ -135,6 +135,12 @@ $ sudo security find-certificate -a \
   -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
 ```
 
+and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
+
+```
+ ./check_ssl_cert -H www.google.com -r ./cabundle.crt 
+```
+
 ## Bugs
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
