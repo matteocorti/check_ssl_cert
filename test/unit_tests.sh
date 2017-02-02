@@ -150,6 +150,52 @@ testAltNames2CaseInsensitive() {
     assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
 }
 
+# SNI Test from https://sni.velox.ch
+
+testSNIWithHostName() {
+    # we test a host with the ServerName
+    ${SCRIPT} -H alice.sni.velox.ch
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+}
+
+testSNIWithCorrectAlias() {
+    # we test a host with a correct Alias
+    ${SCRIPT} -H alice.sni.velox.ch -n carol.sni.velox.ch --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+}
+
+testSNIWithCorrectAlias2() {
+    # we test a host with a correct Alias
+    ${SCRIPT} -H carol.sni.velox.ch -n carol.sni.velox.ch --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+}
+
+testSNIWithCorrectAlias3() {
+    # we test a host with a correct Alias
+    ${SCRIPT} -H carol.sni.velox.ch -n alice.sni.velox.ch --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+}
+
+testSNIWithIncorrectAlias() {
+    # we test a host with a correct Alias
+    ${SCRIPT} -H alice.sni.velox.ch -n bob.sni.velox.ch --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"    
+}
+
+testSNIWithWildcard() {
+    # we test a host with a correct Alias
+    ${SCRIPT} -H mallory.sni.velox.ch -n blah.sni.velox.ch --altnames
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+}
+
+# SSL Labs
+    
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a C
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt

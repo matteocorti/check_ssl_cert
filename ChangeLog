@@ -1,6 +1,7 @@
 2017-02-02  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed the command line argument parsing
+	* check_ssl_cert: Fixed -servername
 
 2017-01-29  Matteo Corti  <matteo@corti.li>
 
