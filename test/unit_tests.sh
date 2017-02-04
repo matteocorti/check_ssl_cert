@@ -154,7 +154,7 @@ testAltNames2CaseInsensitive() {
 
 testSNIWithHostName() {
     # we test a host with the ServerName
-    ${SCRIPT} -H alice.sni.velox.ch -d
+    ${SCRIPT} -H alice.sni.velox.ch
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
 }
