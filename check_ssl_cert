@@ -337,7 +337,7 @@ fetch_certificate() {
         echo "[DBG] storing a copy of the OpenSSL errors in ${HOST}.error"
         cp "${ERROR}" "${HOST}.error"
 
-	sed 's/^/\[DBG\]\ /' "${HOST}.error"
+	sed 's/^/\[DBG\]\     /' "${HOST}.error"
 	
     fi
 
