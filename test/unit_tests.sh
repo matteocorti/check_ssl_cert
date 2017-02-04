@@ -154,44 +154,69 @@ testAltNames2CaseInsensitive() {
 
 testSNIWithHostName() {
     # we test a host with the ServerName
-    ${SCRIPT} -H alice.sni.velox.ch -d
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H alice.sni.velox.ch
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
+	
 }
 
 testSNIWithCorrectAlias() {
     # we test a host with a correct Alias
-    ${SCRIPT} -H alice.sni.velox.ch -n carol.sni.velox.ch --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H alice.sni.velox.ch -n carol.sni.velox.ch --altnames
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
 }
 
 testSNIWithCorrectAlias2() {
     # we test a host with a correct Alias
-    ${SCRIPT} -H carol.sni.velox.ch -n carol.sni.velox.ch --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H carol.sni.velox.ch -n carol.sni.velox.ch --altnames
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
 }
 
 testSNIWithCorrectAlias3() {
     # we test a host with a correct Alias
-    ${SCRIPT} -H carol.sni.velox.ch -n alice.sni.velox.ch --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H carol.sni.velox.ch -n alice.sni.velox.ch --altnames
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
 }
 
 testSNIWithIncorrectAlias() {
     # we test a host with a correct Alias
-    ${SCRIPT} -H alice.sni.velox.ch -n bob.sni.velox.ch --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H alice.sni.velox.ch -n bob.sni.velox.ch --altnames
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"    
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
 }
 
 testSNIWithWildcard() {
     # we test a host with a correct Alias
-    ${SCRIPT} -H mallory.sni.velox.ch -n blah.sni.velox.ch --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H mallory.sni.velox.ch -n blah.sni.velox.ch --altnames
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"    
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
 }
 
 # SSL Labs

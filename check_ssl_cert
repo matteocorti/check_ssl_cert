@@ -334,10 +334,9 @@ fetch_certificate() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] storing a copy of the retrieved certificate in ${HOST}.crt"
         cp "${CERT}" "${HOST}.crt"
+	
         echo "[DBG] storing a copy of the OpenSSL errors in ${HOST}.error"
-        cp "${ERROR}" "${HOST}.error"
-
-	sed 's/^/\[DBG\]\     /' "${HOST}.error"
+        cp "${ERROR}" "${HOST}.error:"
 	
     fi
 
