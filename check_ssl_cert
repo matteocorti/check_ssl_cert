@@ -1777,10 +1777,13 @@ main() {
     ################################################################################
     # If we get this far, assume all is well. :)
 
-    # If --altnames was specified we show the specified CN instead of
-    # the certificate CN
-    if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] ; then
-        CN=${COMMON_NAME}
+    # If --altnames was specified or if the certificate is wildcard,
+    # then we show the specified CN in addition to the certificate CN
+    CHECKEDNAMES=""
+    if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
+        CHECKEDNAMES="(${COMMON_NAME}) "
+    elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i "^\*\." ; then
+        CHECKEDNAMES="(${COMMON_NAME}) "
     fi
 
     if [ -n "${DAYS_VALID}" ] ; then
@@ -1802,7 +1805,7 @@ main() {
         SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
     fi
 
-    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate for '${CN}' from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate '${CN}' ${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
 
     exit 0
 
