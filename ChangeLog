@@ -1,3 +1,7 @@
+2017-02-08  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Patch from Pavel Rochnyak: Changed the CN output when --altnames is used
+
 2017-02-02  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed the command line argument parsing
@@ -10,7 +14,7 @@
 
 2016-12-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35) 
+	* check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35)
 
 2016-12-13  Matteo Corti  <matteo@corti.li>
 
