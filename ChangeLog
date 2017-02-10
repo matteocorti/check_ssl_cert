@@ -1,3 +1,7 @@
+2017-02-10  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added the --sni option
+
 2017-02-08  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Patch from Pavel Rochnyak: Changed the CN output when --altnames is used

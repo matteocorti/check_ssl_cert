@@ -175,6 +175,19 @@ testSNIWithCorrectAlias() {
     fi	
 }
 
+testSNIWithIP() {
+    # we test a host with the IP and use --sni to get the right cert
+    if [ -z "${TRAVIS+x}" ] ; then
+	IP=$( host alice.sni.velox.ch | grep 'address' | sed 's/.*\ //' )
+	${SCRIPT} -H "${IP}" -n dave.sni.velox.ch --altnames --sni bob.sni.velox.ch
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping SNI tests on Travis CI"
+    fi	
+	
+}
+
 testSNIWithCorrectAlias2() {
     # we test a host with a correct Alias
     if [ -z "${TRAVIS+x}" ] ; then

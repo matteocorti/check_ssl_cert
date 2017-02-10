@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.40.0
+VERSION=1.41.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -92,8 +92,9 @@ usage() {
     echo "                              smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned            allows self-signed certificates"
     echo "      --serial serialnum      pattern to match the serial number"
-    echo "      --ssl2                  force SSL version 2"
-    echo "      --ssl3                  force SSL version 3"
+    echo "      --sni name              sets the TLS SNI (Server Name Indication) extension in the ClientHello message to 'name'"
+    echo "      --ssl2                  forces SSL version 2"
+    echo "      --ssl3                  forces SSL version 3"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
     echo "       --rsa                  cipher selection: force RSA authentication"
@@ -395,6 +396,7 @@ main() {
     FILE_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
+    SNI=""
     TIMEOUT="15"
     VERBOSE=""
     OCSP="1" # enabled by default
@@ -674,6 +676,14 @@ main() {
                     unknown "--clientpass requires an argument"
                 fi
                 ;;
+	    --sni)
+		if [ $# -gt 1 ]; then
+		    SNI="$2"
+		    shift 2
+		else
+		    unknown "--sni requires an argument"
+		fi
+		;;  
             -S|--ssl)
                 if [ $# -gt 1 ]; then
 
@@ -947,8 +957,12 @@ main() {
     #
     SERVERNAME=
     if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
-	
-        SERVERNAME="-servername ${HOST}"
+
+	if [ -n "${SNI}" ]; then
+	    SERVERNAME="-servername ${SNI}"
+	else
+            SERVERNAME="-servername ${HOST}"
+	fi
 
 	if [ -n "${DEBUG}" ] ; then
             echo "[DBG] '${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"

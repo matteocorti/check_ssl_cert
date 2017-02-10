@@ -1,3 +1,4 @@
+2017-02-10 Version 1.41.0: Added --sni to specify the server name
 2017-02-08 Version 1.40.0: Changed the CN output when --altnames is used
 2017-02-02 Version 1.39.0: Fixed a bug related to SNI
 2017-02-02 Version 1.38.2: Fixed a bug in the command line argument parsing
