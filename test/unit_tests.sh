@@ -40,7 +40,6 @@ testUsage() {
 }    
 
 testETHZ() {
-    # debugging: to be removed
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
