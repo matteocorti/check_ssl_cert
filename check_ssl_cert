@@ -1037,7 +1037,7 @@ main() {
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
-    # trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2' EXIT HUP INT QUIT TERM
+    trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2' EXIT HUP INT QUIT TERM
 
     fetch_certificate
 
