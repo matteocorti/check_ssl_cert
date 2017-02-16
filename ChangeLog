@@ -1,3 +1,7 @@
+2017-02-16  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Support for newer OpenSSL versions (1.1)
+
 2017-02-10  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added the --sni option
