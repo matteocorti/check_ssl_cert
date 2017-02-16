@@ -54,6 +54,7 @@ usage() {
     echo "      --clientpass phrase     set passphrase for client certificate."
     echo "   -c,--critical days         minimum number of days a certificate has to be valid"
     echo "                              to issue a critical status"
+    echo "      --curl-bin path         path of the curl binary to be used"
     echo "   -d,--debug                 produces debugging output"
     echo "   -e,--email address         pattern to match the email address contained in the"
     echo "                              certificate"
@@ -394,6 +395,7 @@ main() {
     DEBUG=""
     OPENSSL=""
     FILE_BIN=""
+    CURL_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
     SNI=""
@@ -525,6 +527,14 @@ main() {
                     shift 2
                 else
                    unknown "-c,--critical requires an argument"
+                fi
+                ;;
+            --curl-bin)
+                if [ $# -gt 1 ]; then
+                    CURL_BIN="$2"
+                    shift 2
+                else
+                    unknown "--curl-bin requires an argument"
                 fi
                 ;;
             # Deprecated option: used to be as --warning
@@ -857,6 +867,12 @@ main() {
     if [ -z "${FILE_BIN}" ] ; then
         check_required_prog file
         FILE_BIN=$PROG
+    fi
+
+    # file
+    if [ -z "${CURL_BIN}" ] ; then
+        check_required_prog curl
+        CURL_BIN=$PROG
     fi
 
     # Expect (optional)

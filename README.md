@@ -28,6 +28,7 @@ Options:
       --clientpass phrase     set passphrase for client certificate.
    -c,--critical days         minimum number of days a certificate has to be valid
                               to issue a critical status
+      --curl-bin path         path of the curl binary to be used
    -d,--debug                 produces debugging output
    -e,--email address         pattern to match the email address contained in the
                               certificate
