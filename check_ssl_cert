@@ -338,7 +338,7 @@ fetch_certificate() {
         cp "${CERT}" "${HOST}.crt"
 	
         echo "[DBG] storing a copy of the OpenSSL errors in ${HOST}.error"
-        cp "${ERROR}" "${HOST}.error:"
+        cp "${ERROR}" "${HOST}.error"
 	
     fi
 
