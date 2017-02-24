@@ -264,15 +264,23 @@ testBadSSLRSA8192() {
 }
 
 testBadSSLLongSubdomainWithDashes() {
-    ${SCRIPT} -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping long subdomain with dashes with badssl.com on Travis CI"
+    fi	
 }
 
 testBadSSLLongSubdomain() {
-    ${SCRIPT} -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping long subdomain with badssl.com on Travis CI"
+    fi	
 }
 
 testBadSSLSHA12016() {
