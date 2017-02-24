@@ -187,6 +187,100 @@ testSMTP() {
 	
 }
 
+################################################################################
+# From https://badssl.com
+
+testBadSSLExpired() {
+    ${SCRIPT} -H expired.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLWrongHost() {
+    ${SCRIPT} -H wrong.host.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLSelfSigned() {
+    ${SCRIPT} -H self-signed.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLUntrustedRoot() {
+    ${SCRIPT} -H untrusted-root.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLRevoked() {
+    ${SCRIPT} -H revoked.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLSHA256() {
+    ${SCRIPT} -H sha256.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSL1000SANs() {
+    ${SCRIPT} -H 1000-sans.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+# Disabled as OpenSSL does not seem to handle it
+#testBadSSL10000SANs() {
+#    ${SCRIPT} -H 10000-sans.badssl.com --host-cn
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
+
+testBadSSLEcc256() {
+    ${SCRIPT} -H ecc256.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSLEcc384() {
+    ${SCRIPT} -H ecc384.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSLRSA8192() {
+    ${SCRIPT} -H rsa8192.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSLLongSubdomainWithDashes() {
+    ${SCRIPT} -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSLLongSubdomain() {
+    ${SCRIPT} -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testBadSSLSHA12016() {
+    ${SCRIPT} -H sha1-2016.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLSHA12017() {
+    ${SCRIPT} -H sha1-2017.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
