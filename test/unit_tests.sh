@@ -227,19 +227,19 @@ testBadSSLIncompleteChain() {
 }
 
 testBadSSLSHA256() {
-    ${SCRIPT} -H sha256.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSL1000SANs() {
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H 1000-sans.badssl.com --host-cn
+	${SCRIPT} -H sha256.badssl.com --host-cn
 	EXIT_CODE=$?
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping SHA 256 with badssl.com on Travis CI"
     fi	
+}
+
+testBadSSL1000SANs() {
+    ${SCRIPT} -H 1000-sans.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 # Disabled as OpenSSL does not seem to handle it
