@@ -233,9 +233,13 @@ testBadSSLSHA256() {
 }
 
 testBadSSL1000SANs() {
-    ${SCRIPT} -H 1000-sans.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H 1000-sans.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping SHA 256 with badssl.com on Travis CI"
+    fi	
 }
 
 # Disabled as OpenSSL does not seem to handle it
@@ -246,21 +250,33 @@ testBadSSL1000SANs() {
 #}
 
 testBadSSLEcc256() {
-    ${SCRIPT} -H ecc256.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H ecc256.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping ECC 256 with badssl.com on Travis CI"
+    fi	
 }
 
 testBadSSLEcc384() {
-    ${SCRIPT} -H ecc384.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H ecc384.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping ECC 384 with badssl.com on Travis CI"
+    fi	
 }
 
 testBadSSLRSA8192() {
-    ${SCRIPT} -H rsa8192.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H rsa8192.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping RSA8192 with badssl.com on Travis CI"
+    fi	
 }
 
 testBadSSLLongSubdomainWithDashes() {
