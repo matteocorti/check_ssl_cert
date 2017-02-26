@@ -237,9 +237,13 @@ testBadSSLSHA256() {
 }
 
 testBadSSL1000SANs() {
-    ${SCRIPT} -H 1000-sans.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H 1000-sans.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping 1000 subject alternative names with badssl.com on Travis CI"
+    fi		
 }
 
 # Disabled as OpenSSL does not seem to handle it
