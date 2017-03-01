@@ -1,3 +1,7 @@
+2017-03-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: By errors it makes more sense to show the supplied host instead of the CN
+
 2017-02-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Support for newer OpenSSL versions (1.1)

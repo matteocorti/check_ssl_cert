@@ -129,8 +129,8 @@ usage() {
 # Params
 #   $1 error message
 critical() {
-    if [ -n "${CN}" ] ; then
-        tmp=" ${CN}"
+    if [ -n "${HOST}" ] ; then
+        tmp=" ${HOST}"
     fi
     printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 2
@@ -141,8 +141,8 @@ critical() {
 # Param
 #   $1 warning message
 warning() {
-    if [ -n "${CN}" ] ; then
-        tmp=" ${CN}"
+    if [ -n "${HOST}" ] ; then
+        tmp=" ${HOST}"
     fi
     printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 1
@@ -153,8 +153,8 @@ warning() {
 # Param
 #   $1 message
 unknown() {
-    if [ -n "${CN}" ] ; then
-        tmp=" ${CN}"
+    if [ -n "${HOST}" ] ; then
+        tmp=" ${HOST}"
     fi
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     exit 3
