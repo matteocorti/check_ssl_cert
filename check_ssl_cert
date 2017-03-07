@@ -88,7 +88,7 @@ usage() {
     echo "   -o,--org org               pattern to match the organization of the certificate"
     echo "      --openssl path          path of the openssl binary to be used"
     echo "   -p,--port port             TCP port"
-    echo "   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc}"
+    echo "   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}"
     echo "                              http:               default"
     echo "                              smtp,pop3,imap,ftp: switch to TLS"
     echo "   -s,--selfsigned            allows self-signed certificates"
@@ -295,7 +295,7 @@ convert_ssl_lab_grade() {
 fetch_certificate() {
 
     RET=0
-    
+
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
 
@@ -308,7 +308,7 @@ fetch_certificate() {
                 exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
 		RET=$?
                 ;;
-            pop3|imap|ftp|xmpp)
+            pop3|imap|ftp|xmpp|ldap)
                 exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
 		RET=$?
                 ;;
@@ -336,10 +336,10 @@ fetch_certificate() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] storing a copy of the retrieved certificate in ${HOST}.crt"
         cp "${CERT}" "${HOST}.crt"
-	
+
         echo "[DBG] storing a copy of the OpenSSL errors in ${HOST}.error"
         cp "${ERROR}" "${HOST}.error"
-	
+
     fi
 
     if [ "${RET}" -ne 0 ] ; then
@@ -693,7 +693,7 @@ main() {
 		else
 		    unknown "--sni requires an argument"
 		fi
-		;;  
+		;;
             -S|--ssl)
                 if [ $# -gt 1 ]; then
 
@@ -908,9 +908,9 @@ main() {
     if [ -n "${DEBUG}" ] && [ -n "${PERL}" ] ; then
 	echo "[DBG] perl available: ${PERL}"
     fi
-    
+
     DATEBIN="$(which date 2> /dev/null)"
-    
+
     if [ -n "${DEBUG}" ] && [ -n "${DATEBIN}" ] ; then
 	echo "[DBG] date available: ${DATEBIN}"
     fi
@@ -918,7 +918,7 @@ main() {
     DATETYPE=""
 
     if ! "${DATEBIN}" +%s >/dev/null 2>&1  ;  then
-		
+
         # Perl with Date::Parse (optional)
         test -x "${PERL}" || PERL=""
         if [ -z "${PERL}" ] && [ -n "${VERBOSE}" ] ; then
@@ -984,7 +984,7 @@ main() {
             echo "[DBG] '${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"
 	fi
 
-	
+
     else
 
         if [ -n "${VERBOSE}" ] ; then
@@ -1128,7 +1128,7 @@ main() {
 	echo "[DBG] ISSUER_URI = ${ISSUER_URI}"
 	echo "[DBG] ${SIGNATURE_ALGORITHM}"
     fi
-    
+
     if echo "${SIGNATURE_ALGORITHM}" | grep -q "sha1" ; then
 
         if [ -n "${NOSIGALG}" ] ; then
@@ -1240,7 +1240,7 @@ main() {
     ################################################################################
     # Check the CN
     if [ -n "$COMMON_NAME" ] ; then
-	
+
         ok=""
 
         if [ -n "${DEBUG}" ] ; then
@@ -1248,14 +1248,14 @@ main() {
         fi
 
 	# Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
-	
+
         if echo "${CN}" | grep -q -i "^\*\." ; then
 
             # Match the domain
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] the common name ${CN} begins with a '*'"
 		echo "[DBG] checking if the common name matches ^$(echo "${CN}" | cut -c 3-)\$"
-            fi	    
+            fi
             if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | cut -c 3-)\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
@@ -1284,14 +1284,14 @@ main() {
                     echo "[DBG] the common name ${COMMON_NAME} matches ^${CN}\$"
                 fi
                 ok="true"
-            fi	    
+            fi
 
         else
 
 	    if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
                 ok="true"
 	    fi
-	    
+
         fi
 
         # Check alternate names
@@ -1632,9 +1632,9 @@ main() {
             curl --silent "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
 
             if [ -n "${DEBUG}" ] ; then
-				
+
                 echo "[DBG] OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
-		
+
             fi
 
             # check the result
@@ -1717,8 +1717,8 @@ main() {
 		if [ -n "${DEBUG}" ] ; then
 		    echo "[DBG] openssl ocsp -header requires 'key value'"
 		fi
-	    fi		
-	    
+	    fi
+
 	    # http_proxy is sometimes lower- and sometimes uppercase. Programs usually check both
 	    # shellcheck disable=SC2154
 	    if [ -n "${http_proxy}" ] ; then
@@ -1727,7 +1727,7 @@ main() {
 
             if [ -n "${HTTP_PROXY:-}" ] ; then
 
-		if [ -n "${KEYVALUE}" ] ; then		   		
+		if [ -n "${KEYVALUE}" ] ; then
 		    if [ -n "${DEBUG}" ] ; then
 			echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
 		    fi
@@ -1758,22 +1758,22 @@ main() {
 	    if [ -n "${DEBUG}" ] ; then
 		echo "${OCSP_RESP}" | sed 's/^/[DBG] OCSP: response = /'
 	    fi
-	    
+
             if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
 		critical "certificate is revoked"
-            elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then	    
-	    
+            elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
+
                 if [ -n "${HTTP_PROXY:-}" ] ; then
                     OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                 else
                     OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                 fi
 		critical "${OCSP_RESP}"
-	    
+
 	    fi
-	    
+
 	else
-	    
+
 	    if [ -n "${VERBOSE}" ] ; then
 		echo "openssl ocsp does not support the -header option: disabling OCSP checks"
 	    fi
