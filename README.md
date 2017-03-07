@@ -62,9 +62,9 @@ Options:
    -o,--org org               pattern to match the organization of the certificate
       --openssl path          path of the openssl binary to be used
    -p,--port port             TCP port
-   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc}
-                              http:               default
-                              smtp,pop3,imap,ftp: switch to TLS
+   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
+                              http:                    default
+                              smtp,pop3,imap,ftp,ldap: switch to TLS
    -s,--selfsigned            allows self-signed certificates
       --serial serialnum      pattern to match the serial number
       --ssl2                  force SSL version 2
