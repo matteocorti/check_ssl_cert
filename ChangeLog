@@ -1,3 +1,7 @@
+2017-03-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added LDAP support
+
 2017-03-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: By errors it makes more sense to show the supplied host instead of the CN
