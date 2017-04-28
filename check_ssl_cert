@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.43.0
+VERSION=1.44.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1107,7 +1107,8 @@ main() {
 
     OCSP_URI="$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)"
 
-    ISSUER_URI="$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | sed -e "s/^.*CA Issuers - URI://")"
+    # we just consider the first URI
+    ISSUER_URI="$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
 
     if [ -z "${ISSUER_URI}" ] ; then
 	if [ -n "${VERBOSE}" ] ; then
