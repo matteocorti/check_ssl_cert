@@ -57,3 +57,4 @@ Thanks:
 * Many thanks to Pavel Rochnyak (https://github.com/rpv-tomsk) for the issuer certificate cache patch and
   the wildcard support in alternative names
 * Many thanks to Vamp898 (https://github.com/Vamp898) for the LDAP patch
+* Many thanks to Emilian Ertel for the curl and date patches

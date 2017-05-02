@@ -83,6 +83,11 @@ testValidity() {
     assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
 }
     
+testValidityWithPerl() {
+    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
+}
 
 testAltNames() {
     ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames

@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.44.0
+VERSION=1.45.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -61,6 +61,7 @@ usage() {
     echo "       --ecdsa                cipher selection: force ECDSA authentication"
     echo "   -f,--file file             local file path (works with -H localhost only)"
     echo "      --file-bin path         path of the file binary to be used"
+    echo "      --force-perl-date       force the usage of Perl for date computations"
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
     echo "      --ignore-sig-alg        do not check if the certificate was signed with SHA1"
@@ -401,6 +402,7 @@ main() {
     SNI=""
     TIMEOUT="15"
     VERBOSE=""
+    FORCE_PERL_DATE=""
     OCSP="1" # enabled by default
 
     # Set the default temp dir if not set
@@ -435,6 +437,10 @@ main() {
                 usage
                 exit 0
                 ;;
+	    --force-perl-date)
+		FORCE_PERL_DATE=1
+		shift
+		;;
             --ignore-exp)
                 NOEXP=1
                 shift
@@ -957,11 +963,16 @@ main() {
 
     fi
 
+    if [ -n "${FORCE_PERL_DATE}" ] ; then
+	DATETYPE="PERL"
+    fi
+    
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] check_ssl_version: ${VERSION}"
         echo "[DBG] OpenSSL binary: ${OPENSSL}"
         echo "[DBG] OpenSSL version: $( ${OPENSSL} version )"
         echo "[DBG] System info: $( uname -a )"
+	echo "[DBG] Date computation: ${DATETYPE}"
     fi
 
     ################################################################################
@@ -1211,6 +1222,7 @@ main() {
                 ;;
 
             "PERL")
+		# Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
 				DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
 					use strict;
 					use warnings;
@@ -1218,8 +1230,12 @@ main() {
 					my $cert_date = str2time( $ARGV[0] );
 					my $days = int (( $cert_date - time ) / 86400 + 0.5);
 					print "$days\n";
-				EOF
+EOF
 				)
+				if [ $? -ne 0 ] ; then
+				    # somethig went wrong with the embedded Perl code: check the indentation of EOF
+				    unknown "Error computing the certificate validity with Perl"
+				fi
 				;;
         esac
 
@@ -1630,7 +1646,7 @@ main() {
                 echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
             fi
 
-            curl --silent "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
+            curl --silent --location "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
 
             if [ -n "${DEBUG}" ] ; then
 
