@@ -1,3 +1,7 @@
+2017-05-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fixed a problem with the detection of OCSP URLs
+
 2017-05-02  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added --location to curl to follow redirects

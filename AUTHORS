@@ -58,3 +58,4 @@ Thanks:
   the wildcard support in alternative names
 * Many thanks to Vamp898 (https://github.com/Vamp898) for the LDAP patch
 * Many thanks to Emilian Ertel for the curl and date patches
+* Many thanks to Kosta Velikov for the grep patch
