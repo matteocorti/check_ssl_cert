@@ -1126,6 +1126,11 @@ main() {
 	    echo "cannot find the CA Issuers in the certificate: disabling OCSP checks"
 	fi
 	OCSP=""
+    else
+	if ! echo "${ISSUER_URI}" | grep -qi '^http' ; then
+	    echo "unable to fetch the CA issuer certificate (unsupported protocol)"
+	fi
+	OCSP=""
     fi
 
     SIGNATURE_ALGORITHM="$($OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
@@ -1640,7 +1645,7 @@ EOF
 
         fi
 
-        if [ -z "${ISSUER_CERT}" ]; then
+        if [ -z "${ISSUER_CERT}" ] ; then
 
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
