@@ -1729,7 +1729,7 @@ EOF
 	if [ "$( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )"  -gt 0 ]; then
 
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] openssl ocsp support the -header option"
+		echo "[DBG] openssl ocsp supports the -header option"
 	    fi
 
 	    # the -header option was first accepting key and value separated by space. The newer versions are using key=value
