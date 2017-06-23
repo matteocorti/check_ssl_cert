@@ -228,6 +228,12 @@ testBadSSLRevoked() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testGRCRevoked() {
+    ${SCRIPT} -H revoked.grc.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testBadSSLIncompleteChain() {
     ${SCRIPT} -H incomplete-chain.badssl.com --host-cn
     EXIT_CODE=$?
