@@ -1,3 +1,11 @@
+2017-06-23  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Checks for missing subjectAlternativeName extension
+
+2017-06-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Do not try to check OCSP if the protocol is not HTTP or HTTPS
+
 2017-05-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a problem with the detection of OCSP URLs

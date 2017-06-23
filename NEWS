@@ -1,3 +1,4 @@
+2017-06-22 Version 1.48.0: Checks for missing subjectAlternativeName extension (https://support.google.com/chrome/a/answer/7391219?hl=en)
 2017-06-15 Version 1.47.0: Fixed an issue with OCSP URI with protocols other than HTTP or HTTPS
 2017-05-15 Version 1.46.0: Fixed a problem with the detection of OCSP URLs
 2017-05-02 Version 1.45.0: Fixed bugs in the date computation and OCSP checks

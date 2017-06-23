@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.47.0
+VERSION=1.48.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1260,6 +1260,22 @@ EOF
     fi
 
     ################################################################################
+    # Check the presence of a subjectAlternativeName (required for Chrome)
+    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL x509 -in "${CERT}" -text |
+				   grep --after-context=1 "509v3 Subject Alternative Name:" |
+				   tail -n 1 |
+				   sed -e "s/DNS://g" |
+				   sed -e "s/,//g" |
+				   sed -e "s/^\ *//" 
+			    )
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
+    fi
+    if [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
+	critical "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
+    fi
+    
+    ################################################################################
     # Check the CN
     if [ -n "$COMMON_NAME" ] ; then
 
@@ -1315,7 +1331,7 @@ EOF
 	    fi
 
         fi
-
+				   
         # Check alternate names
         if [ -n "${ALTNAMES}" ] && [ -z "$ok" ]; then
 
@@ -1327,9 +1343,7 @@ EOF
                     echo "[DBG] checking altnames against ${cn}"
                 fi
 
-                for alt_name in $($OPENSSL x509 -in "${CERT}" -text \
-                    | grep --after-context=1 "509v3 Subject Alternative Name:" \
-                    | tail -n 1 | sed -e "s/DNS://g" | sed -e "s/,//g") ; do
+                for alt_name in ${SUBJECT_ALTERNATIVE_NAME} ; do
 
                     if [ -n "${DEBUG}" ] ; then
                         echo "[DBG] check Altname: ${alt_name}"
