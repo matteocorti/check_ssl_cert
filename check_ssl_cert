@@ -1111,8 +1111,11 @@ main() {
     CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
         sed -e "s/^.*[[:space:]]CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
-    CA_O="$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/\/[A-Z][A-Z]*=.*\$//")"
-    CA_CN="$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//")"
+    # Handle properly openssl x509 -issuer -noout output format differences:
+    # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
+    # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
+    CA_O="$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/^.*, O = //" -e "s/\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_CN="$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/^.*, CN = //" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
 
     SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
 
