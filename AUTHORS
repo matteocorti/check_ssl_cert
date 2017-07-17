@@ -59,3 +59,4 @@ Thanks:
 * Many thanks to Vamp898 (https://github.com/Vamp898) for the LDAP patch
 * Many thanks to Emilian Ertel for the curl and date patches
 * Many thanks to Kosta Velikov for the grep patch
+* Many thanks to Vojtech Horky for the OpenSSL 1.1 patch
