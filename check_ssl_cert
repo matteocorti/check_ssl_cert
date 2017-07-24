@@ -1109,7 +1109,7 @@ main() {
 
     # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
     CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
-        sed -e "s/^.*[[:space:]]CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
+        sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
