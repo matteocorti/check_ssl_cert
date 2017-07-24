@@ -1,3 +1,7 @@
+2017-07-24  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fix in the Common Name parsing
+
 2017-06-23  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Checks for missing subjectAlternativeName extension
