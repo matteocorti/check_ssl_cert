@@ -978,12 +978,13 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the -servername option
     #
-    #   openssl s_client does not have a -help option
+    #   openssl s_client now has a -help option, so we can use that.
+    #   Some older versions support -servername, but not -help
     #   => We supply an invalid command line option to get the help
-    #      on standard error
+    #      on standard error for these intermediate versions.
     #
     SERVERNAME=
-    if ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername ; then
+    if ${OPENSSL} s_client -help 2>&1 | grep -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername; then
 
 	if [ -n "${SNI}" ]; then
 	    SERVERNAME="-servername ${SNI}"
