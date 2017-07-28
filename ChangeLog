@@ -1,3 +1,7 @@
+2017-07-28  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Use openssl s_client's -help option to test for SNI support (thanks to d7415)
+
 2017-07-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fix in the Common Name parsing
