@@ -62,3 +62,4 @@ Thanks:
 * Many thanks to Vojtech Horky for the OpenSSL 1.1 patch
 * Many thanks to Nicolas Lafont (https://github.com/ManicoW) for the Common Name fix
 * Many thanks to d7415 (https://github.com/d7415) for the -help patch
+* Many thanks to Łukasz Wąsikowski (https://github.com/IdahoPL) for the curl and date display patches
