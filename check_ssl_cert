@@ -1495,7 +1495,7 @@ EOF
             fi
 
             if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
-                critical "certificate will expire on $DATE"
+                critical "certificate will expire in ${DAYS_VALID} day(s) on $DATE"
             fi
 
         fi
@@ -1507,7 +1507,7 @@ EOF
             fi
 
             if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
-                warning "certificate will expire on $DATE"
+                warning "certificate will expire in ${DAYS_VALID} day(s) on $DATE"
             fi
 
         fi
@@ -1524,13 +1524,13 @@ EOF
 
         while true; do
 
-            JSON="$(curl --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
+            JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
             CURL_RETURN_CODE=$?
 
             if [ ${CURL_RETURN_CODE} -ne 0 ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
-                    echo "[DBG] curl returned ${CURL_RETURN_CODE}: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+                    echo "[DBG] curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
                 fi
 
                 unknown "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
@@ -1540,7 +1540,7 @@ EOF
             JSON="$(printf '%s' "${JSON}" | tr '\n' ' ' )"
 
             if [ -n "${DEBUG}" ] ; then
-                echo "[DBG] Checking SSL Labs: curl --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
+                echo "[DBG] Checking SSL Labs: ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
                 echo "[DBG] SSL Labs JSON: ${JSON}"
             fi
 
@@ -1673,7 +1673,7 @@ EOF
                 echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
             fi
 
-            curl --silent --location "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
+            ${CURL_BIN} --silent --location "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
 
             if [ -n "${DEBUG}" ] ; then
 
