@@ -1238,7 +1238,7 @@ main() {
 
             "PERL")
 		# Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-				DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
+				if ! DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
 					use strict;
 					use warnings;
 					use Date::Parse;
@@ -1246,8 +1246,7 @@ main() {
 					my $days = int (( $cert_date - time ) / 86400 + 0.5);
 					print "$days\n";
 EOF
-				)
-				if [ $? -ne 0 ] ; then
+				) ; then
 				    # somethig went wrong with the embedded Perl code: check the indentation of EOF
 				    unknown "Error computing the certificate validity with Perl"
 				fi
