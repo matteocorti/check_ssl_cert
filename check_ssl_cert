@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.51.0
+VERSION=1.52.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -97,6 +97,7 @@ usage() {
     echo "      --sni name              sets the TLS SNI (Server Name Indication) extension in the ClientHello message to 'name'"
     echo "      --ssl2                  forces SSL version 2"
     echo "      --ssl3                  forces SSL version 3"
+    echo "      --require-san           require the presence of a Subject Alternative Name extension"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
     echo "       --rsa                  cipher selection: force RSA authentication"
@@ -403,6 +404,7 @@ main() {
     TIMEOUT="15"
     VERBOSE=""
     FORCE_PERL_DATE=""
+    REQUIRE_SAN=""
     OCSP="1" # enabled by default
 
     # Set the default temp dir if not set
@@ -692,6 +694,10 @@ main() {
                     unknown "--clientpass requires an argument"
                 fi
                 ;;
+	    --require-san)
+                REQUIRE_SAN=1
+                shift
+                ;;	    
 	    --sni)
 		if [ $# -gt 1 ]; then
 		    SNI="$2"
@@ -1275,7 +1281,7 @@ EOF
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     fi
-    if [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
+    if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
 	critical "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
     fi
     

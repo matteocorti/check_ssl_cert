@@ -1,3 +1,7 @@
+2017-09-09  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: The SAN requirement is now optional
+
 2017-07-28  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Use openssl s_client's -help option to test for SNI support (thanks to d7415)
@@ -26,7 +30,7 @@
 
 2017-04-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug occurring when more than one issuer URI is present
+	* check_ssl_cert: Fixed a bug occurring when more than one issuNer URI is present
 
 2017-03-07  Matteo Corti  <matteo@corti.li>
 

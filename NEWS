@@ -1,3 +1,4 @@
+2017-09-09 Version 1.52.0: The SAN requirement check is now optional
 2017-07-28 Version 1.51.0: Use openssl s_client's -help option to test for SNI support
 2017-07-24 Version 1.50.0: Fix in the Common Name parsing
 2017-07-17 Version 1.49.0: Support for OpenSSL 1.1

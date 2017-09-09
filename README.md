@@ -70,6 +70,7 @@ Options:
       --serial serialnum      pattern to match the serial number
       --ssl2                  force SSL version 2
       --ssl3                  force SSL version 3
+      --require-san           require the presence of a Subject Alternative Name extension
    -r,--rootcert path         root certificate or directory to be used for
                               certificate validation
       --rsa                   cipher selection: force RSA authentication
