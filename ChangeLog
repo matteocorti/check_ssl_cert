@@ -1,3 +1,7 @@
+2017-09-10  Matteo Corti  <corti@mac-mini-1.home>
+
+	* check_ssl_cert: OCSP check is now terminated by a timeout
+
 2017-09-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: The SAN requirement is now optional

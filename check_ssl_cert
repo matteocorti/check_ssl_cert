@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.52.0
+VERSION=1.53.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1678,7 +1678,7 @@ EOF
                 echo "[DBG] OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
             fi
 
-            ${CURL_BIN} --silent --location "${ISSUER_URI}" > "${ISSUER_CERT_TMP}"
+            exec_with_timeout "$TIMEOUT" "${CURL_BIN} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
 
             if [ -n "${DEBUG}" ] ; then
 

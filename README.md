@@ -146,4 +146,6 @@ and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
 ## Bugs
 
+The timeout is applied to each action involving a download.
+
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
