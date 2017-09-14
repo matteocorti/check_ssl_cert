@@ -3,7 +3,7 @@
 if [ -z "${SHUNIT2}" ] ; then
     cat <<EOF
 To be able to run the unit test you need a copy of shUnit2
-You can download it from http://shunit2.googlecode.com/
+You can download it from https://github.com/kward/shunit2
 
 Once downloaded please set the SHUNIT2 variable with the location
 of the 'shunit2' script
