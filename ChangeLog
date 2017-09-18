@@ -1,3 +1,7 @@
+2017-09-18 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* check_ssl_cert: with -f option you now can also pass a certificate revocation list (CRL) to check its validity period
+
 2017-09-10  Matteo Corti  <corti@mac-mini-1.home>
 
 	* check_ssl_cert: OCSP check is now terminated by a timeout
