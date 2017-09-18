@@ -1547,19 +1547,19 @@ EOF
             # CRL certificates
 
             # We always check expired certificates
-            if [ ${DAYS_VALID} -lt 1 ] ; then
+            if [ "${DAYS_VALID}" -lt 1 ] ; then
                 critical "${OPENSSL_COMMAND} certificate is expired (was valid until $DATE)"
             fi
 
             if [ -n "${CRITICAL}" ] ; then
-                if [ ${DAYS_VALID} -lt ${CRITICAL} ] ; then
+                if [ "${DAYS_VALID}" -lt "${CRITICAL}" ] ; then
                     critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
                 fi
 
             fi
 
             if [ -n "${WARNING}" ] ; then
-                if [ ${DAYS_VALID} -lt ${WARNING} ] ; then
+                if [ "${DAYS_VALID}" -lt "${WARNING}" ] ; then
                     warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
                 fi
 
@@ -1970,7 +1970,7 @@ EOF
         SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
     fi
 
-    if [ -z ${CN} ]; then
+    if [ -z "${CN}" ]; then
         DISPLAY_CN=""
     else
         DISPLAY_CN="'${CN}' "
