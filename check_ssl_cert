@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.53.0
+VERSION=1.54.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -62,7 +62,7 @@ usage() {
     echo "   -f,--file file             local file path (works with -H localhost only)"
     echo "                              with -f you can not only pass a x509 certificate file"
     echo "                              but also a certificate revocation list (CRL) to check"
-    echo "                              validity period"
+    echo "                              the validity period"
     echo "      --file-bin path         path of the file binary to be used"
     echo "      --force-perl-date       force the usage of Perl for date computations"
     echo "   -h,--help,-?               this help message"
