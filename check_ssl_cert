@@ -60,6 +60,9 @@ usage() {
     echo "                              certificate"
     echo "       --ecdsa                cipher selection: force ECDSA authentication"
     echo "   -f,--file file             local file path (works with -H localhost only)"
+    echo "                              with -f you can not only pass a x509 certificate file"
+    echo "                              but also a certificate revocation list (CRL) to check"
+    echo "                              validity period"
     echo "      --file-bin path         path of the file binary to be used"
     echo "      --force-perl-date       force the usage of Perl for date computations"
     echo "   -h,--help,-?               this help message"
@@ -1082,54 +1085,75 @@ main() {
 
     fi
 
-    if ! grep -q "CERTIFICATE" "${CERT}" ; then
+    if grep -q "BEGIN X509 CRL" "${CERT}" ; then
+        # we are dealing with a CRL file
+        OPENSSL_COMMAND="crl"
+        OPENSSL_ENDDATE_OPTION="-nextupdate"
+    else
+        # look if we are dealing with a regular certificate file (x509)
+        if ! grep -q "CERTIFICATE" "${CERT}" ; then
 
-        if [ -n "${FILE}" ] ; then
-            critical "'${FILE}' is not a valid certificate file"
-        else
-            # See
-            # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
-            #
-            # - create a branch label via :a
-            # - the N command appends a newline and and the next line of the input
-            #   file to the pattern space
-            # - if we are before the last line, branch to the created label $!ba
-            #   ($! means not to do it on the last line (as there should be one final newline))
-            # - finally the substitution replaces every newline with a space on
-            #   the pattern space
-            ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
-            if [ -n "${VERBOSE}" ] ; then
-                echo "Error: ${ERROR_MESSAGE}"
+            if [ -n "${FILE}" ] ; then
+                critical "'${FILE}' is not a valid certificate file"
+            else
+                # See
+                # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
+                #
+                # - create a branch label via :a
+                # - the N command appends a newline and and the next line of the input
+                #   file to the pattern space
+                # - if we are before the last line, branch to the created label $!ba
+                #   ($! means not to do it on the last line (as there should be one final newline))
+                # - finally the substitution replaces every newline with a space on
+                #   the pattern space
+                ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
+                if [ -n "${VERBOSE}" ] ; then
+                    echo "Error: ${ERROR_MESSAGE}"
+                fi
+                critical "No certificate returned"
             fi
-            critical "No certificate returned"
+
         fi
 
+        # parameters for regular x509 certifcates
+        OPENSSL_COMMAND="x509"
+        OPENSSL_ENDDATE_OPTION="-enddate"
     fi
 
     if [ -n "${VERBOSE}" ] ; then
-        echo "parsing the certificate file"
+        echo "parsing the ${OPENSSL_COMMAND} certificate file"
     fi
 
     ################################################################################
-    # Parse the X.509 certificate
-    DATE="$($OPENSSL x509 -in "${CERT}" -enddate -noout | sed -e "s/^notAfter=//")"
+    # Parse the X.509 certificate or crl
+    DATE="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
 
-    # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
-    CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
-        sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
+    if [ ${OPENSSL_COMMAND} = "crl" ]; then
+        CN=""
+        SUBJECT=""
+        SERIAL=0
+        OCSP_URI=""
+        VALID_ATTRIBUTES=",lastupdate,nextupdate,issuer,"
+    else
+        # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
+        CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
+            sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
+
+        SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
+
+        SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
+
+        OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -ocsp_uri -noout)"
+    fi
 
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-    CA_O="$($OPENSSL x509 -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/^.*, O = //" -e "s/\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
-    CA_CN="$($OPENSSL x509 -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/^.*, CN = //" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
-
-    SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
-
-    OCSP_URI="$($OPENSSL x509 -in "${CERT}" -ocsp_uri -noout)"
+    CA_O="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/^.*, O = //" -e "s/\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_CN="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/^.*, CN = //" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
 
     # we just consider the first URI
-    ISSUER_URI="$($OPENSSL x509 -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
+    ISSUER_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
 
     if [ -z "${ISSUER_URI}" ] ; then
 	if [ -n "${VERBOSE}" ] ; then
@@ -1143,10 +1167,10 @@ main() {
 	OCSP=""
     fi
 
-    SIGNATURE_ALGORITHM="$($OPENSSL x509 -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
+    SIGNATURE_ALGORITHM="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] " "$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
+	echo "[DBG] ${SUBJECT}"
 	echo "[DBG] CN         = ${CN}"
 	echo "[DBG] CA_O       = ${CA_O}"
 	echo "[DBG] CA_CN      = ${CA_CN}"
@@ -1161,12 +1185,12 @@ main() {
         if [ -n "${NOSIGALG}" ] ; then
 
             if [ -n "${VERBOSE}" ] ; then
-                echo 'Certificate is signed with SHA-1'
+                echo "${OPENSSL_COMMAND} Certificate is signed with SHA-1"
             fi
 
         else
 
-            critical 'Certificate is signed with SHA-1'
+            critical "${OPENSSL_COMMAND} Certificate is signed with SHA-1"
 
         fi
 
@@ -1177,12 +1201,12 @@ main() {
         if [ -n "${NOSIGALG}" ] ; then
 
             if [ -n "${VERBOSE}" ] ; then
-                echo 'Certificate is signed with MD5'
+                echo "${OPENSSL_COMMAND} Certificate is signed with MD5"
             fi
 
         else
 
-            critical 'Certificate is signed with MD5'
+            critical "${OPENSSL_COMMAND} Certificate is signed with MD5"
 
         fi
 
@@ -1197,7 +1221,7 @@ main() {
             if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else
-                value="$(${OPENSSL} x509 -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
+                value="$(${OPENSSL} ${OPENSSL_COMMAND} -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
                 LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
            fi
 
@@ -1218,7 +1242,7 @@ main() {
     # Compute for how many days the certificate will be valid
     if [ -n "${DATETYPE}" ]; then
 
-        CERT_END_DATE=$($OPENSSL x509 -in "${CERT}" -noout -enddate | sed -e "s/.*=//")
+        CERT_END_DATE=$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
 
         OLDLANG=$LANG
         LANG=en_US
@@ -1270,7 +1294,7 @@ EOF
 
     ################################################################################
     # Check the presence of a subjectAlternativeName (required for Chrome)
-    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL x509 -in "${CERT}" -text |
+    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text |
 				   grep --after-context=1 "509v3 Subject Alternative Name:" |
 				   tail -n 1 |
 				   sed -e "s/DNS://g" |
@@ -1280,7 +1304,7 @@ EOF
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     fi
-    if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
+    if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ ${OPENSSL_COMMAND} != "crl" ] ; then
 	critical "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
     fi
     
@@ -1488,33 +1512,58 @@ EOF
 	    echo "[DBG] Checking expiration date"
 	fi
 
-        # We always check expired certificates
-        if ! $OPENSSL x509 -in "${CERT}" -noout -checkend 0 > /dev/null ; then
-            critical "certificate is expired (was valid until $DATE)"
-        fi
+        if [ ${OPENSSL_COMMAND} = "x509" ]; then
+            # x509 certificates (default)
 
-        if [ -n "${CRITICAL}" ] ; then
-
-            if [ -n "${DEBUG}" ] ; then
-                echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( CRITICAL * 86400 ))"
+            # We always check expired certificates
+            if ! $OPENSSL x509 -in "${CERT}" -noout -checkend 0 > /dev/null ; then
+                critical "${OPENSSL_COMMAND} certificate is expired (was valid until $DATE)"
             fi
 
-            if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
-                critical "certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+            if [ -n "${CRITICAL}" ] ; then
+
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( CRITICAL * 86400 ))"
+                fi
+
+                if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
+                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                fi
+
             fi
 
-        fi
+            if [ -n "${WARNING}" ] ; then
 
-        if [ -n "${WARNING}" ] ; then
+                if [ -n "${DEBUG}" ] ; then
+                    echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( WARNING * 86400 ))"
+                fi
 
-            if [ -n "${DEBUG}" ] ; then
-                echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( WARNING * 86400 ))"
+                if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
+                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                fi
+
+            fi
+        elif [ ${OPENSSL_COMMAND} = "crl" ]; then
+            # CRL certificates
+
+            # We always check expired certificates
+            if [ "${DAYS_VALID}" -lt 1 ] ; then
+                critical "${OPENSSL_COMMAND} certificate is expired (was valid until $DATE)"
             fi
 
-            if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
-                warning "certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+            if [ -n "${CRITICAL}" ] ; then
+                if [ "${DAYS_VALID}" -lt "${CRITICAL}" ] ; then
+                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                fi
+
             fi
 
+            if [ -n "${WARNING}" ] ; then
+                if [ "${DAYS_VALID}" -lt "${WARNING}" ] ; then
+                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                fi
+
+            fi
         fi
 
     fi
@@ -1921,7 +1970,13 @@ EOF
         SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
     fi
 
-    echo "${SHORTNAME} OK - X.509 ${SELFSIGNEDCERT}certificate '${CN}' ${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    if [ -z "${CN}" ]; then
+        DISPLAY_CN=""
+    else
+        DISPLAY_CN="'${CN}' "
+    fi
+
+    echo "${SHORTNAME} OK - ${OPENSSL_COMMAND} ${SELFSIGNEDCERT}certificate ${DISPLAY_CN}${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
 
     exit 0
 

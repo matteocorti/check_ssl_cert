@@ -34,6 +34,9 @@ Options:
                               certificate
        --ecdsa                cipher selection: force ECDSA authentication
    -f,--file file             local file path (works with -H localhost only)
+                              with -f you can not only pass a x509 certificate file
+                              but also a certificate revocation list (CRL) to check
+                              validity period
       --file-bin path         path of the file binary to be used
       --force-perl-date       force the usage of Perl for date computations
    -h,--help,-?               this help message
