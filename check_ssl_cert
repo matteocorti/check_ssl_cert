@@ -224,7 +224,7 @@ check_required_prog() {
     PROG=$(which "$1" 2> /dev/null)
 
     if [ -z "$PROG" ] ; then
-        critical "cannot find $1"
+        critical "cannot find program: $1"
     fi
 
     if [ ! -x "$PROG" ] ; then
