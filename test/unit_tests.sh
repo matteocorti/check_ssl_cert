@@ -335,11 +335,11 @@ testBadSSLSHA12017() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testIPv4() {
-    ${SCRIPT} -H 129.132.19.216 --sni www.ethz.ch
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
+#testIPv4() {
+#    ${SCRIPT} -H 129.132.19.216 --sni www.ethz.ch
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
 
 #testIPv6() {
 #    ${SCRIPT} -H 2001:67c:10ec:4380::216 --sni www.ethz.ch
