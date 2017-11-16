@@ -304,6 +304,31 @@ fetch_certificate() {
 
     RET=0
 
+    # IPv6 addresses need brackets in a URI
+    if [ "${HOST}" != "${HOST#*[0-9].[0-9]}" ]; then
+       if [ -n "${DEBUG}" ] ; then
+           echo "[DBG] ${HOST} is an IPv4 address"
+       fi
+    elif [ "${HOST}" != "${HOST#*:[0-9a-fA-F]}" ]; then
+       if [ -n "${DEBUG}" ] ; then
+           echo "[DBG] ${HOST} is an IPv6 address"
+       fi
+       if [ -z "${HOST##*[*}" ] ; then
+	   if [ -n "${DEBUG}" ] ; then
+               echo "[DBG] ${HOST} is already specified with brakcets"
+	   fi
+       else
+	   if [ -n "${DEBUG}" ] ; then
+               echo "[DBG] adding brackets to ${HOST}"
+	   fi
+	   HOST="[${HOST}]"	   
+       fi
+    else
+       if [ -n "${DEBUG}" ] ; then
+           echo "[DBG] ${HOST} is not an IP address"
+       fi
+    fi
+    
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
 

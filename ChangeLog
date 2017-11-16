@@ -1,3 +1,7 @@
+2017-11-16    <corti@corti.li>
+
+	* check_ssl_cert (fetch_certificate): adding support for IPv6 addresses
+
 2017-09-18 Bernd Stroessenreuther <booboo@gluga.de>
 
 	* check_ssl_cert: with -f option you now can also pass a certificate revocation list (CRL) to check its validity period
