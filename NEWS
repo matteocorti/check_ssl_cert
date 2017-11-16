@@ -1,3 +1,4 @@
+2017-11-16 Version 1.55.0: Fixed XMPP support and IPv6 addresses as host
 2017-09-19 Version 1.54.0: With the -f command line option, you can also specify a certificate revocation list (CRL)
 2017-09-10 Version 1.53.0: The timeout is applied to OCSP checks
 2017-09-09 Version 1.52.0: The SAN requirement check is now optional

@@ -160,6 +160,12 @@ testAltNames2CaseInsensitive() {
     assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
 }
 
+testXMPP() {
+    ${SCRIPT} -H xmpp.fi --protocol xmpp --port 5269
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}    
+
 # SSL Labs
     
 testETHZWithSSLLabs() {
@@ -328,6 +334,18 @@ testBadSSLSHA12017() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
+
+testIPv4() {
+    ${SCRIPT} -H 129.132.19.216 --sni www.ethz.ch
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+#testIPv6() {
+#    ${SCRIPT} -H 2001:67c:10ec:4380::216 --sni www.ethz.ch
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
 
 # the script will exit without executing main
 export SOURCE_ONLY='test'

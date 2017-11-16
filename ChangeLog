@@ -1,3 +1,7 @@
+2017-11-16  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (fetch_certificate): fixing XMPP support
+
 2017-11-16    <corti@corti.li>
 
 	* check_ssl_cert (fetch_certificate): adding support for IPv6 addresses
