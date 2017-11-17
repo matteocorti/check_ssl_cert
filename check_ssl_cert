@@ -346,7 +346,7 @@ fetch_certificate() {
                 RET=$?
                 ;;
 	    xmpp)
-                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$XMPPPORT ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             *)
@@ -435,6 +435,7 @@ main() {
     CURL_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
+    XMPPPORT="5222"
     SNI=""
     TIMEOUT="15"
     VERBOSE=""
@@ -692,6 +693,7 @@ main() {
             -p|--port)
                 if [ $# -gt 1 ]; then
                     PORT="$2"
+		    XMPPPORT="$2"
                     shift 2
                 else
                     unknown "-p,--port requires an argument"
@@ -1041,6 +1043,26 @@ main() {
 
         if [ -n "${VERBOSE}" ] ; then
             echo "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
+        fi
+
+    fi
+
+    ################################################################################
+    # Check if openssl s_client supports the -xmpphost option
+    #
+    XMPPHOST=
+    if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
+
+        XMPPHOST="-xmpphost ${HOST}"
+
+        if [ -n "${DEBUG}" ] ; then
+            echo "[DBG] '${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
+        fi
+
+    else
+
+        if [ -n "${VERBOSE}" ] ; then
+            echo "'${OPENSSL} s_client' does not support '-xmpphost': disabling 'to' attribute"
         fi
 
     fi
