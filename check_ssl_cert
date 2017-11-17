@@ -119,7 +119,7 @@ usage() {
     echo "                              to issue a warning status"
     echo
     echo "Deprecated options:"
-    echo "   -d,--days days             minimum number of days a certificate has to be valid"
+    echo "      --days days             minimum number of days a certificate has to be valid"
     echo "                              (see --critical and --warning)"
     echo "      --ocsp                  check revocation via OCSP"
     echo "   -S,--ssl version           force SSL version (2,3)"
@@ -334,11 +334,11 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             irc)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3|imap|ftp|ldap)
@@ -582,7 +582,7 @@ main() {
                 fi
                 ;;
             # Deprecated option: used to be as --warning
-            -d|--days)
+            --days)
                 if [ $# -gt 1 ]; then
                     WARNING="$2"
                     shift 2
@@ -1189,7 +1189,7 @@ main() {
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
         CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
-            sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
+            sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
         SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
 
@@ -1201,8 +1201,8 @@ main() {
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-    CA_O="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout | sed -e "s/^.*\/O=//" -e "s/^.*, O = //" -e "s/\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
-    CA_CN="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\/CN=//" -e "s/^.*, CN = //" -e "s/\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_O="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout | sed -e "s/^.*\\/O=//" -e "s/^.*, O = //" -e "s/\\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_CN="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\\/CN=//" -e "s/^.*, CN = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
 
     # we just consider the first URI
     ISSUER_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
@@ -1274,7 +1274,7 @@ main() {
                 unknown "Invalid certificate attribute: ${ATTR}"
             else
                 value="$(${OPENSSL} ${OPENSSL_COMMAND} -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
-                LONG_OUTPUT="${LONG_OUTPUT}\n${ATTR}: ${value}"
+                LONG_OUTPUT="${LONG_OUTPUT}\\n${ATTR}: ${value}"
             fi
 
         }
@@ -1283,7 +1283,7 @@ main() {
         if [ "${LONG_OUTPUT_ATTR}" = "all" ] ; then
             LONG_OUTPUT_ATTR="${VALID_ATTRIBUTES}"
         fi
-        attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\n" )
+        attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\\n" )
         for attribute in $attributes ; do
             check_attr "${attribute}"
         done
@@ -1351,7 +1351,7 @@ EOF
            tail -n 1 |
            sed -e "s/DNS://g" |
            sed -e "s/,//g" |
-           sed -e "s/^\ *//"
+           sed -e "s/^\\ *//"
         )
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
@@ -1372,7 +1372,7 @@ EOF
 
         # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
 
-        if echo "${CN}" | grep -q -i "^\*\." ; then
+        if echo "${CN}" | grep -q -i "^\\*\\." ; then
 
             # Match the domain
             if [ -n "${DEBUG}" ] ; then
@@ -1434,7 +1434,7 @@ EOF
                         echo "[DBG] check Altname: ${alt_name}"
                     fi
 
-                    if echo "${alt_name}" | grep -q -i "^\*\." ; then
+                    if echo "${alt_name}" | grep -q -i "^\\*\\." ; then
 
                         # Match the domain
                         if [ -n "${DEBUG}" ] ; then
@@ -1839,7 +1839,7 @@ EOF
             ISSUER_CERT=${ISSUER_CERT_TMP}
 
         fi
-        OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\([^/]\+\)\(/.*\)\?\$@\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
+        OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
         if [ -n "${DEBUG}" ] ; then
             echo "[DBG] OCSP: host = ${OCSP_HOST}"
@@ -1936,7 +1936,7 @@ EOF
     # Check the organization
     if [ -n "$ORGANIZATION" ] ; then
 
-        ORG=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/.*\/O=//" -e "s/\/.*//")
+        ORG=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
 
         if ! echo "$ORG" | grep -q "^$ORGANIZATION" ; then
             critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
@@ -1998,7 +1998,7 @@ EOF
     CHECKEDNAMES=""
     if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
         CHECKEDNAMES="(${COMMON_NAME}) "
-    elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i "^\*\." ; then
+    elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i "^\\*\\." ; then
         CHECKEDNAMES="(${COMMON_NAME}) "
     fi
 
