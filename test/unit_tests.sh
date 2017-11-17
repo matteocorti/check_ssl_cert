@@ -161,7 +161,7 @@ testAltNames2CaseInsensitive() {
 }
 
 testXMPP() {
-    ${SCRIPT} -H xmpp.fi --protocol xmpp
+    ${SCRIPT} -H nerv.tech --protocol xmpp
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }    
