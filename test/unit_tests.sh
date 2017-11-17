@@ -161,9 +161,13 @@ testAltNames2CaseInsensitive() {
 }
 
 testXMPP() {
-    ${SCRIPT} -H nerv.tech --protocol xmpp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H nerv.tech --protocol xmpp
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    else
+	echo "Skipping XMPP tests on Travis CI"
+    fi	
 }    
 
 # SSL Labs
