@@ -64,6 +64,7 @@ usage() {
     echo "                              but also a certificate revocation list (CRL) to check"
     echo "                              the validity period"
     echo "      --file-bin path         path of the file binary to be used"
+    echo "      --fingerprint SHA1      pattern to match the SHA1-Fingerprint"
     echo "      --force-perl-date       force the usage of Perl for date computations"
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
@@ -651,7 +652,15 @@ main() {
                     SERIAL_LOCK="$2"
                     shift 2
                 else
-                    unknown "-i,--issuer requires an argument"
+                    unknown "--serial requires an argument"
+                fi
+                ;;
+            --fingerprint)
+                if [ $# -gt 1 ]; then
+                    FINGERPRINT_LOCK="$2"
+                    shift 2
+                else
+                    unknown "--fingerprint requires an argument - SHA1 Fingerprint"
                 fi
                 ;;
             --long-output)
@@ -1194,6 +1203,8 @@ main() {
         SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
 
         SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
+	
+	FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
         OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -ocsp_uri -noout)"
     fi
@@ -1227,6 +1238,7 @@ main() {
         echo "[DBG] CA_O       = ${CA_O}"
         echo "[DBG] CA_CN      = ${CA_CN}"
         echo "[DBG] SERIAL     = ${SERIAL}"
+	echo "[DBG] FINGERPRINT= ${FINGERPRINT}"
         echo "[DBG] OCSP_URI   = ${OCSP_URI}"
         echo "[DBG] ISSUER_URI = ${ISSUER_URI}"
         echo "[DBG] ${SIGNATURE_ALGORITHM}"
@@ -1552,6 +1564,21 @@ EOF
 
         if [ -z "$ok" ] ; then
             critical "invalid serial number ('${SERIAL}' does not match '${SERIAL_LOCK}')"
+        fi
+
+    fi
+    ################################################################################
+    # Check the Fingerprint
+    if [ -n "${FINGERPRINT_LOCK}" ] ; then
+
+        ok=""
+
+        if echo "${FINGERPRINT}" | grep -q "^${FINGERPRINT_LOCK}\$" ; then
+            ok="true"
+        fi
+
+        if [ -z "$ok" ] ; then
+            critical "invalid SHA1 Fingerprint ('${FINGERPRINT}' does not match '${FINGERPRINT_LOCK}')"
         fi
 
     fi
