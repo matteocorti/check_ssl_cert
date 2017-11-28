@@ -65,6 +65,7 @@
 	<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
 
       <pre>
+
 Usage: check_ssl_cert -H host [OPTIONS]
 
 Arguments:
@@ -88,6 +89,7 @@ Options:
                               but also a certificate revocation list (CRL) to check
                               the validity period
       --file-bin path         path of the file binary to be used
+      --fingerprint SHA1      pattern to match the SHA1-Fingerprint
       --force-perl-date       force the usage of Perl for date computations
    -h,--help,-?               this help message
       --ignore-exp            ignore expiration date
@@ -116,15 +118,18 @@ Options:
    -o,--org org               pattern to match the organization of the certificate
       --openssl path          path of the openssl binary to be used
    -p,--port port             TCP port
-   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
+   -P,--protocol protocol     use the specific protocol
+                              {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
                               http:                    default
                               smtp,pop3,imap,ftp,ldap: switch to TLS
    -s,--selfsigned            allows self-signed certificates
       --serial serialnum      pattern to match the serial number
-      --sni name              sets the TLS SNI (Server Name Indication) extension in the ClientHello message to 'name'
+      --sni name              sets the TLS SNI (Server Name Indication) extension
+                              in the ClientHello message to 'name'
       --ssl2                  forces SSL version 2
       --ssl3                  forces SSL version 3
-      --require-san           require the presence of a Subject Alternative Name extension
+      --require-san           require the presence of a Subject Alternative Name
+                              extension
    -r,--rootcert path         root certificate or directory to be used for
                               certificate validation
        --rsa                  cipher selection: force RSA authentication
@@ -140,11 +145,13 @@ Options:
                               to issue a warning status
 
 Deprecated options:
-   -d,--days days             minimum number of days a certificate has to be valid
+      --days days             minimum number of days a certificate has to be valid
                               (see --critical and --warning)
       --ocsp                  check revocation via OCSP
    -S,--ssl version           force SSL version (2,3)
                               (see: --ssl2 or --ssl3)
+
+Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
       </pre>
 
 
