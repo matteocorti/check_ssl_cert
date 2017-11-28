@@ -38,6 +38,7 @@ Options:
                               but also a certificate revocation list (CRL) to check
                               the validity period
       --file-bin path         path of the file binary to be used
+      --fingerprint SHA1      pattern to match the SHA1-Fingerprint"
       --force-perl-date       force the usage of Perl for date computations
    -h,--help,-?               this help message
       --ignore-exp            ignore expiration date
