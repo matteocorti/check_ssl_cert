@@ -1,3 +1,7 @@
+2017-11-28  Georg https://github.com/gbotti
+
+	* check_ssl_cert: added --fingerprint to check the SHA1 fingerprint of the certificate
+
 2017-11-17  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): adding support for -xmpphost if available

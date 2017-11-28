@@ -1,4 +1,5 @@
-2017-11-17 Version 1.56.0: Addes support for -xmpphost if available
+2017-11-28 Version 1.57.0: Added --fingerprint to check the SHA1 fingerprint of the certificate
+2017-11-17 Version 1.56.0: Added support for -xmpphost if available
 2017-11-16 Version 1.55.0: Fixed XMPP support and IPv6 addresses as host
 2017-09-19 Version 1.54.0: With the -f command line option, you can also specify a certificate revocation list (CRL)
 2017-09-10 Version 1.53.0: The timeout is applied to OCSP checks

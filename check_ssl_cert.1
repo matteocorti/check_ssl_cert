@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "November, 2017" "1.56.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "November, 2017" "1.57.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -50,6 +50,9 @@ local file path (works with -H localhost only) with -f you can not only pass a x
 .TP
 .BR "   --file-bin" " path"
 path of the file binary to be used
+.TP
+.BR "   --fingerprint" " SHA1"
+pattern to match the SHA1-Fingerprint
 .TP
 .BR "   --force-perl-date"
 force the usage of Perl for date computations
