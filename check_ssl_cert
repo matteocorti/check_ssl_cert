@@ -1149,13 +1149,23 @@ main() {
     if grep -q "BEGIN X509 CRL" "${CERT}" ; then
         # we are dealing with a CRL file
         OPENSSL_COMMAND="crl"
+        OPENSSL_PARAMS=""
         OPENSSL_ENDDATE_OPTION="-nextupdate"
     else
         # look if we are dealing with a regular certificate file (x509)
         if ! grep -q "CERTIFICATE" "${CERT}" ; then
 
             if [ -n "${FILE}" ] ; then
-                critical "'${FILE}' is not a valid certificate file"
+                if ${OPENSSL} crl -in ${CERT} -inform DER | grep -q "BEGIN X509 CRL" ; then
+                    if [ -n "${VERBOSE}" ] ; then
+                        echo "File is DER encoded CRL"
+                    fi
+                    OPENSSL_COMMAND="crl"
+                    OPENSSL_PARAMS="-inform DER"
+                    OPENSSL_ENDDATE_OPTION="-nextupdate"
+                else
+                    critical "'${FILE}' is not a valid certificate file"
+                fi
             else
                 # See
                 # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
@@ -1173,12 +1183,13 @@ main() {
                 fi
                 critical "No certificate returned"
             fi
-
+        else
+            # parameters for regular x509 certifcates
+            OPENSSL_COMMAND="x509"
+            OPENSSL_PARAMS=""
+            OPENSSL_ENDDATE_OPTION="-enddate"
         fi
 
-        # parameters for regular x509 certifcates
-        OPENSSL_COMMAND="x509"
-        OPENSSL_ENDDATE_OPTION="-enddate"
     fi
 
     if [ -n "${VERBOSE}" ] ; then
@@ -1187,7 +1198,7 @@ main() {
 
     ################################################################################
     # Parse the X.509 certificate or crl
-    DATE="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
+    DATE="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
 
     if [ ${OPENSSL_COMMAND} = "crl" ]; then
         CN=""
@@ -1206,17 +1217,17 @@ main() {
 	
 	FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
-        OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -ocsp_uri -noout)"
+        OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout)"
     fi
 
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-    CA_O="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout | sed -e "s/^.*\\/O=//" -e "s/^.*, O = //" -e "s/\\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
-    CA_CN="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\\/CN=//" -e "s/^.*, CN = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_O="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout | sed -e "s/^.*\\/O=//" -e "s/^.*, O = //" -e "s/\\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    CA_CN="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\\/CN=//" -e "s/^.*, CN = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
 
     # we just consider the first URI
-    ISSUER_URI="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
+    ISSUER_URI="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
 
     if [ -z "${ISSUER_URI}" ] ; then
         if [ -n "${VERBOSE}" ] ; then
@@ -1230,7 +1241,7 @@ main() {
         OCSP=""
     fi
 
-    SIGNATURE_ALGORITHM="$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
+    SIGNATURE_ALGORITHM="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ${SUBJECT}"
@@ -1285,7 +1296,7 @@ main() {
             if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else
-                value="$(${OPENSSL} ${OPENSSL_COMMAND} -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
+                value="$(${OPENSSL} ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
                 LONG_OUTPUT="${LONG_OUTPUT}\\n${ATTR}: ${value}"
             fi
 
@@ -1306,7 +1317,7 @@ main() {
     # Compute for how many days the certificate will be valid
     if [ -n "${DATETYPE}" ]; then
 
-        CERT_END_DATE=$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
+        CERT_END_DATE=$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
 
         OLDLANG=$LANG
         LANG=en_US
@@ -1358,7 +1369,7 @@ EOF
 
     ################################################################################
     # Check the presence of a subjectAlternativeName (required for Chrome)
-    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL ${OPENSSL_COMMAND} -in "${CERT}" -text |
+    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -text |
            grep --after-context=1 "509v3 Subject Alternative Name:" |
            tail -n 1 |
            sed -e "s/DNS://g" |
