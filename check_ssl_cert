@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.57.0
+VERSION=1.58.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1156,7 +1156,7 @@ main() {
         if ! grep -q "CERTIFICATE" "${CERT}" ; then
 
             if [ -n "${FILE}" ] ; then
-                if ${OPENSSL} crl -in ${CERT} -inform DER | grep -q "BEGIN X509 CRL" ; then
+                if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -q "BEGIN X509 CRL" ; then
                     if [ -n "${VERBOSE}" ] ; then
                         echo "File is DER encoded CRL"
                     fi

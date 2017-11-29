@@ -1,3 +1,7 @@
+2017-11-29  Wim van Ravesteijn https://github.com/wimvr
+
+	* check_ssl_cert: Support for DER encoded CRL files
+
 2017-11-28  Georg https://github.com/gbotti
 
 	* check_ssl_cert: added --fingerprint to check the SHA1 fingerprint of the certificate
