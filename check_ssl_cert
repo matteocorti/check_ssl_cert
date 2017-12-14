@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.58.0
+VERSION=1.59.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -118,6 +118,7 @@ usage() {
     echo "   -V,--version               version"
     echo "   -w,--warning days          minimum number of days a certificate has to be valid"
     echo "                              to issue a warning status"
+    echo "      --xmpphost name         specifies the host for the 'to' attribute of the stream element"
     echo
     echo "Deprecated options:"
     echo "      --days days             minimum number of days a certificate has to be valid"
@@ -437,6 +438,7 @@ main() {
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
     XMPPPORT="5222"
+    XMPPHOST=""
     SNI=""
     TIMEOUT="15"
     VERBOSE=""
@@ -793,6 +795,14 @@ main() {
                     unknown "-w,--warning requires an argument"
                 fi
                 ;;
+	    --xmpphost)
+		if [ $# -gt 1 ]; then
+                    XMPPHOST="$2"
+                    shift 2
+                else
+                    unknown "--xmpphost requires an argument"
+                fi
+                ;;
             ########################################
             # Special
             --)
@@ -1059,7 +1069,6 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the -xmpphost option
     #
-    XMPPHOST=
     if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
 
         XMPPHOST="-xmpphost ${HOST}"
@@ -1070,6 +1079,12 @@ main() {
 
     else
 
+	if [ -n "${XMPPHOST}" ] ; then
+	    unknown " s_client' does not support '-xmpphost'"
+	fi
+	
+	XMPPHOST=
+	
         if [ -n "${VERBOSE}" ] ; then
             echo "'${OPENSSL} s_client' does not support '-xmpphost': disabling 'to' attribute"
         fi

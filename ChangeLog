@@ -1,3 +1,7 @@
+2017-12-14  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Added an option to specify the 'to' attribute of the XMPP stream element
+
 2017-11-29  Wim van Ravesteijn https://github.com/wimvr
 
 	* check_ssl_cert: Support for DER encoded CRL files

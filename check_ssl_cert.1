@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "November, 2017" "1.58.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "December, 2017" "1.59.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -165,6 +165,9 @@ version
 .TP
 .BR "-w,--warning" " days"
 minimum number of days a certificate has to be valid to issue a warning status
+.TP
+.BR "   --xmpphost" " name"
+specifies the host for the "to" attribute of the stream element
 .SH DEPRECATED OPTIONS
 .TP
 .BR "-d,--days" " days"
