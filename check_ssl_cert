@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.59.0
+VERSION=1.60.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1071,7 +1071,7 @@ main() {
     #
     if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
 
-        XMPPHOST="-xmpphost ${HOST}"
+        XMPPHOST="-xmpphost ${XMPPHOST:-$HOST}"
 
         if [ -n "${DEBUG}" ] ; then
             echo "[DBG] '${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
