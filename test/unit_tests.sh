@@ -175,7 +175,7 @@ testXMPPHost() {
 	out=$(${SCRIPT} -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is)
 	echo "${out}"
 	EXIT_CODE=$?
-	if echo ${out} | grep -q "s_client' does not support '-xmpphost'" ; then
+	if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
 	    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 	else
 	    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
