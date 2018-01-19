@@ -2,3 +2,4 @@
 * Get rid of the CN checks and just use the subjectAlternativeName
   http://unmitigatedrisk.com/?p=381
   https://nameconstraints.bettertls.com/#!about
+* Loop over all the provided OCSP hosts (https://github.com/matteocorti/check_ssl_cert/issues/72)

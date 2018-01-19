@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.60.0
+VERSION=1.61.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1232,7 +1232,8 @@ main() {
 	
 	FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
-        OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout)"
+	# TO DO: we just take the first result: a loop over all the hosts should 
+        OCSP_URI="$($OPENSSL ${OPENSSL_COMMAND} ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
     fi
 
     # Handle properly openssl x509 -issuer -noout output format differences:

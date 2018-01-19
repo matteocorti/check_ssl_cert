@@ -160,16 +160,6 @@ testAltNames2CaseInsensitive() {
     assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
 }
 
-testXMPP() {
-    if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H nerv.tech --protocol xmpp
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
-    else
-	echo "Skipping XMPP tests on Travis CI"
-    fi	
-}
-
 testXMPPHost() {
     if [ -z "${TRAVIS+x}" ] ; then
 	out=$(${SCRIPT} -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is)
@@ -352,6 +342,12 @@ testBadSSLSHA12017() {
     ${SCRIPT} -H sha1-2017.badssl.com --host-cn
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testMultipleOCSPHosts() {
+    ${SCRIPT} -H netlock.hu
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #testIPv4() {
