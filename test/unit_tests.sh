@@ -345,7 +345,7 @@ testBadSSLSHA12017() {
 }
 
 testMultipleOCSPHosts() {
-    ${SCRIPT} -H netlock.hu
+    ${SCRIPT} -H netlock.hu --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
