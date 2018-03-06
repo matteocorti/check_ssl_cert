@@ -223,7 +223,7 @@ exec_with_timeout() {
 # Returns 1 if the program exists and is executable
 check_required_prog() {
 
-    PROG=$(which "$1" 2> /dev/null)
+    PROG=$(command -v "$1" 2> /dev/null)
 
     if [ -z "$PROG" ] ; then
         critical "cannot find program: $1"
@@ -944,7 +944,7 @@ main() {
     fi
 
     # Expect (optional)
-    EXPECT="$(which expect 2> /dev/null)"
+    EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
     if [  -n "${VERBOSE}" ] ; then
         if [ -z "${EXPECT}" ] ; then
@@ -955,7 +955,7 @@ main() {
     fi
 
     # Timeout (optional)
-    TIMEOUT_BIN="$(which timeout 2> /dev/null)"
+    TIMEOUT_BIN="$(command -v timeout 2> /dev/null)"
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
     if [  -n "${VERBOSE}" ] ; then
 
@@ -971,13 +971,13 @@ main() {
         echo "disabling timeouts"
     fi
 
-    PERL="$(which perl 2> /dev/null)"
+    PERL="$(command -v perl 2> /dev/null)"
 
     if [ -n "${DEBUG}" ] && [ -n "${PERL}" ] ; then
         echo "[DBG] perl available: ${PERL}"
     fi
 
-    DATEBIN="$(which date 2> /dev/null)"
+    DATEBIN="$(command -v date 2> /dev/null)"
 
     if [ -n "${DEBUG}" ] && [ -n "${DATEBIN}" ] ; then
         echo "[DBG] date available: ${DATEBIN}"
@@ -1040,14 +1040,11 @@ main() {
 
 	DEFAULT_CA=0
 	if [ -f "${OPENSSL_DIR}"/cert.pem ] ; then
-	    DEFAULT_CA="$( grep BEGIN "${OPENSSL_DIR}"/cert.pem | wc -l )"
+	    DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/cert.pem )"
 	elif [ -f "${OPENSSL_DIR}"/certs ] ; then
-	    DEFAULT_CA="$( grep BEGIN "${OPENSSL_DIR}"/certs | wc -l )"
+	    DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/certs )"
 	fi
 	echo "[DBG] ${DEFAULT_CA} root certificates installed by default"
-
-	exit
-	
 	
         echo "[DBG] System info: $( uname -a )"
         echo "[DBG] Date computation: ${DATETYPE}"
