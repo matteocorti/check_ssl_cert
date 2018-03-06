@@ -1,3 +1,8 @@
+2018-03-06  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fixed OCSP check with LibreSSL
+	* check_ssl_cert: Lists the number or default root certificates in debug mode
+
 2018-01-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a bug processing more than one OCSP host
