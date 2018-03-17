@@ -14,7 +14,7 @@
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
-# See the LICENSE file for details.
+# See the LICENSE file for details. 
 
 ################################################################################
 # Constants
@@ -114,7 +114,7 @@ usage() {
     echo "      --tls1                  force TLS version 1"
     echo "      --tls1_1                force TLS version 1.1"
     echo "      --tls1_2                force TLS version 1.2"
-    echo "      --tls1_3                force TLS version 1.3"
+    #echo "      --tls1_3                force TLS version 1.3"
     echo "   -v,--verbose               verbose output"
     echo "   -V,--version               version"
     echo "   -w,--warning days          minimum number of days a certificate has to be valid"
