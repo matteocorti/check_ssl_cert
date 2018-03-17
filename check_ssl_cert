@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.62.0
+VERSION=1.63.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1109,6 +1109,14 @@ main() {
 
     fi
 
+    ################################################################################
+    # check if openssl s_client supports the SSL TLS version
+    if [ -n "${SSL_VERSION}" ] ; then
+	if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${SSL_VERSION}" ; then
+	    unknown "OpenSSL does not support the ${SSL_VERSION} version"
+	fi    
+    fi
+    
     ################################################################################
     # Fetch the X.509 certificate
 
