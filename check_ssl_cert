@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.63.0
+VERSION=1.64.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -73,7 +73,7 @@ usage() {
     echo "      --ignore-ocsp           do not check revocation with OCSP"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir directory where to store issuer certificates cache"
-    echo "   -L,--check-ssl-labs grade  SSL Labs assestment"
+    echo "   -L,--check-ssl-labs grade  SSL Labs assessment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
     echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "      --long-output list      append the specified comma separated (no spaces) list"
@@ -648,7 +648,7 @@ main() {
                 ;;
             -L|--check-ssl-labs)
                 if [ $# -gt 1 ]; then
-                    SSL_LAB_ASSESTMENT="$2"
+                    SSL_LAB_ASSESSMENT="$2"
                     shift 2
                 else
                     unknown "-L|--check-ssl-labs requires an argument"
@@ -918,9 +918,9 @@ main() {
 
     fi
 
-    if [ -n "${SSL_LAB_ASSESTMENT}" ] ; then
-        convert_ssl_lab_grade "${SSL_LAB_ASSESTMENT}"
-        SSL_LAB_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+    if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
+        convert_ssl_lab_grade "${SSL_LAB_ASSESSMENT}"
+        SSL_LAB_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
 
     if [ -n "${DEBUG}" ] ; then
@@ -943,7 +943,7 @@ main() {
     fi
 
     # curl
-    if [ -z "${CURL_BIN}" -a -n "${SSL_LAB_ASSESTMENT}" ] ; then
+    if [ -z "${CURL_BIN}" ] && [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
         check_required_prog curl
         CURL_BIN=$PROG
     fi
@@ -1702,7 +1702,7 @@ EOF
 
     ################################################################################
     # Check SSL Labs
-    if [ -n "${SSL_LAB_ASSESTMENT}" ] ; then
+    if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
 
         if [ -n "${VERBOSE}" ] ; then
             echo "Checking SSL Labs assestment"
@@ -1770,11 +1770,11 @@ EOF
                         convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
                         SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
-                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_ASSESTMENT_NUMERIC}"
+                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_ASSESSMENT_NUMERIC}"
 
                         # Check the grade
-                        if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESTMENT_NUMERIC}" ] ; then
-                            critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESTMENT})"
+                        if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESSMENT_NUMERIC}" ] ; then
+                            critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESSMENT})"
                         fi
 
                         if [ -n "${DEBUG}" ] ; then

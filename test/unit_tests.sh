@@ -45,6 +45,12 @@ testETHZ() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testLetsEncrypt() {
+    ${SCRIPT} -H helloworld.letsencrypt.org --rootcert cabundle.crt
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}   
+
 testGoDaddy() {
     ${SCRIPT} -H www.godaddy.com --cn www.godaddy.com --rootcert cabundle.crt
     EXIT_CODE=$?

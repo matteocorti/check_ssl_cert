@@ -1,3 +1,7 @@
+2018-03-28  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Removed cURL dependency when not checking SSL Labs
+
 2018-03-17  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added support for TLS 1.3
