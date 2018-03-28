@@ -943,11 +943,11 @@ main() {
     fi
 
     # curl
-    if [ -z "${CURL_BIN}" ] && [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
+    if [ -z "${CURL_BIN}" ] && [ -z "${SSL_LAB_ASSESSMENT}" ] && [ -n "${OCSP}" ] ; then
         check_required_prog curl
         CURL_BIN=$PROG
     fi
-
+    
     # Expect (optional)
     EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
