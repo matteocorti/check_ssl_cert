@@ -12,6 +12,9 @@ Optional dependencies
 - In order to perform date computations the plugin needs a Perl
   interpreter and the module Date::Parse
 
+- In order to use the SSL Lab Assessment 'curl' is required to reside in the
+  current PATH.
+
 Installation
 ============
 

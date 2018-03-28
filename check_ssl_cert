@@ -942,8 +942,8 @@ main() {
         FILE_BIN=$PROG
     fi
 
-    # file
-    if [ -z "${CURL_BIN}" ] ; then
+    # curl
+    if [ -z "${CURL_BIN}" -a -n "${SSL_LAB_ASSESTMENT}" ] ; then
         check_required_prog curl
         CURL_BIN=$PROG
     fi
