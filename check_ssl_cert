@@ -943,9 +943,11 @@ main() {
     fi
     
     # curl
-    if [ -z "${CURL_BIN}" ] && [ -n "${SSL_LAB_ASSESSMENT}" ] && [ -n "${OCSP}" ] ; then
-        check_required_prog curl
-        CURL_BIN=$PROG
+    if [ -z "${CURL_BIN}" ] ; then
+	 if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+             check_required_prog curl
+             CURL_BIN=$PROG
+	 fi
     fi
     
     # Expect (optional)
