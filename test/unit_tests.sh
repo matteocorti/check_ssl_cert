@@ -169,12 +169,12 @@ testAltNames2CaseInsensitive() {
 testXMPPHost() {
     if [ -z "${TRAVIS+x}" ] ; then
 	out=$(${SCRIPT} -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is)
-	echo "${out}"
 	EXIT_CODE=$?
+	echo "DEBUG TEST: code = $EXIT_CODE, out=${out}"
 	if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
-	    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
-	else
 	    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
+	else
+	    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 	fi
     else
 	echo "Skipping XMPP tests on Travis CI"
