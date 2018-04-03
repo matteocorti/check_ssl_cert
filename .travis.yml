@@ -8,3 +8,5 @@ os:
 script:
     - export SHUNIT2=$(pwd)/shunit2/shunit2
     - make test
+    - ./shell-ci-build.sh
+    
