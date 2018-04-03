@@ -368,10 +368,6 @@ testMultipleOCSPHosts() {
 #    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #}
 
-testUUUU() {
-    assertEquals "A" "B"
-}
-
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
