@@ -30,7 +30,7 @@ clean:
 	rm -rf rpmroot
 
 test:
-	( cd test && ./unit_tests.sh )
+	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && cd test && ./unit_tests.sh )
 
 rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
