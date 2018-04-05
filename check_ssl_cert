@@ -944,10 +944,21 @@ main() {
     
     # curl
     if [ -z "${CURL_BIN}" ] ; then
-	 if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
-             check_required_prog curl
-             CURL_BIN=$PROG
-	 fi
+	if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LABS+ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary not specified"
+	    fi
+            check_required_prog curl
+            CURL_BIN=$PROG
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] cURL available: ${CURL_BIN}"
+	    fi
+	else
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LABS+ASSESSMENT}, OCSP = ${OCSP}"
+	    fi
+	fi
     fi
     
     # Expect (optional)
