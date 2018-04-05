@@ -185,7 +185,7 @@ testXMPPHost() {
     
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a C
-    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs C --rootcert cabundle.crt
+    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs A --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

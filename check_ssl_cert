@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.66.0b1
+VERSION=1.66.0b2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -946,7 +946,7 @@ main() {
     if [ -z "${CURL_BIN}" ] ; then
 	if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LABS+ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LABS_ASSESSMENT}, OCSP = ${OCSP}"
 		echo "[DBG] cURL binary not specified"
 	    fi
             check_required_prog curl
@@ -1718,11 +1718,15 @@ EOF
     if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
 
         if [ -n "${VERBOSE}" ] ; then
-            echo "Checking SSL Labs assestment"
+            echo "Checking SSL Labs assessment"
         fi
 
         while true; do
 
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] executing ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+            fi	    
+	    
             JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
             CURL_RETURN_CODE=$?
 
