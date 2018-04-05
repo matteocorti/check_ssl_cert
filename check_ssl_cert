@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.66.0b2
+VERSION=1.66.0b3
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -946,7 +946,7 @@ main() {
     if [ -z "${CURL_BIN}" ] ; then
 	if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LABS_ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_ASSESSMENT}, OCSP = ${OCSP}"
 		echo "[DBG] cURL binary not specified"
 	    fi
             check_required_prog curl
@@ -956,7 +956,7 @@ main() {
 	    fi
 	else
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LABS+ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LAB_ASSESSMENT}, OCSP = ${OCSP}"
 	    fi
 	fi
     fi
