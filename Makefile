@@ -2,8 +2,9 @@ PLUGIN=check_ssl_cert
 VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
+YEAR=`date +"%Y"`
 
-dist: version_check
+dist: version_check copyright_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)
@@ -17,7 +18,6 @@ install:
 	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
 
 version_check:
-	VERSION=`cat VERSION`
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%define\ version\ *$(VERSION)" $(PLUGIN).spec
 	grep -q -- "- $(VERSION)-" $(PLUGIN).spec
@@ -25,11 +25,17 @@ version_check:
 	grep -q "${VERSION}" NEWS
 	echo "Version check: OK"
 
+copyright_check:
+	grep -q "(c) Matteo Corti, 2007-$(YEAR)" README.md
+	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti" COPYRIGHT
+	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti <matteo@corti.li>" $(PLUGIN)
+	echo "Copyright year check: OK"
+
 clean:
 	rm -f *~
 	rm -rf rpmroot
 
-test:
+test: dist
 	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && cd test && ./unit_tests.sh )
 
 rpm: dist

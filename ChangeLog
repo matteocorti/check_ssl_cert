@@ -1,3 +1,7 @@
+2018-04-12  Matteo Corti  <matteo@corti.li>
+
+	* Makefile: Checks if the copyright year is correct. make test is now dependent on make dist
+
 2018-04-06  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Added UTF8 output
