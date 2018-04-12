@@ -1,7 +1,7 @@
 
  (c) Matteo Corti, ETH Zurich, 2007-2012
 
- (c) Matteo Corti, 2007-2017
+ (c) Matteo Corti, 2007-2018
 
   see AUTHORS for the complete list of contributors
 
