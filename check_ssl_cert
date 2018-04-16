@@ -107,7 +107,7 @@ usage() {
     echo "                              extension"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
-    echo "       --rsa                  cipher selection: force RSA authentication"
+    echo "      --rsa                   cipher selection: force RSA authentication"
     echo "      --terse                 terse output"
     echo "   -t,--timeout               seconds timeout after the specified time"
     echo "                              (defaults to 15 seconds)"
