@@ -107,7 +107,8 @@ usage() {
     echo "                              extension"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
-    echo "       --rsa                  cipher selection: force RSA authentication"
+    echo "      --rsa                   cipher selection: force RSA authentication"
+    echo "      --terse                 terse output"
     echo "   -t,--timeout               seconds timeout after the specified time"
     echo "                              (defaults to 15 seconds)"
     echo "      --temp dir              directory where to store the temporary files"
@@ -561,6 +562,10 @@ main() {
                 ;;
             --ignore-ocsp)
                 OCSP=""
+                shift
+                ;;
+            --terse)
+                TERSE=1
                 shift
                 ;;
             -v|--verbose)
@@ -2135,7 +2140,12 @@ EOF
         DISPLAY_CN="'${CN}' "
     fi
 
-    echo "${SHORTNAME} OK - ${OPENSSL_COMMAND} ${SELFSIGNEDCERT}certificate ${DISPLAY_CN}${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+
+    if [ -n "${TERSE}" ]; then
+        echo "${SHORTNAME} OK ${CN} ${DAYS_VALID}"
+    else 
+        echo "${SHORTNAME} OK - ${OPENSSL_COMMAND} ${SELFSIGNEDCERT}certificate ${DISPLAY_CN}${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    fi
 
     exit 0
 
