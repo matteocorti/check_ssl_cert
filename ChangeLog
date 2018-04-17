@@ -1,3 +1,7 @@
+2018-04-17  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Merged the --terse patch, added performance data to the terse output and reordered the help
+
 2018-04-12  Matteo Corti  <matteo@corti.li>
 
 	* Makefile: Checks if the copyright year is correct. make test is now dependent on make dist

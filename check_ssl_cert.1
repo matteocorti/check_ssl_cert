@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "April, 2018" "1.66.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "April, 2018" "1.67.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -63,23 +63,23 @@ this help message
 .BR "   --ignore-exp"
 ignore expiration date
 .TP
-.BR "   --ignore-sig-alg"
-do not check if the certificate was signed with SHA1 or MD5
-.TP
 .BR "   --ignore-ocsp"
 do not check revocation with OCSP
 .TP
-.BR "-i,--issuer" " issuer"
-pattern to match the issuer of the certificate
+.BR "   --ignore-sig-alg"
+do not check if the certificate was signed with SHA1 or MD5
+.TP
+.BR "   --ignore-ssl-labs-cache"
+Forces a new check by SSL Labs (see -L)
 .TP
 .BR "   --issuer-cert-cache" " dir"
 directory where to store issuer certificates cache
 .TP
+.BR "-i,--issuer" " issuer"
+pattern to match the issuer of the certificate
+.TP
 .BR "-L,--check-ssl-labs grade"
 SSL Labs assestment (please check https://www.ssllabs.com/about/terms.html)
-.TP
-.BR "   --ignore-ssl-labs-cache"
-Forces a new check by SSL Labs (see -L)
 .TP
 .BR "   --long-output" " list"
 append the specified comma separated (no spaces) list of attributes to the plugin output on additional lines.
@@ -142,14 +142,14 @@ root certificate or directory to be used for certficate validation (passed to op
 .BR "   --rsa"
 cipher selection: force RSA authentication
 .TP
+.BR "   --temp" " dir"
+directory where to store the temporary files
+.TP
 .BR "   --terse"
 terse output (also see --verbose) 
 .TP
 .BR "-t,--timeout"
 seconds timeout after the specified time (defaults to 15 seconds)
-.TP
-.BR "   --temp" " dir"
-directory where to store the temporary files
 .TP
 .BR "   --tls1"
 force TLS version 1

@@ -68,3 +68,4 @@ Thanks:
 * Many thanks to Wim van Ravesteijn (https://github.com/wimvr) for the DER encoded CRL files patch
 * Many thanks to yasirathackersdotmu (https://github.com/yasirathackersdotmu)
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the curl patch
+* Many thanks to Dan Pritts for the --terse patch

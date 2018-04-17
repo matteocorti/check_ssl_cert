@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.66.0
+VERSION=1.67.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -56,9 +56,9 @@ usage() {
     echo "                              to issue a critical status"
     echo "      --curl-bin path         path of the curl binary to be used"
     echo "   -d,--debug                 produces debugging output"
+    echo "      --ecdsa                 cipher selection: force ECDSA authentication"
     echo "   -e,--email address         pattern to match the email address contained in the"
     echo "                              certificate"
-    echo "       --ecdsa                cipher selection: force ECDSA authentication"
     echo "   -f,--file file             local file path (works with -H localhost only)"
     echo "                              with -f you can not only pass a x509 certificate file"
     echo "                              but also a certificate revocation list (CRL) to check"
@@ -68,14 +68,14 @@ usage() {
     echo "      --force-perl-date       force the usage of Perl for date computations"
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
+    echo "      --ignore-ocsp           do not check revocation with OCSP"
     echo "      --ignore-sig-alg        do not check if the certificate was signed with SHA1"
     echo "                              or MD5"
-    echo "      --ignore-ocsp           do not check revocation with OCSP"
+    echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir directory where to store issuer certificates cache"
     echo "   -L,--check-ssl-labs grade  SSL Labs assessment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
-    echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "      --long-output list      append the specified comma separated (no spaces) list"
     echo "                              of attributes to the plugin output on additional lines"
     echo "                              Valid attributes are:"
@@ -108,10 +108,10 @@ usage() {
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
     echo "      --rsa                   cipher selection: force RSA authentication"
+    echo "      --temp dir              directory where to store the temporary files"
     echo "      --terse                 terse output"
     echo "   -t,--timeout               seconds timeout after the specified time"
     echo "                              (defaults to 15 seconds)"
-    echo "      --temp dir              directory where to store the temporary files"
     echo "      --tls1                  force TLS version 1"
     echo "      --tls1_1                force TLS version 1.1"
     echo "      --tls1_2                force TLS version 1.2"
@@ -2142,7 +2142,7 @@ EOF
 
 
     if [ -n "${TERSE}" ]; then
-        echo "${SHORTNAME} OK ${CN} ${DAYS_VALID}"
+        echo "${SHORTNAME} OK ${CN} ${DAYS_VALID}${PERFORMANCE_DATA}"
     else 
         echo "${SHORTNAME} OK - ${OPENSSL_COMMAND} ${SELFSIGNEDCERT}certificate ${DISPLAY_CN}${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
     fi

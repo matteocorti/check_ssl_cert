@@ -15,7 +15,8 @@ A Nagios plugin to check an X.509 certificate:
 ## Usage
 
 ```
-check_ssl_cert -H host [OPTIONS]
+
+Usage: check_ssl_cert -H host [OPTIONS]
 
 Arguments:
    -H,--host host             server
@@ -30,9 +31,9 @@ Options:
                               to issue a critical status
       --curl-bin path         path of the curl binary to be used
    -d,--debug                 produces debugging output
+      --ecdsa                 cipher selection: force ECDSA authentication
    -e,--email address         pattern to match the email address contained in the
                               certificate
-       --ecdsa                cipher selection: force ECDSA authentication
    -f,--file file             local file path (works with -H localhost only)
                               with -f you can not only pass a x509 certificate file
                               but also a certificate revocation list (CRL) to check
@@ -42,14 +43,14 @@ Options:
       --force-perl-date       force the usage of Perl for date computations
    -h,--help,-?               this help message
       --ignore-exp            ignore expiration date
+      --ignore-ocsp           do not check revocation with OCSP
       --ignore-sig-alg        do not check if the certificate was signed with SHA1
                               or MD5
-      --ignore-ocsp           do not check revocation with OCSP
+      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)
    -i,--issuer issuer         pattern to match the issuer of the certificate
       --issuer-cert-cache dir directory where to store issuer certificates cache
-   -L,--check-ssl-labs grade  SSL Labs assestment
+   -L,--check-ssl-labs grade  SSL Labs assessment
                               (please check https://www.ssllabs.com/about/terms.html)
-      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)
       --long-output list      append the specified comma separated (no spaces) list
                               of attributes to the plugin output on additional lines
                               Valid attributes are:
@@ -67,36 +68,41 @@ Options:
    -o,--org org               pattern to match the organization of the certificate
       --openssl path          path of the openssl binary to be used
    -p,--port port             TCP port
-   -P,--protocol protocol     use the specific protocol {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
+   -P,--protocol protocol     use the specific protocol
+                              {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
                               http:                    default
                               smtp,pop3,imap,ftp,ldap: switch to TLS
    -s,--selfsigned            allows self-signed certificates
       --serial serialnum      pattern to match the serial number
-      --ssl2                  force SSL version 2
-      --ssl3                  force SSL version 3
-      --require-san           require the presence of a Subject Alternative Name extension
+      --sni name              sets the TLS SNI (Server Name Indication) extension
+                              in the ClientHello message to 'name'
+      --ssl2                  forces SSL version 2
+      --ssl3                  forces SSL version 3
+      --require-san           require the presence of a Subject Alternative Name
+                              extension
    -r,--rootcert path         root certificate or directory to be used for
                               certificate validation
       --rsa                   cipher selection: force RSA authentication
+      --temp dir              directory where to store the temporary files
       --terse                 terse output
    -t,--timeout               seconds timeout after the specified time
                               (defaults to 15 seconds)
-      --temp dir              directory where to store the temporary files
       --tls1                  force TLS version 1
       --tls1_1                force TLS version 1.1
       --tls1_2                force TLS version 1.2
+      --tls1_3                force TLS version 1.3
    -v,--verbose               verbose output
    -V,--version               version
    -w,--warning days          minimum number of days a certificate has to be valid
                               to issue a warning status
+      --xmpphost name         specifies the host for the 'to' attribute of the stream element
 
 Deprecated options:
-   -d,--days days             minimum number of days a certificate has to be valid
+      --days days             minimum number of days a certificate has to be valid
                               (see --critical and --warning)
       --ocsp                  check revocation via OCSP
    -S,--ssl version           force SSL version (2,3)
                               (see: --ssl2 or --ssl3)
-
 ```
 
 ## Expect
