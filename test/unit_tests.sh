@@ -368,6 +368,13 @@ testMultipleOCSPHosts() {
 #    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #}
 
+testFormatShort() {
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong output" "SSL_CERT OK www.ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
