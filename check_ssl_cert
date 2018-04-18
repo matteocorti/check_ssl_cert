@@ -435,7 +435,7 @@ add_performance_data() {
 #   $1 variable name (e.g. SHORTNAME)
 #   $2 variable value (e.g. SSL_CERT)
 var_for_sed() {
-    echo "s|%$1%|`echo \"$2\" | sed -e 's#|#\\\\|#g'`|g"
+    echo "s|%$1%|$( echo "$2" | sed -e 's#|#\\\\|#g' )|g"
 }
 
 ################################################################################
@@ -2174,18 +2174,17 @@ EOF
         EXTRA_OUTPUT="${PERFORMANCE_DATA}${LONG_OUTPUT}"
     fi
 
-    echo -n "$FORMAT" | sed \
-        -e "`var_for_sed CA_ISSUER_MATCHED \"${CA_ISSUER_MATCHED}\"`" \
-        -e "`var_for_sed CHECKEDNAMES \"${CHECKEDNAMES}\"`" \
-        -e "`var_for_sed CN \"${CN}\"`" \
-        -e "`var_for_sed DATE \"${DATE}\"`" \
-        -e "`var_for_sed DAYS_VALID \"${DAYS_VALID}\"`" \
-        -e "`var_for_sed DISPLAY_CN \"${DISPLAY_CN}\"`" \
-        -e "`var_for_sed OPENSSL_COMMAND \"${OPENSSL_COMMAND}\"`" \
-        -e "`var_for_sed SELFSIGNEDCERT \"${SELFSIGNEDCERT}\"`" \
-        -e "`var_for_sed SHORTNAME \"${SHORTNAME}\"`" \
-        -e "`var_for_sed SSL_LABS_HOST_GRADE \"${SSL_LABS_HOST_GRADE}\"`"
-    echo "$EXTRA_OUTPUT"
+    echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
+        -e "$( var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}" )" \
+        -e "$( var_for_sed CHECKEDNAMES "${CHECKEDNAMES}" )" \
+        -e "$( var_for_sed CN "${CN}" )" \
+        -e "$( var_for_sed DATE "${DATE}" )" \
+        -e "$( var_for_sed DAYS_VALID "${DAYS_VALID}" )" \
+        -e "$( var_for_sed DISPLAY_CN "${DISPLAY_CN}" )" \
+        -e "$( var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}" )" \
+        -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
+        -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
+        -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
 
     exit 0
 
