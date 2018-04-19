@@ -66,6 +66,8 @@ usage() {
     echo "      --file-bin path         path of the file binary to be used"
     echo "      --fingerprint SHA1      pattern to match the SHA1-Fingerprint"
     echo "      --force-perl-date       force the usage of Perl for date computations"
+    echo "      --format FORMAT         format output template on success, for example"
+    echo "                              \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
     echo "   -h,--help,-?               this help message"
     echo "      --ignore-exp            ignore expiration date"
     echo "      --ignore-ocsp           do not check revocation with OCSP"
@@ -428,6 +430,15 @@ add_performance_data() {
 }
 
 ################################################################################
+# Prepares sed-style command for variable replacement
+# Params
+#   $1 variable name (e.g. SHORTNAME)
+#   $2 variable value (e.g. SSL_CERT)
+var_for_sed() {
+    echo "s|%$1%|$( echo "$2" | sed -e 's#|#\\\\|#g' )|g"
+}
+
+################################################################################
 # Main
 ################################################################################
 main() {
@@ -447,6 +458,7 @@ main() {
     FORCE_PERL_DATE=""
     REQUIRE_SAN=""
     OCSP="1" # enabled by default
+    FORMAT=""
 
     # Set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -625,6 +637,14 @@ main() {
                     shift 2
                 else
                     unknown "--file-bin requires an argument"
+                fi
+                ;;
+             --format)
+                if [ $# -gt 1 ]; then
+                    FORMAT="$2"
+                    shift 2
+                else
+                    unknown "-format requires an argument"
                 fi
                 ;;
             -H|--host)
@@ -2149,12 +2169,31 @@ EOF
         DISPLAY_CN="'${CN}' "
     fi
 
+    if [ -z "$FORMAT" ]; then
+        if [ -n "${TERSE}" ]; then
+            FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
+        else
+            FORMAT="%SHORTNAME% OK - %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%SSL_LABS_HOST_GRADE%"
+        fi
+    fi
 
     if [ -n "${TERSE}" ]; then
-        echo "${SHORTNAME} OK ${CN} ${DAYS_VALID}${PERFORMANCE_DATA}"
-    else 
-        echo "${SHORTNAME} OK - ${OPENSSL_COMMAND} ${SELFSIGNEDCERT}certificate ${DISPLAY_CN}${CHECKEDNAMES}from '${CA_ISSUER_MATCHED}' valid until ${DATE}${DAYS_VALID}${SSL_LABS_HOST_GRADE}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+        EXTRA_OUTPUT="${PERFORMANCE_DATA}"
+    else
+        EXTRA_OUTPUT="${PERFORMANCE_DATA}${LONG_OUTPUT}"
     fi
+
+    echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
+        -e "$( var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}" )" \
+        -e "$( var_for_sed CHECKEDNAMES "${CHECKEDNAMES}" )" \
+        -e "$( var_for_sed CN "${CN}" )" \
+        -e "$( var_for_sed DATE "${DATE}" )" \
+        -e "$( var_for_sed DAYS_VALID "${DAYS_VALID}" )" \
+        -e "$( var_for_sed DISPLAY_CN "${DISPLAY_CN}" )" \
+        -e "$( var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}" )" \
+        -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
+        -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
+        -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
 
     exit 0
 
