@@ -1,3 +1,7 @@
+2018-04-19  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Merged the SNI name check patch
+
 2018-04-17  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Merged the --terse patch, added performance data to the terse output and reordered the help

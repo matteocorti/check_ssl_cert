@@ -2104,6 +2104,15 @@ EOF
     fi
 
     ################################################################################
+    # Check if the supplied server name matched the delivered certificate
+    if [ -n "${SNI}" ]; then
+	NWCN=${CN#\*.}
+	if echo "${SNI}" | grep -qv "${NWCN}" ; then
+	    warning "SNI name {$SNI} does not match certificate name: ${CN}"
+	fi
+    fi
+    
+    ################################################################################
     # If we get this far, assume all is well. :)
 
     # If --altnames was specified or if the certificate is wildcard,

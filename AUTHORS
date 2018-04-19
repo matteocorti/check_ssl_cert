@@ -69,3 +69,5 @@ Thanks:
 * Many thanks to yasirathackersdotmu (https://github.com/yasirathackersdotmu)
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the curl patch
 * Many thanks to Dan Pritts for the --terse patch
+* Many thanks to eeertel (https://github.com/eeertel) for the SNI warning patch
+
