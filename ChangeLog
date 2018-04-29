@@ -1,3 +1,7 @@
+2018-04-29  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Remooved the SNI name check patch (see #78)
+
 2018-04-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Merged the SNI name check patch

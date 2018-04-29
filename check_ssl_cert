@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.67.0
+VERSION=1.68.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2121,15 +2121,6 @@ EOF
 
         fi
 
-    fi
-
-    ################################################################################
-    # Check if the supplied server name matched the delivered certificate
-    if [ -n "${SNI}" ]; then
-	NWCN=${CN#\*.}
-	if echo "${SNI}" | grep -qv "${NWCN}" ; then
-	    warning "SNI name {$SNI} does not match certificate name: ${CN}"
-	fi
     fi
     
     ################################################################################
