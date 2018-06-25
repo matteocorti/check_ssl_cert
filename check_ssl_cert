@@ -1188,6 +1188,13 @@ main() {
 
     fi
 
+    if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
+	OCSP_RESPONSE_TMP="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
+        if [ -z "${OCSP_RESPONSE_TMP}" ] || [ ! -w "${OCSP_RESPONSE_TMP}" ] ; then
+            unknown 'temporary file creation failure.'
+        fi
+    fi
+    
     if [ -n "${VERBOSE}" ] ; then
         echo "downloading certificate to ${TMPDIR}"
     fi
@@ -1204,7 +1211,7 @@ main() {
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
-    trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2' EXIT HUP INT QUIT TERM
+    trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2 OCSP_RESPONSE_TMP' EXIT HUP INT QUIT TERM
 
     fetch_certificate
 
@@ -1340,16 +1347,13 @@ main() {
        	    echo "checking OCSP stapling"
 	fi
 
-	OCSP_RESPONSE=$(
-	    echo QUIT |
-		openssl s_client -connect "${HOST}":"${PORT}" ${SERVERNAME} -status 2> /dev/null |
-		grep -A 17 'OCSP response:'
-		     )
+	exec_with_timeout "$TIMEOUT" "echo QUIT | openssl s_client -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
+
 	if [ -n "${DEBUG}" ] ; then
-	    echo "${OCSP_RESPONSE}" | sed 's/^/[DBG]\ /'
+	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
 	fi
 
-	if ! echo "${OCSP_RESPONSE}" | grep -q 'Next Update' ; then
+	if ! grep -q 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
 	    critical "OCSP stapling not enabled"
 	else
 	    if [ -n "${VERBOSE}" ] ; then
