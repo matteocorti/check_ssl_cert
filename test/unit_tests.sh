@@ -356,6 +356,12 @@ testMultipleOCSPHosts() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testRequireOCSP() {
+    ${SCRIPT} -H corti.li --rootcert cabundle.crt --require-ocsp-stapling
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 #testIPv4() {
 #    ${SCRIPT} -H 129.132.19.216 --sni www.ethz.ch
 #    EXIT_CODE=$?
