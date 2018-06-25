@@ -105,6 +105,7 @@ usage() {
     echo "                              in the ClientHello message to 'name'"
     echo "      --ssl2                  forces SSL version 2"
     echo "      --ssl3                  forces SSL version 3"
+    echo "      --require-ocsp-stapling require OCSP stapling"
     echo "      --require-san           require the presence of a Subject Alternative Name"
     echo "                              extension"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
@@ -457,6 +458,7 @@ main() {
     VERBOSE=""
     FORCE_PERL_DATE=""
     REQUIRE_SAN=""
+    REQUIRE_OCSP_STAPLING=""
     OCSP="1" # enabled by default
     FORMAT=""
 
@@ -772,6 +774,10 @@ main() {
                     unknown "--clientpass requires an argument"
                 fi
                 ;;
+            --require-ocsp-stapling)
+		REQUIRE_OCSP_STAPLING=1
+		shift
+		;;
             --require-san)
                 REQUIRE_SAN=1
                 shift
@@ -1327,6 +1333,32 @@ main() {
         OCSP=""
     fi
 
+    # Check OCSP stapling
+    if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
+	
+	if [ -n "${VERBOSE}" ] ; then
+       	    echo "checking OCSP stapling"
+	fi
+
+	OCSP_RESPONSE=$(
+	    echo QUIT |
+		openssl s_client -connect "${HOST}":"${PORT}" ${SERVERNAME} -status 2> /dev/null |
+		grep -A 17 'OCSP response:'
+		     )
+	if [ -n "${DEBUG}" ] ; then
+	    echo "${OCSP_RESPONSE}" | sed 's/^/[DBG]\ /'
+	fi
+
+	if ! echo "${OCSP_RESPONSE}" | grep -q 'Next Update' ; then
+	    critical "OCSP stapling not enabled"
+	else
+	    if [ -n "${VERBOSE}" ] ; then
+       		echo "  OCSP stapling enabled"
+	    fi
+	fi	    
+	
+    fi
+    
     # shellcheck disable=SC2086
     SIGNATURE_ALGORITHM="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
