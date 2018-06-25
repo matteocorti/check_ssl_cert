@@ -1,3 +1,4 @@
+2018-06-25 Version 1.69.0: Added an option to require OCSP stapling
 2018-04-29 Version 1.68.0: Removed the SNI name check
 2018-04-17 Version 1.67.0: Terse output, warning if the specified server name is not found in the certificate and --format option
 2018-04-06 Version 1.66.0: UTF-8 output

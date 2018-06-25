@@ -1,3 +1,7 @@
+2018-06-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added a check to require OCSP stapling
+
 2018-04-29  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Remooved the SNI name check patch (see #78)
