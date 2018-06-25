@@ -91,6 +91,7 @@ Options:
       --file-bin path         path of the file binary to be used
       --fingerprint SHA1      pattern to match the SHA1-Fingerprint
       --force-perl-date       force the usage of Perl for date computations
+      --format FORMAT         custom output format (e.g. "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'")
    -h,--help,-?               this help message
       --ignore-exp            ignore expiration date
       --ignore-sig-alg        do not check if the certificate was signed with SHA1
@@ -139,10 +140,12 @@ Options:
       --tls1                  force TLS version 1
       --tls1_1                force TLS version 1.1
       --tls1_2                force TLS version 1.2
+      --tls1_3                force TLS version 1.3
    -v,--verbose               verbose output
    -V,--version               version
    -w,--warning days          minimum number of days a certificate has to be valid
                               to issue a warning status
+      --xmpphost name         specifies the host for the 'to' attribute of the stream element
 
 Deprecated options:
       --days days             minimum number of days a certificate has to be valid
