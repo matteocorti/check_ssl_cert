@@ -140,6 +140,15 @@ usage() {
 }
 
 ################################################################################
+# Cleanup when exiting
+cleanup() {
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] cleaning up temporary files"
+    fi
+    rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2 $OCSP_RESPONSE_TMP
+}
+
+################################################################################
 # Exits with a critical message
 # Params
 #   $1 error message
@@ -1211,7 +1220,7 @@ main() {
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
-    trap 'rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2 OCSP_RESPONSE_TMP' EXIT HUP INT QUIT TERM
+    trap cleanup EXIT HUP INT QUIT TERM
 
     fetch_certificate
 

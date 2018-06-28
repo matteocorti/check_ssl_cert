@@ -1,3 +1,7 @@
+2018-06-28  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: fixed a bug in the deletion of temporary files when a signal is caught
+
 2018-06-25  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added a check to require OCSP stapling
