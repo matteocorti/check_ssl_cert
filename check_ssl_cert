@@ -145,7 +145,7 @@ cleanup() {
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] cleaning up temporary files"
     fi
-    rm -f $CERT $ERROR $ISSUER_CERT_TMP $ISSUER_CERT_TMP2 $OCSP_RESPONSE_TMP
+    rm -f "$CERT" "$ERROR" "$ISSUER_CERT_TMP" "$ISSUER_CERT_TMP2" "$OCSP_RESPONSE_TMP"
 }
 
 ################################################################################
