@@ -19,10 +19,15 @@
 ################################################################################
 # Constants
 
-VERSION=1.69.0
+VERSION=1.70.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
+
+SIGNALS="EXIT HUP INT QUIT TERM ABRT"
+
+# return value for the creation of temporary files
+TEMPFILE=""
 
 ################################################################################
 # Functions
@@ -157,8 +162,31 @@ cleanup() {
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] signal caught $SIGNAL"
 	echo "[DBG] cleaning up temporary files"
+	# shellcheck disable=SC2086
+	echo $TEMPORARY_FILES | tr '\ ' '\n' | sed 's/^/[DBG]   /'
+    fi    
+    # shellcheck disable=SC2086
+    rm $TEMPORARY_FILES
+    # shellcheck disable=SC2086
+    trap - $SIGNALS
+    exit
+}
+
+create_temporary_file() {
+
+    # create a temporary file
+    TEMPFILE="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
+    if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
+        unknown 'temporary file creation failure.'
     fi
-    rm -f "$CERT" "$ERROR" "$ISSUER_CERT_TMP" "$ISSUER_CERT_TMP2" "$OCSP_RESPONSE_TMP"
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] temporary file $TEMPFILE created"
+    fi
+    
+    # add the file to the list of temporary files
+    TEMPORARY_FILES="$TEMPORARY_FILES $TEMPFILE"
+    
 }
 
 ################################################################################
@@ -1187,34 +1215,18 @@ main() {
     # Fetch the X.509 certificate
 
     # Temporary storage for the certificate and the errors
-    CERT="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-    if [ -z "${CERT}" ] || [ ! -w "${CERT}" ] ; then
-        unknown 'temporary file creation failure.'
-    fi
-
-    ERROR="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-    if [ -z "${ERROR}" ] || [ ! -w "${ERROR}" ] ; then
-        unknown 'temporary file creation failure.'
-    fi
+    create_temporary_file; CERT=$TEMPFILE
+    create_temporary_file; ERROR=$TEMPFILE
 
     if [ -n "${OCSP}" ] ; then
 
-        ISSUER_CERT_TMP="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-        if [ -z "${ISSUER_CERT_TMP}" ] || [ ! -w "${ISSUER_CERT_TMP}" ] ; then
-            unknown 'temporary file creation failure.'
-        fi
-        ISSUER_CERT_TMP2="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-        if [ -z "${ISSUER_CERT_TMP2}" ] || [ ! -w "${ISSUER_CERT_TMP2}" ] ; then
-            unknown 'temporary file creation failure.'
-        fi
+	create_temporary_file; ISSUER_CERT_TMP=$TEMPFILE
+	create_temporary_file; ISSUER_CERT_TMP2=$TEMPFILE
 
     fi
 
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
-	OCSP_RESPONSE_TMP="$( mktemp -t "${0##*/}XXXXXX" 2> /dev/null )"
-        if [ -z "${OCSP_RESPONSE_TMP}" ] || [ ! -w "${OCSP_RESPONSE_TMP}" ] ; then
-            unknown 'temporary file creation failure.'
-        fi
+	create_temporary_file; OCSP_RESPONSE_TMP=$TEMPFILE
     fi
     
     if [ -n "${VERBOSE}" ] ; then
@@ -1233,7 +1245,8 @@ main() {
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
-    trap_with_arg cleanup EXIT HUP INT QUIT TERM
+    # shellcheck disable=SC2086
+    trap_with_arg cleanup $SIGNALS
 
     fetch_certificate
 
