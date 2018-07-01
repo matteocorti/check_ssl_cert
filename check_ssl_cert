@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.71.0
+VERSION=1.72.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -156,17 +156,25 @@ trap_with_arg() {
 }
 
 ################################################################################
-# Cleanup when exiting
-cleanup() {
-    SIGNAL=$1
+# Cleanup temporary files
+remove_temporary_files() {
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] signal caught $SIGNAL"
 	echo "[DBG] cleaning up temporary files"
 	# shellcheck disable=SC2086
 	echo $TEMPORARY_FILES | tr '\ ' '\n' | sed 's/^/[DBG]   /'
     fi    
     # shellcheck disable=SC2086
     rm $TEMPORARY_FILES
+}
+
+################################################################################
+# Cleanup when exiting
+cleanup() {
+    SIGNAL=$1
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] signal caught $SIGNAL"
+    fi
+    remove_temporary_files
     # shellcheck disable=SC2086
     trap - $SIGNALS
     exit
@@ -197,6 +205,7 @@ critical() {
     if [ -n "${HOST}" ] ; then
         tmp=" ${HOST}"
     fi
+    remove_temporary_files
     printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 2
 }
@@ -209,6 +218,7 @@ warning() {
     if [ -n "${HOST}" ] ; then
         tmp=" ${HOST}"
     fi
+    remove_temporary_files
     printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 1
 }
@@ -221,6 +231,7 @@ unknown() {
     if [ -n "${HOST}" ] ; then
         tmp=" ${HOST}"
     fi
+    remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     exit 3
 }
@@ -2256,6 +2267,8 @@ EOF
         -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
         -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
         -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
+
+    remove_temporary_files
 
     exit 0
 

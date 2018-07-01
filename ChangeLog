@@ -1,6 +1,7 @@
-2018-07-01  Matteo Corti  <corti@mac-mini-1.home>
+2018-07-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: do not trap on EXIT
+	* check_ssl_cert: remove temporary file when no signals are trapped
 
 2018-06-28  Matteo Corti  <matteo@corti.li>
 
