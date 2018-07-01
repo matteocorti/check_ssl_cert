@@ -19,12 +19,12 @@
 ################################################################################
 # Constants
 
-VERSION=1.70.0
+VERSION=1.71.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
 
-SIGNALS="EXIT HUP INT QUIT TERM ABRT"
+SIGNALS="HUP INT QUIT TERM ABRT"
 
 # return value for the creation of temporary files
 TEMPFILE=""
