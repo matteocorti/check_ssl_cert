@@ -14,7 +14,7 @@
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
-# See the LICENSE file for details. 
+# See the LICENSE file for details.
 
 ################################################################################
 # Constants
@@ -159,12 +159,14 @@ trap_with_arg() {
 # Cleanup temporary files
 remove_temporary_files() {
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] cleaning up temporary files"
-	# shellcheck disable=SC2086
-	echo $TEMPORARY_FILES | tr '\ ' '\n' | sed 's/^/[DBG]   /'
-    fi    
+        echo "[DBG] cleaning up temporary files"
+        # shellcheck disable=SC2086
+        echo $TEMPORARY_FILES | tr '\ ' '\n' | sed 's/^/[DBG]   /'
+    fi
     # shellcheck disable=SC2086
-    rm $TEMPORARY_FILES
+    if [ -n "$TEMPORARY_FILES" ]; then
+        rm -f $TEMPORARY_FILES
+    fi
 }
 
 ################################################################################
@@ -191,10 +193,10 @@ create_temporary_file() {
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] temporary file $TEMPFILE created"
     fi
-    
+
     # add the file to the list of temporary files
     TEMPORARY_FILES="$TEMPORARY_FILES $TEMPFILE"
-    
+
 }
 
 ################################################################################
@@ -389,14 +391,14 @@ fetch_certificate() {
 	   if [ -n "${DEBUG}" ] ; then
                echo "[DBG] adding brackets to ${HOST}"
 	   fi
-	   HOST="[${HOST}]"	   
+	   HOST="[${HOST}]"
        fi
     else
        if [ -n "${DEBUG}" ] ; then
            echo "[DBG] ${HOST} is not an IP address"
        fi
     fi
-    
+
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
 
@@ -630,7 +632,7 @@ main() {
             --tls1_3)
                 SSL_VERSION="-tls1_3"
                 shift
-                ;;                
+                ;;
             --ocsp)
                 # deprecated
                 shift
@@ -1033,7 +1035,7 @@ main() {
         check_required_prog file
         FILE_BIN=$PROG
     fi
-    
+
     # curl
     if [ -z "${CURL_BIN}" ] ; then
 	if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
@@ -1052,7 +1054,7 @@ main() {
 	    fi
 	fi
     fi
-    
+
     # Expect (optional)
     EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
@@ -1144,7 +1146,7 @@ main() {
         echo "[DBG] OpenSSL binary: ${OPENSSL}"
         echo "[DBG] OpenSSL version: $( ${OPENSSL} version )"
 
-	OPENSSL_DIR="$( ${OPENSSL} version -d | sed -E 's/OPENSSLDIR: "([^"]*)"/\1/' )"	
+	OPENSSL_DIR="$( ${OPENSSL} version -d | sed -E 's/OPENSSLDIR: "([^"]*)"/\1/' )"
 
 	echo "[DBG] OpenSSL configuration directory: ${OPENSSL_DIR}"
 
@@ -1155,7 +1157,7 @@ main() {
 	    DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/certs )"
 	fi
 	echo "[DBG] ${DEFAULT_CA} root certificates installed by default"
-	
+
         echo "[DBG] System info: $( uname -a )"
         echo "[DBG] Date computation: ${DATETYPE}"
     fi
@@ -1205,9 +1207,9 @@ main() {
 	if [ -n "${XMPPHOST}" ] ; then
 	    unknown " s_client' does not support '-xmpphost'"
 	fi
-	
+
 	XMPPHOST=
-	
+
         if [ -n "${VERBOSE}" ] ; then
             echo "'${OPENSSL} s_client' does not support '-xmpphost': disabling 'to' attribute"
         fi
@@ -1219,9 +1221,9 @@ main() {
     if [ -n "${SSL_VERSION}" ] ; then
 	if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${SSL_VERSION}" ; then
 	    unknown "OpenSSL does not support the ${SSL_VERSION} version"
-	fi    
+	fi
     fi
-    
+
     ################################################################################
     # Fetch the X.509 certificate
 
@@ -1239,7 +1241,7 @@ main() {
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
 	create_temporary_file; OCSP_RESPONSE_TMP=$TEMPFILE
     fi
-    
+
     if [ -n "${VERBOSE}" ] ; then
         echo "downloading certificate to ${TMPDIR}"
     fi
@@ -1354,10 +1356,10 @@ main() {
         SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
 
         SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
-	
+
 	FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
-	# TO DO: we just take the first result: a loop over all the hosts should 
+	# TO DO: we just take the first result: a loop over all the hosts should
 	# shellcheck disable=SC2086
         OCSP_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
     fi
@@ -1388,7 +1390,7 @@ main() {
 
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
-	
+
 	if [ -n "${VERBOSE}" ] ; then
        	    echo "checking OCSP stapling"
 	fi
@@ -1405,10 +1407,10 @@ main() {
 	    if [ -n "${VERBOSE}" ] ; then
        		echo "  OCSP stapling enabled"
 	    fi
-	fi	    
-	
+	fi
+
     fi
-    
+
     # shellcheck disable=SC2086
     SIGNATURE_ALGORITHM="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
@@ -1540,7 +1542,7 @@ EOF
 
     ################################################################################
     # Check the presence of a subjectAlternativeName (required for Chrome)
-    
+
     # shellcheck disable=SC2086
     SUBJECT_ALTERNATIVE_NAME=$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
            grep --after-context=1 "509v3 Subject Alternative Name:" |
@@ -1843,8 +1845,8 @@ EOF
 
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] executing ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
-            fi	    
-	    
+            fi
+
             JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
             CURL_RETURN_CODE=$?
 
@@ -2204,7 +2206,7 @@ EOF
         fi
 
     fi
-    
+
     ################################################################################
     # If we get this far, assume all is well. :)
 
