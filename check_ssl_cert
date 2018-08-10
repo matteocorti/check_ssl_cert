@@ -2062,7 +2062,7 @@ EOF
             echo "[DBG] OCSP: host = ${OCSP_HOST}"
         fi
 
-	if [ -n "{OCSP_HOST}" ] ; then
+	if [ -n "${OCSP_HOST}" ] ; then
 
             # check if -header is supported
             OCSP_HEADER=""
