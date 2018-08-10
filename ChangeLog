@@ -1,3 +1,11 @@
+2018-08-10  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: disabling OCSP checks if no OCSP host is found
+
+2018-07-20  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Applied a patch from Markus Frosch to fix the cleanup of temporary files
+
 2018-07-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: do not trap on EXIT
