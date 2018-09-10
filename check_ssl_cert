@@ -435,7 +435,7 @@ fetch_certificate() {
 
     else
 
-        exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -1348,29 +1348,49 @@ main() {
         SERIAL=0
         OCSP_URI=""
         VALID_ATTRIBUTES=",lastupdate,nextupdate,issuer,"
+        # shellcheck disable=SC2086
+        ISSUERS="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout)"
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
-        CN="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb |
+        # shellcheck disable=SC2086
+        CN="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
-        SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout -nameopt utf8,oneline,-esc_msb)"
+        # shellcheck disable=SC2086
+        SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"
 
         SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
 
-	FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
+        FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
-	# TO DO: we just take the first result: a loop over all the hosts should
-	# shellcheck disable=SC2086
+        # TO DO: we just take the first result: a loop over all the hosts should
+        # shellcheck disable=SC2086
         OCSP_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
+
+        # count the certificates in the chain
+        NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+
+        # start with first certificate
+        CERT_IN_CHAIN=1
+        # shellcheck disable=SC2086
+        while [ $CERT_IN_CHAIN -le $NUM_CERTIFICATES ]; do
+            if [ -n "$ISSUERS" ]; then
+                ISSUERS="$ISSUERS\n"
+            fi
+            # shellcheck disable=SC2086
+            ISSUERS="$ISSUERS$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
+                               awk -v n=$CERT_IN_CHAIN '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' | \
+                               $OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
+
+            CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
+        done
     fi
 
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    CA_O="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout | sed -e "s/^.*\\/O=//" -e "s/^.*, O = //" -e "s/\\/[A-Z][A-Z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
-    # shellcheck disable=SC2086
-    CA_CN="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout  | sed -e "s/^.*\\/CN=//" -e "s/^.*, CN = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Z][A-Z]* =.*\$//")"
+    ISSUERS=$(echo "$ISSUERS" | sed 's/\\n/\n/g' | sed -e "s/^.*\\/CN=//" -e "s/^.* CN = //" -e "s/^.*, O = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Za-z][A-Za-z]* =.*\$//")
 
     # we just consider the first URI
     # shellcheck disable=SC2086
@@ -1417,10 +1437,12 @@ main() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ${SUBJECT}"
         echo "[DBG] CN         = ${CN}"
-        echo "[DBG] CA_O       = ${CA_O}"
-        echo "[DBG] CA_CN      = ${CA_CN}"
+        # shellcheck disable=SC2162
+        echo "$ISSUERS" | while read LINE; do
+            echo "[DBG] CA         = ${LINE}"
+        done
         echo "[DBG] SERIAL     = ${SERIAL}"
-	echo "[DBG] FINGERPRINT= ${FINGERPRINT}"
+        echo "[DBG] FINGERPRINT= ${FINGERPRINT}"
         echo "[DBG] OCSP_URI   = ${OCSP_URI}"
         echo "[DBG] ISSUER_URI = ${ISSUER_URI}"
         echo "[DBG] ${SIGNATURE_ALGORITHM}"
@@ -1716,25 +1738,18 @@ EOF
         fi
 
         ok=""
-        CA_ISSUER_MATCHED=""
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep "^${ISSUER}\$" | head -n1)
 
-        if echo "${CA_CN}" | grep -q "^${ISSUER}\$" ; then
+        if [ -n "${CA_ISSUER_MATCHED}" ]; then
             ok="true"
-            CA_ISSUER_MATCHED="${CA_CN}"
-        fi
-
-        if echo "${CA_O}" | grep -q "^${ISSUER}\$" ; then
-            ok="true"
-            CA_ISSUER_MATCHED="${CA_O}"
-        fi
-
-        if [ -z "${ok}" ] ; then
-            critical "invalid CA ('${ISSUER}' does not match '${CA_O}' or '${CA_CN}')"
+        else
+            # this looks ugly but preserves spaces in CA name
+            critical "invalid CA ('${ISSUER}' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\' or \'/g")')"
         fi
 
     else
 
-        CA_ISSUER_MATCHED="${CA_CN}"
+        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | head -n1)"
 
     fi
 

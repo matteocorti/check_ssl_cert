@@ -88,6 +88,12 @@ testETHZWildCardSubCaseInsensitive() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
+testRootIssuer() {
+    ${SCRIPT} --rootcert cabundle.crt -H google.com --issuer GlobalSign
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+}
+
 testValidity() {
     # Tests bug #8
     ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000
