@@ -1483,6 +1483,8 @@ main() {
             check_attr "${attribute}"
         done
 
+        LONG_OUTPUT="$(echo "$LONG_OUTPUT" | sed 's/\\n/\n/g')"
+
     fi
 
     ################################################################################
