@@ -966,7 +966,7 @@ main() {
 
     if [ -n "${CRITICAL}" ] ; then
 
-        if ! echo "${CRITICAL}" | grep -q '[0-9][0-9]*' ; then
+        if ! echo "${CRITICAL}" | grep -q '^[0-9][0-9]*$' ; then
             unknown "invalid number of days ${CRITICAL}"
         fi
 
@@ -974,7 +974,7 @@ main() {
 
     if [ -n "${WARNING}" ] ; then
 
-        if ! echo "${WARNING}" | grep -q '[0-9][0-9]*' ; then
+        if ! echo "${WARNING}" | grep -q '^[0-9][0-9]*$' ; then
             unknown "invalid number of days ${WARNING}"
         fi
 
