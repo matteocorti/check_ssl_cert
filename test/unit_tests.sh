@@ -191,14 +191,14 @@ testETHZWithSSLLabs() {
 }
 
 testTimeOut() {
-    ${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol imap --port 993 --timeout  1
+    ${SCRIPT} --rootcert cabundle.crt -H gmail.com --protocol imap --port 993 --timeout  1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIMAP() {
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} --rootcert cabundle.crt -H corti.li --port 993
+	${SCRIPT} --rootcert cabundle.crt -H imap.gmail.com --port 993
 	EXIT_CODE=$?
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -208,7 +208,7 @@ testIMAP() {
 
 testSMTP() {
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} --rootcert cabundle.crt -H corti.li --protocol smtp --port 25 --timeout 60
+	${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
 	EXIT_CODE=$?
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -357,7 +357,7 @@ testMultipleOCSPHosts() {
 }
 
 testRequireOCSP() {
-    ${SCRIPT} -H corti.li --rootcert cabundle.crt --require-ocsp-stapling
+    ${SCRIPT} -H videolan.org --rootcert cabundle.crt --require-ocsp-stapling
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
