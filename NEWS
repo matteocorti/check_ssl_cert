@@ -1,4 +1,8 @@
-Fixed a bug in the cleanup of temporary files, fixed a bug with certificates without OCSP
+2018-09-10 Version 1.73.0: Fixed a bug in the cleanup of temporary files, fixed a bug with certificates without OCSP
+                           Fixed tests with more reliable hosts
+                           Allows to check against all the issuers in the CA chain
+                           Fixed a bug with --long-output on Linux
+			   Fixed the validation of --critical and --warning
 2018-07-01 Version 1.72.0: Corrected a bug introduced in 1.71.0: remove temporary files
 2018-07-01 Version 1.71.0: Corrected a bug introduced in 1.70.0: wrong exit codes
 2018-06-28 Version 1.70.0: Improved the management of temporary files

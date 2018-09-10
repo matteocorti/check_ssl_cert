@@ -1,4 +1,4 @@
-%define version          1.72.0
+%define version          1.73.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -45,6 +45,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Mon Sep 10 2018 Matteo Corti <matteo@corti.li> - 1.73.0-0
+- Updated to 1.73.0
+
 * Sun Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.72.0-0
 - Updated to 1.72.0
 
