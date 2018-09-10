@@ -1356,6 +1356,7 @@ main() {
         CN="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
+        # shellcheck disable=SC2086
         SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"
 
         SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
@@ -1436,7 +1437,7 @@ main() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ${SUBJECT}"
         echo "[DBG] CN         = ${CN}"
-        # shellcheck disable=SC2086
+        # shellcheck disable=SC2162
         echo "$ISSUERS" | while read LINE; do
             echo "[DBG] CA         = ${LINE}"
         done
