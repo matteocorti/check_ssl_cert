@@ -2265,7 +2265,7 @@ EOF
     if [ -n "${TERSE}" ]; then
         EXTRA_OUTPUT="${PERFORMANCE_DATA}"
     else
-        EXTRA_OUTPUT="${PERFORMANCE_DATA}${LONG_OUTPUT}"
+        EXTRA_OUTPUT="${LONG_OUTPUT}${PERFORMANCE_DATA}"
     fi
 
     echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
