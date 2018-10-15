@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.73.0
+VERSION=1.74.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -264,15 +264,25 @@ exec_with_timeout() {
 
         eval "${TIMEOUT_BIN} $time $command" > /dev/null 2>&1
 
-        if [ $? = 137 ] ; then
+        if [ $? -eq 137 ] ; then
             critical "Timeout after ${time} seconds"
         fi
 
     elif [ -n "${EXPECT}" ] ; then
 
+        if [ -n "${DEBUG}" ] ; then
+            echo "[DBG]   expect -c \"set echo \\\"-noecho\\\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }\""
+        fi
+	
         expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"
 
-        if [ $? = 1 ] ; then
+	RET=$?
+
+        if [ -n "${DEBUG}" ] ; then
+            echo "[DBG]   expect returned ${RET}"
+        fi	
+	
+        if [ "${RET}" -eq 1 ] ; then
             critical "Timeout after ${time} seconds"
         fi
 

@@ -1,3 +1,7 @@
+2018-10-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (exec_with_timeout): fixed the check on the the return value
+
 2018-08-10  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: disabling OCSP checks if no OCSP host is found
