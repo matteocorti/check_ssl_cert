@@ -81,6 +81,7 @@ usage() {
     echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir directory where to store issuer certificates cache"
+    echo "   -K,--clientkey path        use client certificate key to authenticate"
     echo "   -L,--check-ssl-labs grade  SSL Labs assessment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
     echo "      --long-output list      append the specified comma separated (no spaces) list"
@@ -839,6 +840,14 @@ main() {
                     unknown "-c,--clientcert requires an argument"
                 fi
                 ;;
+            -K|--clientkey)
+                if [ $# -gt 1 ]; then
+                    CLIENT_KEY="$2"
+                    shift 2
+                else
+                    unknown "-K,--clientkey requires an argument"
+                fi
+                ;;
             --clientpass)
                 if [ $# -gt 1 ]; then
                     CLIENT_PASS="$2"
@@ -970,6 +979,14 @@ main() {
 
         if [ ! -r "${CLIENT_CERT}" ] ; then
             unknown "Cannot read client certificate ${CLIENT_CERT}"
+        fi
+
+    fi
+
+    if [ -n "${CLIENT_KEY}" ] ; then
+
+        if [ ! -r "${CLIENT_KEY}" ] ; then
+            unknown "Cannot read client certificate key ${CLIENT_KEY}"
         fi
 
     fi
@@ -1259,6 +1276,9 @@ main() {
     CLIENT=""
     if [ -n "${CLIENT_CERT}" ] ; then
         CLIENT="-cert ${CLIENT_CERT}"
+    fi
+    if [ -n "${CLIENT_KEY}" ] ; then
+        CLIENT="${CLIENT} -key ${CLIENT_KEY}"
     fi
 
     CLIENTPASS=""
