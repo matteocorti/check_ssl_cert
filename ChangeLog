@@ -1,3 +1,7 @@
+2018-10-18  eimamagi  <https://github.com/eimamagi>
+
+	* check_ssl_cert: Allow to specify a client certificate key
+
 2018-10-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): fixed the check on the the return value

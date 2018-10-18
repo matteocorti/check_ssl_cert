@@ -1,3 +1,4 @@
+2018-10-18 Version 1.75.0: Allow to specify a client certificate key
 2018-10-15 Version 1.74.0: Fixed a bug generating a confusing error message on timeout
 2018-09-10 Version 1.73.0: Fixed a bug in the cleanup of temporary files, fixed a bug with certificates without OCSP
                            Fixed tests with more reliable hosts

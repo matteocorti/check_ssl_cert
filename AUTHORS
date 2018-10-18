@@ -73,3 +73,4 @@ Thanks:
 * Many thanks to Vojtech Horky (https://github.com/vhotspur) for the --format patch
 * Many thanks to Markus Frosch (https://github.com/lazyfrosch) for the cleanup patch
 * Many thanks to Ricardo Bartels (https://github.com/bb-Ricardo) for the patches fixing unit tests, long output on Linux, extending the issuer checks to the whole chain
+* Many thanks to eimamagi (https://github.com/eimamagi) for the client key patch
