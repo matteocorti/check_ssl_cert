@@ -445,8 +445,8 @@ fetch_certificate() {
         fi
 
     else
-
-        exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+	
+        exec_with_timeout "$TIMEOUT" "echo '${HTTP_REQUEST}' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -1252,6 +1252,15 @@ main() {
     fi
 
     ################################################################################
+    # define the HTTP request string
+    if [ -n "${SNI}" ]; then
+        HOST_HEADER="${SNI}"
+    else
+        HOST_HEADER="${HOST}"
+    fi
+    HTTP_REQUEST="HEAD / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
+    
+    ################################################################################
     # Fetch the X.509 certificate
 
     # Temporary storage for the certificate and the errors
@@ -1445,7 +1454,7 @@ main() {
        	    echo "checking OCSP stapling"
 	fi
 
-	exec_with_timeout "$TIMEOUT" "echo QUIT | openssl s_client -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
+	exec_with_timeout "$TIMEOUT" "echo '${HTTP_REQUEST}' | openssl s_client -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
 
 	if [ -n "${DEBUG}" ] ; then
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
