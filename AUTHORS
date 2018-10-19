@@ -74,3 +74,4 @@ Thanks:
 * Many thanks to Markus Frosch (https://github.com/lazyfrosch) for the cleanup patch
 * Many thanks to Ricardo Bartels (https://github.com/bb-Ricardo) for the patches fixing unit tests, long output on Linux, extending the issuer checks to the whole chain
 * Many thanks to eimamagi (https://github.com/eimamagi) for the client key patch
+* Many thanks to Stefan Schlesinger for the HTTP_REQUEST patch
