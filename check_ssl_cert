@@ -116,6 +116,8 @@ usage() {
     echo "                              extension"
     echo "   -r,--rootcert path         root certificate or directory to be used for"
     echo "                              certificate validation"
+    echo "      --rootcert-dir path     root directory to be used for certificate validation"
+    echo "      --rootcert-file path    root certificate to be used for certificate validation"
     echo "      --rsa                   cipher selection: force RSA authentication"
     echo "      --temp dir              directory where to store the temporary files"
     echo "      --terse                 terse output"
@@ -832,6 +834,22 @@ main() {
                     unknown "-r,--rootcert requires an argument"
                 fi
                 ;;
+            --rootcert-dir)
+                if [ $# -gt 1 ]; then
+                    ROOT_CA_DIR="$2"
+                    shift 2
+                else
+                    unknown "--rootcert-dir requires an argument"
+                fi
+                ;;
+            --rootcert-file)
+                if [ $# -gt 1 ]; then
+                    ROOT_CA_FILE="$2"
+                    shift 2
+                else
+                    unknown "--rootcert-file requires an argument"
+                fi
+                ;;
             -C|--clientcert)
                 if [ $# -gt 1 ]; then
                     CLIENT_CERT="$2"
@@ -973,6 +991,32 @@ main() {
             unknown "Root certificate of unknown type $(file "${ROOT_CA}" 2> /dev/null)"
         fi
 
+    fi
+
+    if [ -n "${ROOT_CA_DIR}" ] ; then
+
+        if [ ! -d "${ROOT_CA_DIR}" ] ; then
+            unknown "${ROOT_CA_DIR} is not a directory";
+        fi
+
+        if [ ! -r "${ROOT_CA_DIR}" ] ; then
+            unknown "Cannot read root directory ${ROOT_CA_DIR}"
+        fi
+
+        ROOT_CA_DIR="-CApath ${ROOT_CA_DIR}"
+    fi
+
+    if [ -n "${ROOT_CA_FILE}" ] ; then
+
+        if [ ! -r "${ROOT_CA_FILE}" ] ; then
+            unknown "Cannot read root certificate ${ROOT_CA_FILE}"
+        fi
+
+        ROOT_CA_FILE="-CAfile ${ROOT_CA_FILE}"
+    fi
+
+    if [ -n "${ROOT_CA_DIR}" ] || [ -n "${ROOT_CA_FILE}" ]; then
+        ROOT_CA="${ROOT_CA_DIR} ${ROOT_CA_FILE}"
     fi
 
     if [ -n "${CLIENT_CERT}" ] ; then
