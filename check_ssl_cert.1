@@ -148,6 +148,14 @@ require the presence of a Subject Alternative Name extension
 .BR "-r,--rootcert" " cert"
 root certificate or directory to be used for certficate validation (passed to openssl's -CAfile or -CApath)
 .TP
+.BR "   --rootcert-dir" " dir"
+root directory to be used for certficate validation (passed to openssl's -CApath)
+overrides option -r,--rootcert
+.TP
+.BR "   --rootcert-file" " cert"
+root certificate to be used for certficate validation (passed to openssl's -CAfile)
+overrides option -r,--rootcert
+.TP
 .BR "   --rsa"
 cipher selection: force RSA authentication
 .TP
