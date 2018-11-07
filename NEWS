@@ -1,3 +1,5 @@
+2018-11-07 Version 1.78.0: Bug fixes in IMAP and HTTP requests
+2018-11-05 Version 1.77.0: CA file and directory support
 2018-10-19 Version 1.76.0: Sends a correct HTTP request
 2018-10-18 Version 1.75.0: Allow to specify a client certificate key
 2018-10-15 Version 1.74.0: Fixed a bug generating a confusing error message on timeout

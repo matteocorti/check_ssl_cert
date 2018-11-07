@@ -1,3 +1,12 @@
+2018-11-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fixed a problem with IMAP on port 993
+	* check_ssl_cert: fixed a problem with newlines in the HTTP request
+
+2018-11-05  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: CA file and directory support
+
 2018-10-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed the HTTP request string
