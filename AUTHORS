@@ -76,3 +76,4 @@ Thanks:
 * Many thanks to eimamagi (https://github.com/eimamagi) for the client key patch and for the CA file and directory support
 * Many thanks to Stefan Schlesinger for the HTTP_REQUEST patch
 * Many thanks to sokol-44 (https://github.com/sokol-44) for the HTTP request fix
+* Many thanks to Jonas Meurer (https://github.com/mejo-) for the IMAP / IMAPS fix

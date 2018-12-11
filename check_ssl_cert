@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.78.0
+VERSION=1.79.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -104,7 +104,7 @@ usage() {
     echo "   -P,--protocol protocol     use the specific protocol"
     echo "                              {http|smtp|pop3|imap|imaps|ftp|xmpp|irc|ldap}"
     echo "                              http:                    default"
-    echo "                              smtp,pop3,imap,ftp,ldap: switch to TLS"
+    echo "                              smtp,pop3,imap,imaps,ftp,ldap: switch to TLS"
     echo "   -s,--selfsigned            allows self-signed certificates"
     echo "      --serial serialnum      pattern to match the serial number"
     echo "      --sni name              sets the TLS SNI (Server Name Indication) extension"
@@ -1481,11 +1481,16 @@ main() {
 
     # we just consider the first URI
     # shellcheck disable=SC2086
-    ISSUER_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://")"
+    ISSUER_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
 
     if [ -z "${ISSUER_URI}" ] ; then
         if [ -n "${VERBOSE}" ] ; then
             echo "cannot find the CA Issuers in the certificate: disabling OCSP checks"
+        fi
+        OCSP=""
+    elif [ "${ISSUER_URI}" != "$(echo "${ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
+        if [ -n "${VERBOSE}" ] ; then
+            echo "unable to fetch the CA issuer certificate (spaces in URI)"
         fi
         OCSP=""
     elif ! echo "${ISSUER_URI}" | grep -qi '^http' ; then
