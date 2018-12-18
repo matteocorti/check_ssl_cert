@@ -221,6 +221,17 @@ testIMAPS() {
     fi	
 }
 
+testPOP3S() {
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} --rootcert cabundle.crt -H pop.gmail.com --port 993 --timeout 30 --protocol pop3s
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping POP3S tests on Travis CI"
+    fi
+}
+
+
 testSMTP() {
     if [ -z "${TRAVIS+x}" ] ; then
 	${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
