@@ -71,9 +71,9 @@ Options:
       --openssl path          path of the openssl binary to be used
    -p,--port port             TCP port
    -P,--protocol protocol     use the specific protocol
-                              {http|smtp|pop3|imap|ftp|xmpp|irc|ldap}
+                              {http|smtp|pop3|pop3s|imap|imaps|ftp|xmpp|irc|ldap}
                               http:                    default
-                              smtp,pop3,imap,ftp,ldap: switch to TLS
+                              smtp,pop3,imap,imaps,ftp,ldap: switch to TLS
    -s,--selfsigned            allows self-signed certificates
       --serial serialnum      pattern to match the serial number
       --sni name              sets the TLS SNI (Server Name Indication) extension
