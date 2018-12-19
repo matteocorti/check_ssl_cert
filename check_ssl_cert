@@ -1958,9 +1958,14 @@ EOF
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] executing ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
             fi
-
-            JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
-            CURL_RETURN_CODE=$?
+	    
+	    if [ -n "${SNI}" ] ; then
+		JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
+                CURL_RETURN_CODE=$?
+            else
+                JSON="$(${CURL_BIN} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
+                CURL_RETURN_CODE=$?
+            fi
 
             if [ ${CURL_RETURN_CODE} -ne 0 ] ; then
 

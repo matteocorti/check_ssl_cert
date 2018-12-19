@@ -1,6 +1,7 @@
 2018-12-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Better help about IMAP IMAPS POP3 and POP3S
+	* check_ssl_cert: Support for SNI and SSL Labs
 
 2018-12-11  Matteo Corti  <corti@macmini.home>
 
