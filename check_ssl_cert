@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.79.0
+VERSION=1.80.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -208,7 +208,11 @@ create_temporary_file() {
 #   $1 error message
 critical() {
     if [ -n "${HOST}" ] ; then
-        tmp=" ${HOST}"
+	if [ -n "${SNI}" ] ; then
+	    tmp=" ${SNI}"
+	else
+            tmp=" ${HOST}"
+	fi
     fi
     remove_temporary_files
     printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
@@ -221,7 +225,11 @@ critical() {
 #   $1 warning message
 warning() {
     if [ -n "${HOST}" ] ; then
-        tmp=" ${HOST}"
+	if [ -n "${SNI}" ] ; then
+	    tmp=" ${SNI}"
+	else
+            tmp=" ${HOST}"
+	fi
     fi
     remove_temporary_files
     printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
@@ -234,7 +242,11 @@ warning() {
 #   $1 message
 unknown() {
     if [ -n "${HOST}" ] ; then
-        tmp=" ${HOST}"
+	if [ -n "${SNI}" ] ; then
+	    tmp=" ${SNI}"
+	else
+            tmp=" ${HOST}"
+	fi
     fi
     remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
