@@ -4,7 +4,7 @@ DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 YEAR=`date +"%Y"`
 
-dist: version_check copyright_check
+dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)
@@ -24,12 +24,6 @@ version_check:
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q "${VERSION}" NEWS
 	echo "Version check: OK"
-
-copyright_check:
-	grep -q "(c) Matteo Corti, 2007-$(YEAR)" README.md
-	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti" COPYRIGHT
-	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti <matteo@corti.li>" $(PLUGIN)
-	echo "Copyright year check: OK"
 
 clean:
 	rm -f *~
