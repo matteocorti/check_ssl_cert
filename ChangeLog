@@ -1,3 +1,7 @@
+2019-01-16  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: replaced echo -e with printf
+
 2018-12-24  Matteo Corti  <corti@macmini.home>
 
 	* check_ssl_cert: Better output in case of errors while using SNI
