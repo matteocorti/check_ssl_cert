@@ -84,6 +84,7 @@ usage() {
     echo "   -K,--clientkey path        use client certificate key to authenticate"
     echo "   -L,--check-ssl-labs grade  SSL Labs assessment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
+    echo "   --check-ssl-labs-warn-grade  SSL-Labs grade on which to warn"
     echo "      --long-output list      append the specified comma separated (no spaces) list"
     echo "                              of attributes to the plugin output on additional lines"
     echo "                              Valid attributes are:"
@@ -773,6 +774,14 @@ main() {
                     unknown "-L|--check-ssl-labs requires an argument"
                 fi
                 ;;
+            --check-ssl-labs-warn-grade)
+                if [ $# -gt 1 ]; then
+                    SSL_LAB_WARN_ASSESTMENT="$2"
+                    shift 2
+                else
+                    unknown "--check-ssl-labs-warn-grade requires an argument"
+                fi
+                ;;
             --serial)
                 if [ $# -gt 1 ]; then
                     SERIAL_LOCK="$2"
@@ -1102,6 +1111,15 @@ main() {
     if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
         convert_ssl_lab_grade "${SSL_LAB_ASSESSMENT}"
         SSL_LAB_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+    fi
+
+    if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then
+        convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
+        SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+    fi
+
+    if [ "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" -le "${SSL_LAB_ASSESSMENT_NUMERIC}" ]; then
+        unknown  "--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs"
     fi
 
     if [ -n "${DEBUG}" ] ; then
@@ -2042,6 +2060,8 @@ EOF
                         # Check the grade
                         if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESSMENT_NUMERIC}" ] ; then
                             critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESSMENT})"
+                        elif [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -le "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
+                            warning "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
                         fi
 
                         if [ -n "${DEBUG}" ] ; then
