@@ -768,7 +768,7 @@ main() {
                 ;;
             -L|--check-ssl-labs)
                 if [ $# -gt 1 ]; then
-                    SSL_LAB_ASSESSMENT="$2"
+                    SSL_LAB_CRIT_ASSESSMENT="$2"
                     shift 2
                 else
                     unknown "-L|--check-ssl-labs requires an argument"
@@ -1108,8 +1108,8 @@ main() {
 
     fi
 
-    if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
-        convert_ssl_lab_grade "${SSL_LAB_ASSESSMENT}"
+    if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
+        convert_ssl_lab_grade "${SSL_LAB_CRIT_ASSESSMENT}"
         SSL_LAB_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
 
@@ -1142,9 +1142,9 @@ main() {
 
     # curl
     if [ -z "${CURL_BIN}" ] ; then
-	if [ -n "${SSL_LAB_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+	if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
 		echo "[DBG] cURL binary not specified"
 	    fi
             check_required_prog curl
@@ -1154,7 +1154,7 @@ main() {
 	    fi
 	else
 	    if [ -n "${DEBUG}" ] ; then
-		echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LAB_ASSESSMENT}, OCSP = ${OCSP}"
+		echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
 	    fi
 	fi
     fi
@@ -1977,7 +1977,7 @@ EOF
 
     ################################################################################
     # Check SSL Labs
-    if [ -n "${SSL_LAB_ASSESSMENT}" ] ; then
+    if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
 
         if [ -n "${VERBOSE}" ] ; then
             echo "Checking SSL Labs assessment"
@@ -2058,7 +2058,7 @@ EOF
 
                         # Check the grade
                         if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESSMENT_NUMERIC}" ] ; then
-                            critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESSMENT})"
+                            critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
                         elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
                             if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
                                 warning "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
