@@ -1110,13 +1110,13 @@ main() {
 
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
         convert_ssl_lab_grade "${SSL_LAB_CRIT_ASSESSMENT}"
-        SSL_LAB_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+        SSL_LAB_CRIT_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
 
     if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then
         convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
-        if ( $SSL_LAB_WARN_ASSESTMENT_NUMERIC < $SSL_LAB_ASSESSMENT_NUMERIC ); then
+        if ( $SSL_LAB_WARN_ASSESTMENT_NUMERIC < $SSL_LAB_CRIT_ASSESSMENT_NUMERIC ); then
             unknown  "--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs"
         fi
     fi
@@ -2054,10 +2054,10 @@ EOF
                         convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
                         SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
-                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_ASSESSMENT_NUMERIC}"
+                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}"
 
                         # Check the grade
-                        if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESSMENT_NUMERIC}" ] ; then
+                        if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ] ; then
                             critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
                         elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
                             if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
