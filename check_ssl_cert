@@ -1116,9 +1116,6 @@ main() {
     if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then
         convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
-    else
-        SSL_LAB_WARN_ASSESTMENT=$SSL_LAB_ASSESTMENT
-        SSL_LAB_WARN_ASSESTMENT_NUMERIC=$SSL_LAB_ASSESTMENT_NUMERIC
     fi
 
     if [ "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" -le "${SSL_LAB_ASSESSMENT_NUMERIC}" ]; then
@@ -2063,8 +2060,10 @@ EOF
                         # Check the grade
                         if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_ASSESSMENT_NUMERIC}" ] ; then
                             critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_ASSESSMENT})"
-                        elif [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
-                            warning "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
+                        elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
+                            if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
+                                warning "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
+                            fi
                         fi
 
                         if [ -n "${DEBUG}" ] ; then
