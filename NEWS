@@ -1,3 +1,4 @@
+2019-02-01 Version 1.81.0: Added an option to specify a warning level with SSL Labs
 2019-01-16 Version 1.80.1: Fixed a problem on systems not supporting echo -e
 2018-12-24 Version 1.80.0: Better output in case of errors while using SNI
 2018-12-10 Version 1.79.0: Differentiate between IMAP on port 143 and IMAPS on port 993

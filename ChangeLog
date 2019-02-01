@@ -1,3 +1,7 @@
+2019-02-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: applied patch for the SSLlabs warning
+
 2019-01-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: replaced echo -e with printf

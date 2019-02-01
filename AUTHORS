@@ -79,3 +79,4 @@ Thanks:
 * Many thanks to Jonas Meurer (https://github.com/mejo-) for the IMAP / IMAPS fix
 * Many thanks to Mathieu Simon (https://github.com/matsimon) for the IMAPS and POP3S patch
 * Many thanks to Nico (https://github.com/nicox) for the SSLlabs patch
+* Many thanks to barakAtSoluto (https://github.com/barakAtSoluto) for the SSLlabs warning patch

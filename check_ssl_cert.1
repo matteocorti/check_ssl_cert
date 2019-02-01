@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.TH "check_ssl_cert" 1 "December, 2019" "1.80.1" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "February, 2019" "1.81.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -86,6 +86,9 @@ use client certificate key to authenticate
 .TP
 .BR "-L,--check-ssl-labs grade"
 SSL Labs assestment (please check https://www.ssllabs.com/about/terms.html)
+.TP
+.BR "   --check-ssl-warn-labs grade"
+SSL Labs grade on which to warn
 .TP
 .BR "   --long-output" " list"
 append the specified comma separated (no spaces) list of attributes to the plugin output on additional lines.
