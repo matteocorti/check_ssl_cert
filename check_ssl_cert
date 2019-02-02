@@ -81,6 +81,8 @@ usage() {
     echo "      --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)"
     echo "   -i,--issuer issuer         pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir directory where to store issuer certificates cache"
+    echo "      --inetproto protocol    Force IP version for operations that use s_client (4,6)."
+    echo "                                This requires OpenSSL 1.1.0 or higher."
     echo "   -K,--clientkey path        use client certificate key to authenticate"
     echo "   -L,--check-ssl-labs grade  SSL Labs assessment"
     echo "                              (please check https://www.ssllabs.com/about/terms.html)"
