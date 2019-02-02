@@ -764,7 +764,7 @@ main() {
                     INETPROTO="-$2"
                     shift 2
                 else
-                    unknown "--inetproto requires an argument"s
+                    unknown "--inetproto requires an argument"
                 fi
                 ;;
             --issuer-cert-cache)
