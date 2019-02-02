@@ -50,6 +50,8 @@ Options:
       --ignore-ssl-labs-cache Forces a new check by SSL Labs (see -L)
    -i,--issuer issuer         pattern to match the issuer of the certificate
       --issuer-cert-cache dir directory where to store issuer certificates cache
+      --inetproto protocol    Force IP version for operations that use s_client (4,6).
+                                This requires OpenSSL 1.1.0 or higher.
    -L,--check-ssl-labs grade  SSL Labs assessment
                               (please check https://www.ssllabs.com/about/terms.html)
       --long-output list      append the specified comma separated (no spaces) list
