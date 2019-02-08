@@ -1,3 +1,7 @@
+2019-02-08  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Check the readability of the certificate file
+
 2019-02-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: applied patch for the SSLlabs warning

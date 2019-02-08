@@ -1,3 +1,4 @@
+2019-02-08 Version 1.82.0: Added a check on the readability of the certificate file
 2019-02-01 Version 1.81.0: Added an option to specify a warning level with SSL Labs
 2019-01-16 Version 1.80.1: Fixed a problem on systems not supporting echo -e
 2018-12-24 Version 1.80.0: Better output in case of errors while using SNI
