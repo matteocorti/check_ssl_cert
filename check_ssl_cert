@@ -1412,33 +1412,39 @@ main() {
         # look if we are dealing with a regular certificate file (x509)
         if ! grep -q "CERTIFICATE" "${CERT}" ; then
 
-            if [ -n "${FILE}" ] ; then
-                if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -q "BEGIN X509 CRL" ; then
-                    if [ -n "${VERBOSE}" ] ; then
-                        echo "File is DER encoded CRL"
-                    fi
-                    OPENSSL_COMMAND="crl"
-                    OPENSSL_PARAMS="-inform DER -nameopt utf8,oneline,-esc_msb"
-                    OPENSSL_ENDDATE_OPTION="-nextupdate"
-                else
-                    critical "'${FILE}' is not a valid certificate file"
-                fi
+            # check if we can read the file
+            if [ -w "${FILE}" ] ; then
+
+              if [ -n "${FILE}" ] ; then
+                 if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -q "BEGIN X509 CRL" ; then
+                     if [ -n "${VERBOSE}" ] ; then
+                         echo "File is DER encoded CRL"
+                     fi
+                      OPENSSL_COMMAND="crl"
+                      OPENSSL_PARAMS="-inform DER -nameopt utf8,oneline,-esc_msb"
+                      OPENSSL_ENDDATE_OPTION="-nextupdate"
+                  else
+                      critical "'${FILE}' is not a valid certificate file"
+                  fi
+              else
+                  # See
+                  # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
+                  #
+                  # - create a branch label via :a
+                  # - the N command appends a newline and and the next line of the input
+                  #   file to the pattern space
+                  # - if we are before the last line, branch to the created label $!ba
+                  #   ($! means not to do it on the last line (as there should be one final newline))
+                  # - finally the substitution replaces every newline with a space on
+                  #   the pattern space
+                  ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
+                  if [ -n "${VERBOSE}" ] ; then
+                      echo "Error: ${ERROR_MESSAGE}"
+                  fi
+                  critical "No certificate returned"
+              fi
             else
-                # See
-                # http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n
-                #
-                # - create a branch label via :a
-                # - the N command appends a newline and and the next line of the input
-                #   file to the pattern space
-                # - if we are before the last line, branch to the created label $!ba
-                #   ($! means not to do it on the last line (as there should be one final newline))
-                # - finally the substitution replaces every newline with a space on
-                #   the pattern space
-                ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
-                if [ -n "${VERBOSE}" ] ; then
-                    echo "Error: ${ERROR_MESSAGE}"
-                fi
-                critical "No certificate returned"
+                unknown "Can't read file, check file permissions"
             fi
         else
             # parameters for regular x509 certifcates
