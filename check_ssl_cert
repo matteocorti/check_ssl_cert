@@ -2300,14 +2300,35 @@ EOF
 		elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 		    
 		    if [ -n "${DEBUG}" ] ; then
-			echo '[DBG] OCSP: not good'
-		    fi		       
+			echo "[DBG] OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
+		    fi
 
                     if [ -n "${HTTP_PROXY:-}" ] ; then
-			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+
+			if [ -n "${DEBUG}" ] ; then
+			    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+			fi
+			
+			if [ -n "${OCSP_HEADER}" ] ; then
+			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+			else
+			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
+			fi
+			    
                     else
-			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+
+			if [ -n "${DEBUG}" ] ; then
+			    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+			fi
+
+			if [ -n "${OCSP_HEADER}" ] ; then
+			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+			else
+			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 )"
+			fi
+
                     fi
+
                     critical "OCSP error: '${OCSP_RESP}'"
 		    
 		fi		
