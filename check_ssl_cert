@@ -2290,17 +2290,27 @@ EOF
 		fi
 		
 		if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
-                    critical "certificate is revoked"
+		    
+		    if [ -n "${DEBUG}" ] ; then
+			echo '[DBG] OCSP: revoked'
+		    fi		       
+		    
+		    critical "certificate is revoked"
+		    
 		elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 		    
+		    if [ -n "${DEBUG}" ] ; then
+			echo '[DBG] OCSP: not good'
+		    fi		       
+
                     if [ -n "${HTTP_PROXY:-}" ] ; then
 			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                     else
 			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                     fi
-                    critical "${OCSP_RESP}"
+                    critical "OCSP error: '${OCSP_RESP}'"
 		    
-		fi
+		fi		
 		
             else
 

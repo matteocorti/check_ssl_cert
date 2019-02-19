@@ -29,6 +29,11 @@ clean:
 	rm -f *~
 	rm -rf rpmroot
 
+distclean: clean
+	rm -rf check_ssl_cert-[0-9]*
+	rm -f *.crt
+	rm -f *.error
+
 test: dist
 	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && cd test && ./unit_tests.sh )
 
@@ -45,4 +50,4 @@ rpm: dist
 
 
 
-.PHONY: install clean test rpm
+.PHONY: install clean test rpm distclean
