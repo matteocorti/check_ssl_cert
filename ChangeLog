@@ -1,3 +1,7 @@
+2019-02-27  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: better error message in case of wrong intermediate certificate
+
 2019-02-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Better error message in case of OCSP failure
