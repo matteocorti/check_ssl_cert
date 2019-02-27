@@ -137,13 +137,6 @@ testAltNamesCaseInsensitve() {
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
 }
 
-testAltNames2() {
-    # should fail: inf.ethz.ch has the same ip as www.inf.ethz.ch but inf.ethz.ch is not in the certificate
-    ${SCRIPT} -H inf.ethz.ch --cn inf.ethz.ch --rootcert cabundle.crt --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
-}
-
 testMultipleAltNamesOK() {
     # Test with multiple CN's
     ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n ethz.ch --rootcert cabundle.crt --altnames
@@ -161,13 +154,6 @@ testMultipleAltNamesFailOne() {
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
     ${SCRIPT} -H inf.ethz.ch -n wrong.ch -n www.ethz.ch --rootcert cabundle.crt --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
-}
-
-testAltNames2CaseInsensitive() {
-    # should fail: inf.ethz.ch has the same ip as www.inf.ethz.ch but inf.ethz.ch is not in the certificate
-    ${SCRIPT} -H inf.ethz.ch --cn INF.ETHZ.CH --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
 }
@@ -297,15 +283,16 @@ testBadSSLSHA256() {
     fi	
 }
 
-testBadSSL1000SANs() {
-    if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H 1000-sans.badssl.com --host-cn
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-	echo "Skipping 1000 subject alternative names with badssl.com on Travis CI"
-    fi		
-}
+# exired on Feb 17 2019
+#testBadSSL1000SANs() {
+#    if [ -z "${TRAVIS+x}" ] ; then
+#	${SCRIPT} -H 1000-sans.badssl.com --host-cn
+#	EXIT_CODE=$?
+#	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#    else
+#	echo "Skipping 1000 subject alternative names with badssl.com on Travis CI"
+#    fi		
+#}
 
 # Disabled as OpenSSL does not seem to handle it
 #testBadSSL10000SANs() {
