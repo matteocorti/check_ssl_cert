@@ -2180,7 +2180,7 @@ EOF
 
                 else
 
-                    unknown "Unable to fetch a valid certificate issuer intermediate certificate."
+                    unknown "Unable to fetch a valid certificate issuer certificate."
 
                 fi
 
