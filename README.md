@@ -119,7 +119,7 @@ See: http://en.wikipedia.org/wiki/Expect
 
 ## Virtual servers
 
-check_ssl_client supports the servername TLS extension in ClientHello
+check_ssl_cert supports the servername TLS extension in ClientHello
 if the installed openssl version provides it. This is needed if you
 are checking a machine with virtual hosts.
 
