@@ -2168,9 +2168,9 @@ EOF
             fi
 
             if [ -n "${CURL_USER_AGENT}" ] ; then
-                exec_with_timeout "$TIMEOUT" '${CURL_BIN} --silent --user-agent '"'${CURL_USER_AGENT}'"' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}'
+                exec_with_timeout "$TIMEOUT" "${CURL_BIN} --silent --user-agent '${CURL_USER_AGENT}' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             else
-                exec_with_timeout "$TIMEOUT" '${CURL_BIN} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}'
+                exec_with_timeout "$TIMEOUT" "${CURL_BIN} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             fi
 
             if [ -n "${DEBUG}" ] ; then
