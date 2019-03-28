@@ -1,4 +1,5 @@
-2019-03-01 Version 1.83.0: Spelling corrections, added an option to specify the cURL user agent
+2019-03-28 Version 1.84.0: Added an option to specify the cURL user agent
+2019-03-01 Version 1.83.0: Spelling corrections
 2019-02-08 Version 1.82.0: Added a check on the readability of the certificate file
 2019-02-01 Version 1.81.0: Added an option to specify a warning level with SSL Labs
 2019-01-16 Version 1.80.1: Fixed a problem on systems not supporting echo -e
