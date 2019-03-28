@@ -29,6 +29,7 @@ Options:
    -c,--critical days         	   minimum number of days a certificate has to be valid
                               	   to issue a critical status
       --curl-bin path         	   path of the curl binary to be used
+      --curl-user-agent string     user agent that curl shall use to obtain the issuer cert      
    -d,--debug                 	   produces debugging output
       --ecdsa                 	   cipher selection: force ECDSA authentication
    -e,--email address         	   pattern to match the email address contained in the

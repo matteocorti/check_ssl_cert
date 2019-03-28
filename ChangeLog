@@ -1,3 +1,7 @@
+2019-03-28  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added an option to specify a user agent for cURL
+
 2019-02-27  Matteo Corti  <matteo@corti.li>
 
 	* test/unit_tests.sh (testMultipleAltNamesFailTwo): removed outdated tests
