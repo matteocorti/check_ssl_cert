@@ -212,6 +212,8 @@ critical() {
     if [ -n "${HOST}" ] ; then
 	if [ -n "${SNI}" ] ; then
 	    tmp=" ${SNI}"
+	elif [ -n "${FILE}" ] ; then
+            tmp=" ${FILE}"
 	else
             tmp=" ${HOST}"
 	fi
