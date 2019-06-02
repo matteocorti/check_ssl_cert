@@ -1,3 +1,7 @@
+2019-06-02  Matteo Corti  <corti@macmini.home>
+
+	* check_ssl_cert (critical): Return the filename when using --file by warnings
+
 2019-03-28  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added an option to specify a user agent for cURL

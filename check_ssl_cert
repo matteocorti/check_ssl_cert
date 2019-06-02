@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.84.0
+VERSION=1.85.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -231,6 +231,8 @@ warning() {
     if [ -n "${HOST}" ] ; then
 	if [ -n "${SNI}" ] ; then
 	    tmp=" ${SNI}"
+	elif [ -n "${FILE}" ] ; then
+            tmp=" ${FILE}"
 	else
             tmp=" ${HOST}"
 	fi
@@ -248,6 +250,8 @@ unknown() {
     if [ -n "${HOST}" ] ; then
 	if [ -n "${SNI}" ] ; then
 	    tmp=" ${SNI}"
+	elif [ -n "${FILE}" ] ; then
+            tmp=" ${FILE}"
 	else
             tmp=" ${HOST}"
 	fi
