@@ -1000,10 +1000,11 @@ main() {
     done
 
     ################################################################################
-    # Set COMMON_NAME to hostname if -N was given as argument
-    if [ "$COMMON_NAME" = "__HOST__" ] ; then
-        COMMON_NAME="${HOST}"
-    fi
+    # Set COMMON_NAME to hostname if -N was given as argument.
+    # COMMON_NAME may be a space separated list of hostnames.
+    case $COMMON_NAME in
+        *__HOST__*) COMMON_NAME=$(echo "$COMMON_NAME" | sed "s/__HOST__/${HOST}/") ;;
+    esac
 
     ################################################################################
     # Sanity checks
