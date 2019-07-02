@@ -1753,7 +1753,7 @@ EOF
                 echo "[DBG] the common name ${CN} begins with a '*'"
                 echo "[DBG] checking if the common name matches ^$(echo "${CN}" | cut -c 3-)\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | cut -c 3-)\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i -E "^$(echo "${CN}" | cut -c 3-)\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
                 fi
@@ -1765,7 +1765,7 @@ EOF
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i -E "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                 fi
@@ -1776,7 +1776,7 @@ EOF
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] checking if the common name matches ^${CN}\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i -E "^${CN}\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^${CN}\$"
                 fi
@@ -1785,7 +1785,7 @@ EOF
 
         else
 
-            if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i -E "^${CN}$" ; then
                 ok="true"
             fi
 
@@ -1815,7 +1815,7 @@ EOF
                             echo "[DBG] the altname ${alt_name} begins with a '*'"
                             echo "[DBG] checking if the common name matches ^$(echo "${alt_name}" | cut -c 3-)\$"
                         fi
-                        if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
+                        if echo "${cn}" | grep -q -i -E "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^$( echo "${alt_name}" | cut -c 3- )\$"
                             fi
@@ -1827,7 +1827,7 @@ EOF
                         if [ -n "${DEBUG}" ] ; then
                             echo "[DBG] checking if the common name matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                         fi
-                        if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
+                        if echo "${cn}" | grep -q -i -E "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                             fi
@@ -1838,7 +1838,7 @@ EOF
                         if [ -n "${DEBUG}" ] ; then
                             echo "[DBG] checking if the common name matches ^${alt_name}\$"
                         fi
-                        if echo "${cn}" | grep -q -i "^${alt_name}\$" ; then
+                        if echo "${cn}" | grep -q -i -E "^${alt_name}\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^${alt_name}\$"
                             fi
@@ -1847,7 +1847,7 @@ EOF
 
                     else
 
-                        if echo "${cn}" | grep -q -i "^${alt_name}$" ; then
+                        if echo "${cn}" | grep -q -i -E "^${alt_name}$" ; then
                             ok="true"
                         fi
 
@@ -1870,11 +1870,11 @@ EOF
         fi
 
         if [ -n "$fail" ] ; then
-           critical "invalid CN ('$CN' does not match '$fail')"
+           critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '$fail')"
         fi
 
         if [ -z "$ok" ] ; then
-            critical "invalid CN ('$CN' does not match '$COMMON_NAME')"
+            critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '$COMMON_NAME')"
         fi
 
         if [ -n "${DEBUG}" ] ; then
@@ -1892,13 +1892,13 @@ EOF
         fi
 
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep "^${ISSUER}\$" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${ISSUER}\$" | head -n1)
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
-            critical "invalid CA ('${ISSUER}' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+            critical "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
         fi
 
     else
@@ -1918,7 +1918,7 @@ EOF
         fi
 
         if [ -z "$ok" ] ; then
-            critical "invalid serial number ('${SERIAL}' does not match '${SERIAL_LOCK}')"
+            critical "invalid serial number ('$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")' does not match '${SERIAL}')"
         fi
 
     fi
@@ -1928,12 +1928,12 @@ EOF
 
         ok=""
 
-        if echo "${FINGERPRINT}" | grep -q "^${FINGERPRINT_LOCK}\$" ; then
+        if echo "${FINGERPRINT}" | grep -q -E "^${FINGERPRINT_LOCK}\$" ; then
             ok="true"
         fi
 
         if [ -z "$ok" ] ; then
-            critical "invalid SHA1 Fingerprint ('${FINGERPRINT}' does not match '${FINGERPRINT_LOCK}')"
+            critical "invalid SHA1 Fingerprint ('$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")' does not match '${FINGERPRINT}')"
         fi
 
     fi
@@ -2378,8 +2378,8 @@ EOF
 
         ORG=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
 
-        if ! echo "$ORG" | grep -q "^$ORGANIZATION" ; then
-            critical "invalid organization ('$ORGANIZATION' does not match '$ORG')"
+        if ! echo "$ORG" | grep -q -E "^$ORGANIZATION" ; then
+            critical "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '$ORG')"
         fi
 
     fi
@@ -2398,8 +2398,8 @@ EOF
             critical "the certificate does not contain an email address"
         fi
 
-        if ! echo "$EMAIL" | grep -q "^$ADDR" ; then
-            critical "invalid email ($ADDR does not match $EMAIL)"
+        if ! echo "$EMAIL" | grep -q -E "^$ADDR" ; then
+            critical "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match $EMAIL)"
         fi
 
     fi
