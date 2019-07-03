@@ -1753,7 +1753,7 @@ EOF
                 echo "[DBG] the common name ${CN} begins with a '*'"
                 echo "[DBG] checking if the common name matches ^$(echo "${CN}" | cut -c 3-)\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i -E "^$(echo "${CN}" | cut -c 3-)\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | cut -c 3-)\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$( echo "${CN}" | cut -c 3- )\$"
                 fi
@@ -1765,7 +1765,7 @@ EOF
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i -E "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                 fi
@@ -1776,7 +1776,7 @@ EOF
             if [ -n "${DEBUG}" ] ; then
                 echo "[DBG] checking if the common name matches ^${CN}\$"
             fi
-            if echo "${COMMON_NAME}" | grep -q -i -E "^${CN}\$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$" ; then
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] the common name ${COMMON_NAME} matches ^${CN}\$"
                 fi
@@ -1785,7 +1785,7 @@ EOF
 
         else
 
-            if echo "${COMMON_NAME}" | grep -q -i -E "^${CN}$" ; then
+            if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
                 ok="true"
             fi
 
@@ -1815,7 +1815,7 @@ EOF
                             echo "[DBG] the altname ${alt_name} begins with a '*'"
                             echo "[DBG] checking if the common name matches ^$(echo "${alt_name}" | cut -c 3-)\$"
                         fi
-                        if echo "${cn}" | grep -q -i -E "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
+                        if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^$( echo "${alt_name}" | cut -c 3- )\$"
                             fi
@@ -1827,7 +1827,7 @@ EOF
                         if [ -n "${DEBUG}" ] ; then
                             echo "[DBG] checking if the common name matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                         fi
-                        if echo "${cn}" | grep -q -i -E "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
+                        if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9\-]*/' )\$"
                             fi
@@ -1838,7 +1838,7 @@ EOF
                         if [ -n "${DEBUG}" ] ; then
                             echo "[DBG] checking if the common name matches ^${alt_name}\$"
                         fi
-                        if echo "${cn}" | grep -q -i -E "^${alt_name}\$" ; then
+                        if echo "${cn}" | grep -q -i "^${alt_name}\$" ; then
                             if [ -n "${DEBUG}" ] ; then
                                 echo "[DBG] the common name ${cn} matches ^${alt_name}\$"
                             fi
@@ -1847,7 +1847,7 @@ EOF
 
                     else
 
-                        if echo "${cn}" | grep -q -i -E "^${alt_name}$" ; then
+                        if echo "${cn}" | grep -q -i "^${alt_name}$" ; then
                             ok="true"
                         fi
 
