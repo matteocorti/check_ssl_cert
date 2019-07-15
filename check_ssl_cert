@@ -437,11 +437,11 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "printf 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             irc)
-                exec_with_timeout "$TIMEOUT" "echo -e 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "$TIMEOUT" "printf 'QUIT\\r' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3|imap|ftp|ldap)
@@ -472,7 +472,7 @@ fetch_certificate() {
 
     else
 	
-        exec_with_timeout "$TIMEOUT" "echo '${HTTP_REQUEST}' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "$TIMEOUT" "printf '${HTTP_REQUEST}' | $OPENSSL s_client ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
