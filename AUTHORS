@@ -82,3 +82,5 @@ Thanks:
 * Many thanks to barakAtSoluto (https://github.com/barakAtSoluto) for the SSLlabs warning patch
 * Many thanks to Valentin Heidelberger (https://github.com/va1entin) for the cURL user agent patch
 * Many thanks to Tone (https://github.com/anthonyhaussman) for the warning message improvement patch
+* Many thanks to Michael Niewiara (https://github.com/mobitux) for the HTTPS/echo fix
+* Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch	
