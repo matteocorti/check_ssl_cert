@@ -476,7 +476,7 @@ fetch_certificate() {
         RET=$?
 
     fi
-
+    
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] storing a copy of the retrieved certificate in ${HOST}.crt"
         cp "${CERT}" "${HOST}.crt"
@@ -488,19 +488,19 @@ fetch_certificate() {
 
     if [ "${RET}" -ne 0 ] ; then
 
-        if [ -n "${DEBUG}" ] ; then
+	if [ -n "${DEBUG}" ] ; then
             sed 's/^/[DBG] SSL error: /' "${ERROR}"
-        fi
-
-        # s_client could verify the server certificate because the server requires a client certificate
-        if grep -q '^Acceptable client certificate CA names' "${CERT}" ; then
-
+	fi
+    
+	# s_client could verify the server certificate because the server requires a client certificate
+	if grep -q '^Acceptable client certificate CA names' "${CERT}" ; then
+	    
             if [ -n "${VERBOSE}" ] ; then
-                echo "The server requires a client certificate"
+		echo "The server requires a client certificate"
             fi
-
-        else
-
+	    
+	else
+	    
             # Try to clean up the error message
             #     Remove the 'verify and depth' lines
             #     Take the 1st line (seems OK with the use cases I tested)
@@ -513,6 +513,12 @@ fetch_certificate() {
 
         fi
 
+    else
+
+	if grep -q usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ] ; then
+	    unknown "it seems that OpenSSL -starttls does not support yet LDAP"
+	fi
+	
     fi
 
 }
