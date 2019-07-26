@@ -1,6 +1,10 @@
-2019-06-02  Matteo Corti  <corti@macmini.home>
+2019-07-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (critical): Return the filename when using --file by warnings
+	* check_ssl_cert: Try to detect if LDAP is not supported
+
+2019-06-02  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Return the filename when using --file by warnings
 
 2019-03-28  Matteo Corti  <matteo@corti.li>
 
