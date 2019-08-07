@@ -1,5 +1,5 @@
 .\" Process this file with
-.\" groff -man -Tascii foo.1
+.\" groff -man -Tascii check_ssl_cert.1
 .\"
 .TH "check_ssl_cert" 1 "July, 2019" "1.86.0" "USER COMMANDS"
 .SH NAME
@@ -128,7 +128,7 @@ path of the openssl binary to be used
 TCP port
 .TP
 .BR "-P,--protocol" " protocol"
-use the specific protocol: http (default), irc or smtp,pop3,imap,ftp,ldap (switch to TLS)
+use the specific protocol: ftp, http (default), imap, imaps, irc, ldap, ldaps, pop3, pop3s, smtp, xmpp. These protocols switch to TLS using StartTLS: ftp, imap, ldap, pop3, smtp.
 .TP
 .BR "-s,--selfsigned"
 allows self-signed certificates
@@ -169,7 +169,7 @@ cipher selection: force RSA authentication
 directory where to store the temporary files
 .TP
 .BR "   --terse"
-terse output (also see --verbose) 
+terse output (also see --verbose)
 .TP
 .BR "-t,--timeout"
 seconds timeout after the specified time (defaults to 15 seconds)
