@@ -1,3 +1,8 @@
+2019-08-08  Matteo Corti <matteo@corti.li>
+
+	* check_ssl_cert: Applied patch to support LDAPS
+	* check_ssl_cert.1: Formatting and ordering
+	
 2019-07-26  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Try to detect if LDAP is not supported
