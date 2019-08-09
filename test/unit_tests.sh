@@ -375,17 +375,34 @@ testRequireOCSP() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-#testIPv4() {
-#    ${SCRIPT} -H 129.132.19.216 --sni www.ethz.ch
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
+# tests for -4 and -6
+testIPv4() {
+    if openssl s_client -help 2>&1 | grep -q -- -4 ; then
+	${SCRIPT} -H www.google.com --rootcert cabundle.crt -4
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping forcing IPv4: no OpenSSL support"
+    fi
+}
 
-#testIPv6() {
-#    ${SCRIPT} -H 2001:67c:10ec:4380::216 --sni www.ethz.ch
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
+testIPv6() {
+    if openssl s_client -help 2>&1 | grep -q -- -6 ; then
+
+	if ifconfig -a | grep -q inet6 ; then
+	    	
+	    ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
+	    EXIT_CODE=$?
+	    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+	else
+	    "Skipping forcing IPv6: not IPv6 configured locally"
+	fi
+	
+    else
+	echo "Skipping forcing IPv6: no OpenSSL support"
+    fi
+}
 
 testFormatShort() {
     OUTPUT=$( ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
