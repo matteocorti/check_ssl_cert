@@ -84,3 +84,4 @@ Thanks:
 * Many thanks to Tone (https://github.com/anthonyhaussman) for the warning message improvement patch
 * Many thanks to Michael Niewiara (https://github.com/mobitux) for the HTTPS/echo fix
 * Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch
+* Many thanks to Dick Visser (https://github.com/dnmvisser) for the --inetproto patch

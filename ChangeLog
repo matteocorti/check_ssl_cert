@@ -2,6 +2,7 @@
 
 	* check_ssl_cert (ascii_grep): Removed NULL characters before 'grepping' a file
 	* check_ssl_cert (critical): Display the CN in a crical or warning message (if present)
+	* check_ssl_cert: merged patch to choose the IP protocol version
 
 2019-08-08  Matteo Corti <matteo@corti.li>
 
