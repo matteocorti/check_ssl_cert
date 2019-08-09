@@ -493,7 +493,7 @@ fetch_certificate() {
 	fi
 
 	# s_client could verify the server certificate because the server requires a client certificate
-	if grep -q '^Acceptable client certificate CA names' "${CERT}" ; then
+	if ascii_grep '^Acceptable client certificate CA names' "${CERT}" ; then
 
             if [ -n "${VERBOSE}" ] ; then
 		echo "The server requires a client certificate"
@@ -515,7 +515,7 @@ fetch_certificate() {
 
     else
 
-	if grep -q usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ] ; then
+	if ascii_grep usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ] ; then
 	    unknown "it seems that OpenSSL -starttls does not support yet LDAP"
 	fi
 
@@ -544,6 +544,21 @@ add_performance_data() {
 var_for_sed() {
     echo "s|%$1%|$( echo "$2" | sed -e 's#|#\\\\|#g' )|g"
 }
+
+################################################################################
+# Performs a grep removing the NULL characters first
+#
+# As the POSIX grep does not have the -a option, we remove the NULL characters
+# first to avoid the error Binary file matches
+#
+# Params
+#  $1 pattern
+#  $2 file
+#
+ascii_grep() {
+    tr -d '\000' < "$2" | grep -q "$1"
+}
+
 
 ################################################################################
 # Main
@@ -1403,7 +1418,7 @@ main() {
 
     fetch_certificate
 
-    if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
+    if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
         if [ -n "${SERVERNAME}" ] ; then
 
@@ -1418,7 +1433,7 @@ main() {
 
         fi
 
-        if grep -q 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
+        if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
             critical "cannot fetch certificate: OpenSSL got an unexpected message"
 
@@ -1426,14 +1441,14 @@ main() {
 
     fi
 
-    if grep -q "BEGIN X509 CRL" "${CERT}" ; then
+    if ascii_grep "BEGIN X509 CRL" "${CERT}" ; then
         # we are dealing with a CRL file
         OPENSSL_COMMAND="crl"
         OPENSSL_PARAMS="-nameopt utf8,oneline,-esc_msb"
         OPENSSL_ENDDATE_OPTION="-nextupdate"
     else
         # look if we are dealing with a regular certificate file (x509)
-        if ! grep -q "CERTIFICATE" "${CERT}" ; then
+        if ! ascii_grep "CERTIFICATE" "${CERT}" ; then
 
             if [ -n "${FILE}" ] ; then
 
@@ -1579,7 +1594,7 @@ main() {
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
 	fi
 
-	if ! grep -q 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
+	if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
 	    critical "OCSP stapling not enabled"
 	else
 	    if [ -n "${VERBOSE}" ] ; then
@@ -2412,9 +2427,9 @@ EOF
 
     ################################################################################
     # Check if the certificate was verified
-    if [ -z "${NOAUTH}" ] && grep -q '^verify\ error:' "${ERROR}" ; then
+    if [ -z "${NOAUTH}" ] && ascii_grep '^verify\ error:' "${ERROR}" ; then
 
-        if grep -q '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' "${ERROR}" ; then
+        if ascii_grep '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' "${ERROR}" ; then
 
             if [ -z "${SELFSIGNED}" ] ; then
                 critical "Cannot verify certificate, self signed certificate"
