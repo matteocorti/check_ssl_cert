@@ -21,6 +21,7 @@ Arguments:
    -H,--host host                  server
 
 Options:
+
    -A,--noauth                	   ignore authority warnings (expiration only)
       --altnames              	   matches the pattern specified in -n with alternate
                               	   names too
@@ -49,6 +50,8 @@ Options:
       --ignore-sig-alg        	   do not check if the certificate was signed with SHA1
                               	   or MD5
       --ignore-ssl-labs-cache 	   Forces a new check by SSL Labs (see -L)
+      --inetproto protocol         Force IP version for operations that use s_client (4,6).
+                                   This requires OpenSSL 1.1.0 or higher.
    -i,--issuer issuer         	   pattern to match the issuer of the certificate
       --issuer-cert-cache dir 	   directory where to store issuer certificates cache
    -L,--check-ssl-labs grade  	   SSL Labs assessment
