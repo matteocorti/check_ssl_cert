@@ -396,7 +396,7 @@ testIPv6() {
 	    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
 	else
-	    "Skipping forcing IPv6: not IPv6 configured locally"
+	    echo "Skipping forcing IPv6: not IPv6 configured locally"
 	fi
 	
     else
