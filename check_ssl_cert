@@ -1436,9 +1436,9 @@ main() {
 		fi
 	    fi
 	fi
-
+	
 	# check if IPv6 is available locally
-	if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq 6 ] && ! ifconfig -a | grep -q inet6 ; then
+	if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && ! ifconfig -a | grep -q inet6 ; then
 	    unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
 	fi	
 	
