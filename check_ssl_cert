@@ -135,6 +135,8 @@ usage() {
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
     echo "                                   to issue a warning status"
     echo "      --xmpphost name              specifies the host for the 'to' attribute of the stream element"
+    echo "   -4                              force IPv4"
+    echo "   -6                              force IPv6"
     echo
     echo "Deprecated options:"
     echo "      --days days                  minimum number of days a certificate has to be valid"
@@ -749,6 +751,16 @@ main() {
                 echo "check_ssl_cert version ${VERSION}"
                 exit 3
                 ;;
+	    -4)
+		INETPROTO="-4"
+		shift
+		;;
+	    -6)
+		INETPROTO="-6"
+		shift
+		;;
+	  
+	    
             ########################################
             # Options with arguments
             -c|--critical)
@@ -830,14 +842,6 @@ main() {
                     shift 2
                 else
                     unknown "-i,--issuer requires an argument"s
-                fi
-                ;;
-            --inetproto)
-                if [ $# -gt 1 ]; then
-                    INETPROTO="-$2"
-                    shift 2
-                else
-                    unknown "--inetproto requires an argument"
                 fi
                 ;;
             --issuer-cert-cache)

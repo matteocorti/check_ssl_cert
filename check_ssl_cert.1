@@ -78,9 +78,6 @@ do not check if the certificate was signed with SHA1 or MD5
 .BR "   --ignore-ssl-labs-cache"
 Forces a new check by SSL Labs (see -L)
 .TP
-.BR "   --inetproto protocol"
-Force IP version 4 or 6
-.TP
 .BR "   --issuer-cert-cache" " dir"
 directory where to store issuer certificates cache
 .TP
@@ -202,6 +199,12 @@ minimum number of days a certificate has to be valid to issue a warning status
 .TP
 .BR "   --xmpphost" " name"
 specifies the host for the "to" attribute of the stream element
+.TP
+.BR "-4"
+forces IPv4
+.TP
+.BR "-6"
+forces IPv6
 .SH DEPRECATED OPTIONS
 .TP
 .BR "-d,--days" " days"
