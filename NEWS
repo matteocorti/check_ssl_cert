@@ -1,3 +1,4 @@
+2019-08-09 Version 1.88.0: Add an option to force IPv4 or IPv6
 2019-08-08 Version 1.87.0: LDAPS support
 2019-07-21 Version 1.86.0: Fixed a bug and enabled extended regex search
 2019-06-02 Version 1.85.0: Improved the warnings when using the --file option

@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.87.0
+VERSION=1.88.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -80,8 +80,7 @@ usage() {
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
     echo "                                   or MD5"
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
-    echo "      --inetproto protocol         Force IP version for operations that use s_client (4,6)."
-    echo "                                     This requires OpenSSL 1.1.0 or higher."
+    echo "      --inetproto protocol         Force IP version 4 or 6"
     echo "   -i,--issuer issuer              pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir      directory where to store issuer certificates cache"
     echo "   -K,--clientkey path             use client certificate key to authenticate"
@@ -1233,6 +1232,12 @@ main() {
 	    fi
             check_required_prog curl
             CURL_BIN=$PROG
+
+	    # check if cURL supports -4 and -6
+	    if ! "${CURL_BIN}" --manual | grep -q -- -6 && [ -n "${INETPROTO}" ] ; then
+		unknown "cURL does not support the ${INETPROTO} option"
+	    fi
+	    
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] cURL available: ${CURL_BIN}"
 	    fi
