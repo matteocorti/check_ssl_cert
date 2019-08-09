@@ -220,7 +220,7 @@ critical() {
     fi
 
     if [ -n "${CN}" ] ; then
-	tmp="${CN}"
+	tmp=" ${CN}"
     else
 	if [ -n "${HOST}" ] ; then
 	    if [ -n "${SNI}" ] ; then
@@ -235,8 +235,10 @@ critical() {
     
     remove_temporary_files
     
-    printf '%s CRITICAL %s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
+    printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
+    
     exit 2
+    
 }
 
 ################################################################################
@@ -244,18 +246,36 @@ critical() {
 # Param
 #   $1 warning message
 warning() {
-    if [ -n "${HOST}" ] ; then
-	if [ -n "${SNI}" ] ; then
-	    tmp=" ${SNI}"
-	elif [ -n "${FILE}" ] ; then
-            tmp=" ${FILE}"
-	else
-            tmp=" ${HOST}"
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] output parameters: HOST       = ${HOST}"
+	echo "[DBG] output parameters: CN         = ${CN}"
+	echo "[DBG] output parameters: SNI       = ${SNI}"       
+	echo "[DBG] output parameters: FILE      = ${FILE}"
+	echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
+	echo "[DBG] output parameters: $1        = $1"
+    fi
+
+    if [ -n "${CN}" ] ; then
+	tmp=" ${CN}"
+    else
+	if [ -n "${HOST}" ] ; then
+	    if [ -n "${SNI}" ] ; then
+		tmp=" ${SNI}"
+	    elif [ -n "${FILE}" ] ; then
+		tmp=" ${FILE}"
+	    else
+		tmp=" ${HOST}"
+	    fi
 	fi
     fi
+    
     remove_temporary_files
+    
     printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
+    
     exit 1
+    
 }
 
 ################################################################################
