@@ -1230,13 +1230,9 @@ main() {
 		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
 		echo "[DBG] cURL binary not specified"
 	    fi
+	    
             check_required_prog curl
             CURL_BIN=$PROG
-
-	    # check if cURL supports -4 and -6
-	    if ! "${CURL_BIN}" --manual | grep -q -- -6 && [ -n "${INETPROTO}" ] ; then
-		unknown "cURL does not support the ${INETPROTO} option"
-	    fi
 	    
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] cURL available: ${CURL_BIN}"
@@ -1418,15 +1414,38 @@ main() {
     fi
 
     ################################################################################
-    # Check if openssl s_client supports the -4 or -6 option (since 1.1.0)
+    # --inetproto validation
     if [ -n "${INETPROTO}" ] ; then
+
+	# validate the arguments
 	if [ "${INETPROTO}" != "-4" ] && [ "${INETPROTO}" != "-6" ] ; then
 	    VERSION=$(echo "${INETPROTO}" | awk  '{ string=substr($0, 2); print string; }' )
 	    unknown "Invalid argument '${VERSION}': the value must be 4 or 6"
 	fi
+	
+	# Check if openssl s_client supports the -4 or -6 option	
 	if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${INETPROTO}" ; then
             unknown "OpenSSL does not support the ${INETPROTO} option"
 	fi
+
+	# Check if cURL is needed and if it supports the -4 and -6 options
+	if [ -z "${CURL_BIN}" ] ; then
+	    if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+		if ! "${CURL_BIN}" --manual | grep -q -- -6 && [ -n "${INETPROTO}" ] ; then
+		    unknown "cURL does not support the ${INETPROTO} option"
+		fi
+	    fi
+	fi
+
+	# check if IPv6 is available locally
+	if [ -n "${INETPROTO}" -eq 6 ] && ! ifconfig -a | grep -q inet6 ; then
+	    unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
+	fi
+	
+    fi
+
+
+	
     fi
     ################################################################################
     # define the HTTP request string
