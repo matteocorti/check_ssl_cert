@@ -209,17 +209,33 @@ create_temporary_file() {
 # Params
 #   $1 error message
 critical() {
-    if [ -n "${HOST}" ] ; then
-	if [ -n "${SNI}" ] ; then
-	    tmp=" ${SNI}"
-	elif [ -n "${FILE}" ] ; then
-            tmp=" ${FILE}"
-	else
-            tmp=" ${HOST}"
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] output parameters: HOST       = ${HOST}"
+	echo "[DBG] output parameters: CN         = ${CN}"
+	echo "[DBG] output parameters: SNI       = ${SNI}"       
+	echo "[DBG] output parameters: FILE      = ${FILE}"
+	echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
+	echo "[DBG] output parameters: $1        = $1"
+    fi
+
+    if [ -n "${CN}" ] ; then
+	tmp="${CN}"
+    else
+	if [ -n "${HOST}" ] ; then
+	    if [ -n "${SNI}" ] ; then
+		tmp=" ${SNI}"
+	    elif [ -n "${FILE}" ] ; then
+		tmp=" ${FILE}"
+	    else
+		tmp=" ${HOST}"
+	    fi
 	fi
     fi
+    
     remove_temporary_files
-    printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
+    
+    printf '%s CRITICAL %s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
     exit 2
 }
 
@@ -2500,6 +2516,19 @@ EOF
         EXTRA_OUTPUT="${PERFORMANCE_DATA}"
     else
         EXTRA_OUTPUT="${LONG_OUTPUT}${PERFORMANCE_DATA}"
+    fi
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] output parameters: CA_ISSUER_MATCHED   = ${CA_ISSUER_MATCHED}"
+	echo "[DBG] output parameters: CHECKEDNAMES        = ${CHECKEDNAMES}"
+	echo "[DBG] output parameters: CN                  = ${CN}"
+	echo "[DBG] output parameters: DATE                = ${DATE}"
+	echo "[DBG] output parameters: DAYS_VALID          = ${DAYS_VALID}"
+	echo "[DBG] output parameters: DYSPLAY_CN          = ${DISPLAY_CN}"
+	echo "[DBG] output parameters: OPENSSL_COMMAND     = ${OPENSSL_COMMAND}"
+	echo "[DBG] output parameters: SELFSIGNEDCERT      = ${SELFSIGNEDCERT}"
+	echo "[DBG] output parameters: SHORTNAME           = ${SHORTNAME}"
+	echo "[DBG] output parameters: SSL_LABS_HOST_GRADE = ${SSL_LABS_HOST_GRADE}"
     fi
 
     echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
