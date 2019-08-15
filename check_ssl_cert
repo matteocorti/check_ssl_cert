@@ -1318,7 +1318,7 @@ main() {
 
     else
 
-        if ${DATE}BIN --version >/dev/null 2>&1 ; then
+        if "${DATEBIN}" --version >/dev/null 2>&1 ; then
             DATETYPE="GNU"
         else
             DATETYPE="BSD"
