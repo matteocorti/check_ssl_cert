@@ -476,23 +476,23 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp)
-                exec_with_timeout "$TIMEOUT" "printf 'QUIT\\r' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             irc)
-                exec_with_timeout "$TIMEOUT" "printf 'QUIT\\r' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3|imap|ftp|ldap)
-                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3s|imaps|ldaps)
-                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
 	    xmpp)
-                exec_with_timeout "$TIMEOUT" "echo 'Q' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$XMPPPORT ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$XMPPPORT ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             *)
@@ -503,7 +503,7 @@ fetch_certificate() {
     elif [ -n "${FILE}" ] ; then
 
         if [ "${HOST}" = "localhost" ] ; then
-            exec_with_timeout "$TIMEOUT" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "${TIMEOUT}" "/bin/cat '${FILE}' 2> ${ERROR} 1> ${CERT}"
             RET=$?
         else
             unknown "Error: option 'file' works with -H localhost only"
@@ -511,7 +511,7 @@ fetch_certificate() {
 
     else
 
-        exec_with_timeout "$TIMEOUT" "printf '${HTTP_REQUEST}' | $OPENSSL s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -1318,7 +1318,7 @@ main() {
 
     else
 
-        if $DATEBIN --version >/dev/null 2>&1 ; then
+        if ${DATE}BIN --version >/dev/null 2>&1 ; then
             DATETYPE="GNU"
         else
             DATETYPE="BSD"
@@ -1587,7 +1587,7 @@ main() {
     # Parse the X.509 certificate or crl
 
     # shellcheck disable=SC2086
-    DATE="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
+    DATE="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
 
     if [ ${OPENSSL_COMMAND} = "crl" ]; then
         CN=""
@@ -1596,23 +1596,23 @@ main() {
         OCSP_URI=""
         VALID_ATTRIBUTES=",lastupdate,nextupdate,issuer,"
         # shellcheck disable=SC2086
-        ISSUERS="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout)"
+        ISSUERS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout)"
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
         # shellcheck disable=SC2086
-        CN="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
+        CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 
         # shellcheck disable=SC2086
-        SUBJECT="$($OPENSSL x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"
+        SUBJECT="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"
 
-        SERIAL="$($OPENSSL x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
+        SERIAL="$(${OPENSSL} x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
 
-        FINGERPRINT="$($OPENSSL x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
+        FINGERPRINT="$(${OPENSSL} x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
 
         # TO DO: we just take the first result: a loop over all the hosts should
         # shellcheck disable=SC2086
-        OCSP_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
+        OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
 
         # count the certificates in the chain
         NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
@@ -1627,7 +1627,7 @@ main() {
             # shellcheck disable=SC2086
             ISSUERS="$ISSUERS$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
                                awk -v n=$CERT_IN_CHAIN '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' | \
-                               $OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
+                               ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
         done
@@ -1642,7 +1642,7 @@ main() {
     # we just consider the first URI
     # TODO check SC2016
     # shellcheck disable=SC2086,SC2016
-    ISSUER_URI="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
+    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
 
     # TODO: should be checked
     # shellcheck disable=SC2021
@@ -1670,7 +1670,7 @@ main() {
        	    echo "checking OCSP stapling"
 	fi
 
-	exec_with_timeout "$TIMEOUT" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
+	exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
 
 	if [ -n "${DEBUG}" ] ; then
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
@@ -1687,7 +1687,7 @@ main() {
     fi
 
     # shellcheck disable=SC2086
-    SIGNATURE_ALGORITHM="$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
+    SIGNATURE_ALGORITHM="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
 
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ${SUBJECT}"
@@ -1769,7 +1769,7 @@ main() {
     if [ -n "${DATETYPE}" ]; then
 
 	# shellcheck disable=SC2086
-        CERT_END_DATE=$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
+        CERT_END_DATE=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
 
         OLDLANG=$LANG
         LANG=en_US
@@ -1823,7 +1823,7 @@ EOF
     # Check the presence of a subjectAlternativeName (required for Chrome)
 
     # shellcheck disable=SC2086
-    SUBJECT_ALTERNATIVE_NAME=$($OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
+    SUBJECT_ALTERNATIVE_NAME=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
            grep --after-context=1 "509v3 Subject Alternative Name:" |
            tail -n 1 |
            sed -e "s/DNS://g" |
@@ -2049,22 +2049,22 @@ EOF
             echo "[DBG] Checking expiration date"
         fi
 
-        if [ ${OPENSSL_COMMAND} = "x509" ]; then
+        if [ "${OPENSSL_COMMAND}" = "x509" ]; then
             # x509 certificates (default)
 
             # We always check expired certificates
-            if ! $OPENSSL x509 -in "${CERT}" -noout -checkend 0 > /dev/null ; then
-                critical "${OPENSSL_COMMAND} certificate is expired (was valid until $DATE)"
+            if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend 0 > /dev/null ; then
+                critical "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
             fi
 
             if [ -n "${CRITICAL}" ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
-                    echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( CRITICAL * 86400 ))"
+                    echo "[DBG] executing: ${OPENSSL} x509 -in ${CERT} -noout -checkend $(( CRITICAL * 86400 ))"
                 fi
 
-                if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
-                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
+                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
@@ -2072,32 +2072,32 @@ EOF
             if [ -n "${WARNING}" ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
-                    echo "[DBG] executing: $OPENSSL x509 -in ${CERT} -noout -checkend $(( WARNING * 86400 ))"
+                    echo "[DBG] executing: ${OPENSSL} x509 -in ${CERT} -noout -checkend $(( WARNING * 86400 ))"
                 fi
 
-                if ! $OPENSSL x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
-                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
+                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
-        elif [ ${OPENSSL_COMMAND} = "crl" ]; then
+        elif [ "${OPENSSL_COMMAND}" = "crl" ]; then
             # CRL certificates
 
             # We always check expired certificates
             if [ "${DAYS_VALID}" -lt 1 ] ; then
-                critical "${OPENSSL_COMMAND} certificate is expired (was valid until $DATE)"
+                critical "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
             fi
 
             if [ -n "${CRITICAL}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${CRITICAL}" ] ; then
-                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
 
             if [ -n "${WARNING}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${WARNING}" ] ; then
-                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on $DATE"
+                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
@@ -2127,7 +2127,7 @@ EOF
                 CURL_RETURN_CODE=$?
             fi
 
-            if [ ${CURL_RETURN_CODE} -ne 0 ] ; then
+            if [ "${CURL_RETURN_CODE}" -ne 0 ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
@@ -2246,7 +2246,7 @@ EOF
             echo "[DBG] Checking revokation via OCSP"
         fi
 
-        ISSUER_HASH="$($OPENSSL x509 -in "${CERT}" -noout -issuer_hash)"
+        ISSUER_HASH="$(${OPENSSL} x509 -in "${CERT}" -noout -issuer_hash)"
 
         if [ -z "${ISSUER_HASH}" ] ; then
             unknown 'unable to find issuer certificate hash.'
@@ -2278,9 +2278,9 @@ EOF
             fi
 
             if [ -n "${CURL_USER_AGENT}" ] ; then
-                exec_with_timeout "$TIMEOUT" "${CURL_BIN} --silent --user-agent '${CURL_USER_AGENT}' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
+                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} --silent --user-agent '${CURL_USER_AGENT}' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             else
-                exec_with_timeout "$TIMEOUT" "${CURL_BIN} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
+                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             fi
 
             if [ -n "${DEBUG}" ] ; then
@@ -2300,7 +2300,7 @@ EOF
 
                     cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
-                    $OPENSSL x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+                    ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
                 else
 
@@ -2383,28 +2383,28 @@ EOF
 
                     if [ -n "${KEYVALUE}" ] ; then
 			if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
 			fi
-			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
+			OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
                     else
 			if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
 			fi
-			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+			OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
 		else
 
                     if [ -n "${KEYVALUE}" ] ; then
 			if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
 			fi
-                        OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
+                        OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
                     else
 			if [ -n "${DEBUG}" ] ; then
-			    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+			    echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
 			fi
-			OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+			OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
 		fi
@@ -2430,25 +2430,25 @@ EOF
                     if [ -n "${HTTP_PROXY:-}" ] ; then
 
 			if [ -n "${DEBUG}" ] ; then
-			    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+			    echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
 			fi
 
 			if [ -n "${OCSP_HEADER}" ] ; then
-			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+			    OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
 			else
-			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
+			    OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
 			fi
 
                     else
 
 			if [ -n "${DEBUG}" ] ; then
-			    echo "[DBG] executing $OPENSSL ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+			    echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
 			fi
 
 			if [ -n "${OCSP_HEADER}" ] ; then
-			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+			    OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
 			else
-			    OCSP_RESP="$($OPENSSL ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 )"
+			    OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 )"
 			fi
 
                     fi
@@ -2477,21 +2477,21 @@ EOF
 
     ################################################################################
     # Check the organization
-    if [ -n "$ORGANIZATION" ] ; then
+    if [ -n "${ORGANIZATION}" ] ; then
 
-        ORG=$($OPENSSL x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
+        ORG=$(${OPENSSL} x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
 
-        if ! echo "$ORG" | grep -q -E "^$ORGANIZATION" ; then
-            critical "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '$ORG')"
+        if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}" ; then
+            critical "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
         fi
 
     fi
 
     ################################################################################
     # Check the organization
-    if [ -n "$ADDR" ] ; then
+    if [ -n "${ADDR}" ] ; then
 
-        EMAIL=$($OPENSSL x509 -in "${CERT}" -email -noout)
+        EMAIL=$(${OPENSSL} x509 -in "${CERT}" -email -noout)
 
         if [ -n "${VERBOSE}" ] ; then
             echo "checking email (${ADDR}): ${EMAIL}"
@@ -2501,8 +2501,8 @@ EOF
             critical "the certificate does not contain an email address"
         fi
 
-        if ! echo "$EMAIL" | grep -q -E "^$ADDR" ; then
-            critical "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match $EMAIL)"
+        if ! echo "${EMAIL}" | grep -q -E "^${ADDR}" ; then
+            critical "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
         fi
 
     fi
@@ -2570,7 +2570,7 @@ EOF
         DISPLAY_CN="'${CN}' "
     fi
 
-    if [ -z "$FORMAT" ]; then
+    if [ -z "${FORMAT}" ]; then
         if [ -n "${TERSE}" ]; then
             FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
         else
@@ -2615,6 +2615,8 @@ EOF
 
 }
 
+# Defined externally
+# shellcheck disable=SC2154
 if [ -z "${SOURCE_ONLY}" ]; then
     main "${@}"
 fi
