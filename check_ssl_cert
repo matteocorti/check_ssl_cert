@@ -159,7 +159,7 @@ trap_with_arg() {
     func="$1" ; shift
     for sig ; do
 	# shellcheck disable=SC2064
-        trap "$func $sig" "$sig"
+        trap "${func} ${sig}" "${sig}"
     done
 }
 
@@ -169,11 +169,11 @@ remove_temporary_files() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] cleaning up temporary files"
         # shellcheck disable=SC2086
-        echo $TEMPORARY_FILES | tr '\ ' '\n' | sed 's/^/[DBG]   /'
+        echo ${TEMPORARY_FILES} | tr '\ ' '\n' | sed 's/^/[DBG]   /'
     fi
     # shellcheck disable=SC2086
-    if [ -n "$TEMPORARY_FILES" ]; then
-        rm -f $TEMPORARY_FILES
+    if [ -n "${TEMPORARY_FILES}" ]; then
+        rm -f ${TEMPORARY_FILES}
     fi
 }
 
@@ -182,11 +182,11 @@ remove_temporary_files() {
 cleanup() {
     SIGNAL=$1
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] signal caught $SIGNAL"
+	echo "[DBG] signal caught ${SIGNAL}"
     fi
     remove_temporary_files
     # shellcheck disable=SC2086
-    trap - $SIGNALS
+    trap - ${SIGNALS}
     exit
 }
 
@@ -199,11 +199,11 @@ create_temporary_file() {
     fi
 
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] temporary file $TEMPFILE created"
+	echo "[DBG] temporary file ${TEMPFILE} created"
     fi
 
     # add the file to the list of temporary files
-    TEMPORARY_FILES="$TEMPORARY_FILES $TEMPFILE"
+    TEMPORARY_FILES="${TEMPORARY_FILES} ${TEMPFILE}"
 
 }
 
@@ -321,10 +321,10 @@ exec_with_timeout() {
     if [ -n "${TIMEOUT_BIN}" ] ; then
 
         if [ -n "${DEBUG}" ] ; then
-            echo "[DBG]   ${TIMEOUT_BIN} $time $command"
+            echo "[DBG]   ${TIMEOUT_BIN} ${time} ${command}"
         fi
 
-        eval "${TIMEOUT_BIN} $time $command" > /dev/null 2>&1
+        eval "${TIMEOUT_BIN} ${time} ${command}" > /dev/null 2>&1
 
         if [ $? -eq 137 ] ; then
             critical "Timeout after ${time} seconds"
@@ -333,10 +333,10 @@ exec_with_timeout() {
     elif [ -n "${EXPECT}" ] ; then
 
         if [ -n "${DEBUG}" ] ; then
-            echo "[DBG]   expect -c \"set echo \\\"-noecho\\\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }\""
+            echo "[DBG]   expect -c \"set echo \\\"-noecho\\\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }\""
         fi
 
-        expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"
+        expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"
 
 	RET=$?
 
@@ -365,12 +365,12 @@ check_required_prog() {
 
     PROG=$(command -v "$1" 2> /dev/null)
 
-    if [ -z "$PROG" ] ; then
+    if [ -z "${PROG}" ] ; then
         critical "cannot find program: $1"
     fi
 
-    if [ ! -x "$PROG" ] ; then
-        critical "$PROG is not executable"
+    if [ ! -x "${PROG}" ] ; then
+        critical "${PROG} is not executable"
     fi
 
 }
@@ -476,23 +476,23 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp)
-                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             irc)
-                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3|imap|ftp|ldap)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3s|imaps|ldaps)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect $HOST:$PORT ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
 	    xmpp)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect $HOST:$XMPPPORT ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             *)
@@ -511,7 +511,7 @@ fetch_certificate() {
 
     else
 
-        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect $HOST:$PORT ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -1072,8 +1072,9 @@ main() {
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.
     # COMMON_NAME may be a space separated list of hostnames.
-    case $COMMON_NAME in
-        *__HOST__*) COMMON_NAME=$(echo "$COMMON_NAME" | sed "s/__HOST__/${HOST}/") ;;
+    case ${COMMON_NAME} in
+        *__HOST__*) COMMON_NAME=$(echo "${COMMON_NAME}" | sed "s/__HOST__/${HOST}/") ;;
+	*) ;;
     esac
 
     ################################################################################
@@ -1203,7 +1204,7 @@ main() {
     if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then
         convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
-        if ( $SSL_LAB_WARN_ASSESTMENT_NUMERIC < $SSL_LAB_CRIT_ASSESSMENT_NUMERIC ); then
+        if ( "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" < "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ); then
             unknown  "--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs"
         fi
     fi
@@ -1218,13 +1219,13 @@ main() {
     # OpenSSL
     if [ -z "${OPENSSL}" ] ; then
         check_required_prog openssl
-        OPENSSL=$PROG
+        OPENSSL=${PROG}
     fi
 
     # file
     if [ -z "${FILE_BIN}" ] ; then
         check_required_prog file
-        FILE_BIN=$PROG
+        FILE_BIN=${PROG}
     fi
 
     # curl
@@ -1236,7 +1237,7 @@ main() {
 	    fi
 	    
             check_required_prog curl
-            CURL_BIN=$PROG
+            CURL_BIN=${PROG}
 	    
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] cURL available: ${CURL_BIN}"
@@ -1389,7 +1390,7 @@ main() {
     #
     if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
 
-        XMPPHOST="-xmpphost ${XMPPHOST:-$HOST}"
+        XMPPHOST="-xmpphost ${XMPPHOST:-${HOST}}"
 
         if [ -n "${DEBUG}" ] ; then
             echo "[DBG] '${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
@@ -1462,18 +1463,18 @@ main() {
     # Fetch the X.509 certificate
 
     # Temporary storage for the certificate and the errors
-    create_temporary_file; CERT=$TEMPFILE
-    create_temporary_file; ERROR=$TEMPFILE
+    create_temporary_file; CERT=${TEMPFILE}
+    create_temporary_file; ERROR=${TEMPFILE}
 
     if [ -n "${OCSP}" ] ; then
 
-	create_temporary_file; ISSUER_CERT_TMP=$TEMPFILE
-	create_temporary_file; ISSUER_CERT_TMP2=$TEMPFILE
+	create_temporary_file; ISSUER_CERT_TMP=${TEMPFILE}
+	create_temporary_file; ISSUER_CERT_TMP2=${TEMPFILE}
 
     fi
 
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
-	create_temporary_file; OCSP_RESPONSE_TMP=$TEMPFILE
+	create_temporary_file; OCSP_RESPONSE_TMP=${TEMPFILE}
     fi
 
     if [ -n "${VERBOSE}" ] ; then
@@ -1496,7 +1497,7 @@ main() {
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
     # shellcheck disable=SC2086
-    trap_with_arg cleanup $SIGNALS
+    trap_with_arg cleanup ${SIGNALS}
 
     fetch_certificate
 
@@ -1587,9 +1588,9 @@ main() {
     # Parse the X.509 certificate or crl
 
     # shellcheck disable=SC2086
-    DATE="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" ${OPENSSL_ENDDATE_OPTION} -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
+    DATE="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" "${OPENSSL_ENDDATE_OPTION}" -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
 
-    if [ ${OPENSSL_COMMAND} = "crl" ]; then
+    if [ "${OPENSSL_COMMAND}" = "crl" ]; then
         CN=""
         SUBJECT=""
         SERIAL=0
@@ -1620,13 +1621,13 @@ main() {
         # start with first certificate
         CERT_IN_CHAIN=1
         # shellcheck disable=SC2086
-        while [ $CERT_IN_CHAIN -le $NUM_CERTIFICATES ]; do
-            if [ -n "$ISSUERS" ]; then
-                ISSUERS="$ISSUERS\\n"
+        while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
+            if [ -n "${ISSUERS}" ]; then
+                ISSUERS="${ISSUERS}\\n"
             fi
             # shellcheck disable=SC2086
-            ISSUERS="$ISSUERS$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
-                               awk -v n=$CERT_IN_CHAIN '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' | \
+            ISSUERS="${ISSUERS}$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
+                               awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' | \
                                ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
@@ -1637,7 +1638,7 @@ main() {
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    ISSUERS=$(echo "$ISSUERS" | sed 's/\\n/\n/g' | sed -e "s/^.*\\/CN=//" -e "s/^.* CN = //" -e "s/^.*, O = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Za-z][A-Za-z]* =.*\$//")
+    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -e "s/^.*\\/CN=//" -e "s/^.* CN = //" -e "s/^.*, O = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Za-z][A-Za-z]* =.*\$//")
 
     # we just consider the first URI
     # TODO check SC2016
@@ -1670,7 +1671,7 @@ main() {
        	    echo "checking OCSP stapling"
 	fi
 
-	exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > $OCSP_RESPONSE_TMP"
+	exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > ${OCSP_RESPONSE_TMP}"
 
 	if [ -n "${DEBUG}" ] ; then
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
@@ -1693,7 +1694,7 @@ main() {
         echo "[DBG] ${SUBJECT}"
         echo "[DBG] CN         = ${CN}"
         # shellcheck disable=SC2162
-        echo "$ISSUERS" | while read LINE; do
+        echo "${ISSUERS}" | while read LINE; do
             echo "[DBG] CA         = ${LINE}"
         done
         echo "[DBG] SERIAL     = ${SERIAL}"
@@ -1755,12 +1756,12 @@ main() {
         if [ "${LONG_OUTPUT_ATTR}" = "all" ] ; then
             LONG_OUTPUT_ATTR="${VALID_ATTRIBUTES}"
         fi
-        attributes=$( echo ${LONG_OUTPUT_ATTR} | tr ',' "\\n" )
-        for attribute in $attributes ; do
+        attributes=$( echo "${LONG_OUTPUT_ATTR}" | tr ',' "\\n" )
+        for attribute in ${attributes} ; do
             check_attr "${attribute}"
         done
 
-        LONG_OUTPUT="$(echo "$LONG_OUTPUT" | sed 's/\\n/\n/g')"
+        LONG_OUTPUT="$(echo "${LONG_OUTPUT}" | sed 's/\\n/\n/g')"
 
     fi
 
@@ -1769,9 +1770,9 @@ main() {
     if [ -n "${DATETYPE}" ]; then
 
 	# shellcheck disable=SC2086
-        CERT_END_DATE=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout ${OPENSSL_ENDDATE_OPTION} | sed -e "s/.*=//")
+        CERT_END_DATE=$("${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
 
-        OLDLANG=$LANG
+        OLDLANG="${LANG}"
         LANG=en_US
 
         if [ -n "${DEBUG}" ] ; then
@@ -1802,9 +1803,11 @@ EOF
                     unknown "Error computing the certificate validity with Perl"
                 fi
                 ;;
+	    *)
+		unknown "Internal error: unknown date type"
         esac
 
-        LANG=$OLDLANG
+        LANG="${OLDLANG}"
 
         if [ -n "${VERBOSE}" ] ; then
 
@@ -1815,7 +1818,7 @@ EOF
             fi
 
         fi
-        add_performance_data "days=$DAYS_VALID;${WARNING};${CRITICAL};;"
+        add_performance_data "days=${DAYS_VALID};${WARNING};${CRITICAL};;"
 
     fi
 
@@ -1833,13 +1836,13 @@ EOF
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     fi
-    if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ ${OPENSSL_COMMAND} != "crl" ] ; then
+    if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ "${OPENSSL_COMMAND}" != "crl" ] ; then
         critical "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
     fi
 
     ################################################################################
     # Check the CN
-    if [ -n "$COMMON_NAME" ] ; then
+    if [ -n "${COMMON_NAME}" ] ; then
 
         ok=""
 
@@ -1895,7 +1898,7 @@ EOF
         fi
 
         # Check alternate names
-        if [ -n "${ALTNAMES}" ] && [ -z "$ok" ]; then
+        if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
 
             for cn in ${COMMON_NAME} ; do
 
@@ -1956,15 +1959,14 @@ EOF
 
                     fi
 
-                    if [ -n "$ok" ] ; then
-                        #fail=$cn
+                    if [ -n "${ok}" ] ; then
                         break;
                     fi
 
                 done
 
-                if [ -z "$ok" ] ; then
-                    fail=$cn
+                if [ -z "${ok}" ] ; then
+                    fail="${cn}"
                     break;
                 fi
 
@@ -1972,12 +1974,12 @@ EOF
 
         fi
 
-        if [ -n "$fail" ] ; then
-           critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '$fail')"
+        if [ -n "${fail}" ] ; then
+           critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
         fi
 
-        if [ -z "$ok" ] ; then
-            critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '$COMMON_NAME')"
+        if [ -z "${ok}" ] ; then
+            critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
         fi
 
         if [ -n "${DEBUG}" ] ; then
@@ -2020,7 +2022,7 @@ EOF
             ok="true"
         fi
 
-        if [ -z "$ok" ] ; then
+        if [ -z "${ok}" ] ; then
             critical "invalid serial number ('$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")' does not match '${SERIAL}')"
         fi
 
@@ -2035,7 +2037,7 @@ EOF
             ok="true"
         fi
 
-        if [ -z "$ok" ] ; then
+        if [ -z "${ok}" ] ; then
             critical "invalid SHA1 Fingerprint ('$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")' does not match '${FINGERPRINT}')"
         fi
 
