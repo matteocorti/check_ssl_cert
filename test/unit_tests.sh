@@ -37,7 +37,7 @@ testUsage() {
     ${SCRIPT} > /dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
-}    
+}
 
 testETHZ() {
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
@@ -49,7 +49,7 @@ testLetsEncrypt() {
     ${SCRIPT} -H helloworld.letsencrypt.org --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
-}   
+}
 
 testGoDaddy() {
     ${SCRIPT} -H www.godaddy.com --cn www.godaddy.com --rootcert cabundle.crt
@@ -100,7 +100,7 @@ testValidity() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
 }
-    
+
 testValidityWithPerl() {
     ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date
     EXIT_CODE=$?
@@ -169,11 +169,11 @@ testXMPPHost() {
 	fi
     else
 	echo "Skipping XMPP tests on Travis CI"
-    fi	
+    fi
 }
 
 # SSL Labs
-    
+
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a C
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs A --rootcert cabundle.crt
@@ -194,7 +194,7 @@ testIMAP() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping IMAP tests on Travis CI"
-    fi	
+    fi
 }
 
 testIMAPS() {
@@ -204,7 +204,7 @@ testIMAPS() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping IMAP tests on Travis CI"
-    fi	
+    fi
 }
 
 testPOP3S() {
@@ -225,7 +225,7 @@ testSMTP() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping SMTP tests on Travis CI"
-    fi	
+    fi
 }
 
 ################################################################################
@@ -233,6 +233,12 @@ testSMTP() {
 
 testBadSSLExpired() {
     ${SCRIPT} -H expired.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLExpiredAndWarnThreshold() {
+    ${SCRIPT} -H expired.badssl.com --host-cn --warning 3000
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -280,7 +286,7 @@ testBadSSLSHA256() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping SHA 256 with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 # exired on Feb 17 2019
@@ -291,7 +297,7 @@ testBadSSLSHA256() {
 #	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #    else
 #	echo "Skipping 1000 subject alternative names with badssl.com on Travis CI"
-#    fi		
+#    fi
 #}
 
 # Disabled as OpenSSL does not seem to handle it
@@ -308,7 +314,7 @@ testBadSSLEcc256() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping ECC 256 with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 testBadSSLEcc384() {
@@ -318,7 +324,7 @@ testBadSSLEcc384() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping ECC 384 with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 testBadSSLRSA8192() {
@@ -328,7 +334,7 @@ testBadSSLRSA8192() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping RSA8192 with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 testBadSSLLongSubdomainWithDashes() {
@@ -338,7 +344,7 @@ testBadSSLLongSubdomainWithDashes() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping long subdomain with dashes with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 testBadSSLLongSubdomain() {
@@ -348,7 +354,7 @@ testBadSSLLongSubdomain() {
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
 	echo "Skipping long subdomain with badssl.com on Travis CI"
-    fi	
+    fi
 }
 
 testBadSSLSHA12016() {
@@ -390,7 +396,7 @@ testIPv6() {
     if openssl s_client -help 2>&1 | grep -q -- -6 ; then
 
 	if ifconfig -a | grep -q inet6 ; then
-	    	
+
 	    ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
 	    EXIT_CODE=$?
 	    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -398,7 +404,7 @@ testIPv6() {
 	else
 	    echo "Skipping forcing IPv6: not IPv6 configured locally"
 	fi
-	
+
     else
 	echo "Skipping forcing IPv6: no OpenSSL support"
     fi
@@ -415,7 +421,7 @@ testFormatShort() {
 export SOURCE_ONLY='test'
 
 # source the script.
-. ${SCRIPT} 
+. ${SCRIPT}
 
 unset SOURCE_ONLY
 
@@ -429,6 +435,6 @@ unset SOURCE_ONLY
 . "${SHUNIT2}"
 
 #if ! . "${SHUNIT2}" | tee /dev/tty | grep -q 'tests\ passed:\ *[0-9]*\ 100%' ; then
-#    # at least one of the tests failed    
+#    # at least one of the tests failed
 #    exit 1
 #fi
