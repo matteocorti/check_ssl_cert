@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.88.0
+VERSION=1.89.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -258,7 +258,12 @@ critical() {
 
     remove_temporary_files
 
-    printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+    NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
+    if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
+	printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+    else
+	printf '%s\n' "$1"
+    fi
 
     exit 2
 }
@@ -307,7 +312,12 @@ append_warning_message() {
 warning() {
     remove_temporary_files
 
-    printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+    NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
+    if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
+	printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+    else
+	printf '%s\n' "$1"
+    fi
 
     exit 1
 }

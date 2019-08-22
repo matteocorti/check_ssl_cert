@@ -85,3 +85,4 @@ Thanks:
 * Many thanks to Michael Niewiara (https://github.com/mobitux) for the HTTPS/echo fix
 * Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch
 * Many thanks to Dick Visser (https://github.com/dnmvisser) for the --inetproto patch
+* Many thanks to jmuecke (https://github.com/jmuecke) for the multiple errors patch
