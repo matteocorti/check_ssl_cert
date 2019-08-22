@@ -36,88 +36,88 @@ testDependencies() {
 testUsage() {
     ${SCRIPT} > /dev/null 2>&1
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testETHZ() {
     ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testLetsEncrypt() {
     ${SCRIPT} -H helloworld.letsencrypt.org --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testGoDaddy() {
     ${SCRIPT} -H www.godaddy.com --cn www.godaddy.com --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZCaseInsensitive() {
     # debugging: to be removed
     ${SCRIPT} -H www.ethz.ch --cn WWW.ETHZ.CH --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCard() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardCaseInsensitive() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSubCaseInsensitive() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --rootcert cabundle.crt
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRootIssuer() {
     ${SCRIPT} --rootcert cabundle.crt -H google.com --issuer GlobalSign
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testValidity() {
     # Tests bug #8
     ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testValidityWithPerl() {
     ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_WARNING} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testAltNames() {
     ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
     ${SCRIPT} -H sherlock.sp.ethz.ch --rootcert cabundle.crt --altnames --host-cn
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Check for wildcard support in Alternative Names
@@ -128,34 +128,34 @@ testWildcardAltNames2() {
         --cn spapps.ethz.ch \
         --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testAltNamesCaseInsensitve() {
     ${SCRIPT} -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesOK() {
     # Test with multiple CN's
     ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n ethz.ch --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
     ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
     ${SCRIPT} -H inf.ethz.ch -n wrong.ch -n www.ethz.ch --rootcert cabundle.crt --altnames
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_CRITICAL} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testXMPPHost() {
@@ -163,9 +163,9 @@ testXMPPHost() {
 	out=$(${SCRIPT} -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is)
 	EXIT_CODE=$?
 	if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
-	    assertEquals "wrong exit code" ${NAGIOS_UNKNOWN} "${EXIT_CODE}"
+	    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 	else
-	    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+	    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 	fi
     else
 	echo "Skipping XMPP tests on Travis CI"
@@ -413,7 +413,7 @@ testIPv6() {
 testFormatShort() {
     OUTPUT=$( ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
     EXIT_CODE=$?
-    assertEquals "wrong exit code" ${NAGIOS_OK} "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK www.ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
 }
 
