@@ -30,6 +30,12 @@ SIGNALS="HUP INT QUIT TERM ABRT"
 TEMPFILE=""
 
 ################################################################################
+# Variables
+WARNING_MSG=""
+CRITICAL_MSG=""
+ALL_MSG=""
+
+################################################################################
 # Functions
 
 ################################################################################
@@ -208,77 +214,102 @@ create_temporary_file() {
 }
 
 ################################################################################
+# prepends critical messages to list of all messages
+# Params
+#   $1 error message
+prepend_critical_message() {
+
+  if [ -n "${DEBUG}" ] ; then
+    echo "[DBG] output parameters: HOST       = ${HOST}"
+    echo "[DBG] output parameters: CN         = ${CN}"
+    echo "[DBG] output parameters: SNI       = ${SNI}"
+    echo "[DBG] output parameters: FILE      = ${FILE}"
+    echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
+    echo "[DBG] output parameters: $1        = $1"
+  fi
+
+  if [ -n "${CN}" ] ; then
+    tmp=" ${CN}"
+  else
+    if [ -n "${HOST}" ] ; then
+        if [ -n "${SNI}" ] ; then
+          tmp=" ${SNI}"
+        elif [ -n "${FILE}" ] ; then
+          tmp=" ${FILE}"
+        else
+          tmp=" ${HOST}"
+        fi
+    fi
+  fi
+
+  MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+  if [ "${CRITICAL_MSG}" = "" ]; then
+    CRITICAL_MSG="${MSG}"
+  fi
+
+  ALL_MSG="\n    ${MSG}${ALL_MSG}"
+}
+
+################################################################################
 # Exits with a critical message
 # Params
 #   $1 error message
 critical() {
 
-    if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] output parameters: HOST       = ${HOST}"
-	echo "[DBG] output parameters: CN         = ${CN}"
-	echo "[DBG] output parameters: SNI       = ${SNI}"       
-	echo "[DBG] output parameters: FILE      = ${FILE}"
-	echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
-	echo "[DBG] output parameters: $1        = $1"
-    fi
-
-    if [ -n "${CN}" ] ; then
-	tmp=" ${CN}"
-    else
-	if [ -n "${HOST}" ] ; then
-	    if [ -n "${SNI}" ] ; then
-		tmp=" ${SNI}"
-	    elif [ -n "${FILE}" ] ; then
-		tmp=" ${FILE}"
-	    else
-		tmp=" ${HOST}"
-	    fi
-	fi
-    fi
-    
     remove_temporary_files
-    
-    printf '%s CRITICAL%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
-    
+
+    printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+
     exit 2
-    
 }
+
+################################################################################
+# append all warning messages to list of all messages
+# Params
+#   $1 warning message
+append_warning_message() {
+
+  if [ -n "${DEBUG}" ] ; then
+    echo "[DBG] output parameters: HOST       = ${HOST}"
+    echo "[DBG] output parameters: CN         = ${CN}"
+    echo "[DBG] output parameters: SNI       = ${SNI}"
+    echo "[DBG] output parameters: FILE      = ${FILE}"
+    echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
+    echo "[DBG] output parameters: $1        = $1"
+  fi
+
+  if [ -n "${CN}" ] ; then
+    tmp=" ${CN}"
+  else
+    if [ -n "${HOST}" ] ; then
+        if [ -n "${SNI}" ] ; then
+          tmp=" ${SNI}"
+        elif [ -n "${FILE}" ] ; then
+          tmp=" ${FILE}"
+        else
+          tmp=" ${HOST}"
+        fi
+    fi
+  fi
+
+  MSG="${SHORTNAME} WARN${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+  if [ "${WARNING_MSG}" = "" ]; then
+    WARNING_MSG="${MSG}"
+  fi
+  ALL_MSG="${ALL_MSG}\n    ${MSG}"
+}
+
 
 ################################################################################
 # Exits with a warning message
 # Param
 #   $1 warning message
 warning() {
-
-    if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] output parameters: HOST       = ${HOST}"
-	echo "[DBG] output parameters: CN         = ${CN}"
-	echo "[DBG] output parameters: SNI       = ${SNI}"       
-	echo "[DBG] output parameters: FILE      = ${FILE}"
-	echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
-	echo "[DBG] output parameters: $1        = $1"
-    fi
-
-    if [ -n "${CN}" ] ; then
-	tmp=" ${CN}"
-    else
-	if [ -n "${HOST}" ] ; then
-	    if [ -n "${SNI}" ] ; then
-		tmp=" ${SNI}"
-	    elif [ -n "${FILE}" ] ; then
-		tmp=" ${FILE}"
-	    else
-		tmp=" ${HOST}"
-	    fi
-	fi
-    fi
-    
     remove_temporary_files
-    
-    printf '%s WARN%s: %s%s%s\n' "${SHORTNAME}" "${tmp}" "$1" "${PERFORMANCE_DATA}" "${LONG_OUTPUT}"
-    
+
+    printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+
     exit 1
-    
 }
 
 ################################################################################
@@ -327,7 +358,7 @@ exec_with_timeout() {
         eval "${TIMEOUT_BIN} ${time} ${command}" > /dev/null 2>&1
 
         if [ $? -eq 137 ] ; then
-            critical "Timeout after ${time} seconds"
+            prepend_critical_message "Timeout after ${time} seconds"
         fi
 
     elif [ -n "${EXPECT}" ] ; then
@@ -345,7 +376,7 @@ exec_with_timeout() {
         fi
 
         if [ "${RET}" -eq 1 ] ; then
-            critical "Timeout after ${time} seconds"
+            prepend_critical_message "Timeout after ${time} seconds"
         fi
 
     else
@@ -366,11 +397,11 @@ check_required_prog() {
     PROG=$(command -v "$1" 2> /dev/null)
 
     if [ -z "${PROG}" ] ; then
-        critical "cannot find program: $1"
+        prepend_critical_message "cannot find program: $1"
     fi
 
     if [ ! -x "${PROG}" ] ; then
-        critical "${PROG} is not executable"
+        prepend_critical_message "${PROG} is not executable"
     fi
 
 }
@@ -548,7 +579,7 @@ fetch_certificate() {
                     | grep -v '^verify' \
                     | head -n 1
                  )
-            critical "SSL error: ${ERROR_MESSAGE}"
+            prepend_critical_message "SSL error: ${ERROR_MESSAGE}"
 
         fi
 
@@ -759,8 +790,8 @@ main() {
 		INETPROTO="-6"
 		shift
 		;;
-	  
-	    
+
+
             ########################################
             # Options with arguments
             -c|--critical)
@@ -1235,10 +1266,10 @@ main() {
 		echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
 		echo "[DBG] cURL binary not specified"
 	    fi
-	    
+
             check_required_prog curl
             CURL_BIN=${PROG}
-	    
+
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] cURL available: ${CURL_BIN}"
 	    fi
@@ -1427,8 +1458,8 @@ main() {
 	    VERSION=$(echo "${INETPROTO}" | awk  '{ string=substr($0, 2); print string; }' )
 	    unknown "Invalid argument '${VERSION}': the value must be 4 or 6"
 	fi
-	
-	# Check if openssl s_client supports the -4 or -6 option	
+
+	# Check if openssl s_client supports the -4 or -6 option
 	if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${INETPROTO}" ; then
             unknown "OpenSSL does not support the ${INETPROTO} option"
 	fi
@@ -1441,14 +1472,14 @@ main() {
 		fi
 	    fi
 	fi
-	
+
 	# check if IPv6 is available locally
 	if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && ! ifconfig -a | grep -q inet6 ; then
 	    unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
-	fi	
-	
+	fi
+
     fi
-	
+
     ################################################################################
     # define the HTTP request string
     if [ -n "${SNI}" ]; then
@@ -1518,7 +1549,7 @@ main() {
 
         if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
-            critical "cannot fetch certificate: OpenSSL got an unexpected message"
+            prepend_critical_message "cannot fetch certificate: OpenSSL got an unexpected message"
 
         fi
 
@@ -1545,12 +1576,12 @@ main() {
 			OPENSSL_PARAMS="-inform DER -nameopt utf8,oneline,-esc_msb"
 			OPENSSL_ENDDATE_OPTION="-nextupdate"
                     else
-			critical "'${FILE}' is not a valid certificate file"
+			prepend_critical_message "'${FILE}' is not a valid certificate file"
                     fi
 
 		else
 
-		    critical "'${FILE}' is not readable"
+		    prepend_critical_message "'${FILE}' is not readable"
 
 		fi
 
@@ -1569,7 +1600,8 @@ main() {
                 if [ -n "${VERBOSE}" ] ; then
                     echo "Error: ${ERROR_MESSAGE}"
                 fi
-                critical "No certificate returned"
+                prepend_critical_message "No certificate returned"
+                critical "${CRITICAL_MSG}"
             fi
         else
             # parameters for regular x509 certifcates
@@ -1586,7 +1618,6 @@ main() {
 
     ################################################################################
     # Parse the X.509 certificate or crl
-
     # shellcheck disable=SC2086
     DATE="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" "${OPENSSL_ENDDATE_OPTION}" -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
 
@@ -1667,23 +1698,23 @@ main() {
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
 
-	if [ -n "${VERBOSE}" ] ; then
-       	    echo "checking OCSP stapling"
-	fi
+  if [ -n "${VERBOSE}" ] ; then
+            echo "checking OCSP stapling"
+  fi
 
-	exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > ${OCSP_RESPONSE_TMP}"
+  exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > ${OCSP_RESPONSE_TMP}"
 
-	if [ -n "${DEBUG}" ] ; then
-	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
-	fi
+  if [ -n "${DEBUG}" ] ; then
+      sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
+  fi
 
-	if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
-	    critical "OCSP stapling not enabled"
-	else
-	    if [ -n "${VERBOSE}" ] ; then
-       		echo "  OCSP stapling enabled"
-	    fi
-	fi
+  if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
+      prepend_critical_message "OCSP stapling not enabled"
+  else
+      if [ -n "${VERBOSE}" ] ; then
+          echo "  OCSP stapling enabled"
+      fi
+  fi
 
     fi
 
@@ -1714,7 +1745,7 @@ main() {
 
         else
 
-            critical "${OPENSSL_COMMAND} Certificate is signed with SHA-1"
+            prepend_critical_message "${OPENSSL_COMMAND} Certificate is signed with SHA-1"
 
         fi
 
@@ -1730,7 +1761,7 @@ main() {
 
         else
 
-            critical "${OPENSSL_COMMAND} Certificate is signed with MD5"
+            prepend_critical_message "${OPENSSL_COMMAND} Certificate is signed with MD5"
 
         fi
 
@@ -1745,7 +1776,7 @@ main() {
             if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR}," ; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else
-		# shellcheck disable=SC2086
+    # shellcheck disable=SC2086
                 value="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout -nameopt utf8,oneline,-esc_msb  -"${ATTR}" | sed -e "s/.*=//")"
                 LONG_OUTPUT="${LONG_OUTPUT}\\n${ATTR}: ${value}"
             fi
@@ -1769,7 +1800,7 @@ main() {
     # Compute for how many days the certificate will be valid
     if [ -n "${DATETYPE}" ]; then
 
-	# shellcheck disable=SC2086
+  # shellcheck disable=SC2086
         CERT_END_DATE=$("${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
 
         OLDLANG="${LANG}"
@@ -1803,8 +1834,8 @@ EOF
                     unknown "Error computing the certificate validity with Perl"
                 fi
                 ;;
-	    *)
-		unknown "Internal error: unknown date type"
+      *)
+    unknown "Internal error: unknown date type"
         esac
 
         LANG="${OLDLANG}"
@@ -1837,7 +1868,7 @@ EOF
         echo "[DBG] subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     fi
     if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ "${OPENSSL_COMMAND}" != "crl" ] ; then
-        critical "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
+        prepend_critical_message "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
     fi
 
     ################################################################################
@@ -1975,11 +2006,11 @@ EOF
         fi
 
         if [ -n "${fail}" ] ; then
-           critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
+           prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
         fi
 
         if [ -z "${ok}" ] ; then
-            critical "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
+            prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
         fi
 
         if [ -n "${DEBUG}" ] ; then
@@ -2003,7 +2034,7 @@ EOF
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
-            critical "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+            prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
         fi
 
     else
@@ -2023,7 +2054,7 @@ EOF
         fi
 
         if [ -z "${ok}" ] ; then
-            critical "invalid serial number ('$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")' does not match '${SERIAL}')"
+            prepend_critical_message "invalid serial number ('$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")' does not match '${SERIAL}')"
         fi
 
     fi
@@ -2038,7 +2069,7 @@ EOF
         fi
 
         if [ -z "${ok}" ] ; then
-            critical "invalid SHA1 Fingerprint ('$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")' does not match '${FINGERPRINT}')"
+            prepend_critical_message "invalid SHA1 Fingerprint ('$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")' does not match '${FINGERPRINT}')"
         fi
 
     fi
@@ -2056,7 +2087,7 @@ EOF
 
             # We always check expired certificates
             if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend 0 > /dev/null ; then
-                critical "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
+                prepend_critical_message "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
             fi
 
             if [ -n "${CRITICAL}" ] ; then
@@ -2066,7 +2097,7 @@ EOF
                 fi
 
                 if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
-                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
+                    prepend_critical_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
@@ -2078,7 +2109,7 @@ EOF
                 fi
 
                 if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
-                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
+                    append_warning_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
@@ -2087,19 +2118,19 @@ EOF
 
             # We always check expired certificates
             if [ "${DAYS_VALID}" -lt 1 ] ; then
-                critical "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
+                prepend_critical_message "${OPENSSL_COMMAND} certificate is expired (was valid until ${DATE})"
             fi
 
             if [ -n "${CRITICAL}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${CRITICAL}" ] ; then
-                    critical "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
+                    prepend_critical_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
 
             if [ -n "${WARNING}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${WARNING}" ] ; then
-                    warning "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
+                    append_warning_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
@@ -2160,7 +2191,7 @@ EOF
                 'ERROR')
                     SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
                         | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
-                    critical "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
+                    prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
                     ;;
                 'READY')
                     if ! echo "${JSON}" | grep -q "grade" ; then
@@ -2168,7 +2199,7 @@ EOF
                         # Something went wrong
                         SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
                             | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
-                        critical "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
+                        prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
 
                     else
 
@@ -2190,10 +2221,10 @@ EOF
 
                         # Check the grade
                         if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ] ; then
-                            critical "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
+                            prepend_critical_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
                         elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
                             if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
-                                warning "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
+                                append_warning_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
                             fi
                         fi
 
@@ -2226,7 +2257,7 @@ EOF
                         SSL_LABS_ERROR_MESSAGE="${JSON}"
                     fi
 
-                    critical "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
+                    prepend_critical_message "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
             esac
 
             WAIT_TIME=60
@@ -2421,7 +2452,7 @@ EOF
 			echo '[DBG] OCSP: revoked'
 		    fi
 
-		    critical "certificate is revoked"
+		    prepend_critical_message "certificate is revoked"
 
 		elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 
@@ -2455,7 +2486,7 @@ EOF
 
                     fi
 
-                    critical "OCSP error: '${OCSP_RESP}'"
+                    prepend_critical_message "OCSP error: '${OCSP_RESP}'"
 
 		fi
 
@@ -2484,7 +2515,7 @@ EOF
         ORG=$(${OPENSSL} x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
 
         if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}" ; then
-            critical "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
+            prepend_critical_message "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
         fi
 
     fi
@@ -2499,12 +2530,18 @@ EOF
             echo "checking email (${ADDR}): ${EMAIL}"
         fi
 
-        if [ -z "${EMAIL}" ] ; then
-            critical "the certificate does not contain an email address"
+        if [ -z "${EMAIL}" ] ; then if [ "${CRITICAL_MSG}" != "" ] ; then
+        prepend_critical_message "${CRITICAL_MSG}"
+    fi
+
+    if [ "${WARNING_MSG}" != "" ] ; then
+        append_warning_message "${WARNING_MSG}"
+    fi
+            prepend_critical_message "the certificate does not contain an email address"
         fi
 
         if ! echo "${EMAIL}" | grep -q -E "^${ADDR}" ; then
-            critical "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
+            prepend_critical_message "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
         fi
 
     fi
@@ -2516,7 +2553,7 @@ EOF
         if ascii_grep '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' "${ERROR}" ; then
 
             if [ -z "${SELFSIGNED}" ] ; then
-                critical "Cannot verify certificate, self signed certificate"
+                prepend_critical_message "Cannot verify certificate, self signed certificate"
             else
                 SELFSIGNEDCERT="self signed "
             fi
@@ -2529,10 +2566,19 @@ EOF
 
             # Process errors
             details=$( grep  '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g' )
-            critical "Cannot verify certificate: ${details}"
+            prepend_critical_message "Cannot verify certificate: ${details}"
 
         fi
 
+    fi
+
+		# if errors exist at this point return
+    if [ "${CRITICAL_MSG}" != "" ] ; then
+        critical "${CRITICAL_MSG}"
+    fi
+
+    if [ "${WARNING_MSG}" != "" ] ; then
+        warning "${WARNING_MSG}"
     fi
 
     ################################################################################
