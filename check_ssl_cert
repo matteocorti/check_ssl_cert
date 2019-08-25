@@ -225,7 +225,7 @@ prepend_critical_message() {
     echo "[DBG] output parameters: SNI       = ${SNI}"
     echo "[DBG] output parameters: FILE      = ${FILE}"
     echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
-    echo "[DBG] output parameters: $1        = $1"
+    echo "[DBG] output parameters: message   = $1"
   fi
 
   if [ -n "${CN}" ] ; then
@@ -1681,6 +1681,11 @@ main() {
     # shellcheck disable=SC2086
     ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -e "s/^.*\\/CN=//" -e "s/^.* CN = //" -e "s/^.*, O = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Za-z][A-Za-z]* =.*\$//")
 
+    if [ -n "${DEBUG}" ] ; then
+	echo '[DBG] ISSUERS = '
+	echo "${ISSUERS}" | sed 's/^/[DBG]\ \ \ \ \ \ \ \ \ \ \ /'
+    fi
+    
     # we just consider the first URI
     # TODO check SC2016
     # shellcheck disable=SC2086,SC2016
@@ -1946,6 +1951,7 @@ EOF
                 ok=""
 
                 if [ -n "${DEBUG}" ] ; then
+		    echo '[DBG] ==============================='
                     echo "[DBG] checking altnames against ${cn}"
                 fi
 
@@ -2016,12 +2022,12 @@ EOF
         fi
 
         if [ -n "${fail}" ] ; then
-           prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
-        fi
-
-        if [ -z "${ok}" ] ; then
-            prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
-        fi
+            prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
+	else
+            if [ -z "${ok}" ] ; then
+		prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
+            fi
+	fi
 
         if [ -n "${DEBUG}" ] ; then
             echo "[DBG] CN check finished"
@@ -2039,6 +2045,10 @@ EOF
 
         ok=""
         CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${ISSUER}\$" | head -n1)
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG]   issuer matched = ${CA_ISSUER_MATCHED}"
+	fi
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
             ok="true"
