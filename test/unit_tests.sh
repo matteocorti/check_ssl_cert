@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# $SHUNIT2 should be defined as an environment variable before running the tests
+# shellcheck disable=SC2154
 if [ -z "${SHUNIT2}" ] ; then
     cat <<EOF
 To be able to run the unit test you need a copy of shUnit2
@@ -30,6 +32,8 @@ NAGIOS_UNKNOWN=3
 
 testDependencies() {
     check_required_prog openssl
+    # $PROG is defined in the script
+    # shellcheck disable=SC2154
     assertNotNull 'openssl not found' "${PROG}"
 }
 
@@ -159,6 +163,8 @@ testMultipleAltNamesFailTwo() {
 }
 
 testXMPPHost() {
+    # $TRAVIS is set an environment variable
+    # shellcheck disable=SC2154
     if [ -z "${TRAVIS+x}" ] ; then
 	out=$(${SCRIPT} -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is)
 	EXIT_CODE=$?
@@ -417,11 +423,21 @@ testFormatShort() {
     assertEquals "wrong output" "SSL_CERT OK www.ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
 }
 
+testMoreErrors() {
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical 3000000 --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    # we should get three lines: the plugin output and two errors
+    assertEquals "wrong number of errors" 4 "${OUTPUT}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
 # source the script.
-. ${SCRIPT}
+# Do not follow
+# shellcheck disable=SC1090
+. "${SCRIPT}"
 
 unset SOURCE_ONLY
 
@@ -432,6 +448,8 @@ unset SOURCE_ONLY
 # We parse the output to check if a test failed
 #
 
+# Do not follow
+# shellcheck disable=SC1090
 . "${SHUNIT2}"
 
 #if ! . "${SHUNIT2}" | tee /dev/tty | grep -q 'tests\ passed:\ *[0-9]*\ 100%' ; then

@@ -219,35 +219,46 @@ create_temporary_file() {
 #   $1 error message
 prepend_critical_message() {
 
-  if [ -n "${DEBUG}" ] ; then
-    echo "[DBG] output parameters: HOST       = ${HOST}"
-    echo "[DBG] output parameters: CN         = ${CN}"
-    echo "[DBG] output parameters: SNI       = ${SNI}"
-    echo "[DBG] output parameters: FILE      = ${FILE}"
-    echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
-    echo "[DBG] output parameters: message   = $1"
-  fi
-
-  if [ -n "${CN}" ] ; then
-    tmp=" ${CN}"
-  else
-    if [ -n "${HOST}" ] ; then
-        if [ -n "${SNI}" ] ; then
-          tmp=" ${SNI}"
-        elif [ -n "${FILE}" ] ; then
-          tmp=" ${FILE}"
-        else
-          tmp=" ${HOST}"
-        fi
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "[DBG] prepend_critical_message: new message  = $1"
+	echo "[DBG] prepend_critical_message: HOST         = ${HOST}"
+	echo "[DBG] prepend_critical_message: CN           = ${CN}"
+	echo "[DBG] prepend_critical_message: SNI          = ${SNI}"
+	echo "[DBG] prepend_critical_message: FILE         = ${FILE}"
+	echo "[DBG] prepend_critical_message: SHORTNAME    = ${SHORTNAME}"
+	echo "[DBG] prepend_critical_message: MSG          = ${MSG}"
+	echo "[DBG] prepend_critical_message: CRITICAL_MSG = ${CRITICAL_MSG}"
+	echo "[DBG] prepend_critical_message: ALL_MSG 1    = ${ALL_MSG}"
     fi
-  fi
+    
+    if [ -n "${CN}" ] ; then
+	tmp=" ${CN}"
+    else
+	if [ -n "${HOST}" ] ; then
+            if [ -n "${SNI}" ] ; then
+		tmp=" ${SNI}"
+            elif [ -n "${FILE}" ] ; then
+		tmp=" ${FILE}"
+            else
+		tmp=" ${HOST}"
+            fi
+	fi
+    fi
+    
+    MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    
+    if [ "${CRITICAL_MSG}" = "" ]; then
+	CRITICAL_MSG="${MSG}"
+    fi
+    
+    ALL_MSG="\n    ${MSG}${ALL_MSG}"
+    
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] prepend_critical_message: ALL_MSG 2    = ${ALL_MSG}"
+	echo "[DBG] CRITICAL <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    fi
 
-  MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
-  if [ "${CRITICAL_MSG}" = "" ]; then
-    CRITICAL_MSG="${MSG}"
-  fi
-
-  ALL_MSG="\n    ${MSG}${ALL_MSG}"
 }
 
 ################################################################################
@@ -275,12 +286,12 @@ critical() {
 append_warning_message() {
 
   if [ -n "${DEBUG}" ] ; then
-    echo "[DBG] output parameters: HOST       = ${HOST}"
-    echo "[DBG] output parameters: CN         = ${CN}"
-    echo "[DBG] output parameters: SNI       = ${SNI}"
-    echo "[DBG] output parameters: FILE      = ${FILE}"
-    echo "[DBG] output parameters: SHORTNAME = ${SHORTNAME}"
-    echo "[DBG] output parameters: $1        = $1"
+    echo "[DBG] append_warning_message: HOST       = ${HOST}"
+    echo "[DBG] append_warning_message: CN         = ${CN}"
+    echo "[DBG] append_warning_message: SNI       = ${SNI}"
+    echo "[DBG] append_warning_message: FILE      = ${FILE}"
+    echo "[DBG] append_warning_message: SHORTNAME = ${SHORTNAME}"
+    echo "[DBG] append_warning_message: $1        = $1"
   fi
 
   if [ -n "${CN}" ] ; then
@@ -2555,15 +2566,7 @@ EOF
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] no email in certificate"
 	    fi
-	    
-	    if [ "${CRITICAL_MSG}" != "" ] ; then
-		prepend_critical_message "${CRITICAL_MSG}"
-	    fi
-
-	    if [ "${WARNING_MSG}" != "" ] ; then
-		append_warning_message "${WARNING_MSG}"
-	    fi
-	    
+	    	    
             prepend_critical_message "the certificate does not contain an email address"
 	    
 	else
