@@ -2549,20 +2549,30 @@ EOF
         if [ -n "${VERBOSE}" ] ; then
             echo "checking email (${ADDR}): ${EMAIL}"
         fi
+	
+        if [ -z "${EMAIL}" ] ; then
 
-        if [ -z "${EMAIL}" ] ; then if [ "${CRITICAL_MSG}" != "" ] ; then
-        prepend_critical_message "${CRITICAL_MSG}"
-    fi
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] no email in certificate"
+	    fi
+	    
+	    if [ "${CRITICAL_MSG}" != "" ] ; then
+		prepend_critical_message "${CRITICAL_MSG}"
+	    fi
 
-    if [ "${WARNING_MSG}" != "" ] ; then
-        append_warning_message "${WARNING_MSG}"
-    fi
+	    if [ "${WARNING_MSG}" != "" ] ; then
+		append_warning_message "${WARNING_MSG}"
+	    fi
+	    
             prepend_critical_message "the certificate does not contain an email address"
-        fi
+	    
+	else
+	    
+            if ! echo "${EMAIL}" | grep -q -E "^${ADDR}" ; then
+		prepend_critical_message "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
+            fi
 
-        if ! echo "${EMAIL}" | grep -q -E "^${ADDR}" ; then
-            prepend_critical_message "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
-        fi
+	fi
 
     fi
 
