@@ -271,7 +271,7 @@ critical() {
 
     NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
     if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
-	printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
 	printf '%s\n' "$1"
     fi
@@ -325,7 +325,7 @@ warning() {
 
     NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
     if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
-	printf '%s\nFound error(s):%b\n' "$1" "${ALL_MSG}"
+	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
 	printf '%s\n' "$1"
     fi
