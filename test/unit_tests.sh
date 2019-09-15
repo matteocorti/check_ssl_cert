@@ -44,7 +44,7 @@ testUsage() {
 }
 
 testETHZ() {
-    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --rootcert cabundle.crt
+    ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -63,7 +63,7 @@ testGoDaddy() {
 
 testETHZCaseInsensitive() {
     # debugging: to be removed
-    ${SCRIPT} -H www.ethz.ch --cn WWW.ETHZ.CH --rootcert cabundle.crt
+    ${SCRIPT} -H ethz.ch --cn ETHZ.CH --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -141,13 +141,6 @@ testAltNamesCaseInsensitve() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testMultipleAltNamesOK() {
-    # Test with multiple CN's
-    ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n ethz.ch --rootcert cabundle.crt --altnames
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
     ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --rootcert cabundle.crt --altnames
@@ -176,15 +169,6 @@ testXMPPHost() {
     else
 	echo "Skipping XMPP tests on Travis CI"
     fi
-}
-
-# SSL Labs
-
-testETHZWithSSLLabs() {
-    # we assume www.ethz.ch gets at least a C
-    ${SCRIPT} -H www.ethz.ch --cn www.ethz.ch --check-ssl-labs A --rootcert cabundle.crt
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testTimeOut() {
@@ -431,6 +415,19 @@ testMoreErrors() {
     # we should get three lines: the plugin output and two errors
     assertEquals "wrong number of errors" 4 "${OUTPUT}"
 }
+
+# SSL Labs (last one as it usually takes a lot of time
+
+testETHZWithSSLLabs() {
+    # we assume www.ethz.ch gets at least a C
+    ${SCRIPT} -H ethz.ch --cn ethz.ch --check-ssl-labs A --rootcert cabundle.crt
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+# we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
+echo 'Starting SSL Lab test (to cache the result)'
+curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
 
 # the script will exit without executing main
 export SOURCE_ONLY='test'
