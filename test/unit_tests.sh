@@ -406,7 +406,7 @@ testFormatShort() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
 }
->
+
 testMoreErrors() {
     CRITICAL_VALUE=300000
     ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical ${CRITICAL_VALUE} --rootcert cabundle.crt -d
