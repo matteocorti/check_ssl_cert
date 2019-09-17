@@ -221,15 +221,15 @@ prepend_critical_message() {
 
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "[DBG] prepend_critical_message: new message  = $1"
-	echo "[DBG] prepend_critical_message: HOST         = ${HOST}"
-	echo "[DBG] prepend_critical_message: CN           = ${CN}"
-	echo "[DBG] prepend_critical_message: SNI          = ${SNI}"
-	echo "[DBG] prepend_critical_message: FILE         = ${FILE}"
-	echo "[DBG] prepend_critical_message: SHORTNAME    = ${SHORTNAME}"
-	echo "[DBG] prepend_critical_message: MSG          = ${MSG}"
-	echo "[DBG] prepend_critical_message: CRITICAL_MSG = ${CRITICAL_MSG}"
-	echo "[DBG] prepend_critical_message: ALL_MSG 1    = ${ALL_MSG}"
+	echo "[DBG] prepend_critical_message: new message    = $1"
+	echo "[DBG] prepend_critical_message: HOST           = ${HOST}"
+	echo "[DBG] prepend_critical_message: CN             = ${CN}"
+	echo "[DBG] prepend_critical_message: SNI            = ${SNI}"
+	echo "[DBG] prepend_critical_message: FILE           = ${FILE}"
+	echo "[DBG] prepend_critical_message: SHORTNAME      = ${SHORTNAME}"
+	echo "[DBG] prepend_critical_message: MSG            = ${MSG}"
+	echo "[DBG] prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
+	echo "[DBG] prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
     fi
     
     if [ -n "${CN}" ] ; then
@@ -255,7 +255,9 @@ prepend_critical_message() {
     ALL_MSG="\n    ${MSG}${ALL_MSG}"
     
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] prepend_critical_message: ALL_MSG 2    = ${ALL_MSG}"
+	echo "[DBG] prepend_critical_message: MSG 2          = ${MSG}"
+	echo "[DBG] prepend_critical_message: CRITICAL_MSG 2 = ${CRITICAL_MSG}"
+	echo "[DBG] prepend_critical_message: ALL_MSG 2      = ${ALL_MSG}"
 	echo "[DBG] CRITICAL <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     fi
 
@@ -269,7 +271,17 @@ critical() {
 
     remove_temporary_files
 
+    if [ -n "${DEBUG}" ] ; then
+	echo '[DBG] exiting with CRITICAL'
+	echo "[DBG] ALL_MSG = ${ALL_MSG}"
+    fi
+
     NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] number of errors = ${NUMBER_OF_ERRORS}"
+    fi
+    
     if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
 	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
@@ -398,6 +410,7 @@ exec_with_timeout() {
 
         if [ "${RET}" -eq 1 ] ; then
             prepend_critical_message "Timeout after ${time} seconds"
+	    critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
         fi
 
     else
@@ -2610,7 +2623,7 @@ EOF
 
     fi
 
-		# if errors exist at this point return
+    # if errors exist at this point return
     if [ "${CRITICAL_MSG}" != "" ] ; then
         critical "${CRITICAL_MSG}"
     fi
