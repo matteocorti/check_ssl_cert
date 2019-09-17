@@ -409,8 +409,7 @@ testFormatShort() {
 
 testMoreErrors() {
     CRITICAL_VALUE=300000
-    ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical ${CRITICAL_VALUE} --rootcert cabundle.crt -d
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical ${CRITICAL_VALUE} --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical "${CRITICAL_VALUE}" --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and two errors
