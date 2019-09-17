@@ -2609,6 +2609,12 @@ EOF
                 SELFSIGNEDCERT="self signed "
             fi
 
+	elif ascii_grep '^verify\ error:num=[0-9][0-9]*:certificate\ has\ expired' "${ERROR}" ; then
+
+	    if [ -n "${DEBUG}" ] ; then
+		echo '[DBG] Cannot verify since the certificate has expired.'
+	    fi
+	    
         else
 
             if [ -n "${DEBUG}" ] ; then
