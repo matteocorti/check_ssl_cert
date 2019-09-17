@@ -817,7 +817,7 @@ main() {
             # Options with arguments
             -c|--critical)
                 if [ $# -gt 1 ]; then
-                    CRITICAL="$2"
+                    CRITICAL="$2"		    
                     shift 2
                 else
                    unknown "-c,--critical requires an argument"
@@ -1201,6 +1201,10 @@ main() {
     fi
 
     if [ -n "${CRITICAL}" ] ; then
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] -c specified: ${CRITICAL}"
+	fi
 
         if ! echo "${CRITICAL}" | grep -q '^[0-9][0-9]*$' ; then
             unknown "invalid number of days ${CRITICAL}"
@@ -2124,6 +2128,7 @@ EOF
             if [ -n "${CRITICAL}" ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG] critical = ${CRITICAL}"
                     echo "[DBG] executing: ${OPENSSL} x509 -in ${CERT} -noout -checkend $(( CRITICAL * 86400 ))"
                 fi
 
