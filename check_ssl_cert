@@ -1741,23 +1741,23 @@ main() {
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
 
-  if [ -n "${VERBOSE}" ] ; then
+	if [ -n "${VERBOSE}" ] ; then
             echo "checking OCSP stapling"
-  fi
+	fi
 
-  exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > ${OCSP_RESPONSE_TMP}"
+	exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | openssl s_client ${INETPROTO} -connect ${HOST}:${PORT} ${SERVERNAME} -status 2> /dev/null | grep -A 17 'OCSP response:' > ${OCSP_RESPONSE_TMP}"
 
-  if [ -n "${DEBUG}" ] ; then
-      sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
-  fi
-
-  if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
-      prepend_critical_message "OCSP stapling not enabled"
-  else
-      if [ -n "${VERBOSE}" ] ; then
-          echo "  OCSP stapling enabled"
-      fi
-  fi
+	if [ -n "${DEBUG}" ] ; then
+	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
+	fi
+	
+	if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
+	    prepend_critical_message "OCSP stapling not enabled"
+	else
+	    if [ -n "${VERBOSE}" ] ; then
+		echo "  OCSP stapling enabled"
+	    fi
+	fi
 
     fi
 
@@ -2535,7 +2535,11 @@ EOF
 
                     fi
 
-                    prepend_critical_message "OCSP error: '${OCSP_RESP}'"
+		    if [ -n "${VERBOSE}" ] ; then
+			echo "OCSP Error: ${OCSP_RESP}"
+		    fi
+		    
+                    prepend_critical_message "OCSP error (-v for details)"
 
 		fi
 
