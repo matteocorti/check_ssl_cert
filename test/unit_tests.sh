@@ -406,10 +406,11 @@ testFormatShort() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
 }
-
+>
 testMoreErrors() {
-    ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical 3000000 --rootcert cabundle.crt -d
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical 3000000 --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
+    CRITICAL_VALUE=300000
+    ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical ${CRITICAL_VALUE} --rootcert cabundle.crt -d
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical ${CRITICAL_VALUE} --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and two errors
