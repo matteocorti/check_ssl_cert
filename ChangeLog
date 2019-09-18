@@ -1,3 +1,8 @@
+2019-09-18  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Consolidated the error messages in case of more than one error
+	* check_ssl_cert: Fixed a bug where the cypher was not forced by the OCSP checks
+
 2019-08-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (ascii_grep): Removed NULL characters before 'grepping' a file
