@@ -4,7 +4,6 @@ sudo: required
 
 os:
     - linux
-    - osx
 
 script:
     - make test
