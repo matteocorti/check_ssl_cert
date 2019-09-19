@@ -408,7 +408,7 @@ testFormatShort() {
 }
 
 testMoreErrors() {
-    CRITICAL_VALUE=300000
+    CRITICAL_VALUE=30000
     OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical "${CRITICAL_VALUE}" --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"

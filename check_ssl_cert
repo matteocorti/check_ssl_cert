@@ -278,13 +278,13 @@ critical() {
 	echo "[DBG] ALL_MSG = ${ALL_MSG}"
     fi
 
-    NUMBER_OF_ERRORS=$( echo "${ALL_MSG}" | wc -l )
+    NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
 
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] number of errors = ${NUMBER_OF_ERRORS}"
     fi
     
-    if [ "${NUMBER_OF_ERRORS}" -gt 2 ] ; then
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
 	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
 	printf '%s\n' "$1"
