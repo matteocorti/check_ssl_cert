@@ -9,4 +9,4 @@ os:
 script:
     - make test
     - ./shell-ci-build.sh
-    - shellcheck ./check_ssl_cer test/unit_tests.sh
+    - shellcheck ./check_ssl_cert test/unit_tests.sh
