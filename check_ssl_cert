@@ -113,7 +113,7 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
-    echo "                                   {ftp|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|xmpp}"
+    echo "                                   {ftp|ftps|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|xmpp}"
     echo "                                   http:                    default"
     echo "                                   ftp,imap,ldap,pop3,smtp: switch to TLS using StartTLS"
     echo "   -s,--selfsigned                 allows self-signed certificates"
@@ -556,7 +556,7 @@ fetch_certificate() {
                 exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            pop3s|imaps|ldaps)
+            pop3s|imaps|ftps|ldaps)
                 exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
