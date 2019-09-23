@@ -11,14 +11,15 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior
+Steps to reproduce the behavior.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Systyem (please complete the following information):**
+**System (please complete the following information):**
  - OS: [e.g. iOS]
- - Version [e.g. 22]
+ - OS Version: [e.g. 22]
+ - check_ssl_cert Version: [e.g. 1.19.0]
 
 **Additional context**
 Add any other context about the problem here.
