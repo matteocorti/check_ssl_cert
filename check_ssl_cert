@@ -83,6 +83,8 @@ usage() {
     echo "      --format FORMAT              format output template on success, for example"
     echo "                                   \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
     echo "   -h,--help,-?                    this help message"
+    echo "      --http-use-get               use GET instead of HEAD (default) for the HTTP"
+    echo "                                   related checks"
     echo "      --ignore-exp                 ignore expiration date"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
@@ -381,7 +383,7 @@ exec_with_timeout() {
     # start the command in a subshell to avoid problem with pipes
     # (spawn accepts one command)
     command="/bin/sh -c \"$2\""
-    
+
     if [ -n "${DEBUG}" ] ; then
         printf '[DBG] executing with timeout (%ss): %s\n' "${time}" "${2}"
     fi
@@ -691,6 +693,7 @@ main() {
     REQUIRE_OCSP_STAPLING=""
     OCSP="1" # enabled by default
     FORMAT=""
+    HTTP_METHOD="HEAD"
 
     # Set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -726,6 +729,10 @@ main() {
                 ;;
             --force-perl-date)
                 FORCE_PERL_DATE=1
+                shift
+                ;;
+            --http-use-get)
+                HTTP_METHOD="GET"
                 shift
                 ;;
             --ignore-exp)
@@ -1530,7 +1537,7 @@ main() {
         HOST_HEADER="${HOST}"
     fi
 
-    HTTP_REQUEST="HEAD / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
+    HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
 
     ################################################################################
     # Fetch the X.509 certificate
