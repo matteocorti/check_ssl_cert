@@ -218,6 +218,20 @@ testSMTP() {
     fi
 }
 
+testSMTPSubmbission() {
+    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testSMTPS() {
+    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+
+
 ################################################################################
 # From https://badssl.com
 

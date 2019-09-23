@@ -72,7 +72,8 @@ Thanks:
 * Many thanks to eeertel (https://github.com/eeertel) for the SNI warning patch
 * Many thanks to Vojtech Horky (https://github.com/vhotspur) for the --format patch
 * Many thanks to Markus Frosch (https://github.com/lazyfrosch) for the cleanup patch
-* Many thanks to Ricardo Bartels (https://github.com/bb-Ricardo) for the patches fixing unit tests, long output on Linux, extending the issuer checks to the whole chain
+* Many thanks to Ricardo Bartels (https://github.com/bb-Ricardo) for the patches fixing unit tests,
+  long output on Linux, extending the issuer checks to the whole chain
 * Many thanks to eimamagi (https://github.com/eimamagi) for the client key patch and for the CA file and directory support
 * Many thanks to Stefan Schlesinger for the HTTP_REQUEST patch
 * Many thanks to sokol-44 (https://github.com/sokol-44) for the HTTP request fix
@@ -86,3 +87,5 @@ Thanks:
 * Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch
 * Many thanks to Dick Visser (https://github.com/dnmvisser) for the --inetproto patch
 * Many thanks to jmuecke (https://github.com/jmuecke) for the multiple errors patch
+* Many thanks to iasdeoupxe (https://github.com/iasdeoupxe) for various fixes
+* Many thanks to Andre Klärner (https://github.com/klaernie) for the typos corrections
