@@ -230,7 +230,17 @@ testSMTPS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testFTP() {
+    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}   
 
+testFTPS() {
+    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}   
 
 ################################################################################
 # From https://badssl.com
