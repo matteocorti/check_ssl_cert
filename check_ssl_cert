@@ -550,20 +550,28 @@ fetch_certificate() {
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != "http" ] && [ "${PROTOCOL}" != "https" ] ; then
 
         case "${PROTOCOL}" in
-            smtp)
+            smtp|pop3|ftp)
                 exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            irc|smtps)
+            smtps|pop3s|ftps)
                 exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            pop3|imap|ftp|ldap)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+            ldap)
+                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            pop3s|imaps|ftps|ldaps)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+            irc|ldaps)
+                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                RET=$?
+                ;;
+            imap)
+                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                RET=$?
+                ;;
+            imaps)
+                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\r' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
 	    xmpp)
@@ -1759,9 +1767,9 @@ main() {
 	if [ -n "${VERBOSE}" ] ; then
             echo "checking OCSP stapling"
 	fi
-	
+
 	grep -A 17 'OCSP response:' "${CERT}" > "${OCSP_RESPONSE_TMP}"
-	
+
 	if [ -n "${DEBUG}" ] ; then
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
 	fi
