@@ -14,6 +14,7 @@ A shell script (that can be used as a Nagios plugin) to check an X.509 certifica
 ## Usage
 
 ```
+
 Usage: check_ssl_cert -H host [OPTIONS]
 
 Arguments:
@@ -45,6 +46,8 @@ Options:
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
    -h,--help,-?                    this help message
+      --http-use-get               use GET instead of HEAD (default) for the HTTP
+                                   related checks
       --ignore-exp                 ignore expiration date
       --ignore-ocsp                do not check revocation with OCSP
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
@@ -117,7 +120,6 @@ Deprecated options:
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 
-                              	   (see: --ssl2 or --ssl3)
 ```
 
 ## Expect
