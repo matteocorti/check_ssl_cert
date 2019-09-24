@@ -1649,7 +1649,7 @@ main() {
                 #   ($! means not to do it on the last line (as there should be one final newline))
                 # - finally the substitution replaces every newline with a space on
                 #   the pattern space
-                ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"ß
+                ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
                 if [ -n "${VERBOSE}" ] ; then
                     echo "Error: ${ERROR_MESSAGE}"
                 fi
