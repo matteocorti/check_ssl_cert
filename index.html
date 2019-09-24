@@ -72,28 +72,32 @@ Arguments:
 
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
-      --altnames                   matches the pattern specified in -n with alternate
-                                   names too
+      --altnames                   matches the pattern specified in -n with
+                                   alternate names too
    -C,--clientcert path            use client certificate to authenticate
       --clientpass phrase          set passphrase for client certificate.
-   -c,--critical days              minimum number of days a certificate has to be valid
-                                   to issue a critical status
+   -c,--critical days              minimum number of days a certificate has to
+                                   be valid to issue a critical status
       --curl-bin path              path of the curl binary to be used
-      --curl-user-agent string     user agent that curl shall use to obtain the issuer cert
+      --curl-user-agent string     user agent that curl shall use to obtain the
+                                   issuer cert
    -d,--debug                      produces debugging output
       --ecdsa                      cipher selection: force ECDSA authentication
-   -e,--email address              pattern to match the email address contained in the
-                                   certificate
+   -e,--email address              pattern to match the email address contained
+                                   in the certificate
    -f,--file file                  local file path (works with -H localhost only)
-                                   with -f you can not only pass a x509 certificate file
-                                   but also a certificate revocation list (CRL) to check
-                                   the validity period
+                                   with -f you can not only pass a x509
+                                   certificate file but also a certificate
+                                   revocation list (CRL) to check the validity
+                                   period
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
    -h,--help,-?                    this help message
+      --http-use-get               use GET instead of HEAD (default) for the HTTP
+                                   related checks
       --ignore-exp                 ignore expiration date
       --ignore-ocsp                do not check revocation with OCSP
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
@@ -124,7 +128,7 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|xmpp}
+                                   {ftp|ftps|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}
                                    http:                    default
                                    ftp,imap,ldap,pop3,smtp: switch to TLS using StartTLS
    -s,--selfsigned                 allows self-signed certificates
@@ -162,6 +166,7 @@ Deprecated options:
                                    (see --critical and --warning)
       --ocsp                       check revocation via OCSP
    -S,--ssl version                force SSL version (2,3)
+                                   (see: --ssl2 or --ssl3)
       </pre>
 
 
