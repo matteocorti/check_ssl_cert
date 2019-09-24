@@ -199,7 +199,7 @@ testIMAPS() {
 
 testPOP3S() {
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} --rootcert cabundle.crt -H pop.gmail.com --port 993 --timeout 30 --protocol pop3s
+	${SCRIPT} --rootcert cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s
 	EXIT_CODE=$?
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
