@@ -22,4 +22,4 @@ A clear and concise description of what you expected to happen.
  - check_ssl_cert Version: [e.g. 1.19.0]
 
 **Additional context/output**\
-Add any other context or output (e.g. from `check_ssl_cert -d -v`) about the problem here.
+Add any other context or output (e.g., from `check_ssl_cert -d -v`) about the problem here.
