@@ -1,6 +1,7 @@
-2019-09-24  Matteo Corti  <corti@Matteo-Cortis-Mac-mini.local>
+2019-09-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a bug in the processing of the SSL Labs options
+	* check)ssl)cert: Fixed a bug with POP3S
 
 2019-09-24  Matteo Corti  <matteo@corti.li>
 
