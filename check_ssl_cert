@@ -555,7 +555,7 @@ fetch_certificate() {
                 RET=$?
                 ;;
             smtps|ftps)
-                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof-connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             pop3s)
