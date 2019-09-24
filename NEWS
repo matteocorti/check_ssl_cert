@@ -1,3 +1,4 @@
+2019-09-24 Version 1.93.0: Fixed a bug in the processing of the SSL Labs options
 2019-09-24 Version 1.92.0: Bug fix in the OCSP check
 2019-09-23 Version 1.91.0: Various minor improvements and fixes
 2019-09-19 Version 1.90.0: Bug fix, did not always print all the detected errors
