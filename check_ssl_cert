@@ -115,9 +115,9 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
-    echo "                                   {ftp|ftps|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}"
+    echo "                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}"
     echo "                                   http:                    default"
-    echo "                                   ftp,imap,ldap,pop3,smtp: switch to TLS using StartTLS"
+    echo "                                   ftp,imap,irc,ldap,pop3,smtp: switch to TLS using StartTLS"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
@@ -235,7 +235,7 @@ prepend_critical_message() {
 	echo "[DBG] prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
 	echo "[DBG] prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
     fi
-    
+
     if [ -n "${CN}" ] ; then
 	tmp=" ${CN}"
     else
@@ -249,15 +249,15 @@ prepend_critical_message() {
             fi
 	fi
     fi
-    
+
     MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
-    
+
     if [ "${CRITICAL_MSG}" = "" ]; then
 	CRITICAL_MSG="${MSG}"
     fi
-    
+
     ALL_MSG="\n    ${MSG}${ALL_MSG}"
-    
+
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] prepend_critical_message: MSG 2          = ${MSG}"
 	echo "[DBG] prepend_critical_message: CRITICAL_MSG 2 = ${CRITICAL_MSG}"
@@ -285,7 +285,7 @@ critical() {
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] number of errors = ${NUMBER_OF_ERRORS}"
     fi
-    
+
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
 	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
@@ -337,11 +337,11 @@ append_warning_message() {
 # Param
 #   $1 warning message
 warning() {
-    
+
     remove_temporary_files
 
     NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
-    
+
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
 	printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
     else
@@ -562,11 +562,11 @@ fetch_certificate() {
                 exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            ldap)
+            irc|ldap)
                 exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            irc|ldaps)
+            ircs|ldaps)
                 exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
@@ -857,7 +857,7 @@ main() {
             # Options with arguments
             -c|--critical)
                 if [ $# -gt 1 ]; then
-                    CRITICAL="$2"		    
+                    CRITICAL="$2"
                     shift 2
                 else
                    unknown "-c,--critical requires an argument"
@@ -1740,7 +1740,7 @@ main() {
 	echo '[DBG] ISSUERS = '
 	echo "${ISSUERS}" | sed 's/^/[DBG]\ \ \ \ \ \ \ \ \ \ \ /'
     fi
-    
+
     # we just consider the first URI
     # TODO check SC2016
     # shellcheck disable=SC2086,SC2016
@@ -1777,7 +1777,7 @@ main() {
 	if [ -n "${DEBUG}" ] ; then
 	    sed 's/^/[DBG]\ /' "${OCSP_RESPONSE_TMP}"
 	fi
-	
+
 	if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}" ; then
 	    prepend_critical_message "OCSP stapling not enabled"
 	else
@@ -2565,7 +2565,7 @@ EOF
 		    if [ -n "${VERBOSE}" ] ; then
 			echo "OCSP Error: ${OCSP_RESP}"
 		    fi
-		    
+
                     prepend_critical_message "OCSP error (-v for details)"
 
 		fi
@@ -2609,17 +2609,17 @@ EOF
         if [ -n "${VERBOSE}" ] ; then
             echo "checking email (${ADDR}): ${EMAIL}"
         fi
-	
+
         if [ -z "${EMAIL}" ] ; then
 
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] no email in certificate"
 	    fi
-	    	    
+
             prepend_critical_message "the certificate does not contain an email address"
-	    
+
 	else
-	    
+
             if ! echo "${EMAIL}" | grep -q -E "^${ADDR}" ; then
 		prepend_critical_message "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
             fi
@@ -2645,7 +2645,7 @@ EOF
 	    if [ -n "${DEBUG}" ] ; then
 		echo '[DBG] Cannot verify since the certificate has expired.'
 	    fi
-	    
+
         else
 
             if [ -n "${DEBUG}" ] ; then
