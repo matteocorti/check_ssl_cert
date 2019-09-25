@@ -504,7 +504,7 @@ convert_ssl_lab_grade() {
             shift
             ;;
         *)
-            unknown "Connot convert SSL Lab grade ${GRADE}"
+            unknown "Cannot convert SSL Lab grade ${GRADE}"
             ;;
     esac
 
@@ -1283,11 +1283,11 @@ main() {
     if [ -n "${OPENSSL}" ] ; then
 
         if [ ! -x "${OPENSSL}" ] ; then
-            unknown "${OPENSSL} ist not an executable"
+            unknown "${OPENSSL} is not an executable"
         fi
 
         #if ! "${OPENSSL}" list-standard-commands | grep -q s_client ; then
-        #    unknown "${OPENSSL} ist not an openssl executable"
+        #    unknown "${OPENSSL} is not an openssl executable"
         #fi
 
     fi
@@ -1669,7 +1669,7 @@ main() {
                 critical "${CRITICAL_MSG}"
             fi
         else
-            # parameters for regular x509 certifcates
+            # parameters for regular x509 certificates
             OPENSSL_COMMAND="x509"
             OPENSSL_PARAMS="-nameopt utf8,oneline,-esc_msb"
             OPENSSL_ENDDATE_OPTION="-enddate"
@@ -1900,7 +1900,7 @@ main() {
                     print "$days\n";
 EOF
                 ) ; then
-                    # somethig went wrong with the embedded Perl code: check the indentation of EOF
+                    # something went wrong with the embedded Perl code: check the indentation of EOF
                     unknown "Error computing the certificate validity with Perl"
                 fi
                 ;;
