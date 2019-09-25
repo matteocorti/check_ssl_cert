@@ -78,9 +78,9 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|imap|imaps|irc|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}
+                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}
                                    http:                    default
-                                   ftp,imap,ldap,pop3,smtp: switch to TLS using StartTLS
+                                   ftp,imap,irc,ldap,pop3,smtp: switch to TLS using StartTLS
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
       --sni name                   sets the TLS SNI (Server Name Indication) extension
@@ -169,7 +169,7 @@ $ sudo security find-certificate -a \
 and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
 ```
- ./check_ssl_cert -H www.google.com -r ./cabundle.crt 
+ ./check_ssl_cert -H www.google.com -r ./cabundle.crt
 ```
 
 ## Bugs
