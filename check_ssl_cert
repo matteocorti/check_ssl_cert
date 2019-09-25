@@ -598,7 +598,7 @@ fetch_certificate() {
 
     else
 
-        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -ign_eof -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
