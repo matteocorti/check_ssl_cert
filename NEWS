@@ -68,7 +68,7 @@
 2016-12-23 Version 1.37.0: Added a patch to specify multiple CNs
 2016-12-13 Version 1.36.2: fixed a minor problem with --debug
 2016-12-06 Version 1.36.1: fixed a problem when specifying a CN beginning with *
-2016-12-04 Version 1.36.0: fixed problem when file is returing PEM certificate on newer
+2016-12-04 Version 1.36.0: fixed problem when file is returning PEM certificate on newer
                            Linux distributions
 			   added an option to specify the location of the file utility
 2016-10-18 Version 1.35.0: added support for the selection of the cipher authentication
@@ -109,7 +109,7 @@
                           to Max Winterstein)
 2013-05-12 Version 1.14.6 Added XMPP and timeout support (thanks to Christian
                           Ruppert and Robin H. Johnson)
-2013-03-02 Version 1.14.5 Fixed a bug occuring with TLS and multiple names in
+2013-03-02 Version 1.14.5 Fixed a bug occurring with TLS and multiple names in
                           the certificate
 2012-12-07 Version 1.14.4 Fixed a bug causing -N to always compare the CN
                           with 'localhost'
