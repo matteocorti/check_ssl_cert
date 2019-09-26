@@ -438,10 +438,12 @@ check_required_prog() {
 
     if [ -z "${PROG}" ] ; then
         prepend_critical_message "cannot find program: $1"
+	critical "${SHORTNAME} CRITICAL: cannot find program: $1"
     fi
 
     if [ ! -x "${PROG}" ] ; then
         prepend_critical_message "${PROG} is not executable"
+	critical "${SHORTNAME} CRITICAL: ${PROG} is not executable"
     fi
 
 }
