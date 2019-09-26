@@ -1,3 +1,7 @@
+2019-09-26  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: stops if needed programs are not foud
+
 2019-09-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a bug in the processing of the SSL Labs options
