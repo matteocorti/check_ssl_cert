@@ -1806,16 +1806,16 @@ main() {
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling enabled"
             fi
-            NEXT_UPDATE=`grep -Po 'Next Update: .*$' ${OCSP_RESPONSE_TMP} | cut -b14-`
-            OCSP_EXPIRES_AT=`date -d "${NEXT_UPDATE}" +%s`
-            NOW=`date +%s`
+            NEXT_UPDATE=$(grep -Po 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
+            OCSP_EXPIRES_AT=$(date -d "${NEXT_UPDATE}" +%s)
+            NOW=$(date +%s)
             OCSP_EXPIRES_IN_HOURS=$(( (OCSP_EXPIRES_AT - NOW) / 3600 ))
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             fi
-            if [ -n "${OCSP_CRITICAL}" ] && [ ${OCSP_CRITICAL} -ge ${OCSP_EXPIRES_IN_HOURS} ] ; then
+            if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
-            elif [ -n "${OCSP_WARNING}" ] && [ ${OCSP_WARNING} -ge ${OCSP_EXPIRES_IN_HOURS} ] ; then
+            elif [ -n "${OCSP_WARNING}" ] && [ "${OCSP_WARNING}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
             fi
         fi
