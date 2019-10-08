@@ -222,6 +222,59 @@ create_temporary_file() {
 }
 
 ################################################################################
+# Compute the number of days until a given date
+# Params
+#   $1 date
+# Sets DAYS_UNTIL
+days_until() {
+
+    DATE=$1
+    
+    OLDLANG="${LANG}"
+    LANG=en_US
+
+    if [ -n "${DEBUG}" ] ; then
+        echo "[DBG] Date computations: ${DATETYPE}"
+	echo "[DBG] Computing number of days until ${DATE}"
+    fi
+
+    case "${DATETYPE}" in
+        "BSD")
+            DAYS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+            ;;
+	
+        "GNU")
+            DAYS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+            ;;
+
+        "PERL")
+            # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
+            if ! DAYS_UNTIL=$(perl - "${DATE}" <<-"EOF"
+                    use strict;
+                    use warnings;
+                    use Date::Parse;
+                    my $cert_date = str2time( $ARGV[0] );
+                    my $days = int (( $cert_date - time ) / 86400 + 0.5);
+                    print "$days\n";
+EOF
+                 ) ; then
+                # something went wrong with the embedded Perl code: check the indentation of EOF
+                unknown "Error computing the certificate validity with Perl"
+            fi
+            ;;
+	*)
+	    unknown "Internal error: unknown date type"
+    esac
+
+    LANG="${OLDLANG}"
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] Days until ${DATE}: ${DAYS_UNTIL}"
+    fi    
+
+}
+
+################################################################################
 # prepends critical messages to list of all messages
 # Params
 #   $1 error message
@@ -1807,9 +1860,10 @@ main() {
                 echo "  OCSP stapling enabled"
             fi
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
-            OCSP_EXPIRES_AT=$(date -d "${NEXT_UPDATE}" +%s)
-            NOW=$(date +%s)
-            OCSP_EXPIRES_IN_HOURS=$(( (OCSP_EXPIRES_AT - NOW) / 3600 ))
+
+	    days_until "${NEXT_UPDATE}"
+	    
+            OCSP_EXPIRES_IN_HOURS=$(( DAYS_UNTIL / 3600 ))
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             fi
@@ -1907,43 +1961,9 @@ main() {
     # shellcheck disable=SC2086
         CERT_END_DATE=$("${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
 
-        OLDLANG="${LANG}"
-        LANG=en_US
-
-        if [ -n "${DEBUG}" ] ; then
-            echo "[DBG] Date computations: ${DATETYPE}"
-        fi
-
-        case "${DATETYPE}" in
-            "BSD")
-                DAYS_VALID=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-                ;;
-
-            "GNU")
-                DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-                ;;
-
-            "PERL")
-                # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-                if ! DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
-                    use strict;
-                    use warnings;
-                    use Date::Parse;
-                    my $cert_date = str2time( $ARGV[0] );
-                    my $days = int (( $cert_date - time ) / 86400 + 0.5);
-                    print "$days\n";
-EOF
-                ) ; then
-                    # something went wrong with the embedded Perl code: check the indentation of EOF
-                    unknown "Error computing the certificate validity with Perl"
-                fi
-                ;;
-      *)
-    unknown "Internal error: unknown date type"
-        esac
-
-        LANG="${OLDLANG}"
-
+	days_until "${CERT_END_DATE}"
+	DAYS_VALID="${DAYS_UNTIL}"
+	
         if [ -n "${VERBOSE}" ] ; then
 
             if [ "${DAYS_VALID}" -ge 0 ] ; then
