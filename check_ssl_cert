@@ -1806,7 +1806,7 @@ main() {
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling enabled"
             fi
-            NEXT_UPDATE=$(grep -Po 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
+            NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
             OCSP_EXPIRES_AT=$(date -d "${NEXT_UPDATE}" +%s)
             NOW=$(date +%s)
             OCSP_EXPIRES_IN_HOURS=$(( (OCSP_EXPIRES_AT - NOW) / 3600 ))
