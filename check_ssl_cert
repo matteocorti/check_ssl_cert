@@ -222,11 +222,11 @@ create_temporary_file() {
 }
 
 ################################################################################
-# Compute the number of days until a given date
+# Compute the number of hours until a given date
 # Params
 #   $1 date
-# Sets DAYS_UNTIL
-days_until() {
+# Sets HOURS_UNTIL
+hours_until() {
 
     DATE=$1
     
@@ -235,27 +235,27 @@ days_until() {
 
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] Date computations: ${DATETYPE}"
-	echo "[DBG] Computing number of days until ${DATE}"
+	echo "[DBG] Computing number of hours until '${DATE}'"
     fi
 
     case "${DATETYPE}" in
         "BSD")
-            DAYS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+            HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
 	
         "GNU")
-            DAYS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
+            HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
 
         "PERL")
             # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-            if ! DAYS_UNTIL=$(perl - "${DATE}" <<-"EOF"
+            if ! HOURS_UNTIL=$(perl - "${DATE}" <<-"EOF"
                     use strict;
                     use warnings;
                     use Date::Parse;
                     my $cert_date = str2time( $ARGV[0] );
-                    my $days = int (( $cert_date - time ) / 86400 + 0.5);
-                    print "$days\n";
+                    my $hours = int (( $cert_date - time ) / 3600 + 0.5);
+                    print "$hours\n";
 EOF
                  ) ; then
                 # something went wrong with the embedded Perl code: check the indentation of EOF
@@ -269,7 +269,7 @@ EOF
     LANG="${OLDLANG}"
 
     if [ -n "${DEBUG}" ] ; then
-	echo "[DBG] Days until ${DATE}: ${DAYS_UNTIL}"
+	echo "[DBG] Hours until ${DATE}: ${HOURS_UNTIL}"
     fi    
 
 }
@@ -1861,9 +1861,9 @@ main() {
             fi
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
 
-	    days_until "${NEXT_UPDATE}"
+	    hours_until "${NEXT_UPDATE}"
 	    
-            OCSP_EXPIRES_IN_HOURS=$(( DAYS_UNTIL / 3600 ))
+            OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             fi
@@ -1961,8 +1961,8 @@ main() {
     # shellcheck disable=SC2086
         CERT_END_DATE=$("${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
 
-	days_until "${CERT_END_DATE}"
-	DAYS_VALID="${DAYS_UNTIL}"
+	hours_until "${CERT_END_DATE}"
+	DAYS_VALID=$(( HOURS_UNTIL / 24 ))
 	
         if [ -n "${VERBOSE}" ] ; then
 
