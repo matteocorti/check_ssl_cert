@@ -111,6 +111,10 @@ usage() {
     echo "      --no_tls1_1                  disable TLS version 1.1"
     echo "      --no_tls1_2                  disable TLS version 1.2"
     echo "   -N,--host-cn                    match CN with the host name"
+    echo "      --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to"
+    echo "                                   issue a critical status"
+    echo "      --ocsp-warning hours         minimum number of hours an OCSP response has to be valid to"
+    echo "                                   issue a warning status"
     echo "   -o,--org org                    pattern to match the organization of the certificate"
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
@@ -214,6 +218,59 @@ create_temporary_file() {
 
     # add the file to the list of temporary files
     TEMPORARY_FILES="${TEMPORARY_FILES} ${TEMPFILE}"
+
+}
+
+################################################################################
+# Compute the number of hours until a given date
+# Params
+#   $1 date
+# Sets HOURS_UNTIL
+hours_until() {
+
+    DATE=$1
+    
+    OLDLANG="${LANG}"
+    LANG=en_US
+
+    if [ -n "${DEBUG}" ] ; then
+        echo "[DBG] Date computations: ${DATETYPE}"
+	echo "[DBG] Computing number of hours until '${DATE}'"
+    fi
+
+    case "${DATETYPE}" in
+        "BSD")
+            HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
+            ;;
+	
+        "GNU")
+            HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
+            ;;
+
+        "PERL")
+            # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
+            if ! HOURS_UNTIL=$(perl - "${DATE}" <<-"EOF"
+                    use strict;
+                    use warnings;
+                    use Date::Parse;
+                    my $cert_date = str2time( $ARGV[0] );
+                    my $hours = int (( $cert_date - time ) / 3600 + 0.5);
+                    print "$hours\n";
+EOF
+                 ) ; then
+                # something went wrong with the embedded Perl code: check the indentation of EOF
+                unknown "Error computing the certificate validity with Perl"
+            fi
+            ;;
+	*)
+	    unknown "Internal error: unknown date type"
+    esac
+
+    LANG="${OLDLANG}"
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] Hours until ${DATE}: ${HOURS_UNTIL}"
+    fi    
 
 }
 
@@ -996,6 +1053,22 @@ main() {
                     shift 2
                 else
                     unknown "-n,--cn requires an argument"
+                fi
+                ;;
+            --ocsp-critical)
+                if [ $# -gt 1 ]; then
+                    OCSP_CRITICAL="$2"
+                    shift 2
+                else
+                    unknown "--ocsp-critical requires an argument"
+                fi
+                ;;
+            --ocsp-warning)
+                if [ $# -gt 1 ]; then
+                    OCSP_WARNING="$2"
+                    shift 2
+                else
+                    unknown "--ocsp-warning requires an argument"
                 fi
                 ;;
             -o|--org)
@@ -1786,6 +1859,19 @@ main() {
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling enabled"
             fi
+            NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
+
+	    hours_until "${NEXT_UPDATE}"
+	    
+            OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
+            if [ -n "${VERBOSE}" ] ; then
+                echo "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
+            fi
+            if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
+                prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
+            elif [ -n "${OCSP_WARNING}" ] && [ "${OCSP_WARNING}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
+                append_warning_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
+            fi
         fi
 
     fi
@@ -1875,43 +1961,9 @@ main() {
     # shellcheck disable=SC2086
         CERT_END_DATE=$("${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
 
-        OLDLANG="${LANG}"
-        LANG=en_US
-
-        if [ -n "${DEBUG}" ] ; then
-            echo "[DBG] Date computations: ${DATETYPE}"
-        fi
-
-        case "${DATETYPE}" in
-            "BSD")
-                DAYS_VALID=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-                ;;
-
-            "GNU")
-                DAYS_VALID=$(( ( $(${DATEBIN} -d "${CERT_END_DATE}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-                ;;
-
-            "PERL")
-                # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-                if ! DAYS_VALID=$(perl - "${CERT_END_DATE}" <<-"EOF"
-                    use strict;
-                    use warnings;
-                    use Date::Parse;
-                    my $cert_date = str2time( $ARGV[0] );
-                    my $days = int (( $cert_date - time ) / 86400 + 0.5);
-                    print "$days\n";
-EOF
-                ) ; then
-                    # something went wrong with the embedded Perl code: check the indentation of EOF
-                    unknown "Error computing the certificate validity with Perl"
-                fi
-                ;;
-      *)
-    unknown "Internal error: unknown date type"
-        esac
-
-        LANG="${OLDLANG}"
-
+	hours_until "${CERT_END_DATE}"
+	DAYS_VALID=$(( HOURS_UNTIL / 24 ))
+	
         if [ -n "${VERBOSE}" ] ; then
 
             if [ "${DAYS_VALID}" -ge 0 ] ; then
@@ -2698,6 +2750,21 @@ EOF
         fi
     fi
 
+    if [ -n "${OCSP_EXPIRES_IN_HOURS}" ] ; then
+        # nicer formatting
+        if [ "${OCSP_EXPIRES_IN_HOURS}" -gt 1 ] ; then
+            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours)"
+        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq 1 ] ; then
+            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in one hour)"
+        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq 0 ] ; then
+            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires now)"
+        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq -1 ] ; then
+            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired one hour ago)"
+        else
+            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired ${OCSP_EXPIRES_IN_HOURS} hours ago)"
+        fi
+    fi
+
     if [ -n "${SSL_LABS_HOST_GRADE}" ] ; then
         SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
     fi
@@ -2712,7 +2779,7 @@ EOF
         if [ -n "${TERSE}" ]; then
             FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
         else
-            FORMAT="%SHORTNAME% OK - %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%SSL_LABS_HOST_GRADE%"
+            FORMAT="%SHORTNAME% OK - %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
         fi
     fi
 
@@ -2723,16 +2790,17 @@ EOF
     fi
 
     if [ -n "${DEBUG}" ] ; then
-        echo "[DBG] output parameters: CA_ISSUER_MATCHED   = ${CA_ISSUER_MATCHED}"
-        echo "[DBG] output parameters: CHECKEDNAMES        = ${CHECKEDNAMES}"
-        echo "[DBG] output parameters: CN                  = ${CN}"
-        echo "[DBG] output parameters: DATE                = ${DATE}"
-        echo "[DBG] output parameters: DAYS_VALID          = ${DAYS_VALID}"
-        echo "[DBG] output parameters: DYSPLAY_CN          = ${DISPLAY_CN}"
-        echo "[DBG] output parameters: OPENSSL_COMMAND     = ${OPENSSL_COMMAND}"
-        echo "[DBG] output parameters: SELFSIGNEDCERT      = ${SELFSIGNEDCERT}"
-        echo "[DBG] output parameters: SHORTNAME           = ${SHORTNAME}"
-        echo "[DBG] output parameters: SSL_LABS_HOST_GRADE = ${SSL_LABS_HOST_GRADE}"
+        echo "[DBG] output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
+        echo "[DBG] output parameters: CHECKEDNAMES          = ${CHECKEDNAMES}"
+        echo "[DBG] output parameters: CN                    = ${CN}"
+        echo "[DBG] output parameters: DATE                  = ${DATE}"
+        echo "[DBG] output parameters: DAYS_VALID            = ${DAYS_VALID}"
+        echo "[DBG] output parameters: DYSPLAY_CN            = ${DISPLAY_CN}"
+        echo "[DBG] output parameters: OPENSSL_COMMAND       = ${OPENSSL_COMMAND}"
+        echo "[DBG] output parameters: SELFSIGNEDCERT        = ${SELFSIGNEDCERT}"
+        echo "[DBG] output parameters: SHORTNAME             = ${SHORTNAME}"
+        echo "[DBG] output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
+        echo "[DBG] output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
     fi
 
     echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
@@ -2745,6 +2813,7 @@ EOF
         -e "$( var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}" )" \
         -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
         -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
+        -e "$( var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}" )" \
         -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
 
     remove_temporary_files

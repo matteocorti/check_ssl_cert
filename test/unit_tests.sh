@@ -30,6 +30,27 @@ NAGIOS_WARNING=1
 NAGIOS_CRITICAL=2
 NAGIOS_UNKNOWN=3
 
+testHoursUntilNow() {
+    # testing with perl
+    export DATETYPE='PERL'
+    hours_until "$( date )"
+    assertEquals "error computing the missing hours until now" 0 "${HOURS_UNTIL}"
+}
+
+testHoursUntil5Hours() {
+    # testing with perl
+    export DATETYPE='PERL'
+    hours_until "$( perl -e '$x=localtime(time+(5*3600));print $x' )"
+    assertEquals "error computing the missing hours until now" 5 "${HOURS_UNTIL}"
+}
+
+testHoursUntil42Hours() {
+    # testing with perl
+    export DATETYPE='PERL'
+    hours_until "$( perl -e '$x=localtime(time+(42*3600));print $x' )"
+    assertEquals "error computing the missing hours until now" 42 "${HOURS_UNTIL}"
+}
+
 testDependencies() {
     check_required_prog openssl
     # $PROG is defined in the script
@@ -302,24 +323,6 @@ testBadSSLSHA256() {
 	echo "Skipping SHA 256 with badssl.com on Travis CI"
     fi
 }
-
-# exired on Feb 17 2019
-#testBadSSL1000SANs() {
-#    if [ -z "${TRAVIS+x}" ] ; then
-#	${SCRIPT} -H 1000-sans.badssl.com --host-cn
-#	EXIT_CODE=$?
-#	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#    else
-#	echo "Skipping 1000 subject alternative names with badssl.com on Travis CI"
-#    fi
-#}
-
-# Disabled as OpenSSL does not seem to handle it
-#testBadSSL10000SANs() {
-#    ${SCRIPT} -H 10000-sans.badssl.com --host-cn
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
 
 testBadSSLEcc256() {
     if [ -z "${TRAVIS+x}" ] ; then
