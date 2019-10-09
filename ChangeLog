@@ -1,3 +1,8 @@
+2019-10-09  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: disables TLS 1.3 with --rsa
+	* check_ssl_cert: Validate OCSP stapling expiring date
+
 2019-09-26  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: stops if needed programs are not foud

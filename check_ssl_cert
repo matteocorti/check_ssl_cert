@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.96.0
+VERSION=1.97.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -110,6 +110,7 @@ usage() {
     echo "      --no_tls1                    disable TLS version 1"
     echo "      --no_tls1_1                  disable TLS version 1.1"
     echo "      --no_tls1_2                  disable TLS version 1.2"
+    echo "      --no_tls1_3                  disable TLS version 1.3"
     echo "   -N,--host-cn                    match CN with the host name"
     echo "      --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to"
     echo "                                   issue a critical status"
@@ -135,7 +136,7 @@ usage() {
     echo "                                   certificate validation"
     echo "      --rootcert-dir path          root directory to be used for certificate validation"
     echo "      --rootcert-file path         root certificate to be used for certificate validation"
-    echo "      --rsa                        cipher selection: force RSA authentication"
+    echo "      --rsa                        cipher selection: force RSA authentication (disables TLS 1.3)"
     echo "      --temp dir                   directory where to store the temporary files"
     echo "      --terse                      terse output"
     echo "   -t,--timeout                    seconds timeout after the specified time"
@@ -842,6 +843,10 @@ main() {
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_2"
                 shift
                 ;;
+            --no_tls1_3)
+                SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
+                shift
+                ;;
             -N|--host-cn)
                 COMMON_NAME="__HOST__"
                 shift
@@ -852,6 +857,8 @@ main() {
                 ;;
             --rsa)
                 SSL_AU="-cipher aRSA"
+		# https://blog.cloudflare.com/rfc-8446-aka-tls-1-3/ says “RSA encryption was removed from TLS 1.3”. 
+		SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
                 shift
                 ;;
             --ecdsa)
