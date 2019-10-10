@@ -99,7 +99,7 @@ Options:
                                    certificate validation
       --rootcert-dir path          root directory to be used for certificate validation
       --rootcert-file path         root certificate to be used for certificate validation
-      --rsa                        cipher selection: force RSA authentication (disables TLS 1.3)
+      --rsa                        cipher selection: force RSA authentication
       --temp dir                   directory where to store the temporary files
       --terse                      terse output
    -t,--timeout                    seconds timeout after the specified time

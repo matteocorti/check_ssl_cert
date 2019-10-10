@@ -136,7 +136,7 @@ usage() {
     echo "                                   certificate validation"
     echo "      --rootcert-dir path          root directory to be used for certificate validation"
     echo "      --rootcert-file path         root certificate to be used for certificate validation"
-    echo "      --rsa                        cipher selection: force RSA authentication (disables TLS 1.3)"
+    echo "      --rsa                        cipher selection: force RSA authentication"
     echo "      --temp dir                   directory where to store the temporary files"
     echo "      --terse                      terse output"
     echo "   -t,--timeout                    seconds timeout after the specified time"
@@ -858,8 +858,6 @@ main() {
             --rsa)
 		# see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
                 SSL_AU="-sigalgs 'RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"		
-		# https://blog.cloudflare.com/rfc-8446-aka-tls-1-3/ says “RSA encryption was removed from TLS 1.3”. 
-		SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
                 shift
                 ;;
             --ecdsa)
