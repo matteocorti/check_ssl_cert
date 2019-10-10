@@ -1,5 +1,9 @@
 2019-10-10  Matteo Corti  <matteo@corti.li>
 
+	* check_ssl_cert (main): fixes the ciphers for --rsa and --ecdsa
+
+2019-10-10  Matteo Corti  <matteo@corti.li>
+
 	* check_ssl_cert (check_attr): a wildcard certificate does not match the 'main' domain
 
 2019-10-09  Matteo Corti  <matteo@corti.li>
