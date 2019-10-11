@@ -21,14 +21,18 @@ fi
 SCRIPT=../check_ssl_cert
 if [ ! -r "${SCRIPT}" ] ; then
     echo "Error: the script to test (${SCRIPT}) is not a readable file"
-fi
+fi    
 
-# constants
+oneTimeSetUp() {
+    
+    # constants
 
-NAGIOS_OK=0
-NAGIOS_WARNING=1
-NAGIOS_CRITICAL=2
-NAGIOS_UNKNOWN=3
+    NAGIOS_OK=0
+    NAGIOS_WARNING=1
+    NAGIOS_CRITICAL=2
+    NAGIOS_UNKNOWN=3
+    
+}
 
 testHoursUntilNow() {
     # testing with perl
@@ -491,8 +495,3 @@ unset SOURCE_ONLY
 # Do not follow
 # shellcheck disable=SC1090
 . "${SHUNIT2}"
-
-#if ! . "${SHUNIT2}" | tee /dev/tty | grep -q 'tests\ passed:\ *[0-9]*\ 100%' ; then
-#    # at least one of the tests failed
-#    exit 1
-#fi
