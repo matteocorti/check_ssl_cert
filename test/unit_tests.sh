@@ -458,18 +458,6 @@ testForceECDSA() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testForceECDSAandRSA() {
-    # $TRAVIS is set an environment variable
-    # shellcheck disable=SC2154
-    if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H autoconfig.aegee.org --ecdsa --rsa
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-	echo "Skipping XMPP tests on Travis CI"
-    fi
-}
-
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
