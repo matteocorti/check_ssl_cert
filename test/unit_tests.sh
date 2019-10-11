@@ -452,6 +452,18 @@ testMoreErrors2() {
     assertEquals "wrong number of errors" 4 "${OUTPUT}"
 }
 
+testForceECDSA() {
+    ${SCRIPT} -H  mail.aegee.org --ecdsa
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testForceECDSAandRSA() {
+    ${SCRIPT} -H  autoconfig.aegee.org --ecdsa --rsa
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
