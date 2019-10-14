@@ -2496,7 +2496,7 @@ main() {
                 FILE_NAME=${ISSUER_URI%/}
 
                 # remove everything up to the last slash
-                FILE_NAME=${FILE_NAME##*/}
+                FILE_NAME="${TMPDIR}/${FILE_NAME##*/}"
 
                 echo "[DBG] OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
 
