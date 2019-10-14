@@ -230,7 +230,7 @@ create_temporary_file() {
 hours_until() {
 
     DATE=$1
-    
+
     OLDLANG="${LANG}"
     LANG=en_US
 
@@ -271,7 +271,7 @@ EOF
 
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] Hours until ${DATE}: ${HOURS_UNTIL}"
-    fi    
+    fi
 
 }
 
@@ -1891,7 +1891,7 @@ main() {
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
 
 	    hours_until "${NEXT_UPDATE}"
-	    
+
             OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
             if [ -n "${VERBOSE}" ] ; then
                 echo "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"

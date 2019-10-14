@@ -78,7 +78,7 @@ Options:
       --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to
                                    issue a critical status
       --ocsp-warning hours         minimum number of hours an OCSP response has to be valid to
-                                   issue a warning status   
+                                   issue a warning status
    -o,--org org                    pattern to match the organization of the certificate
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
