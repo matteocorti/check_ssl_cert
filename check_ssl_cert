@@ -770,6 +770,8 @@ main() {
     OCSP="1" # enabled by default
     FORMAT=""
     HTTP_METHOD="HEAD"
+    RSA=""
+    ECDSA=""
 
     # Set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -856,13 +858,11 @@ main() {
                 shift
                 ;;
             --rsa)
-		# see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-                SSL_AU="-sigalgs 'RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"		
+		RSA=1
                 shift
                 ;;
             --ecdsa)
-		# see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-                SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"
+		ECDSA=1
                 shift
                 ;;
             --ssl2)
@@ -1383,12 +1383,34 @@ main() {
         convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
         if [ "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ]; then
-            unknown  "--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs"
+            unknown  '--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs'
         fi
     fi
 
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ROOT_CA = ${ROOT_CA}"
+    fi
+
+    # Ciphers
+    if [ -n "${RSA}" ] && [ -n "${ECDSA}" ] ; then
+	unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'
+    fi
+    if [ -n "${ECDSA}" ] ; then
+	# see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
+        SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"	
+    fi
+    if [ -n "${RSA}" ] ; then
+	if echo "${SSL_VERSION_DISABLED}" | grep -q -- '-no_tls1_3' ||
+		[ "${SSL_VERSION}" = '-tls1' ] ||
+		[ "${SSL_VERSION}" = '-tls1_1' ] ||
+		[ "${SSL_VERSION}" = '-tls1_2' ] ; then
+	    # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
+	    # see https://github.com/matteocorti/check_ssl_cert/issues/167
+            SSL_AU="-sigalgs 'RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"
+	else
+	    # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
+	    SSL_AU="-sigalgs 'RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"
+	fi
     fi
 
     #######################
