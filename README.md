@@ -32,7 +32,7 @@ Options:
       --curl-user-agent string     user agent that curl shall use to obtain the
                                    issuer cert
    -d,--debug                      produces debugging output
-      --ecdsa                      cipher selection: force ECDSA authentication
+      --ecdsa                      signature algorithm selection: force ECDSA certificate
    -e,--email address              pattern to match the email address contained
                                    in the certificate
    -f,--file file                  local file path (works with -H localhost only)
@@ -99,7 +99,7 @@ Options:
                                    certificate validation
       --rootcert-dir path          root directory to be used for certificate validation
       --rootcert-file path         root certificate to be used for certificate validation
-      --rsa                        cipher selection: force RSA authentication
+      --rsa                        signature algorithm selection: force RSA certificate
       --temp dir                   directory where to store the temporary files
       --terse                      terse output
    -t,--timeout                    seconds timeout after the specified time

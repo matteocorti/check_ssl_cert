@@ -43,7 +43,7 @@ user agent that curl shall use to obtain the issuer cert
 produces debugging output
 .TP
 .BR "   --ecdsa"
-cipher selection: force ECDSA authentication
+signature algorithm selection: force ECDSA certificate
 .TP
 .BR "-e,--email" " address"
 pattern to match the email address contained in the certificate
@@ -177,7 +177,7 @@ root certificate to be used for certificate validation (passed to openssl's -CAf
 overrides option -r,--rootcert
 .TP
 .BR "   --rsa"
-cipher selection: force RSA authentication
+signature algorithm selection: force RSA certificate
 .TP
 .BR "   --temp" " dir"
 directory where to store the temporary files
