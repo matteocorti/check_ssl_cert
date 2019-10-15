@@ -636,7 +636,7 @@ fetch_certificate() {
                 RET=$?
                 ;;
             imap)
-                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} $[DANE} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             imaps)
@@ -1437,27 +1437,31 @@ main() {
     fi
 
     if [ -n "${DANE}" ] ; then
-        case $DANE in
-        1)
-          DANE=$(delv +short TLSA _$PORT._tcp.$HOST|sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|tr -d '\n')
-          ;;
-        211)
-          DANE=$(delv +short TLSA _$PORT._tcp.$HOST|sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "2 1 1"|tr -d '\n')
-          ;;
-        301)
-          DANE=$(delv +short TLSA _$PORT._tcp.$HOST|sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 1"|tr -d '\n')
-          ;;
-        311)
-          DANE=$(delv +short TLSA _$PORT._tcp.$HOST|sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 1 1"|tr -d '\n')
-          ;;
-        302)
-          DANE=$(delv +short TLSA _$PORT._tcp.$HOST|sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 2"|tr -d '\n')
-          ;;
+	
+        case ${DANE} in
+            1)
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|tr -d '\n')
+		;;
+            211)
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "2 1 1"|tr -d '\n')
+		;;
+            301)
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 1"|tr -d '\n')
+		;;
+            311)
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 1 1"|tr -d '\n')
+		;;
+            302)
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 2"|tr -d '\n')
+		;;
+	    *)
+		unknown "Internal error: unknown DANE check type ${DANE}"
         esac
+	
 	if [ ${#DANE} -lt 5 ]; then
-	    critical "No TLSA records found at _$PORT._tcp.$HOST"
+	    critical "No TLSA records found at _${PORT}._tcp.${HOST}"
 	fi
-	DANE="${DANE} -dane_tlsa_domain $HOST "
+	DANE="${DANE} -dane_tlsa_domain ${HOST} "
     fi
 
     # Signature algorithms
