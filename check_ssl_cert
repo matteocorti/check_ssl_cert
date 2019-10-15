@@ -1438,29 +1438,33 @@ main() {
 
     if [ -n "${DANE}" ] ; then
 	
-        case ${DANE} in
+	check_required_prog delv
+	
+	case ${DANE} in
             1)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|tr -d '\n')
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | tr -d '\n')
 		;;
             211)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "2 1 1"|tr -d '\n')
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "2 1 1"|tr -d '\n')
 		;;
             301)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 1"|tr -d '\n')
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 0 1"|tr -d '\n')
 		;;
             311)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 1 1"|tr -d '\n')
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 1 1"|tr -d '\n')
 		;;
             302)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /"|grep "3 0 2"|tr -d '\n')
+		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" |sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 0 2"|tr -d '\n')
 		;;
 	    *)
 		unknown "Internal error: unknown DANE check type ${DANE}"
         esac
 	
 	if [ ${#DANE} -lt 5 ]; then
-	    critical "No TLSA records found at _${PORT}._tcp.${HOST}"
+            prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
+            critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
 	fi
+	
 	DANE="${DANE} -dane_tlsa_domain ${HOST} "
     fi
 
@@ -1499,8 +1503,8 @@ main() {
     if [ -z "${FILE_BIN}" ] ; then
         check_required_prog file
         FILE_BIN=${PROG}
-    fi
-
+    fi    
+    
     # curl
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
