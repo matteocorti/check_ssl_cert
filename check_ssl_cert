@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.98.0
+VERSION=1.99.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -68,6 +68,11 @@ usage() {
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
+    echo "      --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)"
+    echo "      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists"
+    echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
+    echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
+    echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "   -d,--debug                      produces debugging output"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "   -e,--email address              pattern to match the email address contained"
@@ -615,31 +620,31 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
             smtp|pop3|ftp)
-                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             smtps|pop3s|ftps)
-                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             irc|ldap)
-                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             ircs|ldaps)
-                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             imap)
-                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             imaps)
-                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             xmpp)
-                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             *)
@@ -657,8 +662,7 @@ fetch_certificate() {
         fi
 
     else
-
-        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -772,6 +776,7 @@ main() {
     HTTP_METHOD="HEAD"
     RSA=""
     ECDSA=""
+    DANE=""
 
     # Set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -1224,6 +1229,34 @@ main() {
                     unknown "--xmpphost requires an argument"
                 fi
                 ;;
+
+	    ##############################
+	    # Variable number of arguments
+	    --dane)
+		
+                if [ -n "${DANE}" ]; then
+                    unknown "--dane can be specified only once"
+                fi
+
+		# check the second parameter if it exist
+		if [ $# -gt 1 ] ; then
+
+		    if [ "${2%${2#?}}"x = '-x' ] ; then
+			shift
+		    else
+			DANE=$2
+			shift 2
+		    fi
+		    
+		else
+
+		    DANE=1
+                    shift
+
+		fi
+
+                ;;
+	    
             ########################################
             # Special
             --)
@@ -1391,7 +1424,61 @@ main() {
         echo "[DBG] ROOT_CA = ${ROOT_CA}"
     fi
 
-    # Ciphers
+    ##############################################################################
+    # DANE
+    
+    if [ -n "${DANE}" ] ; then
+	
+	check_required_prog dig
+
+	DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
+
+	
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] Checking DANE (${DANE})"
+   	    printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
+	    echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
+	fi
+	
+	case ${DANE} in
+            1)
+		DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
+		;;
+            211)
+		DANE=$( echo "${DIG_RESULT}" | grep '2 1 1' | tr -d '\n')
+		;;
+            301)
+		DANE=$( echo "${DIG_RESULT}" | grep '3 0 1' | tr -d '\n')
+		;;
+            311)
+		DANE=$( echo "${DIG_RESULT}" | grep '3 1 1' | tr -d '\n')
+		;;
+            302)
+		DANE=$( echo "${DIG_RESULT}" | grep '3 0 2' | tr -d '\n')
+		;;
+	    *)
+		unknown "Internal error: unknown DANE check type ${DANE}"
+        esac
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] ${#DANE} DANE ="
+	    echo "${DANE}" | sed 's/^/\[DBG\]\     /'
+	fi	
+	
+	if [ ${#DANE} -lt 5 ]; then
+            prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
+            critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
+	fi
+
+	DANE="${DANE} -dane_tlsa_domain ${HOST} "
+
+	if [ -n "${DEBUG}" ] ; then
+	   echo "[DBG] DANE = ${DANE}"
+	fi
+	
+    fi
+    
+    # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ] ; then
 	unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'
     fi
@@ -1426,8 +1513,8 @@ main() {
     if [ -z "${FILE_BIN}" ] ; then
         check_required_prog file
         FILE_BIN=${PROG}
-    fi
-
+    fi    
+    
     # curl
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
@@ -1732,9 +1819,7 @@ main() {
     else
         # look if we are dealing with a regular certificate file (x509)
         if ! ascii_grep "CERTIFICATE" "${CERT}" ; then
-
             if [ -n "${FILE}" ] ; then
-
                 if [ -r "${FILE}" ] ; then
 
                     if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -q "BEGIN X509 CRL" ; then
@@ -1867,6 +1952,16 @@ main() {
             echo "unable to fetch the CA issuer certificate (unsupported protocol)"
         fi
         OCSP=""
+    fi
+
+    # Check DANE validation
+    if [ -n "${DANE}" ] ; then
+	if [ -n "${VERBOSE}" ] ; then
+	    echo "checking DANE"
+	fi
+	if ascii_grep 'No matching DANE TLSA records' "${CERT}"; then
+	    critical 'No matching DANE TLSA records'
+	fi
     fi
 
     # Check OCSP stapling
