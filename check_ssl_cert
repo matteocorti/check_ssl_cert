@@ -248,7 +248,7 @@ hours_until() {
         "BSD")
             HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
-	
+
         "GNU")
             HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
@@ -1233,7 +1233,7 @@ main() {
 	    ##############################
 	    # Variable number of arguments
 	    --dane)
-		
+
                 if [ -n "${DANE}" ]; then
                     unknown "--dane can be specified only once"
                 fi
@@ -1247,7 +1247,7 @@ main() {
 			DANE=$2
 			shift 2
 		    fi
-		    
+
 		else
 
 		    DANE=1
@@ -1256,7 +1256,7 @@ main() {
 		fi
 
                 ;;
-	    
+
             ########################################
             # Special
             --)
@@ -1423,14 +1423,14 @@ main() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ROOT_CA = ${ROOT_CA}"
     fi
-    
+
     # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ] ; then
 	unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'
     fi
     if [ -n "${ECDSA}" ] ; then
 	# see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-        SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"	
+        SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"
     fi
     if [ -n "${RSA}" ] ; then
 	if echo "${SSL_VERSION_DISABLED}" | grep -q -- '-no_tls1_3' ||
@@ -1459,8 +1459,8 @@ main() {
     if [ -z "${FILE_BIN}" ] ; then
         check_required_prog file
         FILE_BIN=${PROG}
-    fi    
-    
+    fi
+
     # curl
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
@@ -1694,23 +1694,22 @@ main() {
 
     ##############################################################################
     # DANE
-    
+
     if [ -n "${DANE}" ] ; then
-	
+
 	check_required_prog dig
-	
+
 	# check if OpenSSL supports -dane_tlsa_rrdata
-	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then	    
-	
+	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
+
 	    DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
 
-	
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] Checking DANE (${DANE})"
    		printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
 		echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
 	    fi
-	
+
 	    case ${DANE} in
 		1)
 		    DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
@@ -1730,19 +1729,19 @@ main() {
 		*)
 		    unknown "Internal error: unknown DANE check type ${DANE}"
             esac
-	    
+
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] ${#DANE} DANE ="
 		echo "${DANE}" | sed 's/^/\[DBG\]\     /'
-	    fi	
-	    
+	    fi
+
 	    if [ ${#DANE} -lt 5 ]; then
 		prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
 		critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
 	    fi
-	    
+
 	    DANE="${DANE} -dane_tlsa_domain ${HOST} "
-	    
+
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] DANE = ${DANE}"
 	    fi
@@ -1752,9 +1751,9 @@ main() {
 	    unknown 'OpenSSL s_client does not support DNS-based Authentication of Named Entities'
 
 	fi
-	    
+
     fi
-    
+
     ################################################################################
     # Fetch the X.509 certificate
 
@@ -2096,7 +2095,7 @@ main() {
 
 	hours_until "${CERT_END_DATE}"
 	DAYS_VALID=$(( HOURS_UNTIL / 24 ))
-	
+
         if [ -n "${VERBOSE}" ] ; then
 
             if [ "${DAYS_VALID}" -ge 0 ] ; then
