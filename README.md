@@ -33,7 +33,7 @@ Options:
                                    issuer cert
       --dane                       verify there are valid TLSA records for the returned
                                    certificate (requires OpenSSL 1.1.0 or newer)
-      --dane 211                   verify that a valid DANE-TA(3) SPKI(1) SHA2-256(1) TLSA record exists
+      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
       --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
       --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
       --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
