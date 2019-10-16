@@ -459,7 +459,7 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
-    ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+    ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk -d
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
