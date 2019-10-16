@@ -1428,11 +1428,11 @@ main() {
 	
 	check_required_prog dig
 
-	DIG_RESULT=$( dig +noall +noclass +nottlid +answer TLSA "_${PORT}._tcp.${HOST}" | sed "s/.*TLSA[ \t]\(.*\)/-dane_tlsa_rrdata \'\1\' /" )
+	DIG_RESULT=$( dig +noall +noclass +nottlid +answer TLSA "_${PORT}._tcp.${HOST}" | sed "s/.*TLSA.\(.*\)/-dane_tlsa_rrdata \'\1\' /" )
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] Checking DANE (${DANE})"
-	    printf '%s\n' "[DBG] dig +noall +noclass +nottlid +answer TLSA _$PORT._tcp.$HOST | sed \"s/.*TLSA[ \t]\(.*\)/-dane_tlsa_rrdata \'\1\' /\" ="
+	    printf '%s\n' "[DBG] dig +noall +noclass +nottlid +answer TLSA _$PORT._tcp.$HOST | sed \"s/.*TLSA.\(.*\)/-dane_tlsa_rrdata \'\1\' /\" ="
 	    echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
 	fi
 	
@@ -1455,6 +1455,11 @@ main() {
 	    *)
 		unknown "Internal error: unknown DANE check type ${DANE}"
         esac
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] ${#DANE} DANE ="
+	    echo "${DANE}" | sed 's/^/\[DBG\]\     /'
+	fi	
 	
 	if [ ${#DANE} -lt 5 ]; then
             prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
