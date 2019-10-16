@@ -24,7 +24,6 @@ if [ ! -r "${SCRIPT}" ] ; then
 fi
 
 oneTimeSetUp() {
-   
     # constants
 
     NAGIOS_OK=0
