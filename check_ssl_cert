@@ -1428,12 +1428,12 @@ main() {
 	
 	check_required_prog dig
 
-	DIG_RESULT=$( dig +short TLSA "_$PORT._tcp.$HOST" |while read L; do echo " -dane_tlsa_rrdata '$L' "; done )
+	DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
 
 	
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] Checking DANE (${DANE})"
-   	    printf '%s\n' "[DBG] dig +short TLSA _$PORT._tcp.$HOST ="
+   	    printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
 	    echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
 	fi
 	
