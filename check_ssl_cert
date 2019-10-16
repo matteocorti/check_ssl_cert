@@ -69,10 +69,10 @@ usage() {
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
     echo "      --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)"
-    echo "      --dane=211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists"
-    echo "      --dane=301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
-    echo "      --dane=302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
-    echo "      --dane=311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
+    echo "      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists"
+    echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
+    echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
+    echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "   -d,--debug                      produces debugging output"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "   -e,--email address              pattern to match the email address contained"
@@ -866,46 +866,6 @@ main() {
 		RSA=1
                 shift
                 ;;
-            --dane)
-                if [ -n "${DANE}" ]; then
-                    echo "--dane can be specified only once"
-                    exit 2
-                fi
-                DANE=1
-                shift
-                ;;
-            --dane=211)
-                if [ -n "${DANE}" ]; then
-                    echo "--dane can be specified only once"
-                    exit 2
-                fi
-                DANE=211
-                shift
-                ;;
-            --dane=301)
-                if [ -n "${DANE}" ]; then
-                    echo "--dane can be specified only once"
-                    exit 2
-                fi
-                DANE=301
-                shift
-                ;;
-            --dane=302)
-                if [ -n "${DANE}" ]; then
-                    echo "--dane can be specified only once"
-                    exit 2
-                fi
-                DANE=302
-                shift
-                ;;
-	    --dane=311)
-                if [ -n "${DANE}" ]; then
-                    echo "--dane can be specified only once"
-                    exit 2
-                fi
-                DANE=311
-                shift
-                ;;
             --ecdsa)
 		ECDSA=1
                 shift
@@ -1269,6 +1229,34 @@ main() {
                     unknown "--xmpphost requires an argument"
                 fi
                 ;;
+
+	    ##############################
+	    # Variable number of arguments
+	    --dane)
+		
+                if [ -n "${DANE}" ]; then
+                    unknown "--dane can be specified only once"
+                fi
+
+		# check the second parameter if it exist
+		if [ $# -gt 1 ] ; then
+
+		    if [ "${2%${2#?}}"x = '-x' ] ; then
+			shift
+		    else
+			DANE=$2
+			shift 2
+		    fi
+		    
+		else
+
+		    DANE=1
+                    shift
+
+		fi
+
+                ;;
+	    
             ########################################
             # Special
             --)
@@ -1438,23 +1426,31 @@ main() {
 
     if [ -n "${DANE}" ] ; then
 	
-	check_required_prog delv
+	check_required_prog dig
+
+	DIG_RESULT=$( dig +noall +noclass +nottlid +answer TLSA "_${PORT}._tcp.${HOST}" | sed "s/.*TLSA[ \t]\(.*\)/-dane_tlsa_rrdata \'\1\' /" )
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] Checking DANE (${DANE})"
+	    printf '%s\n' "[DBG] dig +noall +noclass +nottlid +answer TLSA _$PORT._tcp.$HOST | sed \"s/.*TLSA[ \t]\(.*\)/-dane_tlsa_rrdata \'\1\' /\" ="
+	    echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
+	fi
 	
 	case ${DANE} in
             1)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | tr -d '\n')
+		DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
 		;;
             211)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "2 1 1"|tr -d '\n')
+		DANE=$( echo "${DIG_RESULT}" | grep '2 1 1' | tr -d '\n')
 		;;
             301)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 0 1"|tr -d '\n')
+		DANE=$( echo "${DIG_RESULT}" | grep '3 0 1' | tr -d '\n')
 		;;
             311)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" | sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 1 1"|tr -d '\n')
+		DANE=$( echo "${DIG_RESULT}" | grep '3 1 1' | tr -d '\n')
 		;;
             302)
-		DANE=$(delv +short TLSA "_${PORT}._tcp.${HOST}" |sed "s/\(.*\)/-dane_tlsa_rrdata \'\1\' /" | grep "3 0 2"|tr -d '\n')
+		DANE=$( echo "${DIG_RESULT}" | grep '3 0 2' | tr -d '\n')
 		;;
 	    *)
 		unknown "Internal error: unknown DANE check type ${DANE}"
@@ -1464,10 +1460,15 @@ main() {
             prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
             critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
 	fi
-	
-	DANE="${DANE} -dane_tlsa_domain ${HOST} "
-    fi
 
+	DANE="${DANE} -dane_tlsa_domain ${HOST} "
+
+	if [ -n "${DEBUG}" ] ; then
+	   echo "[DBG] DANE = ${DANE}"
+	fi
+	
+    fi
+    
     # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ] ; then
 	unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'

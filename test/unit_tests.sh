@@ -456,6 +456,50 @@ testMoreErrors2() {
     assertEquals "wrong number of errors" 4 "${OUTPUT}"
 }
 
+# dane
+
+testDANE211() {
+    ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE311SMTP() {
+    ${SCRIPT} --dane 311 --port 25 -P smtp -H mail.ietf.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE311() {
+    ${SCRIPT} --dane 311 -H www.ietf.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE301RSA() {
+    ${SCRIPT} --dane 301 --rsa -H mail.aegee.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE301ECDSA() {
+    ${SCRIPT} --dane 301 --ecdsa -H mail.aegee.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE302RSA() {
+    ${SCRIPT} --dane 302 --rsa -H mail.aegee.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDANE302ECDSA() {
+    ${SCRIPT} --dane 302 --ecdsa  -H mail.aegee.org
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
