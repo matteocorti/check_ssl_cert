@@ -1696,7 +1696,12 @@ main() {
     # DANE
 
     if [ -n "${DANE}" ] ; then
+<<<<<<< HEAD
 
+=======
+    
+  # dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC	
+>>>>>>> 0fdef5306f7d8d1e17e96020b69e2a674dafc4bc
 	check_required_prog dig
 
 	# check if OpenSSL supports -dane_tlsa_rrdata
