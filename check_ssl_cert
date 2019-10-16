@@ -1423,60 +1423,6 @@ main() {
     if [ -n "${DEBUG}" ] ; then
         echo "[DBG] ROOT_CA = ${ROOT_CA}"
     fi
-
-    ##############################################################################
-    # DANE
-    
-    if [ -n "${DANE}" ] ; then
-	
-	check_required_prog dig
-
-	DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
-
-	
-	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] Checking DANE (${DANE})"
-   	    printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
-	    echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
-	fi
-	
-	case ${DANE} in
-            1)
-		DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
-		;;
-            211)
-		DANE=$( echo "${DIG_RESULT}" | grep '2 1 1' | tr -d '\n')
-		;;
-            301)
-		DANE=$( echo "${DIG_RESULT}" | grep '3 0 1' | tr -d '\n')
-		;;
-            311)
-		DANE=$( echo "${DIG_RESULT}" | grep '3 1 1' | tr -d '\n')
-		;;
-            302)
-		DANE=$( echo "${DIG_RESULT}" | grep '3 0 2' | tr -d '\n')
-		;;
-	    *)
-		unknown "Internal error: unknown DANE check type ${DANE}"
-        esac
-
-	if [ -n "${DEBUG}" ] ; then
-	    echo "[DBG] ${#DANE} DANE ="
-	    echo "${DANE}" | sed 's/^/\[DBG\]\     /'
-	fi	
-	
-	if [ ${#DANE} -lt 5 ]; then
-            prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
-            critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
-	fi
-
-	DANE="${DANE} -dane_tlsa_domain ${HOST} "
-
-	if [ -n "${DEBUG}" ] ; then
-	   echo "[DBG] DANE = ${DANE}"
-	fi
-	
-    fi
     
     # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ] ; then
@@ -1746,6 +1692,69 @@ main() {
 
     HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
 
+    ##############################################################################
+    # DANE
+    
+    if [ -n "${DANE}" ] ; then
+	
+	check_required_prog dig
+	
+	# check if OpenSSL supports -dane_tlsa_rrdata
+	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then	    
+	
+	    DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
+
+	
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] Checking DANE (${DANE})"
+   		printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
+		echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
+	    fi
+	
+	    case ${DANE} in
+		1)
+		    DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
+		    ;;
+		211)
+		    DANE=$( echo "${DIG_RESULT}" | grep '2 1 1' | tr -d '\n')
+		    ;;
+		301)
+		    DANE=$( echo "${DIG_RESULT}" | grep '3 0 1' | tr -d '\n')
+		    ;;
+		311)
+		    DANE=$( echo "${DIG_RESULT}" | grep '3 1 1' | tr -d '\n')
+		    ;;
+		302)
+		    DANE=$( echo "${DIG_RESULT}" | grep '3 0 2' | tr -d '\n')
+		    ;;
+		*)
+		    unknown "Internal error: unknown DANE check type ${DANE}"
+            esac
+	    
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] ${#DANE} DANE ="
+		echo "${DANE}" | sed 's/^/\[DBG\]\     /'
+	    fi	
+	    
+	    if [ ${#DANE} -lt 5 ]; then
+		prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
+		critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
+	    fi
+	    
+	    DANE="${DANE} -dane_tlsa_domain ${HOST} "
+	    
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] DANE = ${DANE}"
+	    fi
+
+	else
+
+	    unknown 'OpenSSL s_client does not support DNS-based Authentication of Named Entities'
+
+	fi
+	    
+    fi
+    
     ################################################################################
     # Fetch the X.509 certificate
 

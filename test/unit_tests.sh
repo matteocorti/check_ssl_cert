@@ -20,7 +20,7 @@ fi
 
 SCRIPT=../check_ssl_cert
 if [ ! -r "${SCRIPT}" ] ; then
-    echo "Error: the script to test (${SCRIPT}) is not a readable file"
+    echo "Error: the script to test (${SCRIPT}) is not a readable file"xs
 fi
 
 oneTimeSetUp() {
@@ -32,6 +32,17 @@ oneTimeSetUp() {
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
 
+    # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
+    echo 'Starting SSL Lab test (to cache the result)'
+    curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
+    
+    # check in OpenSSL supports dane checks
+    if openssl s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || openssl s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
+
+	echo "dane checks supported"
+	DANE=1
+    fi
+    
 }
 
 testHoursUntilNow() {
@@ -461,43 +472,71 @@ testMoreErrors2() {
 testDANE211() {
     ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk -d
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE311SMTP() {
     ${SCRIPT} --dane 311 --port 25 -P smtp -H mail.ietf.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE311() {
     ${SCRIPT} --dane 311 -H www.ietf.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE301RSA() {
     ${SCRIPT} --dane 301 --rsa -H mail.aegee.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE301ECDSA() {
     ${SCRIPT} --dane 301 --ecdsa -H mail.aegee.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE302RSA() {
     ${SCRIPT} --dane 302 --rsa -H mail.aegee.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 testDANE302ECDSA() {
     ${SCRIPT} --dane 302 --ecdsa  -H mail.aegee.org
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
 }
 
 # SSL Labs (last one as it usually takes a lot of time
@@ -508,10 +547,6 @@ testETHZWithSSLLabs() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
-
-# we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
-echo 'Starting SSL Lab test (to cache the result)'
-curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
 
 # the script will exit without executing main
 export SOURCE_ONLY='test'
