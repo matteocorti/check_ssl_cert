@@ -749,6 +749,19 @@ ascii_grep() {
     tr -d '\000' < "$2" | grep -q "$1"
 }
 
+################################################################################
+# Checks if there is an option argument (should not begin with -)
+#
+# Params
+#  $1 name of the option (e.g., '-w,--waring') to be used in the error message
+#  $2 next command line parameter
+check_option_argument() {
+    
+    if [ -z "$2" ] || [ "${2%${2#?}}"x = '-x' ] ; then
+	unknown "'${1}' requires an argument"
+    fi
+    
+}
 
 ################################################################################
 # Main
@@ -786,11 +799,13 @@ main() {
     ################################################################################
     # Process command line options
     #
-    # We do no use getopts since it is unable to process long options
+    # We do no use getopts since it is unable to process long options and its
+    # Bash specific.
 
     while true; do
 
         case "$1" in
+	    
             ########################################
             # Options without arguments
             -A|--noauth)
@@ -866,6 +881,14 @@ main() {
 		RSA=1
                 shift
                 ;;
+            --require-ocsp-stapling)
+                REQUIRE_OCSP_STAPLING=1
+                shift
+                ;;
+            --require-san)
+                REQUIRE_SAN=1
+                shift
+                ;;
             --ecdsa)
 		ECDSA=1
                 shift
@@ -925,309 +948,192 @@ main() {
 
 
             ########################################
-            # Options with arguments
+            # Options with one argument
+	    
             -c|--critical)
-                if [ $# -gt 1 ]; then
-                    CRITICAL="$2"
-                    shift 2
-                else
-                    unknown "-c,--critical requires an argument"
-                fi
+		check_option_argument '-c,--critical' "$2"
+                CRITICAL="$2"
+                shift 2
                 ;;
             --curl-bin)
-                if [ $# -gt 1 ]; then
-                    CURL_BIN="$2"
-                    shift 2
-                else
-                    unknown "--curl-bin requires an argument"
-                fi
+		check_option_argument '--curl-bin' "$2"
+                CURL_BIN="$2"
+                shift 2
                 ;;
             --curl-user-agent)
-                if [ $# -gt 1 ]; then
-                    CURL_USER_AGENT="$2"
-                    shift 2
-                else
-                    unknown "--curl-user-agent requires an argument"
-                fi
+		check_option_argument '--curl-user-agent' "$2"
+                CURL_USER_AGENT="$2"
+                shift 2
                 ;;
             # Deprecated option: used to be as --warning
             --days)
-                if [ $# -gt 1 ]; then
-                    WARNING="$2"
-                    shift 2
-                else
-                    unknown "-d,--days requires an argument"
-                fi
+		check_option_argument '--days' "$2"
+                WARNING="$2"
+                shift 2
                 ;;
             -e|--email)
-                if [ $# -gt 1 ]; then
-                    ADDR="$2"
-                    shift 2
-                else
-                    unknown "-e,--email requires an argument"
-                fi
+		check_option_argument 'e|--email' "$2"
+                ADDR="$2"
+                shift 2
                 ;;
             -f|--file)
-                if [ $# -gt 1 ]; then
-                    FILE="$2"
-                    shift 2
-                else
-                    unknown "-f,--file requires an argument"
-                fi
+		check_option_argument ' -f|--file' "$2"
+                FILE="$2"
+                shift 2
                 ;;
             --file-bin)
-                if [ $# -gt 1 ]; then
-                    FILE_BIN="$2"
-                    shift 2
-                else
-                    unknown "--file-bin requires an argument"
-                fi
+                check_option_argument '--file-bin' "$2"
+                FILE_BIN="$2"
+                shift 2
                 ;;
              --format)
-                if [ $# -gt 1 ]; then
-                    FORMAT="$2"
-                    shift 2
-                else
-                    unknown "-format requires an argument"
-                fi
+                check_option_argument '--format' "$2"
+                FORMAT="$2"
+                shift 2
                 ;;
             -H|--host)
-                if [ $# -gt 1 ]; then
-                    HOST="$2"
-                    shift 2
-                else
-                    unknown "-H,--host requires an argument"
-                fi
+                check_option_argument '-H|--host' "$2"
+                HOST="$2"
+                shift 2
                 ;;
             -i|--issuer)
-                if [ $# -gt 1 ]; then
-                    ISSUER="$2"
-                    shift 2
-                else
-                    unknown "-i,--issuer requires an argument"s
-                fi
+                check_option_argument '-i|--issuer' "$2"
+                ISSUER="$2"
+                shift 2
                 ;;
             --issuer-cert-cache)
-                if [ $# -gt 1 ]; then
-                    ISSUER_CERT_CACHE="$2"
-                    shift 2
-                else
-                    unknown "--issuer-cert-cache requires an argument"
-                fi
+                check_option_argument '--issuer-cert-cache' "$2"
+                ISSUER_CERT_CACHE="$2"
+                shift 2
                 ;;
             -L|--check-ssl-labs)
-                if [ $# -gt 1 ]; then
-                    SSL_LAB_CRIT_ASSESSMENT="$2"
-                    shift 2
-                else
-                    unknown "-L|--check-ssl-labs requires an argument"
-                fi
+                check_option_argument '-L|--check-ssl-labs' "$2"
+                SSL_LAB_CRIT_ASSESSMENT="$2"
+                shift 2
                 ;;
             --check-ssl-labs-warn-grade)
-                if [ $# -gt 1 ]; then
-                    SSL_LAB_WARN_ASSESTMENT="$2"
-                    shift 2
-                else
-                    unknown "--check-ssl-labs-warn-grade requires an argument"
-                fi
+                check_option_argument '--check-ssl-labs-warn-grade' "$2"
+                SSL_LAB_WARN_ASSESTMENT="$2"
+                shift 2
                 ;;
             --serial)
-                if [ $# -gt 1 ]; then
-                    SERIAL_LOCK="$2"
-                    shift 2
-                else
-                    unknown "--serial requires an argument"
-                fi
+                check_option_argument '--serial' "$2"
+                SERIAL_LOCK="$2"
+                shift 2
                 ;;
             --fingerprint)
-                if [ $# -gt 1 ]; then
-                    FINGERPRINT_LOCK="$2"
-                    shift 2
-                else
-                    unknown "--fingerprint requires an argument - SHA1 Fingerprint"
-                fi
+                check_option_argument '--fingerprint' "$2"
+                FINGERPRINT_LOCK="$2"
+                shift 2
                 ;;
             --long-output)
-                if [ $# -gt 1 ]; then
-                    LONG_OUTPUT_ATTR="$2"
-                    shift 2
-               else
-                    unknown "--long-output requires an argument"
-               fi
-               ;;
+                check_option_argument '--long-output' "$2"
+                LONG_OUTPUT_ATTR="$2"
+                shift 2
+		;;
             -n|--cn)
-                if [ $# -gt 1 ]; then
-                    if [ -n "${COMMON_NAME}" ]; then
-                        COMMON_NAME="${COMMON_NAME} ${2}"
-                    else
-                        COMMON_NAME="${2}"
-                    fi
-                    shift 2
+                check_option_argument ' -n|--cn' "$2"
+                if [ -n "${COMMON_NAME}" ]; then
+                    COMMON_NAME="${COMMON_NAME} ${2}"
                 else
-                    unknown "-n,--cn requires an argument"
+                    COMMON_NAME="${2}"
                 fi
+                shift 2
                 ;;
             --ocsp-critical)
-                if [ $# -gt 1 ]; then
-                    OCSP_CRITICAL="$2"
-                    shift 2
-                else
-                    unknown "--ocsp-critical requires an argument"
-                fi
+                check_option_argument '--ocsp-critical' "$2"
+                OCSP_CRITICAL="$2"
+                shift 2
                 ;;
             --ocsp-warning)
-                if [ $# -gt 1 ]; then
-                    OCSP_WARNING="$2"
-                    shift 2
-                else
-                    unknown "--ocsp-warning requires an argument"
-                fi
+                check_option_argument '--ocsp-warning' "$2"
+                OCSP_WARNING="$2"
+                shift 2
                 ;;
             -o|--org)
-                if [ $# -gt 1 ]; then
-                    ORGANIZATION="$2"
-                    shift 2
-                else
-                    unknown "-o,--org requires an argument"
-                fi
+                check_option_argument '-o|--org' "$2"
+                ORGANIZATION="$2"
+                shift 2
                 ;;
             --openssl)
-                if [ $# -gt 1 ]; then
-                    OPENSSL="$2"
-                    shift 2
-                else
-                    unknown "--openssl requires an argument"
-                fi
+                check_option_argument '--openssl' "$2"
+                OPENSSL="$2"
+                shift 2
                 ;;
             -p|--port)
-                if [ $# -gt 1 ]; then
-                    PORT="$2"
-                    XMPPPORT="$2"
-                    shift 2
-                else
-                    unknown "-p,--port requires an argument"
-                fi
+                check_option_argument '-p|--port' "$2"
+                PORT="$2"
+                XMPPPORT="$2"
+                shift 2
                 ;;
             -P|--protocol)
-                if [ $# -gt 1 ]; then
-                    PROTOCOL="$2"
-                    shift 2
-                else
-                    unknown "-P,--protocol requires an argument"
-                fi
+                check_option_argument '-P|--protocol' "$2"
+                PROTOCOL="$2"
+                shift 2
                 ;;
             -r|--rootcert)
-                if [ $# -gt 1 ]; then
-                    ROOT_CA="$2"
-                    shift 2
-                else
-                    unknown "-r,--rootcert requires an argument"
-                fi
+                check_option_argument '-r|--rootcert' "$2"
+                ROOT_CA="$2"
+                shift 2
                 ;;
             --rootcert-dir)
-                if [ $# -gt 1 ]; then
-                    ROOT_CA_DIR="$2"
-                    shift 2
-                else
-                    unknown "--rootcert-dir requires an argument"
-                fi
+                check_option_argument '--rootcert-dir' "$2"
+                ROOT_CA_DIR="$2"
+                shift 2
                 ;;
             --rootcert-file)
-                if [ $# -gt 1 ]; then
-                    ROOT_CA_FILE="$2"
-                    shift 2
-                else
-                    unknown "--rootcert-file requires an argument"
-                fi
+                check_option_argument '--rootcert-file' "$2"
+                ROOT_CA_FILE="$2"
+                shift 2
                 ;;
             -C|--clientcert)
-                if [ $# -gt 1 ]; then
-                    CLIENT_CERT="$2"
-                    shift 2
-                else
-                    unknown "-c,--clientcert requires an argument"
-                fi
+                check_option_argument '-C|--clientcert' "$2"
+                CLIENT_CERT="$2"
+                shift 2
                 ;;
             -K|--clientkey)
-                if [ $# -gt 1 ]; then
-                    CLIENT_KEY="$2"
-                    shift 2
-                else
-                    unknown "-K,--clientkey requires an argument"
-                fi
+                check_option_argument '-K|--clientkey' "$2"
+                CLIENT_KEY="$2"
+                shift 2
                 ;;
             --clientpass)
-                if [ $# -gt 1 ]; then
-                    CLIENT_PASS="$2"
-                    shift 2
-                else
-                    unknown "--clientpass requires an argument"
-                fi
-                ;;
-            --require-ocsp-stapling)
-                REQUIRE_OCSP_STAPLING=1
-                shift
-                ;;
-            --require-san)
-                REQUIRE_SAN=1
-                shift
+                check_option_argument '--clientpass' "$2"
+                CLIENT_PASS="$2"
+                shift 2
                 ;;
             --sni)
-                if [ $# -gt 1 ]; then
-                    SNI="$2"
-                    shift 2
-                else
-                    unknown "--sni requires an argument"
-                fi
+                check_option_argument '--sni' "$2"
+                SNI="$2"
+                shift 2
                 ;;
             -S|--ssl)
-                if [ $# -gt 1 ]; then
-
-                    if [ "$2" = "2" ] || [ "$2" = "3" ] ; then
-                        SSL_VERSION="-ssl${2}"
-                        shift 2
-                    else
-                        unknown "invalid argument for --ssl"
-                    fi
-
+                check_option_argument '' "$2"
+                if [ "$2" = "2" ] || [ "$2" = "3" ] ; then
+                    SSL_VERSION="-ssl${2}"
+                    shift 2
                 else
-
-                    unknown "--ssl requires an argument"
-
+                    unknown "invalid argument for --ssl"
                 fi
                 ;;
             -t|--timeout)
-                if [ $# -gt 1 ]; then
-                    TIMEOUT="$2"
-                    shift 2
-                else
-                    unknown "-t,--timeout requires an argument"
-                fi
+                check_option_argument '-t|--timeout' "$2"
+                TIMEOUT="$2"
+                shift 2
                 ;;
             --temp)
-                if [ $# -gt 1 ] ; then
-                    # Override TMPDIR
-                    TMPDIR="$2"
-                    shift 2
-                else
-                    unknown "--temp requires an argument"
-                fi
+		check_option_argument '--temp' "$2"
+                TMPDIR="$2"
+                shift 2
                 ;;
             -w|--warning)
-                if [ $# -gt 1 ]; then
-                    WARNING="$2"
-                    shift 2
-                else
-                    unknown "-w,--warning requires an argument"
-                fi
+                check_option_argument '-w|--warning' "$2"
+                WARNING="$2"
+                shift 2
                 ;;
             --xmpphost)
-                if [ $# -gt 1 ]; then
-                    XMPPHOST="$2"
-                    shift 2
-                else
-                    unknown "--xmpphost requires an argument"
-                fi
+                check_option_argument '--xmpphost' "$2"
+                XMPPHOST="$2"
+                shift 2
                 ;;
 
 	    ##############################

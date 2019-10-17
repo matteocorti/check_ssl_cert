@@ -1,4 +1,4 @@
-2019-10-16 Version 1.99.0: DANE checks
+2019-10-16 Version 1.99.0: DNS-based Authentication of Named Entities (DANE) checks
 2019-10-10 Version 1.98.0: Bug fix release: A wildcard certificate does not match the 'main' domain, ciphers and TLS 1.3
 2019-10-09 Version 1.97.0: Validate OCSP stapling expiring date, option to disable TLS 1.3
 2019-09-25 Version 1.96.0: Bug fixes

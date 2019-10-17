@@ -78,6 +78,18 @@ testUsage() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
+testMissingArgument() {
+    ${SCRIPT} -H www.google.com -c > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"   
+}
+
+testMissingArgument2() {
+    ${SCRIPT} -H www.google.com -c -w 10 > /dev/null 2>&1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"   
+}
+
 testETHZ() {
     ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt
     EXIT_CODE=$?
