@@ -480,6 +480,16 @@ testMoreErrors2() {
 
 # dane
 
+testDANE() {
+    ${SCRIPT} --dane -H mail.aegee.org
+    EXIT_CODE=$?
+    if [ -n "${DANE}" ] ; then
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+    fi
+}
+
 testDANE211() {
     ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
     EXIT_CODE=$?
