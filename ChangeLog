@@ -1,3 +1,7 @@
+2019-10-18  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Fixed a bug ignoring --dane without parameters
+
 2019-10-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Integrated the DANE checks
