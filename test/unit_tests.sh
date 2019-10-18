@@ -481,7 +481,7 @@ testMoreErrors2() {
 # dane
 
 testDANE() {
-    ${SCRIPT} --dane -H mail.aegee.org
+    ${SCRIPT} --dane -H mail.aegee.org -d
     EXIT_CODE=$?
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"

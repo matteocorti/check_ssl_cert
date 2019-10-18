@@ -1601,7 +1601,11 @@ main() {
     ##############################################################################
     # DANE
 
-    if [ -n "${DANE}" ] ; then
+    if [ -n "${DANE}" ] ; then	
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo '[DBG] checking DANE'
+	fi
 	
 	# dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC	
 	check_required_prog dig
