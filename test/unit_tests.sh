@@ -34,14 +34,14 @@ oneTimeSetUp() {
     # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
     echo 'Starting SSL Lab test (to cache the result)'
     curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
-    
+
     # check in OpenSSL supports dane checks
     if openssl s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || openssl s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
 
 	echo "dane checks supported"
 	DANE=1
     fi
-    
+
 }
 
 testHoursUntilNow() {
@@ -81,13 +81,13 @@ testUsage() {
 testMissingArgument() {
     ${SCRIPT} -H www.google.com -c > /dev/null 2>&1
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"   
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testMissingArgument2() {
     ${SCRIPT} -H www.google.com -c -w 10 > /dev/null 2>&1
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"   
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testETHZ() {
@@ -486,7 +486,7 @@ testDANE() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -496,7 +496,7 @@ testDANE211() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -506,7 +506,7 @@ testDANE311SMTP() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -516,7 +516,7 @@ testDANE311() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -526,7 +526,7 @@ testDANE301RSA() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -536,7 +536,7 @@ testDANE301ECDSA() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -546,7 +546,7 @@ testDANE302RSA() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -556,7 +556,7 @@ testDANE302ECDSA() {
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"	
+	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
