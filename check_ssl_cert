@@ -756,11 +756,11 @@ ascii_grep() {
 #  $1 name of the option (e.g., '-w,--waring') to be used in the error message
 #  $2 next command line parameter
 check_option_argument() {
-    
+
     if [ -z "$2" ] || [ "${2%${2#?}}"x = '-x' ] ; then
 	unknown "'${1}' requires an argument"
     fi
-    
+
 }
 
 ################################################################################
@@ -799,13 +799,13 @@ main() {
     ################################################################################
     # Process command line options
     #
-    # We do no use getopts since it is unable to process long options and its
+    # We do not use getopts since it is unable to process long options and it is
     # Bash specific.
 
     while true; do
 
         case "$1" in
-	    
+
             ########################################
             # Options without arguments
             -A|--noauth)
@@ -949,7 +949,7 @@ main() {
 
             ########################################
             # Options with one argument
-	    
+
             -c|--critical)
 		check_option_argument '-c,--critical' "$2"
                 CRITICAL="$2"
@@ -1602,13 +1602,13 @@ main() {
     ##############################################################################
     # DANE
 
-    if [ -n "${DANE}" ] ; then	
+    if [ -n "${DANE}" ] ; then
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo '[DBG] checking DANE'
 	fi
-	
-	# dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC	
+
+	# dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC
 	check_required_prog dig
 
 	# check if OpenSSL supports -dane_tlsa_rrdata
@@ -2552,19 +2552,19 @@ main() {
             if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "$( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )" -gt 0 ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
-                    echo "[DBG] openssl ocsp supports the -header option"
+                    echo "[DBG] ${OPENSSL} ocsp supports the -header option"
                 fi
 
                 # the -header option was first accepting key and value separated by space. The newer versions are using key=value
                 KEYVALUE=""
-                if openssl ocsp -help 2>&1 | grep header | grep -q 'key=value' ; then
+                if ${OPENSSL} ocsp -help 2>&1 | grep header | grep -q 'key=value' ; then
                     if [ -n "${DEBUG}" ] ; then
-                        echo "[DBG] openssl ocsp -header requires 'key=value'"
+                        echo "[DBG] ${OPENSSL} ocsp -header requires 'key=value'"
                     fi
                     KEYVALUE=1
                 else
                     if [ -n "${DEBUG}" ] ; then
-                        echo "[DBG] openssl ocsp -header requires 'key value'"
+                        echo "[DBG] ${OPENSSL} ocsp -header requires 'key value'"
                     fi
                 fi
 
