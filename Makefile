@@ -4,7 +4,7 @@ DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 YEAR=`date +"%Y"`
 
-dist: version_check formatting_check
+dist: version_check formatting_check copyright_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)
