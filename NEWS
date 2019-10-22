@@ -1,3 +1,4 @@
+2019-10-22 Version 1.101.0: Fixed a bug printing both a critical and a warning message when both condition match
 2019-10-18 Version 1.100.0: Fixed a bug ignoring --dane without parameters
 2019-10-16 Version 1.99.0: DNS-based Authentication of Named Entities (DANE) checks
 2019-10-10 Version 1.98.0: Bug fix release: A wildcard certificate does not match the 'main' domain, ciphers and TLS 1.3

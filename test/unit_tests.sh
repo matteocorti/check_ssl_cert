@@ -520,28 +520,8 @@ testDANE311() {
     fi
 }
 
-testDANE301RSA() {
-    ${SCRIPT} --dane 301 --rsa -H mail.aegee.org
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    fi
-}
-
 testDANE301ECDSA() {
     ${SCRIPT} --dane 301 --ecdsa -H mail.aegee.org
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-	assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    fi
-}
-
-testDANE302RSA() {
-    ${SCRIPT} --dane 302 --rsa -H mail.aegee.org
     EXIT_CODE=$?
     if [ -n "${DANE}" ] ; then
 	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"

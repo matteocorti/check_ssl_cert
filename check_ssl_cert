@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.100.0
+VERSION=1.101.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -365,12 +365,15 @@ critical() {
 append_warning_message() {
 
     if [ -n "${DEBUG}" ] ; then
-        echo "[DBG] append_warning_message: HOST       = ${HOST}"
-        echo "[DBG] append_warning_message: CN         = ${CN}"
-        echo "[DBG] append_warning_message: SNI       = ${SNI}"
-        echo "[DBG] append_warning_message: FILE      = ${FILE}"
-        echo "[DBG] append_warning_message: SHORTNAME = ${SHORTNAME}"
-        echo "[DBG] append_warning_message: $1        = $1"
+        echo "[DBG] WARNING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo "[DBG] append_warning_message: HOST         = ${HOST}"
+        echo "[DBG] append_warning_message: CN           = ${CN}"
+        echo "[DBG] append_warning_message: SNI          = ${SNI}"
+        echo "[DBG] append_warning_message: FILE         = ${FILE}"
+        echo "[DBG] append_warning_message: SHORTNAME    = ${SHORTNAME}"
+        echo "[DBG] prepend_warning_message: MSG         = ${MSG}"
+        echo "[DBG] prepend_warning_message: WARNING_MSG = ${WARNING_MSG}"
+        echo "[DBG] prepend_warning_message: ALL_MSG 1   = ${ALL_MSG}"
     fi
 
     if [ -n "${CN}" ] ; then
@@ -388,10 +391,22 @@ append_warning_message() {
     fi
 
     MSG="${SHORTNAME} WARN${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    
     if [ "${WARNING_MSG}" = "" ]; then
         WARNING_MSG="${MSG}"
     fi
+    
     ALL_MSG="${ALL_MSG}\n    ${MSG}"
+
+
+    if [ -n "${DEBUG}" ] ; then
+        echo "[DBG] prepend_warning_message: MSG 2          = ${MSG}"
+        echo "[DBG] prepend_warning_message: WARNING_MSG 2 = ${WARNING_MSG}"
+        echo "[DBG] prepend_warning_message: ALL_MSG 2      = ${ALL_MSG}"
+        echo "[DBG] WARNING <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    fi
+
+    
 }
 
 
@@ -2244,6 +2259,7 @@ main() {
         fi
 
         if [ "${OPENSSL_COMMAND}" = "x509" ]; then
+	    
             # x509 certificates (default)
 
             # We always check expired certificates
@@ -2259,12 +2275,13 @@ main() {
                 fi
 
                 if ! ${OPENSSL} x509 -in "${CERT}" -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
+		    EXPIRES=1
                     prepend_critical_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
 
-            if [ -n "${WARNING}" ] ; then
+            if [ -n "${WARNING}" ] && [ -z "${EXPIRES}" ] ; then
 
                 if [ -n "${DEBUG}" ] ; then
                     echo "[DBG] executing: ${OPENSSL} x509 -in ${CERT} -noout -checkend $(( WARNING * 86400 ))"
@@ -2275,7 +2292,9 @@ main() {
                 fi
 
             fi
+	    
         elif [ "${OPENSSL_COMMAND}" = "crl" ]; then
+	    
             # CRL certificates
 
             # We always check expired certificates
@@ -2285,12 +2304,13 @@ main() {
 
             if [ -n "${CRITICAL}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${CRITICAL}" ] ; then
+		    EXPIRES=1
                     prepend_critical_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
 
             fi
 
-            if [ -n "${WARNING}" ] ; then
+            if [ -n "${WARNING}" ]  && [ -z "${EXPIRES}" ] ; then
                 if [ "${DAYS_VALID}" -lt "${WARNING}" ] ; then
                     append_warning_message "${OPENSSL_COMMAND} certificate will expire in ${DAYS_VALID} day(s) on ${DATE}"
                 fi
