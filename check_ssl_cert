@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.101.0
+VERSION=1.102.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -74,6 +74,7 @@ usage() {
     echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "   -d,--debug                      produces debugging output"
+    echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "   -e,--email address              pattern to match the email address contained"
     echo "                                   in the certificate"
@@ -515,13 +516,11 @@ check_required_prog() {
     PROG=$(command -v "$1" 2> /dev/null)
 
     if [ -z "${PROG}" ] ; then
-        prepend_critical_message "cannot find program: $1"
-        unknown "${SHORTNAME} CRITICAL: cannot find program: $1"
+        unknown "cannot find program: $1"
     fi
 
     if [ ! -x "${PROG}" ] ; then
-        prepend_critical_message "${PROG} is not executable"
-        unknown "${SHORTNAME} CRITICAL: ${PROG} is not executable"
+        unknown "${PROG} is not executable"
     fi
 
 }
@@ -789,6 +788,7 @@ main() {
     FILE_BIN=""
     CURL_BIN=""
     CURL_USER_AGENT=""
+    DIG_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT="443"
     XMPPPORT="5222"
@@ -984,6 +984,11 @@ main() {
             --days)
 		check_option_argument '--days' "$2"
                 WARNING="$2"
+                shift 2
+                ;;
+            --dig-bin)
+		check_option_argument '--dig-bin' "$2"
+                DIG_BIN="$2"
                 shift 2
                 ;;
             -e|--email)
@@ -1373,15 +1378,17 @@ main() {
 
     # OpenSSL
     if [ -z "${OPENSSL}" ] ; then
-        check_required_prog openssl
-        OPENSSL=${PROG}
+	OPENSSL='openssl'
     fi
+    check_required_prog "${OPENSSL}"
+    OPENSSL=${PROG}
 
     # file
     if [ -z "${FILE_BIN}" ] ; then
-        check_required_prog file
-        FILE_BIN=${PROG}
+	FILE_BIN='file'
     fi
+    check_required_prog "${FILE_BIN}"
+    FILE_BIN=${PROG}
 
     # curl
     if [ -z "${CURL_BIN}" ] ; then
@@ -1402,6 +1409,9 @@ main() {
                 echo "[DBG] cURL binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
             fi
         fi
+    else
+	# we check if the provided binary actually works
+	check_required_prog "${CURL_BIN}"
     fi
 
     # Expect (optional)
@@ -1624,16 +1634,20 @@ main() {
 	fi
 
 	# dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC
-	check_required_prog dig
+	if [ -z "${DIG_BIN}" ] ; then
+	    DIG_BIN='dig'
+	fi
+	check_required_prog "${DIG_BIN}"
+	DIG_BIN=${PROG}
 
 	# check if OpenSSL supports -dane_tlsa_rrdata
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
 
-	    DIG_RESULT=$( dig +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
+	    DIG_RESULT=$( "${DIG_BIN}" +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
 
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] Checking DANE (${DANE})"
-   		printf '%s\n' "[DBG] dig +short TLSA _${PORT}._tcp.${HOST} ="
+   		printf '%s\n' "[DBG] ${DIG_BIN} +short TLSA _${PORT}._tcp.${HOST} ="
 		echo "${DIG_RESULT}" | sed 's/^/\[DBG\]\     /'
 	    fi
 

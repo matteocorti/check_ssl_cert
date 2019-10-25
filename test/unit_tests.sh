@@ -540,6 +540,18 @@ testDANE302ECDSA() {
     fi
 }
 
+testRequiredProgramFile() {
+    ${SCRIPT} -H www.google.com --file-bin /doesnotexist
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
+testRequiredProgramPermissions() {
+    ${SCRIPT} -H www.google.com --file-bin /etc/hosts
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {

@@ -1,3 +1,7 @@
+2019-10-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_required_prog): fixed a couple of small issues and introduced a feature to specify the dig binary
+
 2019-10-22  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Fixed a bug printing both a critical and a warning message when both condition match
