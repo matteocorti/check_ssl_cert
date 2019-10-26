@@ -90,7 +90,7 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}
+                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp}
                                    http:                    default
                                    ftp,imap,irc,ldap,pop3,smtp: switch to TLS using StartTLS
    -s,--selfsigned                 allows self-signed certificates
