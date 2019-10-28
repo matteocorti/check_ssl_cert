@@ -552,6 +552,18 @@ testRequiredProgramPermissions() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
+testSieveRSA() {
+    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --dane --rsa
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testSieveRSA() {
+    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --dane --ecdsa
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+    
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
