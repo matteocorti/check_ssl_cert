@@ -553,13 +553,13 @@ testRequiredProgramPermissions() {
 }
 
 testSieveRSA() {
-    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --dane --rsa
+    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSieveRSA() {
-    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --dane --ecdsa
+    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
