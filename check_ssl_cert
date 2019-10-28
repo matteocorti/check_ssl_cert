@@ -1234,6 +1234,7 @@ main() {
             case "${PROTOCOL}" in
 		smtp)
 		    PORT=25
+		    ;;
 		smtps)
 		    PORT=465
 		    ;;
