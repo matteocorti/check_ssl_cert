@@ -498,7 +498,14 @@ exec_with_timeout() {
             printf '[DBG]   expect -c \"set echo \\\"-noecho\\\"; set timeout %s; spawn -noecho %s; expect timeout { exit 1 } eof { exit 0 }\"\n' "${time}" "${command}"
         fi
 
-        expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"
+	expect << EOF
+set echo \"-noecho\"
+set timeout ${time}
+spawn -noecho ${command}
+expect timeout { exit 1 } eof { exit 0 }
+EOF
+	
+#        expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"
 
         RET=$?
 
@@ -699,6 +706,9 @@ fetch_certificate() {
     fi
 
     if [ -n "${DEBUG}" ] ; then
+
+	echo "[DBG] Return value of the command = ${RET}"
+	
         echo "[DBG] storing a copy of the retrieved certificate in ${TMPDIR}/${HOST}-${PORT}.crt"
         cp "${CERT}" "${TMPDIR}/${HOST}-${PORT}.crt"
 
