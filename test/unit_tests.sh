@@ -553,15 +553,23 @@ testRequiredProgramPermissions() {
 }
 
 testSieveRSA() {
-    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping sieve tests on Travis CI"
+    fi
 }
 
 testSieveRSA() {
-    ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+	echo "Skipping sieve tests on Travis CI"
+    fi
 }
     
 # SSL Labs (last one as it usually takes a lot of time
