@@ -1677,8 +1677,8 @@ main() {
 	    fi
 
 	    if [ ${#DANE} -lt 5 ]; then
-		prepend_critical_message "No TLSA records found at _${PORT}._tcp.${HOST}"
-		critical "${SHORTNAME} CRITICAL: No TLSA records found at _${PORT}._tcp.${HOST}"
+		prepend_critical_message "No matching TLSA records found at _${PORT}._tcp.${HOST}"
+		critical "${SHORTNAME} CRITICAL: No matching TLSA records found at _${PORT}._tcp.${HOST}"
 	    fi
 
 	    DANE="${DANE} -dane_tlsa_domain ${HOST} "
