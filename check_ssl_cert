@@ -1232,8 +1232,10 @@ main() {
 	else
 	
             case "${PROTOCOL}" in
-		smtp|smtps)
-		    PORT=587
+		smtp)
+		    PORT=25
+		smtps)
+		    PORT=465
 		    ;;
 		pop3)
 		    PORT=110
