@@ -794,7 +794,7 @@ main() {
     CURL_USER_AGENT=""
     DIG_BIN=""
     IGNORE_SSL_LABS_CACHE=""
-    PORT="443"
+    PORT=""
     XMPPPORT="5222"
     XMPPHOST=""
     SNI=""
@@ -1207,6 +1207,57 @@ main() {
 
     done
 
+    ################################################################################
+    # Default ports
+    if [ -z "${PORT}" ] ; then
+
+	if [ -z "${PROTOCOL}" ] ; then
+       
+	    # default is HTTPS
+	    PORT='443'
+
+	else
+	
+            case "${PROTOCOL}" in
+		smtp|smtps)
+		    PORT=587
+		    ;;
+		pop3)
+		    PORT=110
+		    ;;
+		ftp|ftps)
+		    PORT=21
+		    ;;
+		pop3s)
+		    PORT=995
+		    ;;
+		irc|ircs)
+		    PORT=6667
+		    ;;
+		ldap)
+		    PORT=389
+		    ;;
+		ldaps)
+		    PORT=636
+		    ;;
+		imap)
+		    PORT=143
+		    ;;
+		imaps)
+		    PORT=993
+		    ;;
+		sieve)
+		    PORT=4190
+                    ;;
+		*)
+                    unknown "Error: unsupported protocol ${PROTOCOL}"
+                    ;;
+            esac
+
+	fi
+	
+    fi
+    
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.
     # COMMON_NAME may be a space separated list of hostnames.
