@@ -494,19 +494,29 @@ exec_with_timeout() {
 
     elif [ -n "${EXPECT}" ] ; then
 
-        if [ -n "${DEBUG}" ] ; then
-            printf '[DBG]   expect -c \"set echo \\\"-noecho\\\"; set timeout %s; spawn -noecho %s; expect timeout { exit 1 } eof { exit 0 }\"\n' "${time}" "${command}"
-        fi
-
-	expect << EOF
+	read -r -d '' EXPECT_SCRIPT << EOT
 set echo \"-noecho\"
 set timeout ${time}
-spawn -noecho ${command}
+spawn -noecho sh -c { ${command} }
 expect timeout { exit 1 } eof { exit 0 }
-EOF
-	
-#        expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"
+EOT
 
+	# Check
+	# https://stackoverflow.com/questions/23614039/how-to-get-the-exit-code-of-spawned-process-in-expect-shell-script
+	read -r -d '' EXPECT_SCRIPT << EOT
+set echo \"-noecho\"
+set timeout ${time}
+spawn -noecho sh -c { ${command} }
+expect timeout { exit 1 } eof { exit 0 }
+EOT
+
+        if [ -n "${DEBUG}" ] ; then
+	    echo '[DBG] Executing expect script'
+	    echo "${EXPECT_SCRIPT}" | sed 's/^/[DBG]\ \ \ \ \ /'
+        fi
+
+	echo "${EXPECT_SCRIPT}" | expect
+	
         RET=$?
 
         if [ -n "${DEBUG}" ] ; then
