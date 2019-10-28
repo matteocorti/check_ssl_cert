@@ -1,3 +1,7 @@
+2019-10-28  Matteo Corti  <corti@matteo.ethz.ch>
+
+	* check_ssl_cert (exec_with_timeout): Better handling of timeout return codes
+
 2019-10-28  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Better error message for non matching DANE records

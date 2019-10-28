@@ -474,10 +474,23 @@ exec_with_timeout() {
         fi
 
         eval "${TIMEOUT_BIN} ${time} ${command}" > /dev/null 2>&1
+	RET=$?
 
-        if [ $? -eq 137 ] ; then
+	# return codes
+	# https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation
+	if [ "${RET}" -eq 137 ] ; then
+	    prepend_critical_message "SIGKILL received"
+	elif [ "${RET}" -eq 124 ] ; then
             prepend_critical_message "Timeout after ${time} seconds"
+	elif [ "${RET}" -eq 125 ] ; then
+            prepend_critical_message "execution of ${command} failed"
+	elif [ "${RET}" -eq 126 ] ; then
+            prepend_critical_message "${command} is found but cannot be invoked"
+	elif [ "${RET}" -eq 127 ] ; then
+            prepend_critical_message "${command} cannot be found"
         fi
+
+	return "${RET}"
 
     elif [ -n "${EXPECT}" ] ; then
 
