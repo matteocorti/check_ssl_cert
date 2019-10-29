@@ -20,7 +20,7 @@ fi
 
 SCRIPT=../check_ssl_cert
 if [ ! -r "${SCRIPT}" ] ; then
-    echo "Error: the script to test (${SCRIPT}) is not a readable file"xs
+    echo "Error: the script to test (${SCRIPT}) is not a readable file"
 fi
 
 oneTimeSetUp() {
