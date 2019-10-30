@@ -277,17 +277,18 @@ testSMTPS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testFTP() {
-    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testFTPS() {
-    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
+# Disabled as test.rebex.net is currently not workin. Should find another public FTP server with TLS
+#testFTP() {
+#    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
+#
+#testFTPS() {
+#    ${SCRIPT} --rootcert cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
 
 ################################################################################
 # From https://badssl.com
@@ -562,7 +563,7 @@ testSieveRSA() {
     fi
 }
 
-testSieveRSA() {
+testSieveECDSA() {
     if [ -z "${TRAVIS+x}" ] ; then
 	${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
 	EXIT_CODE=$?
