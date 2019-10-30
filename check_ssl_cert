@@ -507,6 +507,7 @@ exec_with_timeout() {
 
 	# Check and try to get the return value
 	# https://stackoverflow.com/questions/23614039/how-to-get-the-exit-code-of-spawned-process-in-expect-shell-script
+	
 	EXPECT_SCRIPT='' # just to tell shellcheck that the variable is assigned (in fact the value is assigned with the function set_value
 	set_variable EXPECT_SCRIPT << EOT
 set echo \"-noecho\"
@@ -521,7 +522,6 @@ EOT
         fi
 
 	echo "${EXPECT_SCRIPT}" | expect
-#	expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"		
         RET=$?
 
         if [ -n "${DEBUG}" ] ; then
