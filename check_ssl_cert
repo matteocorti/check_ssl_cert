@@ -450,6 +450,17 @@ unknown() {
 }
 
 ################################################################################
+# To set a variable with an HEREDOC in a POSIX compliant way
+# see: https://unix.stackexchange.com/questions/340718/how-do-i-bring-heredoc-text-into-a-shell-script-variable
+# Usage:
+#   set_variable variablename<<'HEREDOC'
+#   ...
+#  HEREDOC
+set_variable() {
+    eval "$1"'=$(cat)'
+}
+
+################################################################################
 # Executes command with a timeout
 # Params:
 #   $1 timeout in seconds
@@ -494,29 +505,23 @@ exec_with_timeout() {
 
     elif [ -n "${EXPECT}" ] ; then
 
-#	read -r -d '' EXPECT_SCRIPT << EOT
-#set echo \"-noecho\"
-#set timeout ${time}
-#spawn -noecho sh -c { ${command} }
-#expect timeout { exit 1 } eof { exit 0 }
-#EOT
-#
 	# Check and try to get the return value
 	# https://stackoverflow.com/questions/23614039/how-to-get-the-exit-code-of-spawned-process-in-expect-shell-script
-#	read -r -d '' EXPECT_SCRIPT << EOT
-#set echo \"-noecho\"
-#set timeout ${time}
-#spawn -noecho sh -c { ${command} }
-#expect timeout { exit 1 } eof { exit 0 }
-#EOT
-#
-#        if [ -n "${DEBUG}" ] ; then
-#	    echo '[DBG] Executing expect script'
-#	    echo "${EXPECT_SCRIPT}" | sed 's/^/[DBG]\ \ \ \ \ /'
-#        fi
-#
-#	echo "${EXPECT_SCRIPT}" | expect
-	expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"		
+	EXPECT_SCRIPT='' # just to tell shellcheck that the variable is assigned (in fact the value is assigned with the function set_value
+	set_variable EXPECT_SCRIPT << EOT
+set echo \"-noecho\"
+set timeout ${time}
+spawn -noecho sh -c { ${command} }
+expect timeout { exit 1 } eof { exit 0 }
+EOT
+
+        if [ -n "${DEBUG}" ] ; then
+	    echo '[DBG] Executing expect script'
+	    printf '%s' "${EXPECT_SCRIPT}" | sed 's/^/[DBG]\ \ \ \ \ /'
+        fi
+
+	echo "${EXPECT_SCRIPT}" | expect
+#	expect -c "set echo \"-noecho\"; set timeout ${time}; spawn -noecho ${command}; expect timeout { exit 1 } eof { exit 0 }"		
         RET=$?
 
         if [ -n "${DEBUG}" ] ; then
