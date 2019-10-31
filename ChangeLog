@@ -1,3 +1,7 @@
+2019-10-31  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (exec_with_timeout): the return value of the command is no more ignored from expect
+
 2019-10-29  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Merged a patch fixing a copy and paste error with sieve

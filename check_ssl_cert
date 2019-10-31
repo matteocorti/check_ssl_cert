@@ -505,15 +505,32 @@ exec_with_timeout() {
 
     elif [ -n "${EXPECT}" ] ; then
 
-	# Check and try to get the return value
-	# https://stackoverflow.com/questions/23614039/how-to-get-the-exit-code-of-spawned-process-in-expect-shell-script
+	# just to tell shellcheck that the variable is assigned
+	# (in fact the value is assigned with the function set_value)
+	EXPECT_SCRIPT=''
+	TIMEOUT_ERROR_CODE=42
 	
-	EXPECT_SCRIPT='' # just to tell shellcheck that the variable is assigned (in fact the value is assigned with the function set_value
 	set_variable EXPECT_SCRIPT << EOT
+
 set echo \"-noecho\"
 set timeout ${time}
+
+# spawn the process
 spawn -noecho sh -c { ${command} }
-expect timeout { exit 1 } eof { exit 0 }
+
+expect { 
+  timeout { exit ${TIMEOUT_ERROR_CODE} }
+  eof
+}
+
+# Get the return value
+# https://stackoverflow.com/questions/23614039/how-to-get-the-exit-code-of-spawned-process-in-expect-shell-script
+
+foreach { pid spawnid os_error_flag value } [wait] break
+
+# return the command return value
+exit \$value
+
 EOT
 
         if [ -n "${DEBUG}" ] ; then
@@ -528,7 +545,7 @@ EOT
             echo "[DBG]   expect returned ${RET}"
         fi
 
-        if [ "${RET}" -eq 1 ] ; then
+        if [ "${RET}" -eq "${TIMEOUT_ERROR_CODE}" ] ; then
             prepend_critical_message "Timeout after ${time} seconds"
             critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
         fi
