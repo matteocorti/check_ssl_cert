@@ -550,9 +550,12 @@ EOT
             critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
         fi
 
+	return "${RET}"
+
     else
 
         eval "${command}"
+	return $?
 
     fi
 
