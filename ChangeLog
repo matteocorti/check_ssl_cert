@@ -1,6 +1,7 @@
 2019-11-04  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): fixed a bug in the SMTP connection (using s_client -name)
+	* check_ssl_cert (main): -name only used with OpenSSL versions which supports it
 
 2019-10-31  Matteo Corti  <matteo@corti.li>
 
