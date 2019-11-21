@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.105.0
+VERSION=1.106.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -111,6 +111,7 @@ usage() {
     echo "                                   'all' will include all the available attributes."
     echo "   -n,--cn name                    pattern to match the CN of the certificate (can be"
     echo "                                   specified multiple times)"
+    echo "      --nmap-bin path              path of the nmap binary to be used"
     echo "      --no_ssl2                    disable SSL version 2"
     echo "      --no_ssl3                    disable SSL version 3"
     echo "      --no_tls1                    disable TLS version 1"
@@ -129,6 +130,10 @@ usage() {
     echo "                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp}"
     echo "                                   http:                    default"
     echo "                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS"
+    echo "      --require-no-ssl2            critical if SSL version 2 is offered"
+    echo "      --require-no-ssl3            critical if SSL version 3 is offered"
+    echo "      --require-no-tls1            critical if TLS 1 is offered"
+    echo "      --require-no-tls1_1          critical if TLS 1.1 is offered"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
@@ -859,6 +864,7 @@ main() {
     CURL_BIN=""
     CURL_USER_AGENT=""
     DIG_BIN=""
+    NMAP_BIN=""
     IGNORE_SSL_LABS_CACHE=""
     PORT=""
     XMPPPORT="5222"
@@ -875,6 +881,7 @@ main() {
     RSA=""
     ECDSA=""
     DANE=""
+    DISALLOWED_PROTOCOLS=""
 
     # Set the default temp dir if not set
     if [ -z "${TMPDIR}" ] ; then
@@ -966,6 +973,22 @@ main() {
 		RSA=1
                 shift
                 ;;
+	    --require-no-ssl2)
+		DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} SSLv2"
+		shift
+		;;
+	    --require-no-ssl3)
+		DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} SSLv3"
+		shift
+		;;
+	    --require-no-tls1)
+		DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} TLSv1.0"
+		shift
+		;;
+	    --require-no-tls1_1)
+		DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} TLSv1.1"
+		shift
+		;;
             --require-ocsp-stapling)
                 REQUIRE_OCSP_STAPLING=1
                 shift
@@ -1061,6 +1084,10 @@ main() {
                 DIG_BIN="$2"
                 shift 2
                 ;;
+	    --nmap-bin)
+		check_option_argument '--nmap-bin' "$2"
+		NMAP_BIN="$2"
+		;;
             -e|--email)
 		check_option_argument 'e|--email' "$2"
                 ADDR="$2"
@@ -1510,7 +1537,7 @@ main() {
     check_required_prog "${FILE_BIN}"
     FILE_BIN=${PROG}
 
-    # curl
+    # cURL
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
             if [ -n "${DEBUG}" ] ; then
@@ -1534,6 +1561,30 @@ main() {
 	check_required_prog "${CURL_BIN}"
     fi
 
+    # nmap
+    if [ -z "${NMAP_BIN}" ] ; then
+        if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"
+                echo "[DBG] nmap binary not specified"
+            fi
+
+            check_required_prog nmap
+            NMAP_BIN=${PROG}
+
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] nmap available: ${NMAP_BIN}"
+            fi
+        else
+            if [ -n "${DEBUG}" ] ; then
+                echo "[DBG] nmap binary not needed. No disallowed protocols"
+            fi
+        fi
+    else
+	# we check if the provided binary actually works
+	check_required_prog "${NMAP_BIN}"
+    fi    
+    
     # Expect (optional)
     EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
@@ -1765,6 +1816,32 @@ main() {
 
     HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
 
+    ##############################################################################
+    # Check for disallowed protocols
+    if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
+
+	OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p ${PORT} --script ssl-enum-ciphers ${HOST} | grep '^|' )
+
+	if [ -n "${DEBUG}" ] ; then
+	    echo "[DBG] offered cyphers and protocols:"
+	    echo "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
+	fi
+	
+	for protocol in ${DISALLOWED_PROTOCOLS} ; do
+	    if [ -n "${DEBUG}" ] ; then
+		echo "[DBG] Checking if '${protocol}' is offered"
+	    fi
+	    if echo "${OFFERED_PROTOCOLS}" | grep -q "${protocol}" ; then
+		if [ -n "${DEBUG}" ] ; then
+		    echo "[DBG]   '${protocol}' is offered"
+		fi
+		prepend_critical_message "${protocol} is offered"
+	    fi
+
+	done
+
+    fi
+    
     ##############################################################################
     # DANE
 
