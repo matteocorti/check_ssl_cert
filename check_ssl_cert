@@ -1820,7 +1820,7 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
 
-	OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p ${PORT} --script ssl-enum-ciphers ${HOST} | grep '^|' )
+	OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p "${PORT}" --script ssl-enum-ciphers "${HOST}" | grep '^|' )
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] offered cyphers and protocols:"
