@@ -14,7 +14,6 @@ A shell script (that can be used as a Nagios plugin) to check an X.509 certifica
 ## Usage
 
 ```
-
 Usage: check_ssl_cert -H host [OPTIONS]
 
 Arguments:
@@ -31,8 +30,7 @@ Options:
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain the
                                    issuer cert
-      --dane                       verify there are valid TLSA records for the returned
-                                   certificate (requires OpenSSL 1.1.0 or newer)
+      --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)
       --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
       --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
       --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
@@ -75,6 +73,7 @@ Options:
                                    'all' will include all the available attributes.
    -n,--cn name                    pattern to match the CN of the certificate (can be
                                    specified multiple times)
+      --nmap-bin path              path of the nmap binary to be used
       --no_ssl2                    disable SSL version 2
       --no_ssl3                    disable SSL version 3
       --no_tls1                    disable TLS version 1
@@ -92,7 +91,11 @@ Options:
    -P,--protocol protocol          use the specific protocol
                                    {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp}
                                    http:                    default
-                                   ftp,imap,irc,ldap,pop3,smtp: switch to TLS using StartTLS
+                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS
+      --require-no-ssl2            critical if SSL version 2 is offered
+      --require-no-ssl3            critical if SSL version 3 is offered
+      --require-no-tls1            critical if TLS 1 is offered
+      --require-no-tls1_1          critical if TLS 1.1 is offered
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
       --sni name                   sets the TLS SNI (Server Name Indication) extension
