@@ -124,6 +124,7 @@ Options:
                                    'all' will include all the available attributes.
    -n,--cn name                    pattern to match the CN of the certificate (can be
                                    specified multiple times)
+      --nmap-bin path              path of the nmap binary to be used
       --no_ssl2                    disable SSL version 2
       --no_ssl3                    disable SSL version 3
       --no_tls1                    disable TLS version 1
@@ -139,9 +140,13 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|smtp|smtps|xmpp}
+                                   {ftp|ftps|http|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp}
                                    http:                    default
-                                   ftp,imap,irc,ldap,pop3,smtp: switch to TLS using StartTLS
+                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS
+      --require-no-ssl2            critical if SSL version 2 is offered
+      --require-no-ssl3            critical if SSL version 3 is offered
+      --require-no-tls1            critical if TLS 1 is offered
+      --require-no-tls1_1          critical if TLS 1.1 is offered
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
       --sni name                   sets the TLS SNI (Server Name Indication) extension
