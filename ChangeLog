@@ -1,3 +1,7 @@
+2019-12-20  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: better error message in case of an invalid host
+
 2019-11-04  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): fixed a bug in the SMTP connection (using s_client -name)
