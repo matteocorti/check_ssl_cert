@@ -1,3 +1,4 @@
+2020-01-07 Version 1.109.0: Option to force HTTP/2
 2019-12-23 Version 1.108.0: Better error message in case of connection refused
 2019-12-20 Version 1.107.0: Better error message in case of an invalid host
 2019-11-21 Version 1.106.0: Optional checks for protocols that should not be supported

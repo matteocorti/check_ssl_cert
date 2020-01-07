@@ -1,3 +1,7 @@
+2020-01-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (fetch_certificate): option to force HTTP/2
+
 2019-12-23  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): better error message in case of connection refused

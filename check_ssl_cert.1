@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "December, 2019" "1.108.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "January, 2020" "1.109.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -158,7 +158,7 @@ path of the openssl binary to be used
 TCP port
 .TP
 .BR "-P,--protocol" " protocol"
-use the specific protocol: ftp, ftps, http (default), imap, imaps, irc, ircs, ldap, ldaps, pop3, pop3s, sieve, smtp, smtps, xmpp.
+use the specific protocol: ftp, ftps, http (default), h2 (http/2), imap, imaps, irc, ircs, ldap, ldaps, pop3, pop3s, sieve, smtp, smtps, xmpp.
 .br
 These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, pop3, smtp.
 .TP
