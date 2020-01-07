@@ -1,7 +1,7 @@
 
  (c) Matteo Corti, ETH Zurich, 2007-2012
 
- (c) Matteo Corti, 2007-2019
+ (c) Matteo Corti, 2007-2020
   see AUTHORS for the complete list of contributors
 
 # check_ssl_cert

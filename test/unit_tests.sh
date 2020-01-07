@@ -572,7 +572,13 @@ testSieveECDSA() {
 	echo "Skipping sieve tests on Travis CI"
     fi
 }
-    
+
+testHTTP2() {
+    ${SCRIPT} -H rwserve.readwritetools.com
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
