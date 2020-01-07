@@ -91,8 +91,8 @@ Options:
    -P,--protocol protocol          use the specific protocol
                                    {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
 				    sieve|smtp|smtps|xmpp}
-                                   https:                   default
-				   h2:                      forces HTTP/2
+                                   https:                             default
+				   h2:                                forces HTTP/2
                                    ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
