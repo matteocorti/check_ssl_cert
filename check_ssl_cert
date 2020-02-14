@@ -127,7 +127,7 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
-    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp}"
+    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp|xmpp-server}"
     echo "                                   https:                             default"
     echo "                                   h2:                                forces HTTP/2"
     echo "                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS"
@@ -731,7 +731,7 @@ fetch_certificate() {
                 exec_with_timeout "${TIMEOUT}" "echo 'LOGOUT' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
-            xmpp)
+            xmpp|xmpp-server)
                 exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
