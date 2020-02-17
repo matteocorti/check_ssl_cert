@@ -568,8 +568,8 @@ testForceHTTP2() {
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
-    # we assume www.ethz.ch gets at least a C
-    ${SCRIPT} -H ethz.ch --cn ethz.ch --check-ssl-labs A --rootcert cabundle.crt
+    # we assume www.ethz.ch gets at least a B
+    ${SCRIPT} -H ethz.ch --cn ethz.ch --check-ssl-labs B --rootcert cabundle.crt
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
