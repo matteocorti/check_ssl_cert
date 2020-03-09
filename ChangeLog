@@ -1,3 +1,7 @@
+2020-03-09  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): new option (--not-valid-longer-than) to check if a certificate is valid longer than the specified number of days
+
 2020-02-17  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): added support for xmpp-server in the STARTTLS negotiation

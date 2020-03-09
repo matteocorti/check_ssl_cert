@@ -1,3 +1,5 @@
+2020-03-09 Version 1.111.0: New option (--not-valid-longer-than) to check if a certificate is valid longer than the
+                            specified number of days
 2020-02-17 Version 1.110.0: Added support for xmpp-server in the STARTTLS negotiation
 2020-01-07 Version 1.109.0: Option to force HTTP/2
 2019-12-23 Version 1.108.0: Better error message in case of connection refused

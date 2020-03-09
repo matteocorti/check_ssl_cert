@@ -79,13 +79,13 @@ testUsage() {
 }
 
 testMissingArgument() {
-    ${SCRIPT} -H www.google.com -c > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --critical > /dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testMissingArgument2() {
-    ${SCRIPT} -H www.google.com -c -w 10 > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --critical --warning 10 > /dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
@@ -564,7 +564,13 @@ testForceHTTP2() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
-    
+
+testNotLongerValidThan() {
+    ${SCRIPT} -H www.ethz.ch --not-valid-longer-than 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # SSL Labs (last one as it usually takes a lot of time
 
 testETHZWithSSLLabs() {
