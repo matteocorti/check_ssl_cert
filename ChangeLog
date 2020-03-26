@@ -1,3 +1,7 @@
+2020-03-26  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): show command line arguments in debug mode
+
 2020-03-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): new option (--not-valid-longer-than) to check if a certificate is valid longer than the specified number of days

@@ -920,6 +920,8 @@ main() {
     # We do not use getopts since it is unable to process long options and it is
     # Bash specific.
 
+    COMMAND_LINE_ARGUMENTS=$*
+    
     while true; do
 
         case "$1" in
@@ -1389,6 +1391,10 @@ main() {
 
 	fi
 	
+    fi
+
+    if [ -n "${DEBUG}" ] ; then
+	echo "[DBG] Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
     fi
     
     ################################################################################
