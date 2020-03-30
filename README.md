@@ -90,10 +90,10 @@ Options:
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
                                    {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
-				    sieve|smtp|smtps|xmpp|xmpp-server}
+				    postgres|sieve|smtp|smtps|xmpp|xmpp-server}
                                    https:                             default
 				   h2:                                forces HTTP/2
-                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS
+                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
