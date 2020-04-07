@@ -1545,7 +1545,7 @@ main() {
         convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
         if [ "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ]; then
-            unknown  '--check-ssl-labs-warn-grade must be greater than -L|--check-ssl-labs'
+            unknown  '--check-ssl-labs-warn must be greater than -L|--check-ssl-labs'
         fi
     fi
 
