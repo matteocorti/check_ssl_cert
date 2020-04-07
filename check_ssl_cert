@@ -102,7 +102,7 @@ usage() {
     echo "   -K,--clientkey path             use client certificate key to authenticate"
     echo "   -L,--check-ssl-labs grade       SSL Labs assessment"
     echo "                                   (please check https://www.ssllabs.com/about/terms.html)"
-    echo "      --check-ssl-labs-warn-grade  SSL-Labs grade on which to warn"
+    echo "      --check-ssl-labs-warn grade  SSL-Labs grade on which to warn"
     echo "      --long-output list           append the specified comma separated (no spaces) list"
     echo "                                   of attributes to the plugin output on additional lines"
     echo "                                   Valid attributes are:"
@@ -1156,8 +1156,8 @@ main() {
                 SSL_LAB_CRIT_ASSESSMENT="$2"
                 shift 2
                 ;;
-            --check-ssl-labs-warn-grade)
-                check_option_argument '--check-ssl-labs-warn-grade' "$2"
+            --check-ssl-labs-warn)
+                check_option_argument '--check-ssl-labs-warn' "$2"
                 SSL_LAB_WARN_ASSESTMENT="$2"
                 shift 2
                 ;;
