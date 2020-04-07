@@ -501,16 +501,16 @@ testDANE211() {
 #        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 #    fi
 #}
-
-testDANE311() {
-    ${SCRIPT} --dane 311 -H www.ietf.org
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    fi
-}
+#
+#testDANE311() {
+#    ${SCRIPT} --dane 311 -H www.ietf.org
+#    EXIT_CODE=$?
+#    if [ -n "${DANE}" ] ; then
+#        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#    else
+#        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+#    fi
+#}
 
 testDANE301ECDSA() {
     ${SCRIPT} --dane 301 --ecdsa -H mail.aegee.org
