@@ -491,15 +491,16 @@ testDANE211() {
     fi
 }
 
-testDANE311SMTP() {
-    ${SCRIPT} --dane 311 --port 25 -P smtp -H mail.ietf.org
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    fi
-}
+# does not work anymore
+#testDANE311SMTP() {
+#    ${SCRIPT} --dane 311 --port 25 -P smtp -H mail.ietf.org
+#    EXIT_CODE=$?
+#    if [ -n "${DANE}" ] ; then
+#        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#    else
+#        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+#    fi
+#}
 
 testDANE311() {
     ${SCRIPT} --dane 311 -H www.ietf.org
