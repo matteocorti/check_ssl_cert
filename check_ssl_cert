@@ -93,6 +93,7 @@ usage() {
     echo "                                   related checks"
     echo "      --ignore-exp                 ignore expiration date"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
+    echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
     echo "                                   or MD5"
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
@@ -898,6 +899,7 @@ main() {
     REQUIRE_SAN=""
     REQUIRE_OCSP_STAPLING=""
     OCSP="1" # enabled by default
+    OCSP_IGNORE_TIMEOUT=""
     FORMAT=""
     HTTP_METHOD="HEAD"
     RSA=""
@@ -1059,6 +1061,10 @@ main() {
                 ;;
             --ignore-ocsp)
                 OCSP=""
+                shift
+                ;;
+            --ignore-ocsp-timeout)
+                OCSP_IGNORE_TIMEOUT=1
                 shift
                 ;;
             --terse)
@@ -2903,28 +2909,28 @@ main() {
 
                     if [ -n "${KEYVALUE}" ] ; then
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
                         fi
-                        OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
                     else
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
                         fi
-                        OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
                 else
 
                     if [ -n "${KEYVALUE}" ] ; then
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
                         fi
-                        OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
                     else
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
                         fi
-                        OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
                 fi
@@ -2933,7 +2939,13 @@ main() {
                     echo "${OCSP_RESP}" | sed 's/^/[DBG] OCSP: response = /'
                 fi
 
-                if echo "${OCSP_RESP}" | grep -qi "revoked" ; then
+                if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -qi "timeout on connect" ; then
+
+                   if [ -n "${DEBUG}" ] ; then
+                        echo '[DBG] OCSP: Timeout on connect'
+                   fi
+
+                elif echo "${OCSP_RESP}" | grep -qi "revoked" ; then
 
                     if [ -n "${DEBUG}" ] ; then
                         echo '[DBG] OCSP: revoked'
@@ -2950,25 +2962,25 @@ main() {
                     if [ -n "${HTTP_PROXY:-}" ] ; then
 
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
                         fi
 
                         if [ -n "${OCSP_HEADER}" ] ; then
-                            OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                         else
-                            OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
                         fi
 
                     else
 
                         if [ -n "${DEBUG}" ] ; then
-                            echo "[DBG] executing ${OPENSSL} ocsp -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+                            echo "[DBG] executing ${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
                         fi
 
                         if [ -n "${OCSP_HEADER}" ] ; then
-                            OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
                         else
-                            OCSP_RESP="$(${OPENSSL} ocsp -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 )"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout ${TIMEOUT} -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -url "${OCSP_URI}" 2>&1 )"
                         fi
 
                     fi
