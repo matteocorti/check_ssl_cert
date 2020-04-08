@@ -129,10 +129,10 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
-    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|sieve|smtp|smtps|xmpp|xmpp-server}"
+    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|postgres|sieve|smtp|smtps|xmpp|xmpp-server}"
     echo "                                   https:                             default"
     echo "                                   h2:                                forces HTTP/2"
-    echo "                                   ftp,imap,irc,ldap,pop3,sieve,smtp: switch to TLS using StartTLS"
+    echo "                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS"
     echo "      --require-no-ssl2            critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            critical if SSL version 3 is offered"
     echo "      --require-no-tls1            critical if TLS 1 is offered"
@@ -728,6 +728,10 @@ fetch_certificate() {
                 ;;
             imaps)
                 exec_with_timeout "${TIMEOUT}" "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
+                RET=$?
+                ;;
+            postgres)
+                exec_with_timeout "${TIMEOUT}" "printf 'X\0\0\0\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             sieve)
@@ -1380,6 +1384,9 @@ main() {
 		    ;;
 		imaps)
 		    PORT=993
+		    ;;
+		postgres)
+		    PORT=5432
 		    ;;
 		sieve)
 		    PORT=4190
