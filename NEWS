@@ -1,3 +1,4 @@
+2020-04-07 Version 1.112.0: Timeout for OCSP queries and option to ignore timeout errors
 2020-03-09 Version 1.111.0: New option (--not-valid-longer-than) to check if a certificate is valid longer than the
                             specified number of days
 2020-02-17 Version 1.110.0: Added support for xmpp-server in the STARTTLS negotiation

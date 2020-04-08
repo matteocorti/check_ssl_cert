@@ -92,3 +92,5 @@ Thanks:
 * Many thanks to Дилян Палаузов (https://github.com/dilyanpalauzov) for the DANE checks
 * Many thanks to dupondje (https://github.com/dupondje) for the check_prog fix
 * Many thanks to Jörg Thalheim (https://github.com/Mic92) for the xmpp-server patch
+* Many thanks to Arkadiusz Miśkiewicz (https://github.com/arekm) for the OCSP timeout patch
+* Many thanks to Thomas Weißschuh (https://github.com/t-8ch) for the PostgreSQL patch
