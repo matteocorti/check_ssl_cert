@@ -400,11 +400,11 @@ append_warning_message() {
     fi
 
     MSG="${SHORTNAME} WARN${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
-    
+
     if [ "${WARNING_MSG}" = "" ]; then
         WARNING_MSG="${MSG}"
     fi
-    
+
     ALL_MSG="${ALL_MSG}\n    ${MSG}"
 
 
@@ -415,7 +415,6 @@ append_warning_message() {
         echo "[DBG] WARNING <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     fi
 
-    
 }
 
 
@@ -518,7 +517,7 @@ exec_with_timeout() {
 	# (in fact the value is assigned with the function set_value)
 	EXPECT_SCRIPT=''
 	TIMEOUT_ERROR_CODE=42
-	
+
 	set_variable EXPECT_SCRIPT << EOT
 
 set echo \"-noecho\"
@@ -527,7 +526,7 @@ set timeout ${time}
 # spawn the process
 spawn -noecho sh -c { ${command} }
 
-expect { 
+expect {
   timeout { exit ${TIMEOUT_ERROR_CODE} }
   eof
 }
@@ -660,7 +659,7 @@ fetch_certificate() {
 
     RET=0
     ALPN=''
-    
+
     # IPv6 addresses need brackets in a URI
     if [ "${HOST}" != "${HOST#*[0-9].[0-9]}" ]; then
         if [ -n "${DEBUG}" ] ; then
@@ -761,7 +760,7 @@ fetch_certificate() {
 	if [ "${PROTOCOL}" = 'h2' ] ; then
 	    ALPN='-alpn h2'
 	fi
-	
+
         exec_with_timeout "${TIMEOUT}" "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} ${ALPN} -connect ${HOST}:${PORT} ${SERVERNAME} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
@@ -770,7 +769,7 @@ fetch_certificate() {
     if [ -n "${DEBUG}" ] ; then
 
 	echo "[DBG] Return value of the command = ${RET}"
-	
+
         echo "[DBG] storing a copy of the retrieved certificate in ${TMPDIR}/${HOST}-${PORT}.crt"
         cp "${CERT}" "${TMPDIR}/${HOST}-${PORT}.crt"
 
@@ -804,7 +803,7 @@ fetch_certificate() {
 	    ERROR='Connection refused'
 	    prepend_critical_message "${ERROR}"
             critical "${SHORTNAME} CRITICAL: ${ERROR}"
-	    
+
         else
 
             # Try to clean up the error message
@@ -927,7 +926,7 @@ main() {
     # Bash specific.
 
     COMMAND_LINE_ARGUMENTS=$*
-    
+
     while true; do
 
         case "$1" in
@@ -1348,12 +1347,12 @@ main() {
     if [ -z "${PORT}" ] ; then
 
 	if [ -z "${PROTOCOL}" ] ; then
-       
+
 	    # default is HTTPS
 	    PORT='443'
 
 	else
-	
+
             case "${PROTOCOL}" in
 		smtp)
 		    PORT=25
@@ -1403,13 +1402,13 @@ main() {
             esac
 
 	fi
-	
+
     fi
 
     if [ -n "${DEBUG}" ] ; then
 	echo "[DBG] Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
     fi
-    
+
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.
     # COMMON_NAME may be a space separated list of hostnames.
@@ -1518,7 +1517,7 @@ main() {
     fi
 
     if [ -n "${NOT_VALID_LONGER_THAN}" ] ; then
-	
+
 	if [ -n "${DEBUG}" ] ; then
             echo "[DBG] --not-valid-longer-than specified: ${NOT_VALID_LONGER_THAN}"
         fi
@@ -1527,7 +1526,7 @@ main() {
             unknown "invalid number of days ${NOT_VALID_LONGER_THAN}"
         fi
 
-    fi	
+    fi
 
     if [ -n "${TMPDIR}" ] ; then
 
@@ -1651,8 +1650,8 @@ main() {
     else
 	# we check if the provided binary actually works
 	check_required_prog "${NMAP_BIN}"
-    fi    
-    
+    fi
+
     # Expect (optional)
     EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
@@ -1894,7 +1893,7 @@ main() {
 	    echo "[DBG] offered cyphers and protocols:"
 	    echo "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
 	fi
-	
+
 	for protocol in ${DISALLOWED_PROTOCOLS} ; do
 	    if [ -n "${DEBUG}" ] ; then
 		echo "[DBG] Checking if '${protocol}' is offered"
@@ -1909,7 +1908,7 @@ main() {
 	done
 
     fi
-    
+
     ##############################################################################
     # DANE
 
@@ -1919,7 +1918,6 @@ main() {
 	    echo '[DBG] checking DANE'
 	fi
 
-	# dig can be replaced with delv, on the next eight lines, if it is working on the system, in order to verify DNSSEC
 	if [ -z "${DIG_BIN}" ] ; then
 	    DIG_BIN='dig'
 	fi
@@ -2559,7 +2557,7 @@ main() {
         fi
 
         if [ "${OPENSSL_COMMAND}" = "x509" ]; then
-	    
+
             # x509 certificates (default)
 
             # We always check expired certificates
@@ -2605,14 +2603,14 @@ main() {
 		    if [ -n "${DEBUG}" ] ; then
 			echo "[DBG] Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
                     fi
-		    
+
 		    prepend_critical_message "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
-		fi		
-		
+		fi
+
 	    fi
 
         elif [ "${OPENSSL_COMMAND}" = "crl" ]; then
-	    
+
             # CRL certificates
 
             # We always check expired certificates
