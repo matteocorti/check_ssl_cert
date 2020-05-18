@@ -1889,11 +1889,19 @@ main() {
     fi
 
     HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
-
+    
     ##############################################################################
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
 
+	# check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch
+	if ${NMAP_BIN} "${HOST}" 2>&1 | grep -q 'Failed to resolve' ; then
+	    if [ -n "${DEBUG}" ] ; then
+		echo '[DBG] nmap is not able to resolve the host name. Trying with -6 to force IPv6 for an IPv6-only host'
+	    fi
+	    NMAP_INETPROTO='-6'
+	fi
+	
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script ssl-enum-ciphers \"${HOST}\" | grep '^|'"
 	fi
