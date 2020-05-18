@@ -1,3 +1,7 @@
+2020-05-18  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Propagates the -6 switch to nmap
+
 2020-03-26  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): show command line arguments in debug mode

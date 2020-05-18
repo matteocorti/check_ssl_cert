@@ -1871,6 +1871,13 @@ main() {
             unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
         fi
 
+	# nmap does not have a -4 switch
+	NMAP_INETPROTO=''
+	if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" = '-6' ] ; then
+	    NMAP_INETPROTO='-6'
+	fi
+
+
     fi
 
     ################################################################################
@@ -1887,7 +1894,7 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
 
-	OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p "${PORT}" --script ssl-enum-ciphers "${HOST}" | grep '^|' )
+	OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script ssl-enum-ciphers "${HOST}" | grep '^|' )
 
 	if [ -n "${DEBUG}" ] ; then
 	    echo "[DBG] offered cyphers and protocols:"
