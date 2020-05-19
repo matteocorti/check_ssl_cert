@@ -1,3 +1,4 @@
+2020-05-19 Version 1.113.0: Fixed a bug with nmap and hosts with IPv6 addresses only
 2020-04-07 Version 1.112.0: Timeout for OCSP queries and option to ignore timeout errors and PostgreSQL support
 2020-03-09 Version 1.111.0: New option (--not-valid-longer-than) to check if a certificate is valid longer than the
                             specified number of days
