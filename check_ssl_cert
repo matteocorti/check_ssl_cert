@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.113.0
+VERSION=1.114.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -133,6 +133,7 @@ usage() {
     echo "                                   https:                             default"
     echo "                                   h2:                                forces HTTP/2"
     echo "                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS"
+    echo "      --proxy proxy                sets http_proxy"
     echo "      --require-no-ssl2            critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            critical if SSL version 3 is offered"
     echo "      --require-no-tls1            critical if TLS 1 is offered"
@@ -1230,6 +1231,11 @@ main() {
                 PROTOCOL="$2"
                 shift 2
                 ;;
+            --proxy)
+                check_option_argument '--proxy' "$2"
+                export http_proxy="$2"
+                shift 2
+		;;
             -r|--rootcert)
                 check_option_argument '-r|--rootcert' "$2"
                 ROOT_CA="$2"
