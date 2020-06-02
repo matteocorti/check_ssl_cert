@@ -1846,12 +1846,12 @@ main() {
 
         debuglog "OpenSSL configuration directory: ${OPENSSL_DIR}"
 
-    DEFAULT_CA=0
-    if [ -f "${OPENSSL_DIR}"/cert.pem ] ; then
-        DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/cert.pem )"
-    elif [ -f "${OPENSSL_DIR}"/certs ] ; then
-        DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/certs )"
-    fi
+        DEFAULT_CA=0
+        if [ -f "${OPENSSL_DIR}"/cert.pem ] ; then
+            DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/cert.pem )"
+        elif [ -f "${OPENSSL_DIR}"/certs ] ; then
+            DEFAULT_CA="$( grep -c BEGIN "${OPENSSL_DIR}"/certs )"
+        fi
         debuglog "${DEFAULT_CA} root certificates installed by default"
 
          debuglog " System info: $( uname -a )"
