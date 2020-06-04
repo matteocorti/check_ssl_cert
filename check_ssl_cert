@@ -36,7 +36,8 @@ TEMPFILE=""
 WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
-
+WARNING_DAYS=20
+CRITICAL_DAYS=15
 ################################################################################
 # Functions
 
@@ -66,7 +67,7 @@ usage() {
     echo "   -C,--clientcert path            use client certificate to authenticate"
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to"
-    echo "                                   be valid to issue a critical status"
+    echo "                                   be valid to issue a critical status. Default: ${CRITICAL_DAYS}"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
@@ -166,7 +167,7 @@ usage() {
     echo "   -v,--verbose                    verbose output"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
-    echo "                                   to issue a warning status"
+    echo "                                   to issue a warning status. Default: ${WARNING_DAYS}"
     echo "      --xmpphost name              specifies the host for the 'to' attribute of the stream element"
     echo "   -4                              force IPv4"
     echo "   -6                              force IPv6"
@@ -595,7 +596,7 @@ check_cert_end_date() {
             DAYS_VALID="$ELEM_DAYS_VALID"
         fi
 
-        add_performance_data "days_chain_elem${el_number}=$ELEM_DAYS_VALID;${WARNING};${CRITICAL};;"
+        add_performance_data "days_chain_elem${el_number}=$ELEM_DAYS_VALID;${WARNING_DAYS};${CRITICAL_DAYS};;"
 
         # We always check expired certificates
         if ! echo "${1}" | $OPENSSL x509 -noout -checkend 0 > /dev/null ; then
@@ -604,22 +605,22 @@ check_cert_end_date() {
             return 2
         fi
 
-        if [ -n "${CRITICAL}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( CRITICAL * 86400 )) on cert element ${el_number}"
+            debuglog "executing: $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "${1}" | $OPENSSL x509 -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
+            if ! echo "${1}" | $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 2
             fi
 
         fi
 
-        if [ -n "${WARNING}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( WARNING * 86400 )) on cert element ${el_number}"
+            debuglog "executing: $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "$1" | $OPENSSL x509 -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
+            if ! echo "$1" | $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 1
             fi
@@ -643,16 +644,16 @@ check_cert_end_date() {
             return 2
         fi
 
-        if [ -n "${CRITICAL}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] ; then
+            if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 2
             fi
 
         fi
 
-        if [ -n "${WARNING}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${WARNING}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] ; then
+            if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 1
             fi
