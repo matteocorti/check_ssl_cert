@@ -1382,14 +1382,6 @@ main() {
                     unknown "--clientpass requires an argument"
                 fi
                 ;;
-            --require-ocsp-stapling)
-                REQUIRE_OCSP_STAPLING=1
-                shift
-                ;;
-            --require-san)
-                REQUIRE_SAN=1
-                shift
-                ;;
             --sni)
                 check_option_argument '--sni' "$2"
                 SNI="$2"
