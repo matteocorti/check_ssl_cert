@@ -248,7 +248,7 @@ create_temporary_file() {
 # Compute the number of hours until a given date
 # Params
 #   $1 date
-# Sets HOURS_UNTIL
+# return HOURS_UNTIL
 hours_until() {
 
     DATE=$1
@@ -290,6 +290,7 @@ EOF
     LANG="${OLDLANG}"
 
     debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
+    return "${HOURS_UNTIL}"
 
 }
 
@@ -573,54 +574,6 @@ check_required_prog() {
 }
 
 ################################################################################
-# get cert validity days
-# Params
-#   $1 date
-# Returns number of days
-get_valid_days(){
-    OLDLANG=$LANG
-    LANG=en_US
-
-    debuglog "Date computations: ${DATETYPE}"
-
-    case "${DATETYPE}" in
-        "BSD")
-            valid_days=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${1}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-            ;;
-
-        "GNU")
-            valid_days=$(( ( $(${DATEBIN} -d "${1}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-            ;;
-
-        "PERL")
-            # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-            if ! valid_days=$(perl - "${1}" <<-"EOF"
-                use strict;
-                use warnings;
-                use Date::Parse;
-                my $cert_date = str2time( $ARGV[0] );
-                my $days = int (( $cert_date - time ) / 86400 + 0.5);
-                print "$days\n";
-EOF
-            ) ; then
-                # somethig went wrong with the embedded Perl code: check the indentation of EOF
-                unknown "Error computing the certificate validity with Perl"
-            fi
-            ;;
-    esac
-
-    LANG=$OLDLANG
-
-    if [ "${valid_days}" -ge 0 ] ; then
-        verboselog "The certificate will expire in ${valid_days} day(s)"
-    else
-        verboselog "The certificate expired "$((- valid_days))" day(s) ago"
-    fi
-
-    echo "$valid_days"
-}
-
-
 # Checks cert end date validity
 # Params
 #   $1 cert
@@ -636,10 +589,11 @@ check_cert_end_date() {
 
     if [ "${OPENSSL_COMMAND}" = "x509" ]; then
         # x509 certificates (default)
-        DATE=$(echo "${1}" | $OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
-        debuglog "Validity date on cert element ${el_number} is $DATE"
+        ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
+        debuglog "Validity date on cert element ${el_number} is $ELEM_END_DATE"
 
-        ELEM_DAYS_VALID=$(get_valid_days "$DATE")
+        HOURS_UNTIL=$(hours_until "$ELEM_END_DATE")
+        ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
         if [ -z "$DAYS_VALID" ] || [ "$ELEM_DAYS_VALID" -lt "$DAYS_VALID" ]; then
             DAYS_VALID="$ELEM_DAYS_VALID"
         fi
@@ -2248,9 +2202,9 @@ main() {
             verboselog "  OCSP stapling enabled"
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
 
-            hours_until "${NEXT_UPDATE}"
 
-            OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
+
+            OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
             verboselog "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
