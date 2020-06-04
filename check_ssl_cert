@@ -2353,7 +2353,7 @@ main() {
 
                 for alt_name in ${SUBJECT_ALTERNATIVE_NAME} ; do
 
-                    debuglog"check Altname: ${alt_name}"
+                    debuglog "check Altname: ${alt_name}"
 
                     if echo "${alt_name}" | grep -q -i "^\\*\\." ; then
 
