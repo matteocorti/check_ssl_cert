@@ -621,7 +621,7 @@ check_cert_end_date() {
 
         if [ -n "${WARNING_DAYS}" ] ; then
 
-            debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
+	    debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
             if ! echo "$1" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
@@ -961,7 +961,7 @@ main() {
     XMPPPORT="5222"
     XMPPHOST=""
     SNI=""
-    TIMEOUT="60"
+    TIMEOUT="120"
     VERBOSE=""
     FORCE_PERL_DATE=""
     REQUIRE_SAN=""
@@ -1167,7 +1167,7 @@ main() {
 
             -c|--critical)
                 check_option_argument '-c,--critical' "$2"
-                CRITICAL="$2"
+                CRITICAL_DAYS="$2"
                 shift 2
                 ;;
             --curl-bin)
@@ -1183,7 +1183,7 @@ main() {
             # Deprecated option: used to be as --warning
             --days)
                 check_option_argument '--days' "$2"
-                WARNING="$2"
+                WARNING_DAYS="$2"
                 shift 2
                 ;;
             --dig-bin)
@@ -1364,7 +1364,7 @@ main() {
                 ;;
             -w|--warning)
                 check_option_argument '-w|--warning' "$2"
-                WARNING="$2"
+                WARNING_DAYS="$2"
                 shift 2
                 ;;
             --xmpphost)
@@ -1563,28 +1563,28 @@ main() {
 
     fi
 
-    if [ -n "${CRITICAL}" ] ; then
+    if [ -n "${CRITICAL_DAYS}" ] ; then
 
-        debuglog "-c specified: ${CRITICAL}"
+        debuglog "-c specified: ${CRITICAL_DAYS}"
 
-        if ! echo "${CRITICAL}" | grep -q '^[0-9][0-9]*$' ; then
-            unknown "invalid number of days ${CRITICAL}"
+        if ! echo "${CRITICAL_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
+            unknown "invalid number of days ${CRITICAL_DAYS}"
         fi
 
     fi
 
-    if [ -n "${WARNING}" ] ; then
+    if [ -n "${WARNING_DAYS}" ] ; then
 
-        if ! echo "${WARNING}" | grep -q '^[0-9][0-9]*$' ; then
-            unknown "invalid number of days ${WARNING}"
+        if ! echo "${WARNING_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
+            unknown "invalid number of days ${WARNING_DAYS}"
         fi
 
     fi
 
-    if [ -n "${CRITICAL}" ] && [ -n "${WARNING}" ] ; then
+    if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] ; then
 
-        if [ "${WARNING}" -le "${CRITICAL}" ] ; then
-            unknown "--warning (${WARNING}) is less than or equal to --critical (${CRITICAL})"
+        if [ "${WARNING_DAYS}" -le "${CRITICAL_DAYS}" ] ; then
+            unknown "--warning (${WARNING_DAYS}) is less than or equal to --critical (${CRITICAL_DAYS})"
         fi
 
     fi
