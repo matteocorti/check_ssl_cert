@@ -184,7 +184,7 @@ usage() {
     echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
 
-    exit $STATUS_UNKNOWN
+    exit "${STATUS_UNKNOWN}"
 
 }
 
@@ -216,7 +216,7 @@ trap_with_arg() {
 # Cleanup temporary files
 remove_temporary_files() {
     debuglog "cleaning up temporary files"
-    debuglog "$(echo $TEMPORARY_FILES | tr '\ ' '\n')"
+    debuglog "$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
     # shellcheck disable=SC2086
     if [ -n "${TEMPORARY_FILES}" ]; then
         rm -f ${TEMPORARY_FILES}
@@ -227,7 +227,7 @@ remove_temporary_files() {
 # Cleanup when exiting
 cleanup() {
     SIGNAL=$1
-    debuglog "signal caught $SIGNAL"
+    debuglog "signal caught ${SIGNAL}"
     remove_temporary_files
     # shellcheck disable=SC2086
     trap - ${SIGNALS}
@@ -242,7 +242,7 @@ create_temporary_file() {
         unknown 'temporary file creation failure.'
     fi
 
-    debuglog "temporary file $TEMPFILE created"
+    debuglog "temporary file ${TEMPFILE} created"
 
     # add the file to the list of temporary files
     TEMPORARY_FILES="${TEMPORARY_FILES} ${TEMPFILE}"
@@ -361,7 +361,7 @@ critical() {
         printf '%s %s \n' "$1" "${PERFORMANCE_DATA}"
     fi
 
-    exit $STATUS_CRITICAL
+    exit "${STATUS_CRITICAL}"
 }
 
 ################################################################################
@@ -427,7 +427,7 @@ warning() {
         printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
     fi
 
-    exit $STATUS_WARNING
+    exit "${STATUS_WARNING}"
 }
 
 ################################################################################
@@ -446,7 +446,7 @@ unknown() {
     fi
     remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
-    exit $STATUS_UNKNOWN
+    exit "${STATUS_UNKNOWN}"
 }
 
 ################################################################################
@@ -589,30 +589,31 @@ check_cert_end_date() {
 
     if [ "${OPENSSL_COMMAND}" = "x509" ]; then
         # x509 certificates (default)
+	# shellcheck disable=SC2086
         ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
-        debuglog "Validity date on cert element ${el_number} is $ELEM_END_DATE"
+        debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
 
-        HOURS_UNTIL=$(hours_until "$ELEM_END_DATE")
+        HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
         ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
-        if [ -z "$DAYS_VALID" ] || [ "$ELEM_DAYS_VALID" -lt "$DAYS_VALID" ]; then
-            DAYS_VALID="$ELEM_DAYS_VALID"
+        if [ -z "${DAYS_VALID}" ] || [ "${ELEM_DAYS_VALID}" -lt "${DAYS_VALID}" ]; then
+            DAYS_VALID="${ELEM_DAYS_VALID}"
         fi
 
-        add_performance_data "days_chain_elem${el_number}=$ELEM_DAYS_VALID;${WARNING_DAYS};${CRITICAL_DAYS};;"
+        add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
 
         # We always check expired certificates
-        if ! echo "${1}" | $OPENSSL x509 -noout -checkend 0 > /dev/null ; then
-            debuglog "executing: $OPENSSL x509 -noout -checkend 0 on cert element ${el_number}"
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until $DATE)"
+        if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 > /dev/null ; then
+            debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number}"
+            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${DATE})"
             return 2
         fi
 
         if [ -n "${CRITICAL_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number}"
+            debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "${1}" | $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
-                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
+                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
                 return 2
             fi
 
@@ -620,10 +621,10 @@ check_cert_end_date() {
 
         if [ -n "${WARNING_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
+            debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "$1" | $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
-                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
+            if ! echo "$1" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
+                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
                 return 1
             fi
 
@@ -642,13 +643,13 @@ check_cert_end_date() {
 
         # We always check expired certificates
         if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until $DATE)"
+            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${DATE})"
             return 2
         fi
 
         if [ -n "${CRITICAL_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
-                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
+                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
                 return 2
             fi
 
@@ -656,7 +657,7 @@ check_cert_end_date() {
 
         if [ -n "${WARNING_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
-                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
+                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
                 return 1
             fi
 
@@ -1149,7 +1150,7 @@ main() {
                 ;;
             -V|--version)
                 echo "check_ssl_cert version ${VERSION}"
-                exit $STATUS_UNKNOWN
+                exit "${STATUS_UNKNOWN}"
                 ;;
             -4)
                 INETPROTO="-4"
@@ -2486,12 +2487,12 @@ main() {
             NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Nb certificates in CA chain: $((NUM_CERTIFICATES))"
             CERT_IN_CHAIN=1
-            while [ "$CERT_IN_CHAIN" -le "$NUM_CERTIFICATES" ]; do
+            while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
                 elem_number=$((CERT_IN_CHAIN))
                 chain_element=$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
-                                   awk -v n=$CERT_IN_CHAIN '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')
+                                   awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')
 
-                check_cert_end_date "${chain_element}" $elem_number
+                check_cert_end_date "${chain_element}" "${elem_number}"
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
             done
         fi
@@ -2974,7 +2975,7 @@ main() {
 
     remove_temporary_files
 
-    exit $STATUS_OK
+    exit "${STATUS_OK}"
 
 }
 
