@@ -26,15 +26,20 @@ VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,e
 
 SIGNALS="HUP INT QUIT TERM ABRT"
 
+LC_ALL=en_US
+
 # return value for the creation of temporary files
 TEMPFILE=""
 
 ################################################################################
 # Variables
+STATUS_OK=0
+STATUS_WARNING=1
+STATUS_CRITICAL=2
+STATUS_UNKNOWN=3
 WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
-
 ################################################################################
 # Functions
 
@@ -64,7 +69,7 @@ usage() {
     echo "   -C,--clientcert path            use client certificate to authenticate"
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to"
-    echo "                                   be valid to issue a critical status"
+    echo "                                   be valid to issue a critical status. Default: ${CRITICAL_DAYS}"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
@@ -164,7 +169,7 @@ usage() {
     echo "   -v,--verbose                    verbose output"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
-    echo "                                   to issue a warning status"
+    echo "                                   to issue a warning status. Default: ${WARNING_DAYS}"
     echo "      --xmpphost name              specifies the host for the 'to' attribute of the stream element"
     echo "   -4                              force IPv4"
     echo "   -6                              force IPv6"
@@ -179,7 +184,7 @@ usage() {
     echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
 
-    exit 3
+    exit $STATUS_UNKNOWN
 
 }
 
@@ -248,13 +253,10 @@ create_temporary_file() {
 # Compute the number of hours until a given date
 # Params
 #   $1 date
-# Sets HOURS_UNTIL
+# return HOURS_UNTIL
 hours_until() {
 
     DATE=$1
-
-    OLDLANG="${LANG}"
-    LANG=en_US
 
     debuglog "Date computations: ${DATETYPE}"
     debuglog "Computing number of hours until '${DATE}'"
@@ -287,9 +289,8 @@ EOF
         unknown "Internal error: unknown date type"
     esac
 
-    LANG="${OLDLANG}"
-
     debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
+    echo "${HOURS_UNTIL}"
 
 }
 
@@ -324,7 +325,7 @@ prepend_critical_message() {
         fi
     fi
 
-    MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${LONG_OUTPUT}"
 
     if [ "${CRITICAL_MSG}" = "" ]; then
         CRITICAL_MSG="${MSG}"
@@ -354,13 +355,13 @@ critical() {
 
     debuglog "number of errors = ${NUMBER_OF_ERRORS}"
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
-        printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ] ; then
+        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
     else
-        printf '%s\n' "$1"
+        printf '%s %s \n' "$1" "${PERFORMANCE_DATA}"
     fi
 
-    exit 2
+    exit $STATUS_CRITICAL
 }
 
 ################################################################################
@@ -393,7 +394,7 @@ append_warning_message() {
         fi
     fi
 
-    MSG="${SHORTNAME} WARN${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    MSG="${SHORTNAME} WARN${tmp}: ${1}${LONG_OUTPUT}"
 
     if [ "${WARNING_MSG}" = "" ]; then
         WARNING_MSG="${MSG}"
@@ -420,13 +421,13 @@ warning() {
 
     NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
-        printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ]; then
+        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
     else
-        printf '%s\n' "$1"
+        printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
     fi
 
-    exit 1
+    exit $STATUS_WARNING
 }
 
 ################################################################################
@@ -445,7 +446,7 @@ unknown() {
     fi
     remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
-    exit 3
+    exit $STATUS_UNKNOWN
 }
 
 ################################################################################
@@ -573,54 +574,6 @@ check_required_prog() {
 }
 
 ################################################################################
-# get cert validity days
-# Params
-#   $1 date
-# Returns number of days
-get_valid_days(){
-    OLDLANG=$LANG
-    LANG=en_US
-
-    debuglog "Date computations: ${DATETYPE}"
-
-    case "${DATETYPE}" in
-        "BSD")
-            valid_days=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${1}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-            ;;
-
-        "GNU")
-            valid_days=$(( ( $(${DATEBIN} -d "${1}" +%s) - $(${DATEBIN} +%s) ) / 86400 ))
-            ;;
-
-        "PERL")
-            # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
-            if ! valid_days=$(perl - "${1}" <<-"EOF"
-                use strict;
-                use warnings;
-                use Date::Parse;
-                my $cert_date = str2time( $ARGV[0] );
-                my $days = int (( $cert_date - time ) / 86400 + 0.5);
-                print "$days\n";
-EOF
-            ) ; then
-                # somethig went wrong with the embedded Perl code: check the indentation of EOF
-                unknown "Error computing the certificate validity with Perl"
-            fi
-            ;;
-    esac
-
-    LANG=$OLDLANG
-
-    if [ "${valid_days}" -ge 0 ] ; then
-        verboselog "The certificate will expire in ${valid_days} day(s)"
-    else
-        verboselog "The certificate expired "$((- valid_days))" day(s) ago"
-    fi
-
-    echo "$valid_days"
-}
-
-
 # Checks cert end date validity
 # Params
 #   $1 cert
@@ -636,15 +589,16 @@ check_cert_end_date() {
 
     if [ "${OPENSSL_COMMAND}" = "x509" ]; then
         # x509 certificates (default)
-        DATE=$(echo "${1}" | $OPENSSL "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
-        debuglog "Validity date on cert element ${el_number} is $DATE"
+        ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
+        debuglog "Validity date on cert element ${el_number} is $ELEM_END_DATE"
 
-        ELEM_DAYS_VALID=$(get_valid_days "$DATE")
+        HOURS_UNTIL=$(hours_until "$ELEM_END_DATE")
+        ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
         if [ -z "$DAYS_VALID" ] || [ "$ELEM_DAYS_VALID" -lt "$DAYS_VALID" ]; then
             DAYS_VALID="$ELEM_DAYS_VALID"
         fi
 
-        add_performance_data "days_chain_elem${el_number}=$ELEM_DAYS_VALID;${WARNING};${CRITICAL};;"
+        add_performance_data "days_chain_elem${el_number}=$ELEM_DAYS_VALID;${WARNING_DAYS};${CRITICAL_DAYS};;"
 
         # We always check expired certificates
         if ! echo "${1}" | $OPENSSL x509 -noout -checkend 0 > /dev/null ; then
@@ -653,22 +607,22 @@ check_cert_end_date() {
             return 2
         fi
 
-        if [ -n "${CRITICAL}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( CRITICAL * 86400 )) on cert element ${el_number}"
+            debuglog "executing: $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "${1}" | $OPENSSL x509 -noout -checkend $(( CRITICAL * 86400 )) > /dev/null ; then
+            if ! echo "${1}" | $OPENSSL x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 2
             fi
 
         fi
 
-        if [ -n "${WARNING}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] ; then
 
-            debuglog "executing: $OPENSSL x509 -noout -checkend $(( WARNING * 86400 )) on cert element ${el_number}"
+            debuglog "executing: $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "$1" | $OPENSSL x509 -noout -checkend $(( WARNING * 86400 )) > /dev/null ; then
+            if ! echo "$1" | $OPENSSL x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 1
             fi
@@ -692,16 +646,16 @@ check_cert_end_date() {
             return 2
         fi
 
-        if [ -n "${CRITICAL}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] ; then
+            if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 2
             fi
 
         fi
 
-        if [ -n "${WARNING}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${WARNING}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] ; then
+            if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on $DATE"
                 return 1
             fi
@@ -1019,6 +973,8 @@ main() {
     ECDSA=""
     DANE=""
     DISALLOWED_PROTOCOLS=""
+    WARNING_DAYS=20
+    CRITICAL_DAYS=15
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1058,7 +1014,6 @@ main() {
                 ;;
             -h|--help|-\?)
                 usage
-                exit 0
                 ;;
             --first-element-only)
                 FIRST_ELEMENT_ONLY=1
@@ -1194,7 +1149,7 @@ main() {
                 ;;
             -V|--version)
                 echo "check_ssl_cert version ${VERSION}"
-                exit 3
+                exit $STATUS_UNKNOWN
                 ;;
             -4)
                 INETPROTO="-4"
@@ -1381,14 +1336,6 @@ main() {
                 else
                     unknown "--clientpass requires an argument"
                 fi
-                ;;
-            --require-ocsp-stapling)
-                REQUIRE_OCSP_STAPLING=1
-                shift
-                ;;
-            --require-san)
-                REQUIRE_SAN=1
-                shift
                 ;;
             --sni)
                 check_option_argument '--sni' "$2"
@@ -2256,9 +2203,9 @@ main() {
             verboselog "  OCSP stapling enabled"
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
 
-            hours_until "${NEXT_UPDATE}"
 
-            OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
+
+            OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
             verboselog "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
@@ -3027,7 +2974,7 @@ main() {
 
     remove_temporary_files
 
-    exit 0
+    exit $STATUS_OK
 
 }
 
