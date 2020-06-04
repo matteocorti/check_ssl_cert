@@ -33,6 +33,10 @@ TEMPFILE=""
 
 ################################################################################
 # Variables
+STATUS_OK=0
+STATUS_WARNING=1
+STATUS_CRITICAL=2
+STATUS_UNKNOWN=3
 WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
@@ -182,7 +186,7 @@ usage() {
     echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
 
-    exit 3
+    exit $STATUS_UNKNOWN
 
 }
 
@@ -359,7 +363,7 @@ critical() {
         printf '%s\n' "$1"
     fi
 
-    exit 2
+    exit $STATUS_CRITICAL
 }
 
 ################################################################################
@@ -425,7 +429,7 @@ warning() {
         printf '%s\n' "$1"
     fi
 
-    exit 1
+    exit $STATUS_WARNING
 }
 
 ################################################################################
@@ -444,7 +448,7 @@ unknown() {
     fi
     remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
-    exit 3
+    exit $STATUS_UNKNOWN
 }
 
 ################################################################################
@@ -1010,7 +1014,7 @@ main() {
                 ;;
             -h|--help|-\?)
                 usage
-                exit 0
+                exit $STATUS_OK
                 ;;
             --first-element-only)
                 FIRST_ELEMENT_ONLY=1
@@ -1146,7 +1150,7 @@ main() {
                 ;;
             -V|--version)
                 echo "check_ssl_cert version ${VERSION}"
-                exit 3
+                exit $STATUS_UNKNOWN
                 ;;
             -4)
                 INETPROTO="-4"
@@ -2971,7 +2975,7 @@ main() {
 
     remove_temporary_files
 
-    exit 0
+    exit $STATUS_OK
 
 }
 
