@@ -95,3 +95,4 @@ Thanks:
 * Many thanks to Arkadiusz Miśkiewicz (https://github.com/arekm) for the OCSP timeout patch
 * Many thanks to Thomas Weißschuh (https://github.com/t-8ch) for the PostgreSQL patch
 * Many thanks to Jonathan Besanceney (https://github.com/jonathan-besanceney) for the proxy patch
+* Many thanks to grizzlydev-sarl (https://github.com/grizzlydev-sarl) for the processing of all the certificate in the chain

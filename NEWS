@@ -1,3 +1,4 @@
+2020-06-04 Version 1.115.0: Checks all the certificates in the chain
 2020-05-27 Version 1.114.0: Added an option to specify a proxy
 2020-05-19 Version 1.113.0: Fixed a bug with nmap and hosts with IPv6 addresses only
 2020-04-07 Version 1.112.0: Timeout for OCSP queries and option to ignore timeout errors and PostgreSQL support

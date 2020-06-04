@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.114.0
+VERSION=1.115.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
