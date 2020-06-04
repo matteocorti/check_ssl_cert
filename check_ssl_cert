@@ -40,8 +40,6 @@ STATUS_UNKNOWN=3
 WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
-WARNING_DAYS=20
-CRITICAL_DAYS=15
 ################################################################################
 # Functions
 
@@ -975,6 +973,8 @@ main() {
     ECDSA=""
     DANE=""
     DISALLOWED_PROTOCOLS=""
+    WARNING_DAYS=20
+    CRITICAL_DAYS=15
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
