@@ -327,7 +327,7 @@ prepend_critical_message() {
         fi
     fi
 
-    MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${LONG_OUTPUT}"
 
     if [ "${CRITICAL_MSG}" = "" ]; then
         CRITICAL_MSG="${MSG}"
@@ -357,10 +357,10 @@ critical() {
 
     debuglog "number of errors = ${NUMBER_OF_ERRORS}"
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
-        printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ] ; then
+        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
     else
-        printf '%s\n' "$1"
+        printf '%s %s \n' "$1" "${PERFORMANCE_DATA}"
     fi
 
     exit $STATUS_CRITICAL
@@ -396,7 +396,7 @@ append_warning_message() {
         fi
     fi
 
-    MSG="${SHORTNAME} WARN${tmp}: ${1}${PERFORMANCE_DATA}${LONG_OUTPUT}"
+    MSG="${SHORTNAME} WARN${tmp}: ${1}${LONG_OUTPUT}"
 
     if [ "${WARNING_MSG}" = "" ]; then
         WARNING_MSG="${MSG}"
@@ -423,10 +423,10 @@ warning() {
 
     NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] ; then
-        printf '%s\nError(s):%b\n' "$1" "${ALL_MSG}"
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ]; then
+        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
     else
-        printf '%s\n' "$1"
+        printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
     fi
 
     exit $STATUS_WARNING
@@ -1014,7 +1014,6 @@ main() {
                 ;;
             -h|--help|-\?)
                 usage
-                exit $STATUS_OK
                 ;;
             --first-element-only)
                 FIRST_ELEMENT_ONLY=1
