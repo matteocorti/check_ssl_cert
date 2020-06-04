@@ -356,9 +356,9 @@ critical() {
     debuglog "number of errors = ${NUMBER_OF_ERRORS}"
 
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ] ; then
-        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
+        printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
     else
-        printf '%s %s \n' "$1" "${PERFORMANCE_DATA}"
+        printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
     fi
 
     exit "${STATUS_CRITICAL}"
@@ -422,7 +422,7 @@ warning() {
     NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
 
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ]; then
-        printf '%s\nError(s):%b\n%s\n' "$1" "${ALL_MSG}" "${PERFORMANCE_DATA}"
+        printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
     else
         printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
     fi

@@ -463,7 +463,7 @@ testFormatShort() {
 
 testMoreErrors() {
     VALUE=1000
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical "${VALUE}" --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical "${VALUE}" --rootcert cabundle.crt --verbose | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and two errors
@@ -472,7 +472,7 @@ testMoreErrors() {
 
 testMoreErrors2() {
     VALUE=1000
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --warning "${VALUE}" --rootcert cabundle.crt | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --warning "${VALUE}" --rootcert cabundle.crt --verbose | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and two errors
