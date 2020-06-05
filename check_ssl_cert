@@ -26,7 +26,7 @@ VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,e
 
 SIGNALS="HUP INT QUIT TERM ABRT"
 
-LC_ALL=en_US
+LC_ALL=C
 
 # return value for the creation of temporary files
 TEMPFILE=""
