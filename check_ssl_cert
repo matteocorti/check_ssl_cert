@@ -125,6 +125,7 @@ usage() {
     echo "      --no_tls1_1                  disable TLS version 1.1"
     echo "      --no_tls1_2                  disable TLS version 1.2"
     echo "      --no_tls1_3                  disable TLS version 1.3"
+    echo "      --not-issued-by issuer       check that the issuer of the certificate does not match the given pattern"
     echo "      --not-valid-longer-than days critical if the certificate validity is longer than the specified period"
     echo "   -N,--host-cn                    match CN with the host name"
     echo "      --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to"
@@ -1262,6 +1263,11 @@ main() {
                 else
                     COMMON_NAME="${2}"
                 fi
+                shift 2
+                ;;
+            --not-issued-by)
+                check_option_argument '--not-issued-by' "$2"
+                NOT_ISSUED_BY="$2"
                 shift 2
                 ;;
             --not-valid-longer-than)
@@ -2436,6 +2442,32 @@ main() {
         else
             # this looks ugly but preserves spaces in CA name
             prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+        fi
+
+    else
+
+        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | head -n1)"
+
+    fi
+
+    ################################################################################
+    # Check if not issued by
+    if [ -n "${NOT_ISSUED_BY}" ] ; then
+
+        debuglog "check NOT_ISSUED_BY: ${NOT_ISSUED_BY}"
+
+	debuglog "  executing echo \"${ISSUERS}\" | grep -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
+	
+        ok=""
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${NOT_ISSUED_BY}\$" | head -n1)
+
+        debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
+
+        if [ -n "${CA_ISSUER_MATCHED}" ]; then
+            # this looks ugly but preserves spaces in CA name
+            prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+        else
+            ok="true"
         fi
 
     else
