@@ -1849,7 +1849,7 @@ main() {
 
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    debuglog "Adding -proxy ${HTTP_PROXY} to the s_client options"
-	    PROXY="${HTTP_PROXY}"
+	    PROXY="-proxy ${HTTP_PROXY}"
 	else
 	    
             verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"
