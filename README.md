@@ -14,6 +14,7 @@ A shell script (that can be used as a Nagios plugin) to check an X.509 certifica
 ## Usage
 
 ```
+
 Usage: check_ssl_cert -H host [OPTIONS]
 
 Arguments:
@@ -26,7 +27,7 @@ Options:
    -C,--clientcert path            use client certificate to authenticate
       --clientpass phrase          set passphrase for client certificate.
    -c,--critical days              minimum number of days a certificate has to
-                                   be valid to issue a critical status
+                                   be valid to issue a critical status. Default: 15
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain the
                                    issuer cert
@@ -47,6 +48,7 @@ Options:
                                    period
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
+      --first-element-only         verify just the first cert element, not the whole chain
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
@@ -55,6 +57,7 @@ Options:
                                    related checks
       --ignore-exp                 ignore expiration date
       --ignore-ocsp                do not check revocation with OCSP
+      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
                                    or MD5
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
@@ -64,7 +67,7 @@ Options:
    -K,--clientkey path             use client certificate key to authenticate
    -L,--check-ssl-labs grade       SSL Labs assessment
                                    (please check https://www.ssllabs.com/about/terms.html)
-      --check-ssl-labs-warn-grade  SSL-Labs grade on which to warn
+      --check-ssl-labs-warn grade  SSL-Labs grade on which to warn
       --long-output list           append the specified comma separated (no spaces) list
                                    of attributes to the plugin output on additional lines
                                    Valid attributes are:
@@ -80,6 +83,8 @@ Options:
       --no_tls1_1                  disable TLS version 1.1
       --no_tls1_2                  disable TLS version 1.2
       --no_tls1_3                  disable TLS version 1.3
+      --not-issued-by issuer       check that the issuer of the certificate does not match the given pattern
+      --not-valid-longer-than days critical if the certificate validity is longer than the specified period
    -N,--host-cn                    match CN with the host name
       --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to
                                    issue a critical status
@@ -89,11 +94,11 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
-				    postgres|sieve|smtp|smtps|xmpp|xmpp-server}
+                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|postgres|sieve|smtp|smtps|xmpp|xmpp-server}
                                    https:                             default
-				   h2:                                forces HTTP/2
+                                   h2:                                forces HTTP/2
                                    ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS
+      --proxy proxy                sets http_proxy
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
@@ -123,7 +128,7 @@ Options:
    -v,--verbose                    verbose output
    -V,--version                    version
    -w,--warning days               minimum number of days a certificate has to be valid
-                                   to issue a warning status
+                                   to issue a warning status. Default: 20
       --xmpphost name              specifies the host for the 'to' attribute of the stream element
    -4                              force IPv4
    -6                              force IPv6
