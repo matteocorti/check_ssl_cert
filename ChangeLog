@@ -1,3 +1,7 @@
+2020-06-09  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: fixed a bug in the output (expiration date of chain elements)
+
 2020-06-05  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): support for s_client -proxy option
