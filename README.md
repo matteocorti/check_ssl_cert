@@ -98,7 +98,7 @@ Options:
                                    https:                             default
                                    h2:                                forces HTTP/2
                                    ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS
-      --proxy proxy                sets http_proxy
+      --proxy proxy                sets http_proxy and the s_client -proxy option
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered

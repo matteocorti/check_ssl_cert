@@ -140,7 +140,7 @@ usage() {
     echo "                                   https:                             default"
     echo "                                   h2:                                forces HTTP/2"
     echo "                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS"
-    echo "      --proxy proxy                sets http_proxy"
+    echo "      --proxy proxy                sets http_proxy and the s_client -proxy option"
     echo "      --require-no-ssl2            critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            critical if SSL version 3 is offered"
     echo "      --require-no-tls1            critical if TLS 1 is offered"
