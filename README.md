@@ -83,8 +83,10 @@ Options:
       --no_tls1_1                  disable TLS version 1.1
       --no_tls1_2                  disable TLS version 1.2
       --no_tls1_3                  disable TLS version 1.3
-      --not-issued-by issuer       check that the issuer of the certificate does not match the given pattern
-      --not-valid-longer-than days critical if the certificate validity is longer than the specified period
+      --not-issued-by issuer       check that the issuer of the certificate does not match
+                                   the given pattern
+      --not-valid-longer-than days critical if the certificate validity is longer than
+                                   the specified period
    -N,--host-cn                    match CN with the host name
       --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to
                                    issue a critical status
@@ -94,10 +96,12 @@ Options:
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|postgres|sieve|smtp|smtps|xmpp|xmpp-server}
+                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
+                                    postgres|sieve|smtp|smtps|xmpp|xmpp-server}
                                    https:                             default
                                    h2:                                forces HTTP/2
-                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to TLS using StartTLS
+                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
+                                   TLS using StartTLS
       --proxy proxy                sets http_proxy and the s_client -proxy option
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
