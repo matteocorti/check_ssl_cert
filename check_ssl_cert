@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.116.0
+VERSION=1.117.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -609,7 +609,7 @@ check_cert_end_date() {
         # We always check expired certificates
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 > /dev/null ; then
             debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number}"
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${DATE})"
+            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE})"
             return 2
         fi
 
@@ -618,7 +618,7 @@ check_cert_end_date() {
             debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number}"
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
-                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
+                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 return 2
             fi
 
@@ -629,7 +629,7 @@ check_cert_end_date() {
 	    debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
             if ! echo "$1" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
-                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
+                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 return 1
             fi
 
@@ -648,13 +648,13 @@ check_cert_end_date() {
 
         # We always check expired certificates
         if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${DATE})"
+            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE})"
             return 2
         fi
 
         if [ -n "${CRITICAL_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
-                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
+                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 return 2
             fi
 
@@ -662,7 +662,7 @@ check_cert_end_date() {
 
         if [ -n "${WARNING_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
-                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${DATE}"
+                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 return 1
             fi
 
