@@ -2198,9 +2198,9 @@ main() {
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -e "s/^.*\\/CN=//" -e "s/^.* CN = //" -e "s/^.*, O = //" -e "s/\\/[A-Za-z][A-Za-z]*=.*\$//" -e "s/, [A-Za-z][A-Za-z]* =.*\$//")
+    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" -e "s/\, |\//\\n/g" | grep -E "^(O|CN) ?= ?" | sed -E -e "s/^(O|CN) ?= ?//" )
 
-    debuglog '[DBG] ISSUERS = '
+    debuglog 'ISSUERS = '
     debuglog "    ${ISSUERS}"
 
     # we just consider the first URI
