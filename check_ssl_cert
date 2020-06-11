@@ -2198,7 +2198,7 @@ main() {
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" -e "s/\, |\//\\n/g" | grep -E "^(O|CN) ?= ?" | sed -E -e "s/^(O|CN) ?= ?//" )
+    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" -e "s/\, |\//\\n/g" | grep -E "^(O|CN) ?= ?")
 
     debuglog 'ISSUERS = '
     debuglog "    ${ISSUERS}"
@@ -2459,7 +2459,7 @@ main() {
         debuglog "check ISSUER: ${ISSUER}"
 
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${ISSUER}\$" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^(O|CN) ?= ?${ISSUER}\$" | sed -E -e "s/^(O|CN) ?= ?//" | head -n1)
 
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
@@ -2467,12 +2467,8 @@ main() {
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
-            prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+            prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
         fi
-
-    else
-
-        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | head -n1)"
 
     fi
 
@@ -2482,23 +2478,23 @@ main() {
 
         debuglog "check NOT_ISSUED_BY: ${NOT_ISSUED_BY}"
 
-	debuglog "  executing echo \"${ISSUERS}\" | grep -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
+	debuglog "  executing echo \"${ISSUERS}\" | sed -E -e \"s/^(O|CN) ?= ?//\" | grep -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
 	
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${NOT_ISSUED_BY}\$" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | grep -E "^${NOT_ISSUED_BY}\$" | head -n1)
 
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
             # this looks ugly but preserves spaces in CA name
-            prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+            prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
         else
             ok="true"
         fi
 
     else
 
-        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | head -n1)"
+        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | grep -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
 
     fi
 
