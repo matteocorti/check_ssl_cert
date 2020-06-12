@@ -1,3 +1,8 @@
+2020-06-12  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Fixed a problem on BSD in the processing of the issuers
+	* check_ssl_cert (debuglog): [DBG] prefix for all the lines
+
 2020-06-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: fixed a bug in the output (expiration date of chain elements)

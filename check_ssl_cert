@@ -193,12 +193,19 @@ usage() {
 
 }
 
+################################################################################
+# Prints the given message to STDERR with the prefix '[DBG] ' if the debug
+# command line option was specified
 # $1: string
 debuglog() {
     if [ -n "${DEBUG}" ] ; then
-        echo "[DBG] ${1}" >&2
+	echo "${1}" | sed 's/^/[DBG] /' >&2
     fi
 }
+
+################################################################################
+# Prints the given message to STDOUT if the verbose command line opttion was
+# specified
 # $1: string
 verboselog() {
     if [ -n "${VERBOSE}" ] ; then
@@ -2194,14 +2201,17 @@ main() {
         done
     fi
 
+    debuglog 'ISSUERS = '
+    debuglog "${ISSUERS}"    
+    
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" -e "s/\, |\//\\n/g" | grep -E "^(O|CN) ?= ?")
+    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" | awk  '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
 
     debuglog 'ISSUERS = '
-    debuglog "    ${ISSUERS}"
+    debuglog "${ISSUERS}"
 
     # we just consider the first URI
     # TODO check SC2016
