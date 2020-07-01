@@ -2716,8 +2716,8 @@ main() {
             debuglog "OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
             # check the result
-            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
-
+            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then		
+		
                 if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -q ': data' ; then
 
                     debuglog "OCSP: converting issuer certificate from DER to PEM"
@@ -2727,6 +2727,8 @@ main() {
                     ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
                 else
+
+		    debuglog "OCSP: complete issuer certificare type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
 
                     unknown "Unable to fetch a valid certificate issuer certificate."
 
