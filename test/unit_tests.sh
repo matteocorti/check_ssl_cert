@@ -226,7 +226,8 @@ testTimeOut() {
 
 testIMAP() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap
+	# minimal critical and warning as they renew pretty late
+        ${SCRIPT} --rootcert cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else

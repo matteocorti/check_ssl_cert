@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.118.0
+VERSION=1.119.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1690,12 +1690,14 @@ main() {
     check_required_prog "${FILE_BIN}"
     FILE_BIN=${PROG}
 
+    debuglog "file version: $( "${FILE_BIN}" --version )"
+
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
             if [ -n "${DEBUG}" ] ; then
-                echo "[DBG] cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
-                echo "[DBG] cURL binary not specified"
+                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+                debuglog "cURL binary not specified"
             fi
 
             check_required_prog curl
@@ -2718,7 +2720,7 @@ main() {
             # check the result
             if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then		
 		
-                if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -q ': data' ; then
+                if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
 
                     debuglog "OCSP: converting issuer certificate from DER to PEM"
 

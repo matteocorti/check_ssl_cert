@@ -1,3 +1,7 @@
+2020-07-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Adding support for better file(1) certificate parsing
+
 2020-06-12  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Fixed a problem on BSD in the processing of the issuers
