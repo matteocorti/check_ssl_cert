@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.119.0
+VERSION=1.120.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -138,7 +138,7 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
-    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|"
+    echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|"
     echo "                                    postgres|sieve|smtp|smtps|xmpp|xmpp-server}"
     echo "                                   https:                             default"
     echo "                                   h2:                                forces HTTP/2"
@@ -820,6 +820,10 @@ fetch_certificate() {
                 exec_with_timeout "${TIMEOUT}" "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
+	    mysql)
+                exec_with_timeout "${TIMEOUT}" "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} ${PROXY} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
+                RET=$?
+                ;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"
                 ;;
@@ -1490,6 +1494,9 @@ main() {
             https|h2)
                 PORT=443
                 ;;
+	    mysql)
+		PORT=3306
+		;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"
                 ;;
