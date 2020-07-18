@@ -420,7 +420,7 @@ testMultipleOCSPHosts() {
 }
 
 testRequireOCSP() {
-    ${SCRIPT} -H videolan.org --rootcert cabundle.crt --require-ocsp-stapling
+    ${SCRIPT} -H videolan.org --rootcert cabundle.crt --require-ocsp-stapling --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
