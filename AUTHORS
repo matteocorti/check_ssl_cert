@@ -97,3 +97,4 @@ Thanks:
 * Many thanks to Jonathan Besanceney (https://github.com/jonathan-besanceney) for the proxy patch
 * Many thanks to grizzlydev-sarl (https://github.com/grizzlydev-sarl) for the processing of all the certificate in the chain
 * Many thanks to Claudio Kuenzler (https://github.com/Napsty) for the chain expiration output fix
+* Many thanks to jf-vf (https://github.com/jf-vf) for the MySQL support patch
