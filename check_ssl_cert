@@ -91,6 +91,7 @@ usage() {
     echo "      --file-bin path              path of the file binary to be used"
     echo "      --fingerprint SHA1           pattern to match the SHA1-Fingerprint"
     echo "      --first-element-only         verify just the first cert element, not the whole chain"
+    echo "      --skip-element NUMBER        skip checks on N cert element from the begining of the chain"
     echo "      --force-perl-date            force the usage of Perl for date computations"
     echo "      --format FORMAT              format output template on success, for example"
     echo "                                   \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
@@ -992,6 +993,7 @@ main() {
     DISALLOWED_PROTOCOLS=""
     WARNING_DAYS=20
     CRITICAL_DAYS=15
+    SKIP_ELEMENT=0
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1259,6 +1261,11 @@ main() {
             --serial)
                 check_option_argument '--serial' "$2"
                 SERIAL_LOCK="$2"
+                shift 2
+                ;;
+            --skip-element)
+                check_option_argument '--skip-element' "$2"
+                SKIP_ELEMENT="$2"
                 shift 2
                 ;;
             --fingerprint)
@@ -2195,7 +2202,8 @@ main() {
         NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
 
         # start with first certificate
-        CERT_IN_CHAIN=1
+        debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
+        CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
         # shellcheck disable=SC2086
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
             if [ -n "${ISSUERS}" ]; then
@@ -2560,7 +2568,8 @@ main() {
             # count the certificates in the chain
             NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Nb certificates in CA chain: $((NUM_CERTIFICATES))"
-            CERT_IN_CHAIN=1
+            debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
+            CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
             while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
                 elem_number=$((CERT_IN_CHAIN))
                 chain_element=$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
