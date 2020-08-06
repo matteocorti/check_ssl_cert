@@ -73,6 +73,8 @@ usage() {
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
+    echo "      --custom-http-header string  custom HTTP header sent when getting the cert"
+    echo "                                   example: 'X-Check-Ssl-Cert: Foobar=1'"
     echo "      --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)"
     echo "      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
@@ -970,6 +972,7 @@ main() {
     FILE_BIN=""
     CURL_BIN=""
     CURL_USER_AGENT=""
+    CUSTOM_HTTP_HEADER=""
     DIG_BIN=""
     NMAP_BIN=""
     IGNORE_SSL_LABS_CACHE=""
@@ -1194,6 +1197,11 @@ main() {
             --curl-user-agent)
                 check_option_argument '--curl-user-agent' "$2"
                 CURL_USER_AGENT="$2"
+                shift 2
+                ;;
+            --custom-http-header)
+                check_option_argument '--custom-http-header' "$2"
+                CUSTOM_HTTP_HEADER="$2"
                 shift 2
                 ;;
             # Deprecated option: used to be as --warning
@@ -1966,7 +1974,12 @@ main() {
         HOST_HEADER="${HOST}"
     fi
 
-    HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\nConnection: close\\n\\n"
+    # add newline if custom HTTP header is defined
+    if [ -n "${CUSTOM_HTTP_HEADER}" ]; then
+        CUSTOM_HTTP_HEADER="${CUSTOM_HTTP_HEADER}\\n"
+    fi
+
+    HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
     ##############################################################################
     # Check for disallowed protocols

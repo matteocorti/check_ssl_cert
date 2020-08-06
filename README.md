@@ -31,6 +31,8 @@ Options:
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain the
                                    issuer cert
+      --custom-http-header string  custom HTTP header sent when getting the cert
+                                   example: 'X-Check-Ssl-Cert: Foobar=1'
       --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)
       --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
       --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
