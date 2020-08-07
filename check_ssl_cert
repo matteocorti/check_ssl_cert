@@ -1697,7 +1697,7 @@ main() {
     check_required_prog "${FILE_BIN}"
     FILE_BIN=${PROG}
 
-    debuglog "file version: $( "${FILE_BIN}" --version )"
+    debuglog "file version: $( "${FILE_BIN}" --version 2>&1 )"
 
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
