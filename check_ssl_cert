@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.121.0
+VERSION=1.122.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -91,7 +91,6 @@ usage() {
     echo "      --file-bin path              path of the file binary to be used"
     echo "      --fingerprint SHA1           pattern to match the SHA1-Fingerprint"
     echo "      --first-element-only         verify just the first cert element, not the whole chain"
-    echo "      --skip-element NUMBER        skip checks on N cert element from the begining of the chain"
     echo "      --force-perl-date            force the usage of Perl for date computations"
     echo "      --format FORMAT              format output template on success, for example"
     echo "                                   \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
@@ -152,6 +151,7 @@ usage() {
     echo "      --require-no-tls1_1          critical if TLS 1.1 is offered"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
+    echo "      --skip-element number        skip checks on N cert element from the begining of the chain"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
     echo "                                   in the ClientHello message to 'name'"
     echo "      --ssl2                       forces SSL version 2"

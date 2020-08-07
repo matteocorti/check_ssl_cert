@@ -95,7 +95,10 @@ Thanks:
 * Many thanks to Arkadiusz Miśkiewicz (https://github.com/arekm) for the OCSP timeout patch
 * Many thanks to Thomas Weißschuh (https://github.com/t-8ch) for the PostgreSQL patch
 * Many thanks to Jonathan Besanceney (https://github.com/jonathan-besanceney) for the proxy patch
-* Many thanks to grizzlydev-sarl (https://github.com/grizzlydev-sarl) for the processing of all the certificate in the chain
+* Many thanks to grizzlydev-sarl (https://github.com/grizzlydev-sarl) for the
+  processing of all the certificate in the chain
 * Many thanks to Claudio Kuenzler (https://github.com/Napsty) for the chain expiration output fix
 * Many thanks to jf-vf (https://github.com/jf-vf) for the MySQL support patch
 * Many thanks to skanx (https://github.com/skanx) for the --not-issued-by output patch
+* Many thanks to Zadkiel (https://github.com/aslafy-z) for the --version, the
+  --skip-element and the custom HTTP header patches

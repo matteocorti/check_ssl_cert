@@ -1,3 +1,7 @@
+2020-08-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Fixed a bug with the output of --version
+
 2020-07-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): Fixed a bug in the output with --not-issued-by
