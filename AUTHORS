@@ -101,4 +101,5 @@ Thanks:
 * Many thanks to jf-vf (https://github.com/jf-vf) for the MySQL support patch
 * Many thanks to skanx (https://github.com/skanx) for the --not-issued-by output patch
 * Many thanks to Zadkiel (https://github.com/aslafy-z) for the --version, the
-  --skip-element and the custom HTTP header patches
+  --skip-element patches
+* Many thanks to Marcel Burkhalter (https://github.com/explorer69) the custom HTTP header patch.
