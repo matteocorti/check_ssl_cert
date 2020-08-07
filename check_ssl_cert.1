@@ -36,8 +36,11 @@ minimum number of days a certificate has to be valid to issue a critical status
 .BR "   --curl-bin" " path"
 path of the curl binary to be used
 .TP
-.BR "   --curl-user-agent" "string"
+.BR "   --curl-user-agent" " string"
 user agent that curl shall use to obtain the issuer cert
+.TP
+.BR "   --custom-http-header" " string"
+custom HTTP header sent when getting the cert
 .TP
 .BR "   --dane"
 verifies there are valid TLSA records for the returned certificate, requires OpenSSL 1.1.0 or later
