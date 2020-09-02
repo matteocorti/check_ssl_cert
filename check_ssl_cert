@@ -153,6 +153,7 @@ usage() {
     echo "      --require-no-tls1_1          critical if TLS 1.1 is offered"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
+    echo "      --element number             checks N cert element from the begining of the chain"
     echo "      --skip-element number        skip checks on N cert element from the begining of the chain"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
     echo "                                   in the ClientHello message to 'name'"
@@ -996,6 +997,7 @@ main() {
     DISALLOWED_PROTOCOLS=""
     WARNING_DAYS=20
     CRITICAL_DAYS=15
+    ELEMENT=0
     SKIP_ELEMENT=0
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
@@ -1269,6 +1271,11 @@ main() {
             --serial)
                 check_option_argument '--serial' "$2"
                 SERIAL_LOCK="$2"
+                shift 2
+                ;;
+            --element)
+                check_option_argument '--element' "$2"
+                ELEMENT="$2"
                 shift 2
                 ;;
             --skip-element)
@@ -2228,6 +2235,9 @@ main() {
                                ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
+            if ! [ $ELEMENT -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+                break
+            fi
         done
     fi
 
@@ -2590,6 +2600,9 @@ main() {
 
                 check_cert_end_date "${chain_element}" "${elem_number}"
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
+                if ! [ $ELEMENT -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+                    break
+                fi
             done
         fi
 
