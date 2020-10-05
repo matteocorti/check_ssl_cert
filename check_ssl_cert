@@ -602,20 +602,20 @@ check_cert_end_date() {
 
     debuglog "Checking expiration date of element ${el_number}"
 
+    # shellcheck disable=SC2086
+    ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
+    debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
+
+    HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
+    ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
+    if [ -z "${DAYS_VALID}" ] || [ "${ELEM_DAYS_VALID}" -lt "${DAYS_VALID}" ]; then
+        DAYS_VALID="${ELEM_DAYS_VALID}"
+    fi
+
+    add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
+
     if [ "${OPENSSL_COMMAND}" = "x509" ]; then
         # x509 certificates (default)
-	# shellcheck disable=SC2086
-        ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
-        debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
-
-        HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
-        ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
-        if [ -z "${DAYS_VALID}" ] || [ "${ELEM_DAYS_VALID}" -lt "${DAYS_VALID}" ]; then
-            DAYS_VALID="${ELEM_DAYS_VALID}"
-        fi
-
-        add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
-
         # We always check expired certificates
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 > /dev/null ; then
             debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number}"
@@ -2575,7 +2575,7 @@ main() {
     if [ -z "${NOEXP}" ] ; then
 
         debuglog "Checking expiration date"
-        if [ -n "${FIRST_ELEMENT_ONLY}" ]; then
+        if [ -n "${FIRST_ELEMENT_ONLY}" ] || [ "${OPENSSL_COMMAND}" = "crl" ]; then
             check_cert_end_date "$(cat "${CERT}")"
         else
             # count the certificates in the chain
