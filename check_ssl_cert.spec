@@ -45,7 +45,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
-* MNon Nov  30 2020 Matteo Corti <matteo@corti.li> - 1.123.0-0
+* Non Nov  30 2020 Matteo Corti <matteo@corti.li> - 1.123.0-0
 - Updated to 1.123.0
 
 * Fri Aug   7 2020 Matteo Corti <matteo@corti.li> - 1.122.0-0
