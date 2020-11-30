@@ -1899,7 +1899,7 @@ main() {
 	    HTTPS_PROXY="${HTTP_PROXY}"
 	fi
 
-	CURL_PROXY="-proxy ${HTTP_PROXY}"
+	CURL_PROXY="--proxy ${HTTP_PROXY}"
 	
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    debuglog "Adding -proxy ${HTTP_PROXY} to the s_client options"
