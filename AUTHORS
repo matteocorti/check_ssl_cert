@@ -84,7 +84,7 @@ Thanks:
 * Many thanks to Valentin Heidelberger (https://github.com/va1entin) for the cURL user agent patch
 * Many thanks to Tone (https://github.com/anthonyhaussman) for the warning message improvement patch
 * Many thanks to Michael Niewiara (https://github.com/mobitux) for the HTTPS/echo fix
-* Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch
+* Many thanks to Zadkiel (https://github.com/aslafy-z) for the extended regex patch and for the n-elementh check
 * Many thanks to Dick Visser (https://github.com/dnmvisser) for the --inetproto patch
 * Many thanks to jmuecke (https://github.com/jmuecke) for the multiple errors patch
 * Many thanks to iasdeoupxe (https://github.com/iasdeoupxe) for various fixes

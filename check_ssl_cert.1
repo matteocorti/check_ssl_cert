@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "July, 2020" "1.122.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "November, 2020" "1.123.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -65,6 +65,9 @@ path of the dig binary to be used
 .TP
 .BR "   --ecdsa"
 signature algorithm selection: force ECDSA certificate
+.TP
+.BR "   --element" " number"
+checks N cert element from the begining of the chain
 .TP
 .BR "-e,--email" " address"
 pattern to match the email address contained in the certificate

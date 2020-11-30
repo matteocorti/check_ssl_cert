@@ -554,7 +554,7 @@ testSieveECDSA() {
 }
 
 testHTTP2() {
-    ${SCRIPT} -H rwserve.readwritetools.com
+    ${SCRIPT} -H rwserve.readwritetools.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

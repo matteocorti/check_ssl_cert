@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.122.0
+VERSION=1.123.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -83,6 +83,7 @@ usage() {
     echo "   -d,--debug                      produces debugging output"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
+    echo "      --element number             checks N cert element from the begining of the chain"
     echo "   -e,--email address              pattern to match the email address contained"
     echo "                                   in the certificate"
     echo "   -f,--file file                  local file path (works with -H localhost only)"
@@ -153,7 +154,6 @@ usage() {
     echo "      --require-no-tls1_1          critical if TLS 1.1 is offered"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
-    echo "      --element number             checks N cert element from the begining of the chain"
     echo "      --skip-element number        skip checks on N cert element from the begining of the chain"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
     echo "                                   in the ClientHello message to 'name'"
@@ -2235,7 +2235,7 @@ main() {
                                ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
-            if ! [ $ELEMENT -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+            if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
                 break
             fi
         done
@@ -2600,7 +2600,7 @@ main() {
 
                 check_cert_end_date "${chain_element}" "${elem_number}"
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
-                if ! [ $ELEMENT -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+                if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
                     break
                 fi
             done
