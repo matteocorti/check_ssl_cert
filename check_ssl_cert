@@ -83,6 +83,7 @@ usage() {
     echo "   -d,--debug                      produces debugging output"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
+    echo "      --element number             checks N cert element from the begining of the chain"
     echo "   -e,--email address              pattern to match the email address contained"
     echo "                                   in the certificate"
     echo "   -f,--file file                  local file path (works with -H localhost only)"
