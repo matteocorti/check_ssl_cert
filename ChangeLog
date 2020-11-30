@@ -1,3 +1,8 @@
+2020-11-30  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (create_temporary_file): bug fix: temp directory not used
+	* check_ssl_cert: patch for the --element option
+
 2020-08-07  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Fixed a bug with the output of --version
