@@ -2626,10 +2626,10 @@ main() {
             debuglog "executing ${CURL_BIN} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
 
             if [ -n "${SNI}" ] ; then
-                JSON="$(${CURL_BIN} ${INETPROTO} --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
+                JSON="$(${CURL_BIN} "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
                 CURL_RETURN_CODE=$?
             else
-                JSON="$(${CURL_BIN} ${INETPROTO} --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
+                JSON="$(${CURL_BIN} "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
                 CURL_RETURN_CODE=$?
             fi
 
