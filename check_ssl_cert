@@ -973,6 +973,7 @@ main() {
     OPENSSL=""
     FILE_BIN=""
     CURL_BIN=""
+    CURL_PROXY=""
     CURL_USER_AGENT=""
     CUSTOM_HTTP_HEADER=""
     DIG_BIN=""
@@ -1898,6 +1899,8 @@ main() {
 	    HTTPS_PROXY="${HTTP_PROXY}"
 	fi
 
+	CURL_PROXY="-proxy ${HTTP_PROXY}"
+	
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    debuglog "Adding -proxy ${HTTP_PROXY} to the s_client options"
 	    PROXY="-proxy ${HTTP_PROXY}"
@@ -1906,8 +1909,7 @@ main() {
             verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"
 
 	fi
-    fi
-    
+    fi    
     
     ################################################################################
     # Check if openssl s_client supports the -name option
@@ -2624,19 +2626,19 @@ main() {
 
         while true; do
 
-            debuglog "executing ${CURL_BIN} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+            debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
 
             if [ -n "${SNI}" ] ; then
-                JSON="$(${CURL_BIN} "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
+                JSON="$(${CURL_BIN} "${CURL_PROXY}" "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
                 CURL_RETURN_CODE=$?
             else
-                JSON="$(${CURL_BIN} "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
+                JSON="$(${CURL_BIN} "${CURL_PROXY}" "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}")"
                 CURL_RETURN_CODE=$?
             fi
 
             if [ "${CURL_RETURN_CODE}" -ne 0 ] ; then
 
-                debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
+                debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}${IGNORE_SSL_LABS_CACHE}\""
 
                 unknown "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
 
@@ -2644,7 +2646,7 @@ main() {
 
             JSON="$(printf '%s' "${JSON}" | tr '\n' ' ' )"
 
-            debuglog "Checking SSL Labs: ${CURL_BIN} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
+            debuglog "Checking SSL Labs: ${CURL_BIN} ${CURL_PROXY} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST}\""
             debuglog "SSL Labs JSON: ${JSON}"
 
             # We clear the cache only on the first run
@@ -2761,9 +2763,9 @@ main() {
             debuglog "OCSP: fetching issuer certificate ${ISSUER_URI} to ${ISSUER_CERT_TMP}"
 
             if [ -n "${CURL_USER_AGENT}" ] ; then
-                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
+                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             else
-                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${INETPROTO} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
+                exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${INETPROTO} --silent --location ${ISSUER_URI} > ${ISSUER_CERT_TMP}"
             fi
 
             debuglog "OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
