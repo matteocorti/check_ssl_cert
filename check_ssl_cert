@@ -1734,6 +1734,8 @@ main() {
             CURL_BIN=${PROG}
 
             debuglog "cURL available: ${CURL_BIN}"
+	    debuglog "$( ${CURL_BIN} --version )"
+
         else
             debuglog "cURL binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
         fi
@@ -1900,7 +1902,7 @@ main() {
 	fi
 
 	if ${CURL_BIN} --manual | grep -q -- --proxy ; then
-	    debuglog "Addiing --proxy ${HTTP_PROXY} to the cURL options"
+	    debuglog "Adding --proxy ${HTTP_PROXY} to the cURL options"
 	    CURL_PROXY="--proxy ${HTTP_PROXY}"
 	fi
 	
