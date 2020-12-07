@@ -127,7 +127,7 @@ Options:
       --temp dir                   directory where to store the temporary files
       --terse                      terse output
    -t,--timeout                    seconds timeout after the specified time
-                                   (defaults to 15 seconds)
+                                   (defaults to 120 seconds)
       --tls1                       force TLS version 1
       --tls1_1                     force TLS version 1.1
       --tls1_2                     force TLS version 1.2
