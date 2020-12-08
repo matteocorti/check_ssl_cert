@@ -103,3 +103,4 @@ Thanks:
 * Many thanks to Zadkiel (https://github.com/aslafy-z) for the --version, the
   --skip-element patches
 * Many thanks to Marcel Burkhalter (https://github.com/explorer69) the custom HTTP header patch.
+* Many thanks to Peter Newmann (https://github.com/peternewman) for the timeout documentation patch
