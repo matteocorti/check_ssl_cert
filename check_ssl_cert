@@ -1912,7 +1912,7 @@ main() {
 	
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    SCLIENT_PROXY="-proxy"
-	    SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' )"
+	    SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/^/' )"
 
 	    debuglog "Adding -proxy ${SCLIENT_PROXY_ARGUMENT} to the s_client options"
 
