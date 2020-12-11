@@ -1,4 +1,4 @@
-%define version          1.124.0
+%define version          1.125.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -45,6 +45,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Mon Dec  11 2020 Matteo Corti <matteo@corti.li> - 1.125.0-0
+- Updated to 1.125.0
+
 * Mon Dec   1 2020 Matteo Corti <matteo@corti.li> - 1.124.0-0
 - Updated to 1.124.0
 

@@ -1,3 +1,7 @@
+2020-12-11  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: Corrected the handling of the issuer URI
+
 2020-12-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Correct handling of -proxy by s_client and --proxy by cURL
