@@ -2275,10 +2275,10 @@ main() {
     debuglog 'ISSUERS = '
     debuglog "${ISSUERS}"
 
-    # we just consider the first URI
+    # we just consider the first HTTP(S) URI
     # TODO check SC2016
     # shellcheck disable=SC2086,SC2016
-    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
+    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | grep -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
 
     # TODO: should be checked
     # shellcheck disable=SC2021
