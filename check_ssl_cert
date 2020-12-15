@@ -2017,7 +2017,7 @@ main() {
     ################################################################################
     # Check if s_client supports the no_ssl options
     for S_CLIENT_OPTION in ${SSL_VERSION_DISABLED} ; do
-	require_s_client_option $S_CLIENT_OPTION
+	require_s_client_option "${S_CLIENT_OPTION}"
     done
 
     ################################################################################
