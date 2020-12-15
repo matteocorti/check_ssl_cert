@@ -2046,16 +2046,16 @@ main() {
             NMAP_INETPROTO='-6'
         fi
 
-        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script ssl-enum-ciphers \"${HOST}\" | grep '^|'"
+        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script ssl-enum-ciphers \"${HOST}\" 2>&1 | grep '^|'"
 
-        OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script ssl-enum-ciphers "${HOST}" | grep '^|' )
+        OFFERED_PROTOCOLS=$( ${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script ssl-enum-ciphers "${HOST}" 2>&1 | grep '^|' )
 
         debuglog "offered cyphers and protocols:"
         debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
 
         for protocol in ${DISALLOWED_PROTOCOLS} ; do
             debuglog "Checking if '${protocol}' is offered"
-            if echo "${OFFERED_PROTOCOLS}" | grep -q "${protocol}" ; then
+            if echo "${OFFERED_PROTOCOLS}" | grep -v 'No supported ciphers found' | grep -q "${protocol}" ; then
                 debuglog "'${protocol}' is offered"
                 prepend_critical_message "${protocol} is offered"
             fi
