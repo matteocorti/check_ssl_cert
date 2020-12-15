@@ -465,6 +465,20 @@ unknown() {
     exit "${STATUS_UNKNOWN}"
 }
 
+
+################################################################################
+# Exits with unknown if s_client does not support the given option
+#
+# Usage:
+#   require_s_client_option '-no_ssl2'
+#
+require_s_client_option() {
+    debuglog "Checking if s_client supports the $1 option"
+    if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "$1" ; then
+	unknown "s_client does not support the $1 option"
+    fi
+}
+
 ################################################################################
 # To set a variable with an HEREDOC in a POSIX compliant way
 # see: https://unix.stackexchange.com/questions/340718/how-do-i-bring-heredoc-text-into-a-shell-script-variable
@@ -1943,8 +1957,6 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the -xmpphost option
     #
-    # Check if openssl s_client supports the -xmpphost option
-    #
     if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
         XMPPHOST="-xmpphost ${XMPPHOST:-${HOST}}"
         debuglog "'${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
@@ -2001,6 +2013,12 @@ main() {
 
 
     fi
+
+    ################################################################################
+    # Check if s_client supports the no_ssl options
+    for S_CLIENT_OPTION in ${SSL_VERSION_DISABLED} ; do
+	require_s_client_option $S_CLIENT_OPTION
+    done
 
     ################################################################################
     # define the HTTP request string

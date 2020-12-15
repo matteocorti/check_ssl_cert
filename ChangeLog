@@ -1,3 +1,7 @@
+2020-12-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (require_s_client_option): Checks if s_client supports the -no_ssl[23] options
+
 2020-12-11  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: Corrected the handling of the issuer URI
