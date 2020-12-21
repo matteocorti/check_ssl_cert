@@ -1,3 +1,4 @@
+2020-12-21 Version 1.127.0: Better handling of certificates without CN in the subject
 2020-12-16 Version 1.126.0: Corrected the handling of old nmap versions
 2020-12-11 Version 1.125.0: Corrected the handling of the issuer URI
 2020-11-31 Version 1.124.0: Bug fix when using a proxy

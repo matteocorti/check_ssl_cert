@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.126.0
+VERSION=1.127.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1624,6 +1624,12 @@ main() {
 
     fi
 
+    if [ -n "${FILE}" ] ; then
+	if [ ! -r "${FILE}" ] ; then
+	    unknown "Cannot read file ${FILE}"
+	fi
+    fi
+    
     if [ -n "${CRITICAL_DAYS}" ] ; then
 
         debuglog "-c specified: ${CRITICAL_DAYS}"
@@ -2260,8 +2266,16 @@ main() {
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
         # shellcheck disable=SC2086
-        CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
+	if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -q 'CN' ; then	   
+            CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
+	else
+	    CN='CN unavailable'
+	    if [ -z "${ALTNAMES}" ] ; then
+		verboselog "Certificate without common name (CN), enabling altername names"
+		ALTNAMES=1		
+	    fi
+	fi
 
         # shellcheck disable=SC2086
         SUBJECT="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"

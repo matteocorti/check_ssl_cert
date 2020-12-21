@@ -1,3 +1,8 @@
+2020-12-21  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): added a sanity check for the -f option
+	* check_ssl_cert (main): better handling of certificates without CN
+
 2020-12-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): fixed the regex for the proxy cleanup for s_client
