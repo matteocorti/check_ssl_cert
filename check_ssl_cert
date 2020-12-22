@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.127.0
+VERSION=1.128.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -122,6 +122,7 @@ usage() {
     echo "   -n,--cn name                    pattern to match the CN of the certificate (can be"
     echo "                                   specified multiple times)"
     echo "      --nmap-bin path              path of the nmap binary to be used"
+    echo "      --no-proxy                   ignores the http_proxy and https_proxy environment variables"
     echo "      --no_ssl2                    disable SSL version 2"
     echo "      --no_ssl3                    disable SSL version 3"
     echo "      --no_tls1                    disable TLS version 1"
@@ -1014,6 +1015,8 @@ main() {
     CRITICAL_DAYS=15
     ELEMENT=0
     SKIP_ELEMENT=0
+    NO_PROXY=""
+    PROXY=""
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1078,6 +1081,10 @@ main() {
                 IGNORE_SSL_LABS_CACHE="&startNew=on"
                 shift
                 ;;
+	    --no-proxy)
+		NO_PROXY=1
+		shift
+		;;
             --no_ssl2)
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2"
                 shift
@@ -1360,6 +1367,7 @@ main() {
                 ;;
             --proxy)
                 check_option_argument '--proxy' "$2"
+		PROXY="$2"
                 export http_proxy="$2"
                 shift 2
                 ;;
@@ -1902,6 +1910,20 @@ main() {
 
     fi
 
+    if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
+	unknown "Only one of --proxy or --no_proxy can be specfied"
+    fi
+
+    ################################################################################
+    # If --no-proxy was specified unset the http_proxy variables
+    if [ -n "${NO_PROXY}" ] ; then
+	debuglog "Disabling the proxy"
+	unset http_proxy
+	unset https_proxy
+	unset HTTP_PROXY
+	unset HTTPS_PROXY
+    fi
+    
     ################################################################################
     # Check if openssl s_client supports the -proxy option
     #
