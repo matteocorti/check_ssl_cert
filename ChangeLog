@@ -1,3 +1,7 @@
+2020-12-23  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): - instead of _ to separate words in the command line options
+
 2020-12-22  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): added the --no-proxy option

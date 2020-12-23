@@ -123,12 +123,12 @@ usage() {
     echo "                                   specified multiple times)"
     echo "      --nmap-bin path              path of the nmap binary to be used"
     echo "      --no-proxy                   ignores the http_proxy and https_proxy environment variables"
-    echo "      --no_ssl2                    disable SSL version 2"
-    echo "      --no_ssl3                    disable SSL version 3"
-    echo "      --no_tls1                    disable TLS version 1"
-    echo "      --no_tls1_1                  disable TLS version 1.1"
-    echo "      --no_tls1_2                  disable TLS version 1.2"
-    echo "      --no_tls1_3                  disable TLS version 1.3"
+    echo "      --no-ssl2                    disable SSL version 2"
+    echo "      --no-ssl3                    disable SSL version 3"
+    echo "      --no-tls1                    disable TLS version 1"
+    echo "      --no-tls1_1                  disable TLS version 1.1"
+    echo "      --no-tls1_2                  disable TLS version 1.2"
+    echo "      --no-tls1_3                  disable TLS version 1.3"
     echo "      --not-issued-by issuer       check that the issuer of the certificate does not match"
     echo "                                   the given pattern"
     echo "      --not-valid-longer-than days critical if the certificate validity is longer than"
@@ -1085,27 +1085,27 @@ main() {
 		NO_PROXY=1
 		shift
 		;;
-            --no_ssl2)
+            --no-ssl2|--no_ssl2) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2"
                 shift
                 ;;
-            --no_ssl3)
+            --no-ssl3|--no_ssl3) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
                 shift
                 ;;
-            --no_tls1)
+            --no-tls1|--no_tls1) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1"
                 shift
                 ;;
-            --no_tls1_1)
+            --no-tls1_1|--no_tls1_1) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_1"
                 shift
                 ;;
-            --no_tls1_2)
+            --no-tls1_2|--no_tls1_2) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_2"
                 shift
                 ;;
-            --no_tls1_3)
+            --no-tls1_3|--no_tls1_3) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
                 shift
                 ;;
