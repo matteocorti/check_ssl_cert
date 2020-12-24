@@ -1961,7 +1961,7 @@ main() {
 	
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    SCLIENT_PROXY="-proxy"
-	    SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/^//' )"
+	    SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
 
 	    debuglog "Adding -proxy ${SCLIENT_PROXY_ARGUMENT} to the s_client options"
 
@@ -2936,13 +2936,14 @@ main() {
                 fi
 
                 if [ -n "${HTTP_PROXY:-}" ] ; then
+                    OCSP_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
 
                     if [ -n "${KEYVALUE}" ] ; then
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
+                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host "$OCSP_PROXY_ARGUMENT" -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "$OCSP_PROXY_ARGUMENT" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
                     else
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host ${HTTP_PROXY#*://} -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host "$OCSP_PROXY_ARGUMENT" -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "$OCSP_PROXY_ARGUMENT" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
                 else
