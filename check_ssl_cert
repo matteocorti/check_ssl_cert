@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.128.0
+VERSION=1.129.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2939,11 +2939,11 @@ main() {
                     OCSP_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
 
                     if [ -n "${KEYVALUE}" ] ; then
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host "$OCSP_PROXY_ARGUMENT" -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "$OCSP_PROXY_ARGUMENT" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
+                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
                     else
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host "$OCSP_PROXY_ARGUMENT" -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "$OCSP_PROXY_ARGUMENT" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                     fi
 
                 else
