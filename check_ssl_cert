@@ -10,7 +10,7 @@
 # See  the INSTALL file for installation instructions
 #
 # Copyright (c) 2007-2012 ETH Zurich.
-# Copyright (c) 2007-2020 Matteo Corti <matteo@corti.li>
+# Copyright (c) 2007-2021 Matteo Corti <matteo@corti.li>
 #
 # This module is free software; you can redistribute it and/or modify it
 # under the terms of GNU general public license (gpl) version 3.
@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.129.0
+VERSION=1.130.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2737,73 +2737,79 @@ main() {
             # We clear the cache only on the first run
             IGNORE_SSL_LABS_CACHE=""
 
-            SSL_LABS_HOST_STATUS=$(echo "${JSON}" \
-                | sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/')
+	    if echo "${JSON}" | grep -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' ; then
+		verboselog 'SSL Labs running at full cbapacity'
+	    else
 
-            debuglog "SSL Labs status: ${SSL_LABS_HOST_STATUS}"
+		SSL_LABS_HOST_STATUS=$(echo "${JSON}" \
+					   | sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/')
 
-            case "${SSL_LABS_HOST_STATUS}" in
-                'ERROR')
-                    SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
-                        | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
-                    prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
-                    ;;
-                'READY')
-                    if ! echo "${JSON}" | grep -q "grade" ; then
+		debuglog "SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 
-                        # Something went wrong
-                        SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
-                            | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
-                        prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
+		case "${SSL_LABS_HOST_STATUS}" in
+                    'ERROR')
+			SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
+						      | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
+			prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
+			;;
+                    'READY')
+			if ! echo "${JSON}" | grep -q "grade" ; then
 
-                    else
+                            # Something went wrong
+                            SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
+							  | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
+                            prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
 
-                        SSL_LABS_HOST_GRADE=$(echo "${JSON}" \
-                            | sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/')
+			else
 
-                        debuglog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+                            SSL_LABS_HOST_GRADE=$(echo "${JSON}" \
+						      | sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/')
 
-                        verboselog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+                            debuglog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
-                        convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
-                        SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+                            verboselog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
-                        add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}"
+                            convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
+                            SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
-                        # Check the grade
-                        if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ] ; then
-                            prepend_critical_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
-                        elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
-                            if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
-                                append_warning_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
+                            add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}"
+
+                            # Check the grade
+                            if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ] ; then
+				prepend_critical_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_CRIT_ASSESSMENT})"
+                            elif [ -n "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ]; then
+				if [ "${SSL_LABS_HOST_GRADE_NUMERIC}" -lt "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" ] ; then
+                                    append_warning_message "SSL Labs grade is ${SSL_LABS_HOST_GRADE} (instead of ${SSL_LAB_WARN_ASSESTMENT})"
+				fi
                             fi
-                        fi
 
-                        debuglog "SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
+                            debuglog "SSL Labs grade (converted): ${SSL_LABS_HOST_GRADE_NUMERIC}"
 
-                        # We have a result: exit
-                        break
+                            # We have a result: exit
+                            break
 
-                    fi
-                    ;;
-                'IN_PROGRESS')
-                    # Data not yet available: warn and continue
-                    verboselog "Warning: no cached data by SSL Labs, check initiated"
-                    ;;
-                'DNS')
-                    verboselog "SSL Labs cannot resolve the domain name"
-                    ;;
-                *)
-                    # Try to extract a message
-                    SSL_LABS_ERROR_MESSAGE=$(echo "${JSON}" \
-                        | sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/')
+			fi
+			;;
+                    'IN_PROGRESS')
+			# Data not yet available: warn and continue
+			verboselog "Warning: no cached data by SSL Labs, check initiated"
+			;;
+                    'DNS')
+			verboselog "SSL Labs cannot resolve the domain name"
+			;;
+                    *)
+			# Try to extract a message
+			SSL_LABS_ERROR_MESSAGE=$(echo "${JSON}" \
+						     | sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/')
 
-                    if [ -z "${SSL_LABS_ERROR_MESSAGE}" ] ; then
-                        SSL_LABS_ERROR_MESSAGE="${JSON}"
-                    fi
+			if [ -z "${SSL_LABS_ERROR_MESSAGE}" ] ; then
+                            SSL_LABS_ERROR_MESSAGE="${JSON}"
+			fi
 
-                    prepend_critical_message "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
-            esac
+			prepend_critical_message "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
+		esac
+
+	    fi
 
             WAIT_TIME=60
             verboselog "Waiting ${WAIT_TIME} seconds"
@@ -2856,7 +2862,7 @@ main() {
             debuglog "OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
             # check the result
-            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then		
+            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
 		
                 if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
 

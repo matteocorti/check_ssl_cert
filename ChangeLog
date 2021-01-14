@@ -1,3 +1,7 @@
+2021-01-14  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): retries when SSL Labs is running at full capacity
+
 2020-12-23  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): - instead of _ to separate words in the command line options
