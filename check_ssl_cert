@@ -621,7 +621,7 @@ check_ocsp() {
     debuglog "Storing the chain element in ${CERT_ELEMENT}"
     echo "${1}" > "${CERT_ELEMENT}"
 
-        ################################################################################
+    ################################################################################
     # Check revocation via OCSP
     if [ -n "${OCSP}" ]; then
 
@@ -2617,19 +2617,6 @@ main() {
     # shellcheck disable=SC2086,SC2016
 
     ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | grep -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
-
-    # TODO: should be checked
-    # shellcheck disable=SC2021
-    if [ -z "${ISSUER_URI}" ] ; then
-        verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks"
-        OCSP=""
-    elif [ "${ISSUER_URI}" != "$(echo "${ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
-        verboselog "unable to fetch the CA issuer certificate (spaces in URI)"
-        OCSP=""
-    elif ! echo "${ISSUER_URI}" | grep -qi '^http' ; then
-        verboselog "unable to fetch the CA issuer certificate (unsupported protocol)"
-        OCSP=""
-    fi
 
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
