@@ -660,6 +660,20 @@ check_ocsp() {
 
 	debuglog "Chain element issuer URI: ${ELEMENT_ISSUER_URI}"
 
+	# TODO: should be checked
+	# shellcheck disable=SC2021
+	if [ -z "${ELEMENT_ISSUER_URI}" ] ; then
+            verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks on element ${el_number}"
+            return
+	elif [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
+            verboselog "unable to fetch the CA issuer certificate (spaces in URI): disabling OCSP checks on element ${el_number}"
+	    return 
+	elif ! echo "${ELEMENT_ISSUER_URI}" | grep -qi '^http' ; then
+            verboselog "unable to fetch the CA issuer certificate (unsupported protocol): disabling OCSP checks on element ${el_number}"
+            return
+	fi
+
+
         if [ -z "${ISSUER_CERT}" ] ; then
 
             debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
