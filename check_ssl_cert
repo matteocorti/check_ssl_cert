@@ -670,7 +670,18 @@ check_ocsp() {
                 exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
             fi
 
-            debuglog "OCSP: issuer certificate type: $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+            debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+
+	    if echo "${ELEMENT_ISSUER_URI}" | grep -q 'p7c' ; then
+		debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
+
+                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
+
+                ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+
+	    fi
+
+	    debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
             # check the result
             if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
@@ -685,13 +696,15 @@ check_ocsp() {
 
                 else
 
-		    debuglog "OCSP: complete issuer certificare type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
+		    debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
 
                     unknown "Unable to fetch a valid certificate issuer certificate."
 
                 fi
 
             fi
+
+	    debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
             if [ -n "${DEBUG}" ] ; then
 
@@ -722,6 +735,13 @@ check_ocsp() {
             ISSUER_CERT=${ISSUER_CERT_TMP}
 
         fi
+
+
+	# TO DO: we just take the first result: a loop over all the hosts should
+        # shellcheck disable=SC2086
+        OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout | head -n 1)"
+	debuglog "OSCP: URI = ${OCSP_URI}"
+	
         OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
         debuglog "OCSP: host = ${OCSP_HOST}"
