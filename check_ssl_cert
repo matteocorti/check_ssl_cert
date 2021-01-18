@@ -610,8 +610,74 @@ check_required_prog() {
 
 }
 
+
 ################################################################################
-# Checks cert revokation
+# Checks cert revokation via CRL
+# Params
+#   $1 cert
+#   $2 element number
+check_crl() {
+    el_number=1
+    if [ -n "$2" ]; then
+        el_number=$2
+    fi
+
+    create_temporary_file; CERT_ELEMENT=${TEMPFILE}
+    debuglog "Storing the chain element in ${CERT_ELEMENT}"
+    echo "${1}" > "${CERT_ELEMENT}"
+    
+    # We check all the elements of the chain (but the root) for revocation
+    # If any element is revoked, the certificate should not be trusted
+    # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
+ 
+    debuglog "Checking CRL status of element ${el_number}"
+
+    # See https://raymii.org/s/articles/OpenSSL_manually_verify_a_certificate_against_a_CRL.html
+
+    CRL_URI=$( "${OPENSSL}" x509 -noout -text -in "${CERT_ELEMENT}" |
+		   grep -A 4 'X509v3 CRL Distribution Points' |
+		   grep URI |
+		   sed 's/^.*URI://'
+	   )
+
+    if [ -n "${CRL_URI}" ] ; then
+
+	debuglog "Certificate revokation list available (${CRL_URI})"
+
+	debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
+
+        if [ -n "${CURL_USER_AGENT}" ] ; then
+            exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+        else
+            exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+        fi
+
+	# convert DER to
+	debuglog "Converting ${CRL_TMP_DER} (DER) to ${CRL_TMP_PEM} (PEM)"
+	"${OPENSSL}" crl -inform DER -in "${CRL_TMP_DER}" -outform PEM -out "${CRL_TMP_PEM}"     
+
+	# combine the certificate and the CRL
+	debuglog "Combining the certificate, the CRL and the root cert"
+	debuglog "cat ${CRL_TMP_PEM} ${CERT} ${ROOT_CA_FILE} > ${CRL_TMP_CHAIN}"
+	cat "${CRL_TMP_PEM}" "${CERT}" "${ROOT_CA_FILE}" > "${CRL_TMP_CHAIN}"
+
+	echo "${OPENSSL}" verify -crl_check -CRLfile "${CRL_TMP_PEM}" "${CERT_ELEMENT}"
+	CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" | sed 's/^.*:\ //' )
+	
+	if ! [ "${CRL_RESULT}" = 'OK' ] ; then
+	    prepend_critical_message "certificate element ${el_number} is revoked"
+	fi
+
+    else
+
+	debuglog "Certificate revokation list not available"
+
+    fi
+    
+}
+
+################################################################################
+# Checks cert revokation via OCSP
 # Params
 #   $1 cert
 #   $2 element number
@@ -1293,6 +1359,7 @@ main() {
     SKIP_ELEMENT=0
     NO_PROXY=""
     PROXY=""
+    CRL=""
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1325,6 +1392,10 @@ main() {
                 ALTNAMES=1
                 shift
                 ;;
+	    --crl)
+		CRL=1
+		shift
+		;;
             -d|--debug)
                 DEBUG=1
                 VERBOSE=1
@@ -1885,11 +1956,14 @@ main() {
             unknown "Cannot read root certificate ${ROOT_CA_FILE}"
         fi
 
-        ROOT_CA_FILE="-CAfile ${ROOT_CA_FILE}"
     fi
 
     if [ -n "${ROOT_CA_DIR}" ] || [ -n "${ROOT_CA_FILE}" ]; then
-        ROOT_CA="${ROOT_CA_DIR} ${ROOT_CA_FILE}"
+	if [ -n "${ROOT_CA_FILE}" ] ; then
+            ROOT_CA="${ROOT_CA_DIR} -CAfile ${ROOT_CA_FILE}"
+	else
+            ROOT_CA="${ROOT_CA_DIR}"
+	fi
     fi
 
     if [ -n "${CLIENT_CERT}" ] ; then
@@ -1947,6 +2021,12 @@ main() {
         if ! echo "${NOT_VALID_LONGER_THAN}" | grep -q '^[0-9][0-9]*$' ; then
             unknown "invalid number of days ${NOT_VALID_LONGER_THAN}"
         fi
+
+    fi
+
+    if [ -n "${CRL}" ] && [ -z "${ROOT_CA_FILE}" ] ; then
+	
+	unknown "To be able to check CRL we need the Root Cert. Please specify it with the --rootcert-file option"
 
     fi
 
@@ -2439,6 +2519,10 @@ main() {
     create_temporary_file; CERT=${TEMPFILE}
     create_temporary_file; ERROR=${TEMPFILE}
 
+    create_temporary_file; CRL_TMP_DER=${TEMPFILE}
+    create_temporary_file; CRL_TMP_PEM=${TEMPFILE}
+    create_temporary_file; CRL_TMP_CHAIN=${TEMPFILE}
+    
     if [ -n "${OCSP}" ] ; then
 
         create_temporary_file; ISSUER_CERT_TMP=${TEMPFILE}
@@ -2947,8 +3031,9 @@ main() {
         else
             # count the certificates in the chain
             NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
-            debuglog "Nb certificates in CA chain: $((NUM_CERTIFICATES))"
+            debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
             debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
+
             CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
             while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
                 elem_number=$((CERT_IN_CHAIN))
@@ -2960,7 +3045,12 @@ main() {
 
 		debuglog '------------------------------------------------------------------------------'
 		check_ocsp "${chain_element}" "${elem_number}"
-		
+
+		if [ -n "${CRL}" ] ; then
+		    debuglog '------------------------------------------------------------------------------'
+		    check_crl "${chain_element}" "${elem_number}"
+		fi
+
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
                 if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
                     break
