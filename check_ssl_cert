@@ -661,13 +661,19 @@ check_crl() {
 	debuglog "cat ${CRL_TMP_PEM} ${CERT} ${ROOT_CA_FILE} > ${CRL_TMP_CHAIN}"
 	cat "${CRL_TMP_PEM}" "${CERT}" "${ROOT_CA_FILE}" > "${CRL_TMP_CHAIN}"
 
-	echo "${OPENSSL}" verify -crl_check -CRLfile "${CRL_TMP_PEM}" "${CERT_ELEMENT}"
-	CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" | sed 's/^.*:\ //' )
-	
-	if ! [ "${CRL_RESULT}" = 'OK' ] ; then
-	    prepend_critical_message "certificate element ${el_number} is revoked"
-	fi
+	debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
+	CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" 2>&1 |
+			  grep ':' |
+			  head -n 1 |
+			  sed 's/^.*:\ //'
+		  )
 
+	debuglog "  result: ${CRL_RESULT}"
+
+	if ! [ "${CRL_RESULT}" = 'OK' ] ; then
+	    prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
+	fi
+	
     else
 
 	debuglog "Certificate revokation list not available"
@@ -895,7 +901,7 @@ check_ocsp() {
 
                     debuglog 'OCSP: revoked'
 
-                    prepend_critical_message "certificate element ${el_number} is revoked"
+                    prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
 
                 elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 
