@@ -70,6 +70,7 @@ usage() {
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to"
     echo "                                   be valid to issue a critical status. Default: ${CRITICAL_DAYS}"
+    echo "      --crl                        checks revokation via CRL (requires --rootcert-file)"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
@@ -2114,9 +2115,9 @@ main() {
 
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
-        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] || [ -n "${CRL}" ] ; then
             if [ -n "${DEBUG}" ] ; then
-                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}"
                 debuglog "cURL binary not specified"
             fi
 
