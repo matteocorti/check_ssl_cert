@@ -22,7 +22,7 @@
 VERSION=1.132.0
 SHORTNAME="SSL_CERT"
 
-VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
+VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
 
 SIGNALS="HUP INT QUIT TERM ABRT"
 
