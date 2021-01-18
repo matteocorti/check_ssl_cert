@@ -1253,6 +1253,14 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "${SHORTNAME} CRITICAL: ${ERROR}"
 
+	elif ascii_grep 'dh\ key\ too\ small' "${ERROR}" ; then
+
+	    prepend_critical_message 'DH with a key too small'
+
+	elif ascii_grep 'alert\ handshake\ failure' "${ERROR}" ; then
+
+	    prepend_critical_message 'Handshake failure'
+
         else
 
             # Try to clean up the error message

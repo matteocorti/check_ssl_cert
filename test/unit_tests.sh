@@ -348,6 +348,42 @@ testBadSSLIncompleteChain() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testBadSSLDH480(){
+    ${SCRIPT} -H dh480.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLDH512(){
+    ${SCRIPT} -H dh512.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLRC4MD5(){
+    ${SCRIPT} -H rc4-md5.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLRC4(){
+    ${SCRIPT} -H rc4.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSL3DES(){
+    ${SCRIPT} -H 3des.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testBadSSLNULL(){
+    ${SCRIPT} -H null.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testBadSSLSHA256() {
     if [ -z "${TRAVIS+x}" ] ; then
         ${SCRIPT} -H sha256.badssl.com --host-cn
