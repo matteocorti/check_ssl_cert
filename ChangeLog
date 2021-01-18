@@ -1,6 +1,7 @@
 2021-01-18  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
+	* check_ssl_cert (check_crl): Checks revokation via CRL
 
 2021-01-15  Matteo Corti  <matteo@corti.li>
 

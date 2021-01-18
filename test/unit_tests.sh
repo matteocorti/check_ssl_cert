@@ -330,6 +330,12 @@ testBadSSLRevoked() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testBadSSLRevokedCRL() {
+    ${SCRIPT} -H revoked.badssl.com --host-cn --crl --rootcert cabundle.crt --ignore-ocsp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testGRCRevoked() {
     ${SCRIPT} -H revoked.grc.com --host-cn
     EXIT_CODE=$?
