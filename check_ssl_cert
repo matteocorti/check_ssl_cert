@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.131.0
+VERSION=1.132.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -512,7 +512,11 @@ exec_with_timeout() {
 
         debuglog "$(printf "%s %s %s\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
 
-        eval "${TIMEOUT_BIN} ${time} ${command}" > /dev/null 2>&1
+	# We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
+	# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692	
+        eval "${TIMEOUT_BIN} ${time} ${command} &" > /dev/null 2>&1
+	TIMEOUT_PID=$!
+	wait "${TIMEOUT_PID}"
         RET=$?
 
         # return codes
@@ -578,6 +582,8 @@ EOT
 
     else
 
+        debuglog "$(printf "%s\n" eval "${command}")"
+
         eval "${command}"
         return $?
 
@@ -615,6 +621,10 @@ check_ocsp() {
         el_number=$2
     fi
 
+    # We check all the elements of the chain (but the root) for revocation
+    # If any element is revoked, the certificate should not be trusted
+    # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
+    
     debuglog "Checking OCSP status of element ${el_number}"
 
     create_temporary_file; CERT_ELEMENT=${TEMPFILE}
