@@ -2999,7 +2999,7 @@ main() {
             IGNORE_SSL_LABS_CACHE=""
 
 	    if echo "${JSON}" | grep -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' ; then
-		verboselog 'SSL Labs running at full cbapacity'
+		verboselog 'SSL Labs running at full capacity'
 	    else
 
 		SSL_LABS_HOST_STATUS=$(echo "${JSON}" \
