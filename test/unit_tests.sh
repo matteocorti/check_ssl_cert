@@ -361,21 +361,33 @@ testBadSSLDH512(){
 }
 
 testBadSSLRC4MD5(){
-    ${SCRIPT} -H rc4-md5.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H rc4-md5.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping RC4 MD5 with badssl.com on Travis CI (OpenSSL too old)"
+    fi
 }
 
 testBadSSLRC4(){
-    ${SCRIPT} -H rc4.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H rc4.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping RC4 with badssl.com on Travis CI (OpenSSL too old)"
+    fi
 }
 
 testBadSSL3DES(){
-    ${SCRIPT} -H 3des.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+	${SCRIPT} -H 3des.badssl.com --host-cn
+	EXIT_CODE=$?
+	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping 3DES with badssl.com on Travis CI (OpenSSL too old)"
+    fi
 }
 
 testBadSSLNULL(){
