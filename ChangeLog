@@ -1,3 +1,8 @@
+2021-01-26  Matteo Corti  <corti@matteo.ethz.ch>
+
+	* check_ssl_cert: added --date to specify the date binary
+	* check_ssl_cert (hours_until): support for BusyBox date
+
 2021-01-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_ocsp): OCSP check on all the chain elements
