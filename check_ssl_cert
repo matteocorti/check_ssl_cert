@@ -523,14 +523,14 @@ exec_with_timeout() {
 	# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692	
         eval "${TIMEOUT_BIN} ${time} ${command} &" > /dev/null 2>&1
 	TIMEOUT_PID=$!
-	wait "${TIMEOUT_PID}"
+	wait "${TIMEOUT_PID}" > /dev/null 2>&1
         RET=$?
 
         # return codes
         # https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation
-        if [ "${RET}" -eq 137 ] ; then
-            prepend_critical_message "SIGKILL received"
-        elif [ "${RET}" -eq 124 ] ; then
+
+	# because of the execution in the backgroud we get a 137 for a timeout
+        if [ "${RET}" -eq 137 ] || [ "${RET}" -eq 124 ] ; then
             prepend_critical_message "Timeout after ${time} seconds"
         elif [ "${RET}" -eq 125 ] ; then
             prepend_critical_message "execution of ${command} failed"

@@ -7,6 +7,10 @@
 	* check_ssl_cert: added --date to specify the date binary
 	* check_ssl_cert (hours_until): support for BusyBox date
 
+2021-01-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (exec_with_timeout): Better handling of wait and kill output
+
 2021-01-18  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
