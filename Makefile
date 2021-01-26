@@ -26,8 +26,8 @@ version_check:
 	echo "Version check: OK"
 
 formatting_check:
-	grep --invert-match -q '\\t' check_ssl_cert test/unit_tests.sh
-	grep --invert-match -q '[[:blank:]]$$' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
+	grep -v -q '\\t' check_ssl_cert test/unit_tests.sh
+	grep -v -q '[[:blank:]]$$' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
 
 clean:
 	rm -f *~
