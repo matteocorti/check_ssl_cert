@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "January, 2021" "1.132.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "January, 2021" "1.133.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -59,6 +59,9 @@ verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
 .TP
 .BR "   --dane 311"
 verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
+.TP
+.BR "   --date" " path"
+path of the date binary to be used
 .TP
 .BR "-d,--debug"
 produces debugging output

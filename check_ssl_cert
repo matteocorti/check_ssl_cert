@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.132.0
+VERSION=1.133.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -81,6 +81,7 @@ usage() {
     echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
     echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
+    echo "      --date path                  path of the datebinary to be used"
     echo "   -d,--debug                      produces debugging output"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
@@ -278,16 +279,21 @@ hours_until() {
 
     debuglog "Date computations: ${DATETYPE}"
     debuglog "Computing number of hours until '${DATE}'"
-
+    
     case "${DATETYPE}" in
         "BSD")
             HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
+	'BUSYBOX')
 
+	    BUSYBOX_DATE=$( echo "${DATE}" | sed -s 's/[ ][^ ]*$//' )	
+	    debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
+	    verbose "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
+            HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${BUSYBOX_DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
+	    ;;
         "GNU")
             HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
-
         "PERL")
             # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
             if ! HOURS_UNTIL=$(perl - "${DATE}" <<-"EOF"
@@ -1592,6 +1598,11 @@ main() {
                 CUSTOM_HTTP_HEADER="$2"
                 shift 2
                 ;;
+            --date)
+                check_option_argument '--date' "$2"
+                DATEBIN="$2"
+                shift 2
+                ;;
             # Deprecated option: used to be as --warning
             --days)
                 check_option_argument '--days' "$2"
@@ -2119,6 +2130,12 @@ main() {
     check_required_prog "${FILE_BIN}"
     FILE_BIN=${PROG}
 
+    # date
+    if [ -z "${DATEBIN}" ] ; then
+	check_required_prog 'date'
+	DATEBIN=${PROG}
+    fi
+    
     debuglog "file version: $( "${FILE_BIN}" --version 2>&1 )"
 
     # cURL
@@ -2189,8 +2206,6 @@ main() {
         debuglog "perl available: ${PERL}"
     fi
 
-    DATEBIN="$(command -v date 2> /dev/null)"
-
     if [ -n "${DATEBIN}" ] ; then
         debuglog "date available: ${DATEBIN}"
     fi
@@ -2198,6 +2213,8 @@ main() {
     DATETYPE=""
 
     if ! "${DATEBIN}" +%s >/dev/null 2>&1  ;  then
+
+	debuglog "no date binary available"
 
         # Perl with Date::Parse (optional)
         test -x "${PERL}" || PERL=""
@@ -2221,13 +2238,17 @@ main() {
 
     else
 
-        if "${DATEBIN}" --version >/dev/null 2>&1 ; then
-            DATETYPE="GNU"
-        else
-            DATETYPE="BSD"
+	debuglog 'checking date version'
+
+        if "${DATEBIN}" --version 2>&1 | grep -q GNU ; then
+            DATETYPE='GNU'
+	elif "${DATEBIN}" --version 2>&1 | grep -q BusyBox ; then
+	    DATETYPE='BUSYBOX'
+       else
+            DATETYPE='BSD'
         fi
 
-        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"
+        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"	    
 
     fi
 

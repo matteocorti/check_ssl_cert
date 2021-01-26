@@ -1,3 +1,5 @@
+2021-01-26 Version 1.133.0: added the --date option to specify the date binary
+                            support for BusyBox date
 2021-01-18 Version 1.132.0: Timeouted subprocesses can now be interrupted
                             Revokation via CRL can be checked with the --crl option
 			    Better error messages for DH with small keys and handshake failures

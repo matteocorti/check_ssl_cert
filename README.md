@@ -39,6 +39,7 @@ Options:
       --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
       --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
       --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
+      --date path                  path of the date binary to be used
    -d,--debug                      produces debugging output
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
