@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 2021-01-26 Version 1.132.0: added the --date option to specify the date binary
                             support for BusyBox date
+=======
+2021-01-18 Version 1.132.0: Timeouted subprocesses can now be interrupted
+                            Revokation via CRL can be checked with the --crl option
+			    Better error messages for DH with small keys and handshake failures
+>>>>>>> e257f34090b304569a755f10fb5ee7262dc41329
 2021-01-15 Version 1.131.0: OCSP check on all the chain elements
 2021-01-14 Version 1.130.0: Retries when SSL Labs has no available slot
 2020-12-24 Version 1.129.0: Bug fix in the proxy parameters handling

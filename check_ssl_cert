@@ -22,7 +22,7 @@
 VERSION=1.132.0
 SHORTNAME="SSL_CERT"
 
-VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,serial,modulus,serial,hash,email,ocsp_uri,fingerprint,"
+VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
 
 SIGNALS="HUP INT QUIT TERM ABRT"
 
@@ -70,6 +70,7 @@ usage() {
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to"
     echo "                                   be valid to issue a critical status. Default: ${CRITICAL_DAYS}"
+    echo "      --crl                        checks revokation via CRL (requires --rootcert-file)"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
     echo "                                   issuer cert"
@@ -517,7 +518,11 @@ exec_with_timeout() {
 
         debuglog "$(printf "%s %s %s\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
 
-        eval "${TIMEOUT_BIN} ${time} ${command}" > /dev/null 2>&1
+	# We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
+	# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692	
+        eval "${TIMEOUT_BIN} ${time} ${command} &" > /dev/null 2>&1
+	TIMEOUT_PID=$!
+	wait "${TIMEOUT_PID}"
         RET=$?
 
         # return codes
@@ -583,6 +588,8 @@ EOT
 
     else
 
+        debuglog "$(printf "%s\n" eval "${command}")"
+
         eval "${command}"
         return $?
 
@@ -609,8 +616,80 @@ check_required_prog() {
 
 }
 
+
 ################################################################################
-# Checks cert revokation
+# Checks cert revokation via CRL
+# Params
+#   $1 cert
+#   $2 element number
+check_crl() {
+    el_number=1
+    if [ -n "$2" ]; then
+        el_number=$2
+    fi
+
+    create_temporary_file; CERT_ELEMENT=${TEMPFILE}
+    debuglog "Storing the chain element in ${CERT_ELEMENT}"
+    echo "${1}" > "${CERT_ELEMENT}"
+    
+    # We check all the elements of the chain (but the root) for revocation
+    # If any element is revoked, the certificate should not be trusted
+    # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
+ 
+    debuglog "Checking CRL status of element ${el_number}"
+
+    # See https://raymii.org/s/articles/OpenSSL_manually_verify_a_certificate_against_a_CRL.html
+
+    CRL_URI=$( "${OPENSSL}" x509 -noout -text -in "${CERT_ELEMENT}" |
+		   grep -A 4 'X509v3 CRL Distribution Points' |
+		   grep URI |
+		   sed 's/^.*URI://'
+	   )
+
+    if [ -n "${CRL_URI}" ] ; then
+
+	debuglog "Certificate revokation list available (${CRL_URI})"
+
+	debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
+
+        if [ -n "${CURL_USER_AGENT}" ] ; then
+            exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+        else
+            exec_with_timeout "${TIMEOUT}" "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+        fi
+
+	# convert DER to
+	debuglog "Converting ${CRL_TMP_DER} (DER) to ${CRL_TMP_PEM} (PEM)"
+	"${OPENSSL}" crl -inform DER -in "${CRL_TMP_DER}" -outform PEM -out "${CRL_TMP_PEM}"     
+
+	# combine the certificate and the CRL
+	debuglog "Combining the certificate, the CRL and the root cert"
+	debuglog "cat ${CRL_TMP_PEM} ${CERT} ${ROOT_CA_FILE} > ${CRL_TMP_CHAIN}"
+	cat "${CRL_TMP_PEM}" "${CERT}" "${ROOT_CA_FILE}" > "${CRL_TMP_CHAIN}"
+
+	debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
+	CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" 2>&1 |
+			  grep ':' |
+			  head -n 1 |
+			  sed 's/^.*:\ //'
+		  )
+
+	debuglog "  result: ${CRL_RESULT}"
+
+	if ! [ "${CRL_RESULT}" = 'OK' ] ; then
+	    prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
+	fi
+	
+    else
+
+	debuglog "Certificate revokation list not available"
+
+    fi
+    
+}
+
+################################################################################
+# Checks cert revokation via OCSP
 # Params
 #   $1 cert
 #   $2 element number
@@ -620,6 +699,10 @@ check_ocsp() {
         el_number=$2
     fi
 
+    # We check all the elements of the chain (but the root) for revocation
+    # If any element is revoked, the certificate should not be trusted
+    # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
+    
     debuglog "Checking OCSP status of element ${el_number}"
 
     create_temporary_file; CERT_ELEMENT=${TEMPFILE}
@@ -824,7 +907,7 @@ check_ocsp() {
 
                     debuglog 'OCSP: revoked'
 
-                    prepend_critical_message "certificate element ${el_number} is revoked"
+                    prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
 
                 elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
 
@@ -1175,6 +1258,14 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "${SHORTNAME} CRITICAL: ${ERROR}"
 
+	elif ascii_grep 'dh\ key\ too\ small' "${ERROR}" ; then
+
+	    prepend_critical_message 'DH with a key too small'
+
+	elif ascii_grep 'alert\ handshake\ failure' "${ERROR}" ; then
+
+	    prepend_critical_message 'Handshake failure'
+
         else
 
             # Try to clean up the error message
@@ -1288,6 +1379,7 @@ main() {
     SKIP_ELEMENT=0
     NO_PROXY=""
     PROXY=""
+    CRL=""
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1320,6 +1412,10 @@ main() {
                 ALTNAMES=1
                 shift
                 ;;
+	    --crl)
+		CRL=1
+		shift
+		;;
             -d|--debug)
                 DEBUG=1
                 VERBOSE=1
@@ -1885,11 +1981,14 @@ main() {
             unknown "Cannot read root certificate ${ROOT_CA_FILE}"
         fi
 
-        ROOT_CA_FILE="-CAfile ${ROOT_CA_FILE}"
     fi
 
     if [ -n "${ROOT_CA_DIR}" ] || [ -n "${ROOT_CA_FILE}" ]; then
-        ROOT_CA="${ROOT_CA_DIR} ${ROOT_CA_FILE}"
+	if [ -n "${ROOT_CA_FILE}" ] ; then
+            ROOT_CA="${ROOT_CA_DIR} -CAfile ${ROOT_CA_FILE}"
+	else
+            ROOT_CA="${ROOT_CA_DIR}"
+	fi
     fi
 
     if [ -n "${CLIENT_CERT}" ] ; then
@@ -1947,6 +2046,12 @@ main() {
         if ! echo "${NOT_VALID_LONGER_THAN}" | grep -q '^[0-9][0-9]*$' ; then
             unknown "invalid number of days ${NOT_VALID_LONGER_THAN}"
         fi
+
+    fi
+
+    if [ -n "${CRL}" ] && [ -z "${ROOT_CA_FILE}" ] ; then
+	
+	unknown "To be able to check CRL we need the Root Cert. Please specify it with the --rootcert-file option"
 
     fi
 
@@ -2034,9 +2139,9 @@ main() {
 
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
-        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
+        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] || [ -n "${CRL}" ] ; then
             if [ -n "${DEBUG}" ] ; then
-                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}"
                 debuglog "cURL binary not specified"
             fi
 
@@ -2449,6 +2554,10 @@ main() {
     create_temporary_file; CERT=${TEMPFILE}
     create_temporary_file; ERROR=${TEMPFILE}
 
+    create_temporary_file; CRL_TMP_DER=${TEMPFILE}
+    create_temporary_file; CRL_TMP_PEM=${TEMPFILE}
+    create_temporary_file; CRL_TMP_CHAIN=${TEMPFILE}
+    
     if [ -n "${OCSP}" ] ; then
 
         create_temporary_file; ISSUER_CERT_TMP=${TEMPFILE}
@@ -2957,8 +3066,9 @@ main() {
         else
             # count the certificates in the chain
             NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
-            debuglog "Nb certificates in CA chain: $((NUM_CERTIFICATES))"
+            debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
             debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
+
             CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
             while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
                 elem_number=$((CERT_IN_CHAIN))
@@ -2970,7 +3080,12 @@ main() {
 
 		debuglog '------------------------------------------------------------------------------'
 		check_ocsp "${chain_element}" "${elem_number}"
-		
+
+		if [ -n "${CRL}" ] ; then
+		    debuglog '------------------------------------------------------------------------------'
+		    check_crl "${chain_element}" "${elem_number}"
+		fi
+
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
                 if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
                     break
