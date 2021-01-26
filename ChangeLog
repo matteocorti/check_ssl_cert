@@ -1,15 +1,13 @@
-<<<<<<< HEAD
 2021-01-26  Matteo Corti  <corti@matteo.ethz.ch>
 
 	* check_ssl_cert: added --date to specify the date binary
 	* check_ssl_cert (hours_until): support for BusyBox date
-=======
+
 2021-01-18  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
 	* check_ssl_cert (fetch_certificate): Better error message for DH with a too small key and handshake failure
 	* check_ssl_cert (check_crl): Checks revokation via CRL
->>>>>>> e257f34090b304569a755f10fb5ee7262dc41329
 
 2021-01-15  Matteo Corti  <matteo@corti.li>
 
