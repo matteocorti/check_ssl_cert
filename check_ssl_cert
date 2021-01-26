@@ -2853,9 +2853,11 @@ main() {
     ################################################################################
     # Check the presence of a subjectAlternativeName (required for Chrome)
 
+    # Do not use grep --after-context=NUM but -A NUM so that it works on BusyBox
+
     # shellcheck disable=SC2086
     SUBJECT_ALTERNATIVE_NAME=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
-           grep --after-context=1 "509v3 Subject Alternative Name:" |
+           grep -A 1 "509v3 Subject Alternative Name:" |
            tail -n 1 |
            sed -e "s/DNS://g" |
            sed -e "s/,//g" |
