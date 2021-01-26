@@ -287,7 +287,8 @@ hours_until() {
 	'BUSYBOX')
 
 	    BUSYBOX_DATE=$( echo "${DATE}" | sed -s 's/[ ][^ ]*$//' )	
-	    debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"    
+	    debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
+	    verbose "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
             HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${BUSYBOX_DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
 	    ;;
         "GNU")
