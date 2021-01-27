@@ -1,3 +1,4 @@
+2021-01-27 Version 1.134.0: complete support for Alpine Linux and BusyBox
 2021-01-26 Version 1.133.0: added the --date option to specify the date binary
                             support for BusyBox date
 2021-01-18 Version 1.132.0: Timeouted subprocesses can now be interrupted
