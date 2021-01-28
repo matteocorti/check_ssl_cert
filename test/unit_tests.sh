@@ -632,7 +632,7 @@ testCertificsteWithoutCN() {
 }
 
 testCertificsteWithEmptySubject() {
-    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore--stc
+    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-stc
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
