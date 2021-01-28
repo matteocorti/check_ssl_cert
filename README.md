@@ -65,6 +65,7 @@ Options:
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
                                    or MD5
+      --ignore-stc                 do not check for signed certificate timestamps
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
       --inetproto protocol         Force IP version 4 or 6
    -i,--issuer issuer              pattern to match the issuer of the certificate

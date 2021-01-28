@@ -626,16 +626,23 @@ testNotLongerValidThan() {
 }
 
 testCertificsteWithoutCN() {
-    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg
+    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-stc
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificsteWithEmptySubject() {
-    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg
+    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore--stc
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
+
+testSTC() {
+    ${SCRIPT} -H no-stc.badssl.com
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+    
 
 # SSL Labs (last one as it usually takes a lot of time
 

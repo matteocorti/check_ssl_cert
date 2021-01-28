@@ -107,6 +107,7 @@ usage() {
     echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
     echo "                                   or MD5"
+    echo "      --ignore-stc                 do not check for signed certificate timestamps"
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
     echo "      --inetproto protocol         Force IP version 4 or 6"
     echo "   -i,--issuer issuer              pattern to match the issuer of the certificate"
@@ -1381,6 +1382,7 @@ main() {
     NO_PROXY=""
     PROXY=""
     CRL=""
+    STC="1" # enabled by default
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1445,6 +1447,10 @@ main() {
                 NOSIGALG=1
                 shift
                 ;;
+	    --ignore-stc)
+		STC=
+		shift
+		;;
             --ignore-ssl-labs-cache)
                 IGNORE_SSL_LABS_CACHE="&startNew=on"
                 shift
@@ -1621,7 +1627,7 @@ main() {
             -e|--email)
                 check_option_argument 'e|--email' "$2"
                 ADDR="$2"
-                shift 2
+		shift 2
                 ;;
             -f|--file)
                 check_option_argument ' -f|--file' "$2"
@@ -3082,8 +3088,8 @@ main() {
                 check_cert_end_date "${chain_element}" "${elem_number}"
 
 		debuglog '------------------------------------------------------------------------------'
-		check_ocsp "${chain_element}" "${elem_number}"
-
+		check_ocsp "${chain_element}" "${elem_number}"		
+		
 		if [ -n "${CRL}" ] ; then
 		    debuglog '------------------------------------------------------------------------------'
 		    check_crl "${chain_element}" "${elem_number}"
@@ -3283,6 +3289,12 @@ main() {
 
     fi
 
+    ##############################################################################
+    # Check for Signed Certificate Timestamps (STC)
+    if [ -n "${STC}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text | grep -q 'SCTs' ; then
+	prepend_critical_message "Cannot find Signed Certificate Timestamps"
+    fi
+ 
     # if errors exist at this point return
     if [ "${CRITICAL_MSG}" != "" ] ; then
         critical "${CRITICAL_MSG}"
