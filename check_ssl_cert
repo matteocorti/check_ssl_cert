@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.134.0
+VERSION=1.135.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1247,9 +1247,10 @@ fetch_certificate() {
 
             verboselog "The server requires a client certificate"
 
-        elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ; then
+        elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
+	     ascii_grep 'connect\ argument\ or\ target\ parameter\ malformed\ or\ ambiguous' "${ERROR}" ; then
 
-            ERROR="${HOST} is invalid"
+            ERROR="${HOST} is not a valid hostname"
             prepend_critical_message "${ERROR}"
             critical "${SHORTNAME} CRITICAL: ${ERROR}"
 
