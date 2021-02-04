@@ -2026,7 +2026,7 @@ main() {
         debuglog "-c specified: ${CRITICAL_DAYS}"
 
         if ! echo "${CRITICAL_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
-            unknown "invalid number of days ${CRITICAL_DAYS}"
+            unknown "invalid number of days '${CRITICAL_DAYS}'"
         fi
 
     fi
@@ -2034,7 +2034,7 @@ main() {
     if [ -n "${WARNING_DAYS}" ] ; then
 
         if ! echo "${WARNING_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
-            unknown "invalid number of days ${WARNING_DAYS}"
+            unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
     fi
@@ -2052,7 +2052,7 @@ main() {
         debuglog "--not-valid-longer-than specified: ${NOT_VALID_LONGER_THAN}"
 
         if ! echo "${NOT_VALID_LONGER_THAN}" | grep -q '^[0-9][0-9]*$' ; then
-            unknown "invalid number of days ${NOT_VALID_LONGER_THAN}"
+            unknown "invalid number of days '${NOT_VALID_LONGER_THAN}'"
         fi
 
     fi
