@@ -2020,6 +2020,11 @@ main() {
 	    unknown "Cannot read file ${FILE}"
 	fi
     fi
+
+    # check if grep is in the path (see #244)
+    if ! echo 0 | grep 0 > /dev/null 2>&1 ; then
+	unknown "cannot execute grep: please check the PATH variable (${PATH})"
+    fi
     
     if [ -n "${CRITICAL_DAYS}" ] ; then
 

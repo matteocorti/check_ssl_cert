@@ -1,3 +1,7 @@
+2021-02-05  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Adds a check for grep (to check if basic utilities are in the PATH)
+
 2021-01-28  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): Checks for signed certificate timestamps (STCs)
