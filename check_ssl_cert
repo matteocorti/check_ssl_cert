@@ -256,7 +256,7 @@ cleanup() {
 
 create_temporary_file() {
 
-    # create a temporary file    
+    # create a temporary file
     TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX" 2> /dev/null )"
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
         unknown 'temporary file creation failure.'
@@ -280,7 +280,7 @@ hours_until() {
 
     debuglog "Date computations: ${DATETYPE}"
     debuglog "Computing number of hours until '${DATE}'"
-    
+
     case "${DATETYPE}" in
         "BSD")
             HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
@@ -521,7 +521,7 @@ exec_with_timeout() {
         debuglog "$(printf "%s %s %s\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
 
 	# We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
-	# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692	
+	# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
         eval "${TIMEOUT_BIN} ${time} ${command} &" > /dev/null 2>&1
 	TIMEOUT_PID=$!
 	wait "${TIMEOUT_PID}" > /dev/null 2>&1
@@ -633,11 +633,11 @@ check_crl() {
     create_temporary_file; CERT_ELEMENT=${TEMPFILE}
     debuglog "Storing the chain element in ${CERT_ELEMENT}"
     echo "${1}" > "${CERT_ELEMENT}"
-    
+
     # We check all the elements of the chain (but the root) for revocation
     # If any element is revoked, the certificate should not be trusted
     # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
- 
+
     debuglog "Checking CRL status of element ${el_number}"
 
     # See https://raymii.org/s/articles/OpenSSL_manually_verify_a_certificate_against_a_CRL.html
@@ -662,7 +662,7 @@ check_crl() {
 
 	# convert DER to
 	debuglog "Converting ${CRL_TMP_DER} (DER) to ${CRL_TMP_PEM} (PEM)"
-	"${OPENSSL}" crl -inform DER -in "${CRL_TMP_DER}" -outform PEM -out "${CRL_TMP_PEM}"     
+	"${OPENSSL}" crl -inform DER -in "${CRL_TMP_DER}" -outform PEM -out "${CRL_TMP_PEM}"
 
 	# combine the certificate and the CRL
 	debuglog "Combining the certificate, the CRL and the root cert"
@@ -681,13 +681,13 @@ check_crl() {
 	if ! [ "${CRL_RESULT}" = 'OK' ] ; then
 	    prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
 	fi
-	
+
     else
 
 	debuglog "Certificate revokation list not available"
 
     fi
-    
+
 }
 
 ################################################################################
@@ -704,7 +704,7 @@ check_ocsp() {
     # We check all the elements of the chain (but the root) for revocation
     # If any element is revoked, the certificate should not be trusted
     # https://security.stackexchange.com/questions/5253/what-happens-when-an-intermediate-ca-is-revoked
-    
+
     debuglog "Checking OCSP status of element ${el_number}"
 
     create_temporary_file; CERT_ELEMENT=${TEMPFILE}
@@ -741,7 +741,7 @@ check_ocsp() {
             fi
 
         fi
-	
+
 	# we just consider the first HTTP(S) URI
 	# TODO check SC2016
 	# shellcheck disable=SC2086,SC2016
@@ -757,7 +757,7 @@ check_ocsp() {
             return
 	elif [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
             verboselog "unable to fetch the CA issuer certificate (spaces in URI): disabling OCSP checks on element ${el_number}"
-	    return 
+	    return
 	elif ! echo "${ELEMENT_ISSUER_URI}" | grep -qi '^http' ; then
             verboselog "unable to fetch the CA issuer certificate (unsupported protocol): disabling OCSP checks on element ${el_number}"
             return
@@ -789,7 +789,7 @@ check_ocsp() {
 
             # check the result
             if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
-		
+
                 if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
 
                     debuglog "OCSP: converting issuer certificate from DER to PEM"
@@ -845,7 +845,7 @@ check_ocsp() {
         # shellcheck disable=SC2086
         OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout | head -n 1)"
 	debuglog "OSCP: URI = ${OCSP_URI}"
-	
+
         OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
         debuglog "OCSP: host = ${OCSP_HOST}"
@@ -974,7 +974,7 @@ check_cert_end_date() {
 
     debuglog "Checking expiration date of element ${el_number}"
 
-    # shellcheck disable=SC2086  
+    # shellcheck disable=SC2086
     ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
     debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
 
@@ -2025,7 +2025,7 @@ main() {
     if ! echo 0 | grep 0 > /dev/null 2>&1 ; then
 	unknown "cannot execute grep: please check the PATH variable (${PATH})"
     fi
-    
+
     if [ -n "${CRITICAL_DAYS}" ] ; then
 
         debuglog "-c specified: ${CRITICAL_DAYS}"
@@ -2063,7 +2063,7 @@ main() {
     fi
 
     if [ -n "${CRL}" ] && [ -z "${ROOT_CA_FILE}" ] ; then
-	
+
 	unknown "To be able to check CRL we need the Root Cert. Please specify it with the --rootcert-file option"
 
     fi
@@ -2147,7 +2147,7 @@ main() {
 	check_required_prog 'date'
 	DATEBIN=${PROG}
     fi
-    
+
     debuglog "file version: $( "${FILE_BIN}" --version 2>&1 )"
 
     # cURL
@@ -2260,7 +2260,7 @@ main() {
             DATETYPE='BSD'
         fi
 
-        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"	    
+        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"
 
     fi
 
@@ -2327,7 +2327,7 @@ main() {
 	unset HTTP_PROXY
 	unset HTTPS_PROXY
     fi
-    
+
     ################################################################################
     # Check if openssl s_client supports the -proxy option
     #
@@ -2362,7 +2362,7 @@ main() {
 	    CURL_PROXY="--proxy"
 	    CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
 	fi
-	
+
 	if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
 	    SCLIENT_PROXY="-proxy"
 	    SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
@@ -2370,8 +2370,8 @@ main() {
 	    debuglog "Adding -proxy ${SCLIENT_PROXY_ARGUMENT} to the s_client options"
 
 	else
-	    
-            verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"	    
+
+            verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"
 
 	fi
 
@@ -2383,8 +2383,8 @@ main() {
 	debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
 	debuglog "  cURL        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
 
-    fi    
-    
+    fi
+
     ################################################################################
     # Check if openssl s_client supports the -name option
     #
@@ -2570,7 +2570,7 @@ main() {
     create_temporary_file; CRL_TMP_DER=${TEMPFILE}
     create_temporary_file; CRL_TMP_PEM=${TEMPFILE}
     create_temporary_file; CRL_TMP_CHAIN=${TEMPFILE}
-    
+
     if [ -n "${OCSP}" ] ; then
 
         create_temporary_file; ISSUER_CERT_TMP=${TEMPFILE}
@@ -2696,14 +2696,14 @@ main() {
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
         # shellcheck disable=SC2086
-	if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -q 'CN' ; then	   
+	if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -q 'CN' ; then
             CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
 	else
 	    CN='CN unavailable'
 	    if [ -z "${ALTNAMES}" ] ; then
 		verboselog "Certificate without common name (CN), enabling altername names"
-		ALTNAMES=1		
+		ALTNAMES=1
 	    fi
 	fi
 
@@ -2724,7 +2724,7 @@ main() {
         # start with first certificate
         debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
         CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
-	
+
         # shellcheck disable=SC2086
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
             if [ -n "${ISSUERS}" ]; then
@@ -2743,8 +2743,8 @@ main() {
     fi
 
     debuglog 'ISSUERS = '
-    debuglog "${ISSUERS}"    
-    
+    debuglog "${ISSUERS}"
+
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
@@ -3020,7 +3020,7 @@ main() {
         debuglog "check NOT_ISSUED_BY: ${NOT_ISSUED_BY}"
 
 	debuglog "  executing echo \"${ISSUERS}\" | sed -E -e \"s/^(O|CN) ?= ?//\" | grep -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
-	
+
         ok=""
         CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | grep -E "^${NOT_ISSUED_BY}\$" | head -n1)
 
@@ -3094,8 +3094,8 @@ main() {
                 check_cert_end_date "${chain_element}" "${elem_number}"
 
 		debuglog '------------------------------------------------------------------------------'
-		check_ocsp "${chain_element}" "${elem_number}"		
-		
+		check_ocsp "${chain_element}" "${elem_number}"
+
 		if [ -n "${CRL}" ] ; then
 		    debuglog '------------------------------------------------------------------------------'
 		    check_crl "${chain_element}" "${elem_number}"
@@ -3300,7 +3300,7 @@ main() {
     if [ -n "${STC}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text | grep -q 'SCTs' ; then
 	prepend_critical_message "Cannot find Signed Certificate Timestamps"
     fi
- 
+
     # if errors exist at this point return
     if [ "${CRITICAL_MSG}" != "" ] ; then
         critical "${CRITICAL_MSG}"
