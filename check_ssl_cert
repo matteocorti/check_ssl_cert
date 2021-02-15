@@ -107,7 +107,7 @@ usage() {
     echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
     echo "                                   or MD5"
-    echo "      --ignore-stc                 do not check for signed certificate timestamps"
+    echo "      --ignore-sct                 do not check for signed certificate timestamps (SCT)"
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
     echo "      --inetproto protocol         Force IP version 4 or 6"
     echo "   -i,--issuer issuer              pattern to match the issuer of the certificate"
@@ -1383,7 +1383,7 @@ main() {
     NO_PROXY=""
     PROXY=""
     CRL=""
-    STC="1" # enabled by default
+    SCT="1" # enabled by default
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1448,8 +1448,8 @@ main() {
                 NOSIGALG=1
                 shift
                 ;;
-	    --ignore-stc)
-		STC=
+	    --ignore-sct)
+		SCT=
 		shift
 		;;
             --ignore-ssl-labs-cache)
@@ -3296,9 +3296,9 @@ main() {
     fi
 
     ##############################################################################
-    # Check for Signed Certificate Timestamps (STC)
-    if [ -n "${STC}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text | grep -q 'SCTs' ; then
-	prepend_critical_message "Cannot find Signed Certificate Timestamps"
+    # Check for Signed Certificate Timestamps (SCT)
+    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text | grep -q 'SCTs' ; then
+	prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
     fi
 
     # if errors exist at this point return
