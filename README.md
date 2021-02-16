@@ -28,7 +28,7 @@ Options:
       --clientpass phrase          set passphrase for client certificate.
    -c,--critical days              minimum number of days a certificate has to
                                    be valid to issue a critical status. Default: 15
-      --crl                        checks revokation via CRL (requires --rootcert-file)				   
+      --crl                        checks revokation via CRL (requires --rootcert-file)
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain the
                                    issuer cert
@@ -65,7 +65,7 @@ Options:
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
                                    or MD5
-      --ignore-stc                 do not check for signed certificate timestamps
+      --ignore-sct                 do not check for signed certificate timestamps (SCT)
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
       --inetproto protocol         Force IP version 4 or 6
    -i,--issuer issuer              pattern to match the issuer of the certificate

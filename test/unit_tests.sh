@@ -626,7 +626,7 @@ testNotLongerValidThan() {
 }
 
 testCertificsteWithoutCN() {
-    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-stc
+    ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -637,8 +637,8 @@ testCertificsteWithEmptySubject() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testSTC() {
-    ${SCRIPT} -H no-stc.badssl.com
+testSCT() {
+    ${SCRIPT} -H no-sct.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
