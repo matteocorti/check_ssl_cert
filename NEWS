@@ -1,4 +1,5 @@
-2021-01-28 Version 1.135.0: checks for signed certificate timestamps (STCs)
+2021-02-16 Version 1.136.0: Fixed the signed certificate timestamps spelling (command line option)
+2021-01-28 Version 1.135.0: checks for signed certificate timestamps (SCTs)
 2021-01-27 Version 1.134.0: complete support for Alpine Linux and BusyBox
 2021-01-26 Version 1.133.0: added the --date option to specify the date binary
                             support for BusyBox date

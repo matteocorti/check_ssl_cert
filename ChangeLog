@@ -4,7 +4,7 @@
 
 2021-01-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Checks for signed certificate timestamps (STCs)
+	* check_ssl_cert (check_attr): Checks for signed certificate timestamps (SCTs)
 	* check_ssl_cert (fetch_certificate): Better error catching for s_client errors
 
 2021-01-26  Matteo Corti  <matteo@corti.li>
