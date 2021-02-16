@@ -226,7 +226,7 @@ testTimeOut() {
 
 testIMAP() {
     if [ -z "${TRAVIS+x}" ] ; then
-	# minimal critical and warning as they renew pretty late
+        # minimal critical and warning as they renew pretty late
         ${SCRIPT} --rootcert cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -362,9 +362,9 @@ testBadSSLDH512(){
 
 testBadSSLRC4MD5(){
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H rc4-md5.badssl.com --host-cn
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        ${SCRIPT} -H rc4-md5.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
         echo "Skipping RC4 MD5 with badssl.com on Travis CI (OpenSSL too old)"
     fi
@@ -372,9 +372,9 @@ testBadSSLRC4MD5(){
 
 testBadSSLRC4(){
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H rc4.badssl.com --host-cn
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        ${SCRIPT} -H rc4.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
         echo "Skipping RC4 with badssl.com on Travis CI (OpenSSL too old)"
     fi
@@ -382,9 +382,9 @@ testBadSSLRC4(){
 
 testBadSSL3DES(){
     if [ -z "${TRAVIS+x}" ] ; then
-	${SCRIPT} -H 3des.badssl.com --host-cn
-	EXIT_CODE=$?
-	assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        ${SCRIPT} -H 3des.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
         echo "Skipping 3DES with badssl.com on Travis CI (OpenSSL too old)"
     fi
