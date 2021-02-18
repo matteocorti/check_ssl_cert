@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.136.0
+VERSION=1.137.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -179,7 +179,7 @@ usage() {
     echo "      --tls1_1                     force TLS version 1.1"
     echo "      --tls1_2                     force TLS version 1.2"
     echo "      --tls1_3                     force TLS version 1.3"
-    echo "   -u,--url                        HTTP request url"
+    echo "   -u,--url URL                    HTTP request URL"
     echo "   -v,--verbose                    verbose output"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
