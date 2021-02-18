@@ -179,6 +179,7 @@ usage() {
     echo "      --tls1_1                     force TLS version 1.1"
     echo "      --tls1_2                     force TLS version 1.2"
     echo "      --tls1_3                     force TLS version 1.3"
+    echo "   -u,--url                        HTTP request url"
     echo "   -v,--verbose                    verbose output"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
@@ -1382,6 +1383,7 @@ main() {
     PROXY=""
     CRL=""
     SCT="1" # enabled by default
+    HTTP_REQUEST_URL="/"
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -1804,6 +1806,11 @@ main() {
             --temp)
                 check_option_argument '--temp' "$2"
                 TMPDIR="$2"
+                shift 2
+                ;;
+            -u|--url)
+                check_option_argument '-u|--url' "$2"
+                HTTP_REQUEST_URL="$2"
                 shift 2
                 ;;
             -w|--warning)
@@ -2479,7 +2486,7 @@ main() {
         CUSTOM_HTTP_HEADER="${CUSTOM_HTTP_HEADER}\\n"
     fi
 
-    HTTP_REQUEST="${HTTP_METHOD} / HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
+    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
     ##############################################################################
     # Check for disallowed protocols

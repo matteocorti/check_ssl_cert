@@ -1,3 +1,7 @@
+2021-02-17  Robin Pronk  <robin.pronk@nedap.com>
+
+	* check_ssl_cert: Make HTTP request url configurable (default stays /)
+
 2021-02-05  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Adds a check for grep (to check if basic utilities are in the PATH)
