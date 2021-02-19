@@ -1349,7 +1349,6 @@ main() {
 
     # Default values
     DEBUG=""
-    OPENSSL=""
     FILE_BIN=""
     CURL_BIN=""
     CURL_PROXY=""

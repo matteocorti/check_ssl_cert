@@ -1,3 +1,8 @@
+2021-02-19  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Do not reset $OPENSSL so that a different
+                                 OpenSSL version can be specified with the environment variable
+
 2021-02-17  Robin Pronk  <robin.pronk@nedap.com>
 
 	* check_ssl_cert: Make HTTP request url configurable (default stays /)
