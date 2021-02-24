@@ -259,7 +259,7 @@ testPOP3S() {
 
 testSMTP() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
+        ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -268,13 +268,13 @@ testSMTP() {
 }
 
 testSMTPSubmbission() {
-    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60
+    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPS() {
-    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60
+    ${SCRIPT} --rootcert cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -476,7 +476,7 @@ testMultipleOCSPHosts() {
 }
 
 testRequireOCSP() {
-    ${SCRIPT} -H videolan.org --rootcert cabundle.crt --require-ocsp-stapling --critical 1 --warning 2
+    ${SCRIPT} -H videolan.org --rootcert cabundle.crt --require-ocsp-stapling --critical 1 --warning 2 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
