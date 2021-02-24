@@ -67,7 +67,8 @@ Options:
                                    or MD5
       --ignore-sct                 do not check for signed certificate timestamps (SCT)
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
-      --inetproto protocol         Force IP version 4 or 6
+      --ignore-tls-renegotiation   Ignores the TLS renegotiation check
+      --Inetproto protocol         Force IP version 4 or 6
    -i,--issuer issuer              pattern to match the issuer of the certificate
       --issuer-cert-cache dir      directory where to store issuer certificates cache
    -K,--clientkey path             use client certificate key to authenticate
