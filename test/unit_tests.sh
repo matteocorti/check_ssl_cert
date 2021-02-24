@@ -91,50 +91,50 @@ testMissingArgument2() {
 }
 
 testETHZ() {
-    ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt
+    ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testLetsEncrypt() {
-    ${SCRIPT} -H helloworld.letsencrypt.org --rootcert cabundle.crt
+    ${SCRIPT} -H helloworld.letsencrypt.org --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testGoDaddy() {
-    ${SCRIPT} -H www.godaddy.com --cn www.godaddy.com --rootcert cabundle.crt
+    ${SCRIPT} -H www.godaddy.com --cn www.godaddy.com --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZCaseInsensitive() {
     # debugging: to be removed
-    ${SCRIPT} -H ethz.ch --cn ETHZ.CH --rootcert cabundle.crt
+    ${SCRIPT} -H ethz.ch --cn ETHZ.CH --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCard() {
-    ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn sp.ethz.ch --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testETHZWildCardCaseInsensitive() {
-    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --rootcert cabundle.crt
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
-    ${SCRIPT} -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --rootcert cabundle.crt
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSubCaseInsensitive() {
-    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --rootcert cabundle.crt
+    ${SCRIPT} -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -147,26 +147,26 @@ testRootIssuer() {
 
 testValidity() {
     # Tests bug #8
-    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000
+    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testValidityWithPerl() {
-    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date
+    ${SCRIPT} --rootcert cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testAltNames() {
-    ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames
+    ${SCRIPT} -H www.inf.ethz.ch --cn www.inf.ethz.ch --rootcert cabundle.crt --altnames --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
-    ${SCRIPT} -H sherlock.sp.ethz.ch --rootcert cabundle.crt --altnames --host-cn
+    ${SCRIPT} -H sherlock.sp.ethz.ch --rootcert cabundle.crt --altnames --host-cn --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -177,20 +177,21 @@ testWildcardAltNames2() {
         --cn somehost.spapps.ethz.ch \
         --cn otherhost.sPaPPs.ethz.ch \
         --cn spapps.ethz.ch \
-        --rootcert cabundle.crt --altnames
+        --rootcert cabundle.crt --altnames \
+        --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testAltNamesCaseInsensitve() {
-    ${SCRIPT} -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --rootcert cabundle.crt --altnames
+    ${SCRIPT} -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --rootcert cabundle.crt --altnames --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
-    ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --rootcert cabundle.crt --altnames
+    ${SCRIPT} -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --rootcert cabundle.crt --altnames --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -398,7 +399,7 @@ testBadSSLNULL(){
 
 testBadSSLSHA256() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H sha256.badssl.com --host-cn
+        ${SCRIPT} -H sha256.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -408,7 +409,7 @@ testBadSSLSHA256() {
 
 testBadSSLEcc256() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H ecc256.badssl.com --host-cn
+        ${SCRIPT} -H ecc256.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -418,7 +419,7 @@ testBadSSLEcc256() {
 
 testBadSSLEcc384() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H ecc384.badssl.com --host-cn
+        ${SCRIPT} -H ecc384.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -428,7 +429,7 @@ testBadSSLEcc384() {
 
 testBadSSLRSA8192() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H rsa8192.badssl.com --host-cn
+        ${SCRIPT} -H rsa8192.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -438,7 +439,7 @@ testBadSSLRSA8192() {
 
 testBadSSLLongSubdomainWithDashes() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
+        ${SCRIPT} -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -448,7 +449,7 @@ testBadSSLLongSubdomainWithDashes() {
 
 testBadSSLLongSubdomain() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
+        ${SCRIPT} -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -469,7 +470,7 @@ testBadSSLSHA12017() {
 }
 
 testMultipleOCSPHosts() {
-    ${SCRIPT} -H netlock.hu --rootcert cabundle.crt
+    ${SCRIPT} -H netlock.hu --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -510,14 +511,14 @@ testIPv6() {
 }
 
 testFormatShort() {
-    OUTPUT=$( ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
+    OUTPUT=$( ${SCRIPT} -H ethz.ch --cn ethz.ch --rootcert cabundle.crt --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" --ignore-tls-renegotiation | cut '-d|' -f 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
 }
 
 testMoreErrors() {
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical 1000 --warning 1001 --rootcert cabundle.crt --verbose | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --critical 1000 --warning 1001 --rootcert cabundle.crt --verbose --ignore-tls-renegotiation | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -525,7 +526,7 @@ testMoreErrors() {
 }
 
 testMoreErrors2() {
-    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --warning 1000 --warning 1001 --rootcert cabundle.crt --verbose | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} -H www.ethz.ch --email doesnotexist --warning 1000 --warning 1001 --rootcert cabundle.crt --verbose --ignore-tls-renegotiation | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -535,7 +536,7 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
-    ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+    ${SCRIPT} --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk --ignore-tls-renegotiation
     EXIT_CODE=$?
     if [ -n "${DANE}" ] ; then
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -608,13 +609,13 @@ testSieveECDSA() {
 }
 
 testHTTP2() {
-    ${SCRIPT} -H rwserve.readwritetools.com --critical 1 --warning 2
+    ${SCRIPT} -H rwserve.readwritetools.com --critical 1 --warning 2 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testForceHTTP2() {
-    ${SCRIPT} -H www.ethz.ch --protocol h2
+    ${SCRIPT} -H www.ethz.ch --protocol h2 --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -648,7 +649,7 @@ testSCT() {
 
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a B
-    ${SCRIPT} -H ethz.ch --cn ethz.ch --check-ssl-labs B --rootcert cabundle.crt
+    ${SCRIPT} -H ethz.ch --cn ethz.ch --check-ssl-labs B --rootcert cabundle.crt --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

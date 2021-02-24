@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.137.0
+VERSION=1.138.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -109,6 +109,7 @@ usage() {
     echo "                                   or MD5"
     echo "      --ignore-sct                 do not check for signed certificate timestamps (SCT)"
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
+    echo "      --ignore-tls-renegotiation   Ignores the TLS renegotiation check"
     echo "      --inetproto protocol         Force IP version 4 or 6"
     echo "   -i,--issuer issuer              pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir      directory where to store issuer certificates cache"
@@ -1455,6 +1456,10 @@ main() {
                 IGNORE_SSL_LABS_CACHE="&startNew=on"
                 shift
                 ;;
+            --ignore-tls-renegotiation)
+                IGNORE_TLS_RENEGOTIATION='1'
+                shift
+                ;;
             --no-proxy)
                 NO_PROXY=1
                 shift
@@ -2607,7 +2612,7 @@ main() {
     trap_with_arg cleanup ${SIGNALS}
 
     fetch_certificate
-
+    
     if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
         if [ -n "${SERVERNAME}" ] ; then
@@ -2623,11 +2628,22 @@ main() {
 
         if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
-            prepend_critical_message "cannot fetch certificate: OpenSSL got an unexpected message"
+            prepend_critical_message 'cannot fetch certificate: OpenSSL got an unexpected message'
 
         fi
 
     fi
+
+    # check for TLS renegotiation
+    if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] ; then
+        
+        verboselog "Checking TLS renegotiation"
+
+        if ascii_grep '^Secure\ Renegotiation\ IS\ supported' "${CERT}" ; then
+            prepend_critical_message 'TLS secure renegotiation is supported'
+        fi
+        
+    fi        
 
     if ascii_grep "BEGIN X509 CRL" "${CERT}" ; then
         # we are dealing with a CRL file
@@ -3301,6 +3317,7 @@ main() {
 
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
+    debuglog 'Checking Signed Certificate Timestamps (SCTs)'
     if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text | grep -q 'SCTs' ; then
         prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
     fi
