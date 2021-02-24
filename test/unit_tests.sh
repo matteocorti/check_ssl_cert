@@ -79,13 +79,13 @@ testUsage() {
 }
 
 testMissingArgument() {
-    ${SCRIPT} -H www.google.com --critical > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --critical --ignore-tls-renegotiation > /dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testMissingArgument2() {
-    ${SCRIPT} -H www.google.com --critical --warning 10 > /dev/null 2>&1
+    ${SCRIPT} -H www.google.com --critical --warning 10 --ignore-tls-renegotiation > /dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
@@ -140,7 +140,7 @@ testETHZWildCardSubCaseInsensitive() {
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert cabundle.crt -H google.com --issuer 'GlobalSign'
+    ${SCRIPT} --rootcert cabundle.crt -H google.com --issuer 'GlobalSign' --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -484,7 +484,7 @@ testRequireOCSP() {
 # tests for -4 and -6
 testIPv4() {
     if openssl s_client -help 2>&1 | grep -q -- -4 ; then
-        ${SCRIPT} -H www.google.com --rootcert cabundle.crt -4
+        ${SCRIPT} -H www.google.com --rootcert cabundle.crt -4 --ignore-tls-renegotiation
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -497,7 +497,7 @@ testIPv6() {
 
         if ifconfig -a | grep -q inet6 ; then
 
-            ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
+            ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6 --ignore-tls-renegotiation
             EXIT_CODE=$?
             assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -577,13 +577,13 @@ testDANE301ECDSA() {
 }
 
 testRequiredProgramFile() {
-    ${SCRIPT} -H www.google.com --file-bin /doesnotexist
+    ${SCRIPT} -H www.google.com --file-bin /doesnotexist --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testRequiredProgramPermissions() {
-    ${SCRIPT} -H www.google.com --file-bin /etc/hosts
+    ${SCRIPT} -H www.google.com --file-bin /etc/hosts --ignore-tls-renegotiation
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
