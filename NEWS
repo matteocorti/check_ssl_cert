@@ -1,3 +1,4 @@
+2021-02-25 Version 1.140.0: Fixed a bug in the SCT check
 2021-02-24 Version 1.139.0: Fixed a bug in the TLS renegotiation check
 2021-02-24 Version 1.138.0: Checks for TLS renegotiation
 2021-02-18 Version 1.137.0: Added  the --url option to specify the URL for the HTTP request

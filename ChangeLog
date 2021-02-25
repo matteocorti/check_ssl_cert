@@ -1,3 +1,7 @@
+2021-02-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): fixed the SCT check
+
 2021-02-24  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Check for TLS renegotiation
