@@ -1,3 +1,5 @@
+Do not check SCTs if the certificate is self signed
+
 2021-02-25 Version 1.140.0: Fixed a bug in the SCT check
 2021-02-24 Version 1.139.0: Fixed a bug in the TLS renegotiation check
 2021-02-24 Version 1.138.0: Checks for TLS renegotiation

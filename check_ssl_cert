@@ -3322,9 +3322,11 @@ main() {
 
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
-    debuglog 'Checking Signed Certificate Timestamps (SCTs)'
-    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -q 'SCTs' ; then
-        prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
+    if [ -z "${SELFSIGNED}" ] ; then
+	debuglog 'Checking Signed Certificate Timestamps (SCTs)'
+	if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -q 'SCTs' ; then
+            prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
+	fi
     fi
 
     # if errors exist at this point return
