@@ -1625,6 +1625,11 @@ main() {
                 DIG_BIN="$2"
                 shift 2
                 ;;
+            --inetproto)
+                check_option_argument '--inetproto' "$2"
+                INETPROTO="-$2"
+                shift 2
+                ;;
             --nmap-bin)
                 check_option_argument '--nmap-bin' "$2"
                 NMAP_BIN="$2"
@@ -2810,7 +2815,7 @@ main() {
     fi
 
     # shellcheck disable=SC2086
-    SIGNATURE_ALGORITHM="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep 'Signature Algorithm' | head -n 1)"
+    SIGNATURE_ALGORITHM="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep -m 1 -F 'Signature Algorithm')"
 
     if [ -n "${DEBUG}" ] ; then
         debuglog "${SUBJECT}"
