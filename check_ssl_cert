@@ -1216,7 +1216,7 @@ fetch_certificate() {
                 debuglog 'converting PKCS #12 to PEM'
                 "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys
 
-            elif "${FILE_BIN}" "${FILE}" | grep -F -q 'Certificate, Version=3' ; then
+            elif "${FILE_BIN}" "${FILE}" | grep -F -q 'Certificate, Version=3' || "${FILE_BIN}" "${FILE}" | grep -F -q 'data' ; then
 
                 debuglog 'converting DER to PEM'
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}"

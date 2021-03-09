@@ -627,7 +627,7 @@ testNotLongerValidThan() {
 }
 
 testDERCert() {
-    ${SCRIPT} -H localhost -f ./der.cer --ignore-sct -d
+    ${SCRIPT} -H localhost -f ./der.cer --ignore-sct
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
