@@ -589,22 +589,22 @@ testRequiredProgramPermissions() {
 }
 
 testSieveRSA() {
-    if [ -z "${TRAVIS+x}" ] ; then
+    if ! openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' ; then
         ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-        echo "Skipping sieve tests on Travis CI"
+        echo "Skipping sieve tests (not supported)"
     fi
 }
 
 testSieveECDSA() {
-    if [ -z "${TRAVIS+x}" ] ; then
+    if ! openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' ; then
         ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-        echo "Skipping sieve tests on Travis CI"
+        echo "Skipping sieve tests (not supported)"
     fi
 }
 
