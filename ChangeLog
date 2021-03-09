@@ -1,6 +1,7 @@
 2021-03-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Added missing processing of the --inetproto option
+	* check_ssl_cert (check_ocsp): skupping empty certificates
 	* check_ssl_cert (fetch_certificate): supporting local files in PKCS #12 and DER formats
 	* check_ssl_cert (main): Using grep -F when possible
 

@@ -798,6 +798,12 @@ check_ocsp() {
 
                     ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
+                elif "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q 'empty' ; then
+
+                    # empty certs are allowed
+                    debuglog "OCSP empty certificate detected: skipping"
+                    return
+
                 else
 
                     debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
@@ -1216,7 +1222,7 @@ fetch_certificate() {
                 debuglog 'converting PKCS #12 to PEM'
                 "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys
 
-            elif "${FILE_BIN}" "${FILE}" | grep -F -q 'Certificate, Version=3' || "${FILE_BIN}" "${FILE}" | grep -F -q 'data' ; then
+            elif "${FILE_BIN}" "${FILE}" | grep -q -E '(data|Certificate)' ; then
 
                 debuglog 'converting DER to PEM'
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}"
