@@ -2358,8 +2358,10 @@ main() {
 
     ################################################################################
     # Check if openssl s_client supports the specified protocol
-    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'sieve' ] && ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' ; then
-        unknown "OpenSSL does not support the protocol sieve"
+    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'sieve' ] ; then
+        if ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; then
+            unknown "OpenSSL does not support the protocol sieve"
+        fi
     fi
 
     if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
