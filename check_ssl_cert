@@ -144,6 +144,8 @@ usage() {
     echo "                                   issue a warning status"
     echo "   -o,--org org                    pattern to match the organization of the certificate"
     echo "      --openssl path               path of the openssl binary to be used"
+    echo "      --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section"
+    echo "                                   openssl(1)"
     echo "   -p,--port port                  TCP port"
     echo "   -P,--protocol protocol          use the specific protocol"
     echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|"
