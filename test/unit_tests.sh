@@ -626,6 +626,12 @@ testNotLongerValidThan() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testDERCert() {
+    ${SCRIPT} -H localhost -f ./der.cer --ignore-sct
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testCertificsteWithoutCN() {
     ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct
     EXIT_CODE=$?
