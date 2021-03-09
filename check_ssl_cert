@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.140.0
+VERSION=1.141.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -644,8 +644,8 @@ check_crl() {
     # See https://raymii.org/s/articles/OpenSSL_manually_verify_a_certificate_against_a_CRL.html
 
     CRL_URI=$( "${OPENSSL}" x509 -noout -text -in "${CERT_ELEMENT}" |
-                   grep -A 4 'X509v3 CRL Distribution Points' |
-                   grep URI |
+                   grep -F -A 4 'X509v3 CRL Distribution Points' |
+                   grep -F URI |
                    sed 's/^.*URI://'
            )
     if [ -n "${CRL_URI}" ] ; then
@@ -671,7 +671,7 @@ check_crl() {
 
         debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
         CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" 2>&1 |
-                          grep ':' |
+                          grep -F ':' |
                           head -n 1 |
                           sed 's/^.*:\ //'
                   )
@@ -746,7 +746,7 @@ check_ocsp() {
         # TODO check SC2016
         # shellcheck disable=SC2086,SC2016
 
-        ELEMENT_ISSUER_URI="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep "CA Issuers" | grep -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
+        ELEMENT_ISSUER_URI="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep -F "CA Issuers" | grep -F -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
 
         debuglog "Chain element issuer URI: ${ELEMENT_ISSUER_URI}"
 
@@ -758,7 +758,7 @@ check_ocsp() {
         elif [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
             verboselog "unable to fetch the CA issuer certificate (spaces in URI): disabling OCSP checks on element ${el_number}"
             return
-        elif ! echo "${ELEMENT_ISSUER_URI}" | grep -qi '^http' ; then
+        elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http' ; then
             verboselog "unable to fetch the CA issuer certificate (unsupported protocol): disabling OCSP checks on element ${el_number}"
             return
         fi
@@ -776,7 +776,7 @@ check_ocsp() {
 
             debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-            if echo "${ELEMENT_ISSUER_URI}" | grep -q 'p7c' ; then
+            if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c' ; then
                 debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
 
                 cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
@@ -863,7 +863,7 @@ check_ocsp() {
 
                 # the -header option was first accepting key and value separated by space. The newer versions are using key=value
                 KEYVALUE=""
-                if ${OPENSSL} ocsp -help 2>&1 | grep header | grep -q 'key=value' ; then
+                if ${OPENSSL} ocsp -help 2>&1 | grep -F header | grep -F -q 'key=value' ; then
                     debuglog "${OPENSSL} ocsp -header requires 'key=value'"
                     KEYVALUE=1
                 else
@@ -901,17 +901,17 @@ check_ocsp() {
 
                 debuglog "$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
 
-                if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -qi "timeout on connect" ; then
+                if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -F -q -i "timeout on connect" ; then
 
                     debuglog 'OCSP: Timeout on connect'
 
-                elif echo "${OCSP_RESP}" | grep -qi "revoked" ; then
+                elif echo "${OCSP_RESP}" | grep -F -q -i "revoked" ; then
 
                     debuglog 'OCSP: revoked'
 
                     prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
 
-                elif ! echo "${OCSP_RESP}" | grep -qi "good" ; then
+                elif ! echo "${OCSP_RESP}" | grep -F -q -i "good" ; then
 
                     debuglog "OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
 
@@ -2126,7 +2126,7 @@ main() {
         SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"
     fi
     if [ -n "${RSA}" ] ; then
-        if echo "${SSL_VERSION_DISABLED}" | grep -q -- '-no_tls1_3' ||
+        if echo "${SSL_VERSION_DISABLED}" | grep -F -q -- '-no_tls1_3' ||
             [ "${SSL_VERSION}" = '-tls1' ] ||
             [ "${SSL_VERSION}" = '-tls1_1' ] ||
             [ "${SSL_VERSION}" = '-tls1_2' ] ; then
@@ -2266,9 +2266,9 @@ main() {
 
         debuglog 'checking date version'
 
-        if "${DATEBIN}" --version 2>&1 | grep -q GNU ; then
+        if "${DATEBIN}" --version 2>&1 | grep -F -q GNU ; then
             DATETYPE='GNU'
-        elif "${DATEBIN}" --version 2>&1 | grep -q BusyBox ; then
+        elif "${DATEBIN}" --version 2>&1 | grep -F -q BusyBox ; then
             DATETYPE='BUSYBOX'
        else
             DATETYPE='BSD'
@@ -2312,7 +2312,7 @@ main() {
     #      on standard error for these intermediate versions.
     #
     SERVERNAME=
-    if ${OPENSSL} s_client -help 2>&1 | grep -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -servername; then
+    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -servername; then
 
         if [ -n "${SNI}" ]; then
             SERVERNAME="-servername ${SNI}"
@@ -2371,13 +2371,13 @@ main() {
             HTTPS_PROXY="${HTTP_PROXY}"
         fi
 
-        if ${CURL_BIN} --manual | grep -q -- --proxy ; then
+        if ${CURL_BIN} --manual | grep -F -q -- --proxy ; then
             debuglog "Adding --proxy ${HTTP_PROXY} to the cURL options"
             CURL_PROXY="--proxy"
             CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
         fi
 
-        if ${OPENSSL} s_client -help 2>&1 | grep -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -proxy; then
+        if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -proxy; then
             SCLIENT_PROXY="-proxy"
             SCLIENT_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
 
@@ -2403,7 +2403,7 @@ main() {
     # Check if openssl s_client supports the -name option
     #
     S_CLIENT_NAME=
-    if ${OPENSSL} s_client -help 2>&1 | grep -q -- -name || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -name; then
+    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -name || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -name; then
 
         CURRENT_HOSTNAME=$( hostname )
         S_CLIENT_NAME="-name ${CURRENT_HOSTNAME}"
@@ -2419,7 +2419,7 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the -xmpphost option
     #
-    if ${OPENSSL} s_client -help 2>&1 | grep -q -- -xmpphost ; then
+    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -xmpphost ; then
         XMPPHOST="-xmpphost ${XMPPHOST:-${HOST}}"
         debuglog "'${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
     else
@@ -2456,14 +2456,14 @@ main() {
         # Check if cURL is needed and if it supports the -4 and -6 options
         if [ -z "${CURL_BIN}" ] ; then
             if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] ; then
-                if ! "${CURL_BIN}" --manual | grep -q -- -6 && [ -n "${INETPROTO}" ] ; then
+                if ! "${CURL_BIN}" --manual | grep -F -q -- -6 && [ -n "${INETPROTO}" ] ; then
                     unknown "cURL does not support the ${INETPROTO} option"
                 fi
             fi
         fi
 
         # check if IPv6 is available locally
-        if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && ! ifconfig -a | grep -q inet6 ; then
+        if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && ! ifconfig -a | grep -F -q inet6 ; then
             unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
         fi
 
@@ -2502,7 +2502,7 @@ main() {
     if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
 
         # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch
-        if ${NMAP_BIN} "${HOST}" 2>&1 | grep -q 'Failed to resolve' ; then
+        if ${NMAP_BIN} "${HOST}" 2>&1 | grep -F -q 'Failed to resolve' ; then
             debuglog 'nmap is not able to resolve the host name. Trying with -6 to force IPv6 for an IPv6-only host'
 
             NMAP_INETPROTO='-6'
@@ -2517,7 +2517,7 @@ main() {
 
         for protocol in ${DISALLOWED_PROTOCOLS} ; do
             debuglog "Checking if '${protocol}' is offered"
-            if echo "${OFFERED_PROTOCOLS}" | grep -v 'No supported ciphers found' | grep -q "${protocol}" ; then
+            if echo "${OFFERED_PROTOCOLS}" | grep -F -v 'No supported ciphers found' | grep -q "${protocol}" ; then
                 debuglog "'${protocol}' is offered"
                 prepend_critical_message "${protocol} is offered"
             fi
@@ -2536,7 +2536,7 @@ main() {
         check_required_prog "${DIG_BIN}"
         DIG_BIN=${PROG}
         # check if OpenSSL supports -dane_tlsa_rrdata
-        if ${OPENSSL} s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
+        if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -dane_tlsa_rrdata; then
             DIG_RESULT=$( "${DIG_BIN}" +short TLSA "_${PORT}._tcp.${HOST}" |while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done )
             debuglog "Checking DANE (${DANE})"
             debuglog "$(printf '%s\n' "${DIG_BIN} +short TLSA _${PORT}._tcp.${HOST} =")"
@@ -2547,16 +2547,16 @@ main() {
                 DANE=$( echo "${DIG_RESULT}" | tr -d '\n')
                 ;;
             211)
-                DANE=$( echo "${DIG_RESULT}" | grep '2 1 1' | tr -d '\n')
+                DANE=$( echo "${DIG_RESULT}" | grep -F '2 1 1' | tr -d '\n')
                 ;;
             301)
-                DANE=$( echo "${DIG_RESULT}" | grep '3 0 1' | tr -d '\n')
+                DANE=$( echo "${DIG_RESULT}" | grep -F '3 0 1' | tr -d '\n')
                 ;;
             311)
-                DANE=$( echo "${DIG_RESULT}" | grep '3 1 1' | tr -d '\n')
+                DANE=$( echo "${DIG_RESULT}" | grep -F '3 1 1' | tr -d '\n')
                 ;;
             302)
-                DANE=$( echo "${DIG_RESULT}" | grep '3 0 2' | tr -d '\n')
+                DANE=$( echo "${DIG_RESULT}" | grep -F '3 0 2' | tr -d '\n')
                 ;;
             *)
                 unknown "Internal error: unknown DANE check type ${DANE}"
@@ -2663,7 +2663,7 @@ main() {
 
                 if [ -r "${FILE}" ] ; then
 
-                    if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -q "BEGIN X509 CRL" ; then
+                    if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -F -q "BEGIN X509 CRL" ; then
                         debuglog "File is DER encoded CRL"
 
                         OPENSSL_COMMAND="crl"
@@ -2722,7 +2722,7 @@ main() {
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
         # shellcheck disable=SC2086
-        if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -q 'CN' ; then
+        if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -F -q 'CN' ; then
             CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
             sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
         else
@@ -2745,7 +2745,7 @@ main() {
         OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
 
         # count the certificates in the chain
-        NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+        NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
 
         # start with first certificate
         debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
@@ -2784,14 +2784,14 @@ main() {
     # TODO check SC2016
     # shellcheck disable=SC2086,SC2016
 
-    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep "CA Issuers" | grep -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
+    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep -F "CA Issuers" | grep -F -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
 
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
 
         verboselog "checking OCSP stapling"
 
-        grep -A 17 'OCSP response:' "${CERT}" > "${OCSP_RESPONSE_TMP}"
+        grep -F -A 17 'OCSP response:' "${CERT}" > "${OCSP_RESPONSE_TMP}"
 
         debuglog "${OCSP_RESPONSE_TMP}"
 
@@ -2831,7 +2831,7 @@ main() {
         debuglog "${SIGNATURE_ALGORITHM}"
     fi
 
-    if echo "${SIGNATURE_ALGORITHM}" | grep -q "sha1" ; then
+    if echo "${SIGNATURE_ALGORITHM}" | grep -F -q "sha1" ; then
 
         if [ -n "${NOSIGALG}" ] ; then
 
@@ -2845,7 +2845,7 @@ main() {
 
     fi
 
-    if echo "${SIGNATURE_ALGORITHM}" | grep -qi "md5" ; then
+    if echo "${SIGNATURE_ALGORITHM}" | grep -F -qi "md5" ; then
 
         if [ -n "${NOSIGALG}" ] ; then
 
@@ -2895,7 +2895,7 @@ main() {
 
     # shellcheck disable=SC2086
     SUBJECT_ALTERNATIVE_NAME=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
-           grep -A 1 "509v3 Subject Alternative Name:" |
+           grep -F -A 1 "509v3 Subject Alternative Name:" |
            tail -n 1 |
            sed -e "s/DNS://g" |
            sed -e "s/,//g" |
@@ -3106,7 +3106,7 @@ main() {
             check_cert_end_date "$(cat "${CERT}")"
         else
             # count the certificates in the chain
-            NUM_CERTIFICATES=$(grep -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+            NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
             debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
 
@@ -3174,7 +3174,7 @@ main() {
             # We clear the cache only on the first run
             IGNORE_SSL_LABS_CACHE=""
 
-            if echo "${JSON}" | grep -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' ; then
+            if echo "${JSON}" | grep -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' ; then
                 verboselog 'SSL Labs running at full capacity'
             else
 
@@ -3190,7 +3190,7 @@ main() {
                         prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
                         ;;
                     'READY')
-                        if ! echo "${JSON}" | grep -q "grade" ; then
+                        if ! echo "${JSON}" | grep -F -q "grade" ; then
 
                             # Something went wrong
                             SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
@@ -3329,7 +3329,7 @@ main() {
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] ; then
 	debuglog 'Checking Signed Certificate Timestamps (SCTs)'
-	if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -q 'SCTs' ; then
+	if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
             prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
 	fi
     fi
