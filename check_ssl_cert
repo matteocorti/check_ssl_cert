@@ -1228,7 +1228,8 @@ fetch_certificate() {
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}"
                 
             else
-
+                
+                debuglog "Copying the certificate to ${CERT}"
                 /bin/cat "${FILE}" > "${CERT}"
                 RET=$?
 
