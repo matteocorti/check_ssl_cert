@@ -2356,6 +2356,12 @@ main() {
 
     fi
 
+    ################################################################################
+    # Check if openssl s_client supports the specified protocol
+    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'sieve' ] && ${OPENSSL} s_client -starttls "${PROTOCOL}" 2>&1 | grep -F -q 'Value must be one of:' ; then
+        unknown "OpenSSL does not support the protocol sieve"
+    fi
+
     if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
         unknown "Only one of --proxy or --no_proxy can be specfied"
     fi
