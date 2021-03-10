@@ -1,9 +1,16 @@
-language: bash
-
-sudo: required
+language: shell
 
 os:
     - linux
+
+$ different distros to test different OpenSSL versions
+jobs:
+  include:
+   - dist: xenial
+   - dist: bionic
+   - dist: focal
+   - dist: trusty
+   - dist: precise
 
 script:
     - make test
