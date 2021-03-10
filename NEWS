@@ -1,3 +1,4 @@
+2021-03-10 Version 1.142.0: Improved the TLS renegotiation check
 2021-03-09 Version 1.141.0: Do not check SCTs if the certificate is self signed
                             Fixed the processing of --inetproto
                             Supports local PCKS #12 and DER formatted certificates
