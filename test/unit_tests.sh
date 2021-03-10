@@ -658,7 +658,7 @@ testCertificsteWithEmptySubject() {
 }
 
 testSCT() {
-    ${SCRIPT} -H no-sct.badssl.com
+    ${SCRIPT} -H no-sct.badssl.com -d
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
