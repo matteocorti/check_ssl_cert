@@ -3391,9 +3391,18 @@ main() {
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] ; then
+        
 	debuglog 'Checking Signed Certificate Timestamps (SCTs)'
-	if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
-            prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
+
+        # check if OpenSSL supoort SCTs
+        if man verify | grep -F -q SCT ; then
+        
+	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
+                prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
+            fi
+
+        else            
+            verboselog 'Skipping SCTs check as not supported by OpenSSL'
 	fi
     fi
 
