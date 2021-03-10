@@ -497,7 +497,7 @@ testIPv6() {
 
         if ifconfig -a | grep -q inet6 ; then
 
-            if ping -6 www.google.com 2>&1 > /dev/null ; then
+            if ping -6 www.google.com > /dev/null 2>&1  ; then
             
                 ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
                 EXIT_CODE=$?
