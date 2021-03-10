@@ -12,9 +12,8 @@ jobs:
    - dist: precise
 
 script:
-    - curl -L https://cpanmin.us | perl - App::cpanminus
-    - ~/perl5/bin/cpanm local::lib
-    - ~/perl5/bin/cpanm Date::Parse
+    - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus
+    - sudo cpanm Date::Parse
     - make test
     - ./shell-ci-build.sh
     - shellcheck ./check_ssl_cert test/unit_tests.sh
