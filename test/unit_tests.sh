@@ -627,9 +627,13 @@ testHTTP2() {
 }
 
 testForceHTTP2() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if openssl s_client -help 2>&1 | grep -q -F alpn ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Skupping forced HTTP2 test as -alpn is not supported"
+    fi
 }
 
 testNotLongerValidThan() {
