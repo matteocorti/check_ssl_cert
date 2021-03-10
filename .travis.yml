@@ -1,11 +1,19 @@
-language: bash
-
-sudo: required
+language: shell
 
 os:
     - linux
 
+jobs:
+  include:
+   - dist: xenial
+   - dist: bionic
+   - dist: focal
+   - dist: trusty
+   - dist: precise
+
 script:
+    - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus
+    - sudo cpanm Date::Parse
     - make test
     - ./shell-ci-build.sh
     - shellcheck ./check_ssl_cert test/unit_tests.sh

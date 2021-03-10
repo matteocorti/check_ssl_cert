@@ -589,7 +589,7 @@ testRequiredProgramPermissions() {
 }
 
 testSieveRSA() {
-    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; } ; then
+    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
         ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -599,7 +599,7 @@ testSieveRSA() {
 }
 
 testSieveECDSA() {
-    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; } ; then
+    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
         ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --ecdsa
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"

@@ -1,3 +1,7 @@
+2021-03-10  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Improved renegotiation testing
+
 2021-03-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Added missing processing of the --inetproto option
