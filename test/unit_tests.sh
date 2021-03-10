@@ -497,9 +497,15 @@ testIPv6() {
 
         if ifconfig -a | grep -q inet6 ; then
 
-            ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
-            EXIT_CODE=$?
-            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+            if ping -6 www.google.com 2>&1 > /dev/null ; then
+            
+                ${SCRIPT} -H www.google.com --rootcert cabundle.crt -6
+                EXIT_CODE=$?
+                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+            else
+                echo "IPv6 is configured but not working: skipping test"
+            fi
 
         else
             echo "Skipping forcing IPv6: not IPv6 configured locally"
