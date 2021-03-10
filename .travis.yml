@@ -13,6 +13,7 @@ jobs:
 
 script:
     - curl -L https://cpanmin.us | perl - App::cpanminus
+    - ~/perl5/bin/cpanm local::lib
     - ~/perl5/bin/cpanm Date::Parse
     - make test
     - ./shell-ci-build.sh
