@@ -632,6 +632,13 @@ testDERCert() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testPKCS12Cert() {
+    export PASS=
+    ${SCRIPT} -H localhost -f ./client.p12 --ignore-sct --password env:PASS
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testCertificsteWithoutCN() {
     ${SCRIPT} -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct
     EXIT_CODE=$?

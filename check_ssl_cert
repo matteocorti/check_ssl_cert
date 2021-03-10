@@ -1222,11 +1222,20 @@ fetch_certificate() {
             if echo "${FILE}" | grep -q -E '[.](p12|pfx)$' ; then
 
                 debuglog 'converting PKCS #12 to PEM'
+
+                create_temporary_file; PKCS12_ERROR=${TEMPFILE}
+
 		if [ -n "${PASSWORD_SOURCE}" ] ; then
-		    PASSIN="-passin ${PASSWORD_SOURCE}"
-		fi
-		debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys ${PASSIN}"
-                "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys "${PASSIN}"
+		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
+                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2> "${PKCS12_ERROR}"
+                else
+		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
+                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2> "${PKCS12_ERROR}"
+                fi
+                
+                if [ $? -eq 1 ] ; then
+                    unknown "Error converting ${FILE}: $( head -n 1 "${PKCS12_ERROR}" ) "
+                fi
 
             elif "${FILE_BIN}" "${FILE}" | grep -q -E '(data|Certificate)' ; then
 
