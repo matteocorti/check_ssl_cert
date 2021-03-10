@@ -3,7 +3,6 @@ language: shell
 os:
     - linux
 
-$ different distros to test different OpenSSL versions
 jobs:
   include:
    - dist: xenial
