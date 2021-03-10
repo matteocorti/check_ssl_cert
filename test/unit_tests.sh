@@ -542,12 +542,18 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
-    ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    # $TRAVIS is set an environment variable
+    # shellcheck disable=SC2154
+    if [ -z "${TRAVIS+x}" ] ; then
+        ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+        EXIT_CODE=$?
+        if [ -n "${DANE}" ] ; then
+            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        else
+            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        fi
     else
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        echo "Skipping SMTP tests on Travis CI"
     fi
 }
 
