@@ -658,9 +658,15 @@ testCertificsteWithEmptySubject() {
 }
 
 testSCT() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -d
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if man verify | grep -F -q SCT ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    fi
 }
     
 
