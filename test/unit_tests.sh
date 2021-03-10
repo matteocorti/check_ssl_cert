@@ -589,6 +589,12 @@ testRequiredProgramPermissions() {
 }
 
 testSieveRSA() {
+    openssl s_client -starttls sieve 2>&1
+
+    echo
+    echo
+    echo --------------------------------------------------------------------------------
+    
     if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; } ; then
         ${SCRIPT} -P sieve -p 4190 -H mail.aegee.org --rsa
         EXIT_CODE=$?
