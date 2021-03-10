@@ -1222,7 +1222,11 @@ fetch_certificate() {
             if echo "${FILE}" | grep -q -E '[.](p12|pfx)$' ; then
 
                 debuglog 'converting PKCS #12 to PEM'
-                "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys
+		if [ -n "${PASSWORD_SOURCE}" ] ; then
+		    PASSIN="-passin ${PASSWORD_SOURCE}"
+		fi
+		debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys ${PASSIN}"
+                "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys "${PASSIN}"
 
             elif "${FILE_BIN}" "${FILE}" | grep -q -E '(data|Certificate)' ; then
 
@@ -1774,6 +1778,11 @@ main() {
                 OPENSSL="$2"
                 shift 2
                 ;;
+	    --password)
+		check_option_argument '--password' "$2"
+		PASSWORD_SOURCE="$2"
+		shift 2
+		;;
             -p|--port)
                 check_option_argument '-p|--port' "$2"
                 PORT="$2"
