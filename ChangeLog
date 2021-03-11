@@ -1,3 +1,7 @@
+2021-03-11  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): Setting GZIP to quiet (-q) before using man
+
 2021-03-10  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Improved renegotiation testing
