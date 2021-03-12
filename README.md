@@ -24,6 +24,8 @@ Options:
    -A,--noauth                     ignore authority warnings (expiration only)
       --altnames                   matches the pattern specified in -n with
                                    alternate names too
+      --check-ciphers grade        checks the offered ciphers
+      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher
    -C,--clientcert path            use client certificate to authenticate
       --clientpass phrase          set passphrase for client certificate.
    -c,--critical days              minimum number of days a certificate has to
