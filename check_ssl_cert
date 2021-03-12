@@ -3274,6 +3274,17 @@ main() {
 
         exec_with_timeout "nmap -sV --script ssl-enum-ciphers ${HOST} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
+        if [ -n "${DEBUG}" ] ; then
+            debuglog 'nmap output:'
+            while read -r LINE; do
+                debuglog "${LINE}"
+            done < "${NMAP_OUT}"
+            debuglog 'nmap errors:'
+            while read -r LINE; do
+                debuglog "${LINE}"
+            done < "${NMAP_ERR}"
+        fi
+        
         if [ -s "${NMAP_ERR}" ] ; then
             NMAP_ERROR=$( head -n 1 "${NMAP_ERR}" )
             unknown "nmap exited with error: ${NMAP_ERROR}"
