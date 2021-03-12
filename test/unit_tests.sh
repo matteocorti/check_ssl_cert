@@ -684,7 +684,7 @@ testSCT() {
 }
     
 testCiphersOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --check-ciphers A --check-ciphers-warnings
+    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers C --check-ciphers-warnings
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
