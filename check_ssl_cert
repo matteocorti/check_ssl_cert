@@ -606,6 +606,8 @@ EOT
         RET=$?
         
         end_time=$( date +%s )
+
+        # we deduce the command duration from the total specified timeout
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
 
         return "${RET}"
@@ -711,6 +713,7 @@ check_crl() {
 #   $1 cert
 #   $2 element number
 check_ocsp() {
+    
     el_number=1
     if [ -n "$2" ]; then
         el_number=$2
@@ -757,224 +760,233 @@ check_ocsp() {
 
         fi
 
-        # we just consider the first HTTP(S) URI
-        # TODO check SC2016
         # shellcheck disable=SC2086,SC2016
-
-        ELEMENT_ISSUER_URI="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep -F "CA Issuers" | grep -F -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
-
-        debuglog "Chain element issuer URI: ${ELEMENT_ISSUER_URI}"
+        ELEMENT_ISSUER_URIS="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
         
-        # TODO: should be checked
-        # shellcheck disable=SC2021
-        if [ -z "${ELEMENT_ISSUER_URI}" ] ; then
+        if [ -z "${ELEMENT_ISSUER_URIS}" ] ; then
             verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks on element ${el_number}"
-            return
-        elif [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
-            verboselog "unable to fetch the CA issuer certificate (spaces in URI): disabling OCSP checks on element ${el_number}"
-            return
-        elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http' ; then
-            verboselog "unable to fetch the CA issuer certificate (unsupported protocol): disabling OCSP checks on element ${el_number}"
             return
         fi
 
+        debuglog "Chain element issuer URIs: ${ELEMENT_ISSUER_URIS}"
 
-        if [ -z "${ISSUER_CERT}" ] ; then
+        for ELEMENT_ISSUER_URI in ${ELEMENT_ISSUER_URIS} ; do
+            debuglog "checking issuer URIs: ${ELEMENT_ISSUER_URI}"
 
-            debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
-
-            if [ -n "${CURL_USER_AGENT}" ] ; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
-            else
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+            # shellcheck disable=SC2021
+            if [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
+                verboselog "unable to fetch the CA issuer certificate (spaces in URI): skipping"
+                continue
+            elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http' ; then
+                verboselog "unable to fetch the CA issuer certificate (unsupported protocol): skipping"
+                continue
             fi
 
-            debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-            if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c' ; then
-                debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
+            if [ -z "${ISSUER_CERT}" ] ; then
+                
+                debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
 
-                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
+                if [ -n "${CURL_USER_AGENT}" ] ; then
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                else
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                fi
 
-                ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+                debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-            fi
-
-            debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
-
-            # check the result
-            if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
-
-                if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
-
-                    debuglog "OCSP: converting issuer certificate from DER to PEM"
+                if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c' ; then
+                    debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
 
                     cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
-                    ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
-
-                elif "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q 'empty' ; then
-
-                    # empty certs are allowed
-                    debuglog "OCSP empty certificate detected: skipping"
-                    return
-
-                else
-
-                    debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
-
-                    unknown "Unable to fetch a valid certificate issuer certificate."
+                    ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
                 fi
 
-            fi
+                debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-            debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+                # check the result
+                if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
 
-            if [ -n "${DEBUG}" ] ; then
+                    if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
 
-                # remove trailing /
-                FILE_NAME=${ELEMENT_ISSUER_URI%/}
+                        debuglog "OCSP: converting issuer certificate from DER to PEM"
 
-                # remove everything up to the last slash
-                FILE_NAME="${TMPDIR}/${FILE_NAME##*/}"
+                        cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
-                debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
+                        ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
-                cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
-            fi
+                    elif "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q 'empty' ; then
 
-            if [ -n "${ISSUER_CERT_CACHE}" ] ; then
-                if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
+                        # empty certs are allowed
+                        debuglog "OCSP empty certificate detected: skipping"
+                        return
 
-                    unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writeable!"
+                    else
+
+                        debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
+
+                        unknown "Unable to fetch a valid certificate issuer certificate."
+
+                    fi
 
                 fi
 
-                debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                if [ -n "${DEBUG}" ] ; then
+
+                    # remove trailing /
+                    FILE_NAME=${ELEMENT_ISSUER_URI%/}
+
+                    # remove everything up to the last slash
+                    FILE_NAME="${TMPDIR}/${FILE_NAME##*/}"
+
+                    debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
+
+                    cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
+                    
+                fi
+
+                if [ -n "${ISSUER_CERT_CACHE}" ] ; then
+                    
+                    if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
+                        unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writeable!"
+                    fi
+
+                    debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+                    cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+                fi
+
+                ISSUER_CERT=${ISSUER_CERT_TMP}
 
             fi
 
-            ISSUER_CERT=${ISSUER_CERT_TMP}
 
-        fi
+        done
 
-
-        # TO DO: we just take the first result: a loop over all the hosts should
         # shellcheck disable=SC2086
-        OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout | head -n 1)"
-        debuglog "OSCP: URI = ${OCSP_URI}"
+        OCSP_URIS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout)"
 
-        OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
+        debuglog "OSCP: URIs = ${OCSP_URIS}"
+                
+        for OCSP_URI in ${OCSP_URIS} ; do
+        
+            debuglog "OSCP: URI = ${OCSP_URI}"
 
-        debuglog "OCSP: host = ${OCSP_HOST}"
+            OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
-        if [ -n "${OCSP_HOST}" ] ; then
+            debuglog "OCSP: host = ${OCSP_HOST}"
 
-            # check if -header is supported
-            OCSP_HEADER=""
+            if [ -n "${OCSP_HOST}" ] ; then
 
-            # ocsp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
-            # so we check if the major version is greater than 0
-            if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "$( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )" -gt 0 ] ; then
+                # check if -header is supported
+                OCSP_HEADER=""
 
-                debuglog "openssl ocsp supports the -header option"
+                # ocsp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
+                # so we check if the major version is greater than 0
+                if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "$( ${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g' )" -gt 0 ] ; then
 
-                # the -header option was first accepting key and value separated by space. The newer versions are using key=value
-                KEYVALUE=""
-                if ${OPENSSL} ocsp -help 2>&1 | grep -F header | grep -F -q 'key=value' ; then
-                    debuglog "${OPENSSL} ocsp -header requires 'key=value'"
-                    KEYVALUE=1
-                else
-                    debuglog "${OPENSSL} ocsp -header requires 'key value'"
-                fi
+                    debuglog "openssl ocsp supports the -header option"
 
-                # http_proxy is sometimes lower- and sometimes uppercase. Programs usually check both
-                # shellcheck disable=SC2154
-                if [ -n "${http_proxy}" ] ; then
-                    HTTP_PROXY="${http_proxy}"
-                fi
-
-                if [ -n "${HTTP_PROXY:-}" ] ; then
-                    OCSP_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
-
-                    if [ -n "${KEYVALUE}" ] ; then
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
+                    # the -header option was first accepting key and value separated by space. The newer versions are using key=value
+                    KEYVALUE=""
+                    if ${OPENSSL} ocsp -help 2>&1 | grep -F header | grep -F -q 'key=value' ; then
+                        debuglog "${OPENSSL} ocsp -header requires 'key=value'"
+                        KEYVALUE=1
                     else
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                        debuglog "${OPENSSL} ocsp -header requires 'key value'"
                     fi
 
-                else
-
-                    if [ -n "${KEYVALUE}" ] ; then
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
-                    else
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
-                        OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
+                    # http_proxy is sometimes lower- and sometimes uppercase. Programs usually check both
+                    # shellcheck disable=SC2154
+                    if [ -n "${http_proxy}" ] ; then
+                        HTTP_PROXY="${http_proxy}"
                     fi
-
-                fi
-
-                debuglog "$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
-
-                if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -F -q -i "timeout on connect" ; then
-
-                    debuglog 'OCSP: Timeout on connect'
-
-                elif echo "${OCSP_RESP}" | grep -F -q -i "revoked" ; then
-
-                    debuglog 'OCSP: revoked'
-
-                    prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
-
-                elif ! echo "${OCSP_RESP}" | grep -F -q -i "good" ; then
-
-                    debuglog "OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
 
                     if [ -n "${HTTP_PROXY:-}" ] ; then
+                        OCSP_PROXY_ARGUMENT="$( echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//' )"
 
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
-
-                        if [ -n "${OCSP_HEADER}" ] ; then
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                        if [ -n "${KEYVALUE}" ] ; then
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST=${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST="${OCSP_HOST}" 2>&1 )"
                         else
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} -host \"${OCSP_PROXY_ARGUMENT}\" -path ${OCSP_URI} -header HOST ${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                         fi
 
                     else
 
-                        debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
-
-                        if [ -n "${OCSP_HEADER}" ] ; then
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                        if [ -n "${KEYVALUE}" ] ; then
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1 )"
                         else
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" 2>&1 )"
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1 )"
                         fi
 
                     fi
 
-                    verboselog "OCSP Error: ${OCSP_RESP}"
+                    debuglog "$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
 
-                    prepend_critical_message "OCSP error (-v for details)"
+                    if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -F -q -i "timeout on connect" ; then
+
+                        debuglog 'OCSP: Timeout on connect'
+
+                    elif echo "${OCSP_RESP}" | grep -F -q -i "revoked" ; then
+
+                        debuglog 'OCSP: revoked'
+
+                        prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
+
+                    elif ! echo "${OCSP_RESP}" | grep -F -q -i "good" ; then
+
+                        debuglog "OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
+
+                        if [ -n "${HTTP_PROXY:-}" ] ; then
+
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+
+                            if [ -n "${OCSP_HEADER}" ] ; then
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                            else
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1 )"
+                            fi
+
+                        else
+
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+
+                            if [ -n "${OCSP_HEADER}" ] ; then
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1 )"
+                            else
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" 2>&1 )"
+                            fi
+
+                        fi
+
+                        verboselog "OCSP Error: ${OCSP_RESP}"
+
+                        prepend_critical_message "OCSP error (-v for details)"
+
+                    fi
+
+                else
+
+                    verboselog "openssl ocsp does not support the -header option: disabling OCSP checks"
 
                 fi
 
             else
 
-                verboselog "openssl ocsp does not support the -header option: disabling OCSP checks"
+                verboselog "no OCSP host found: disabling OCSP checks"
 
             fi
 
-        else
-
-                verboselog "no OCSP host found: disabling OCSP checks"
-
-        fi
+        done
 
     fi
 
