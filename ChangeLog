@@ -1,3 +1,7 @@
+2021-03-12  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (exec_with_timeout): reducing the total timeout by each execution
+
 2021-03-11  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): Setting GZIP to quiet (-q) before using man

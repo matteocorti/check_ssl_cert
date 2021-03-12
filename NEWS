@@ -1,3 +1,4 @@
+Better handling of the timeout
 2021-03-10 Version 1.142.0: Improved the TLS renegotiation check
                             Added --password to specify a password source for PCKS12 certificates
 2021-03-09 Version 1.141.0: Do not check SCTs if the certificate is self signed
