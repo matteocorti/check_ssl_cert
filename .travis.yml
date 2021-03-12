@@ -3,6 +3,9 @@ language: shell
 os:
     - linux
 
+before_install:
+  - sudo apt-get -y install nmap
+
 jobs:
   include:
    - dist: xenial
