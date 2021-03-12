@@ -1,5 +1,9 @@
 2021-03-12  Matteo Corti  <matteo@corti.li>
 
+	* check_ssl_cert (exec_with_timeout): fixing timeout on systems using 'timeout'
+
+2021-03-12  Matteo Corti  <matteo@corti.li>
+
 	* check_ssl_cert (exec_with_timeout): reducing the total timeout by each execution
 	* check_ssl_cert (check_attr): check chiphers with nmap
 
