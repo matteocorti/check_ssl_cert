@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.142.0
+VERSION=1.143.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -66,6 +66,8 @@ usage() {
     echo "   -A,--noauth                     ignore authority warnings (expiration only)"
     echo "      --altnames                   matches the pattern specified in -n with"
     echo "                                   alternate names too"
+    echo "      --check-ciphers grade        checks the offered ciphers"
+    echo "      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher"
     echo "   -C,--clientcert path            use client certificate to authenticate"
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to"
@@ -507,6 +509,8 @@ set_variable() {
 # Executes command with a timeout
 # Params:
 #   $1 command
+#   $2 where to put the stdout
+#   $3 where to put the stderr
 # Returns 1 if timed out 0 otherwise
 exec_with_timeout() {
 
@@ -516,6 +520,15 @@ exec_with_timeout() {
     # (spawn accepts one command)
     command="/bin/sh -c \"$1\""
 
+    OUTFILE=/dev/null
+    if [ -n "$2" ] ; then
+        OUTFILE=$2
+    fi
+    ERRFILE=/dev/null
+    if [ -n "$3" ] ; then
+        ERRFILE=$3
+    fi
+    
     start_time=$( date +%s )
     
     debuglog "executing with timeout (${time}s): $1"
@@ -526,7 +539,7 @@ exec_with_timeout() {
 
         # We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
         # https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
-        eval "${TIMEOUT_BIN} ${time} ${command} &" > /dev/null 2>&1
+        eval "${TIMEOUT_BIN} ${time} ${command} &" > "${OUTFILE}" 2> "${ERRFILE}"
         TIMEOUT_PID=$!
         wait "${TIMEOUT_PID}" > /dev/null 2>&1
         RET=$?
@@ -563,7 +576,7 @@ set echo \"-noecho\"
 set timeout ${time}
 
 # spawn the process
-spawn -noecho sh -c { ${command} }
+spawn -noecho sh -c { ${command} > ${OUTFILE} 2> ${ERRFILE} }
 
 expect {
   timeout { exit ${TIMEOUT_ERROR_CODE} }
@@ -602,7 +615,7 @@ EOT
 
         debuglog "$(printf "%s\n" eval "${command}")"
 
-        eval "${command}"
+        eval "${command}" > "${OUTFILE}" 2> "${ERRFILE}"
         RET=$?
         
         end_time=$( date +%s )
@@ -1475,14 +1488,20 @@ main() {
     while true; do
 
         case "$1" in
+            
             ########################################
             # Options without arguments
+            
             -A|--noauth)
                 NOAUTH=1
                 shift
                 ;;
             --altnames)
                 ALTNAMES=1
+                shift
+                ;;
+            --check-ciphers-warnings)
+                CHECK_CIPHERS_WARNINGS=1
                 shift
                 ;;
             --crl)
@@ -1661,6 +1680,11 @@ main() {
             -c|--critical)
                 check_option_argument '-c,--critical' "$2"
                 CRITICAL_DAYS="$2"
+                shift 2
+                ;;
+            --check-ciphers)
+                check_option_argument '--check-ciphers' "$2"
+                CHECK_CIPHERS="$2"
                 shift 2
                 ;;
             --curl-bin)
@@ -2189,6 +2213,11 @@ main() {
         fi
     fi
 
+    if [ -n "${CHECK_CIPHERS}" ] ; then
+        convert_ssl_lab_grade "${CHECK_CIPHERS}"
+        CHECK_CIPHERS_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+    fi
+
     debuglog "ROOT_CA = ${ROOT_CA}"
 
     # Signature algorithms
@@ -2262,8 +2291,12 @@ main() {
 
     # nmap
     if [ -z "${NMAP_BIN}" ] ; then
-        if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then
-            debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"
+        
+        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
+
+            if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}" ; fi
+            if [ -n "${CHECK_CIPHERS}" ] ; then  debuglog "nmap binary needed. CHECK_CIPHERS = ${CHECK_CIPHERS}" ; fi
+            if [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then  debuglog "nmap binary needed. CHECK_CIPHERS_WARNINGS" ; fi
             debuglog "nmap binary not specified"
 
             check_required_prog nmap
@@ -2273,9 +2306,11 @@ main() {
         else
             debuglog "nmap binary not needed. No disallowed protocols"
         fi
+        
     else
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
+        
     fi
 
     # Expect (optional)
@@ -3224,8 +3259,74 @@ main() {
 
     fi
 
-    debuglog '------------------------------------------------------------------------------'
+    ################################################################################
+    # Check SSL Labs
+    if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
 
+        verboselog "Checking offered ciphers with nmap"
+
+        if [ -n "${CHECK_CIPHERS}" ] ; then
+            debuglog "Checking offered ciphers (minimum level ${CHECK_CIPHERS}: ${CHECK_CIPHERS_NUMERIC})"
+        fi
+
+        create_temporary_file; NMAP_OUT=${TEMPFILE}
+        create_temporary_file; NMAP_ERR=${TEMPFILE}
+
+        exec_with_timeout "nmap -sV --script ssl-enum-ciphers ${HOST} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+
+        if [ -s "${NMAP_ERR}" ] ; then
+            NMAP_ERROR=$( head -n 1 "${NMAP_ERR}" )
+            unknown "nmap exited with error: ${NMAP_ERROR}"
+        fi
+        
+        if [ -n "${CHECK_CIPHERS}" ] ; then
+        
+            NMAP_GRADE=$( grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //' )
+            convert_ssl_lab_grade "${NMAP_GRADE}"
+            NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+
+            verboselog "nmap cipher grade ${NMAP_GRADE}: ${NMAP_GRADE_NUMERIC}"
+
+            # Check the grade
+            if [ "${NMAP_GRADE_NUMERIC}" -lt "${CHECK_CIPHERS_NUMERIC}" ] ; then
+                prepend_critical_message "${HOST} offers ciphers with grade ${NMAP_GRADE} (instead of ${CHECK_CIPHERS})"
+            fi
+
+        fi
+
+        if [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
+
+            if grep -F -q 'warnings:' "${NMAP_OUT}" ; then
+                
+                PARSING_WARNINGS=
+                WARNINGS=
+                while IFS= read -r line; do
+                    
+                    if echo "${line}" | grep -q -F 'warnings:' ; then
+                        PARSING_WARNINGS=1
+                    elif echo "${line}" | grep -q -F ':' ; then
+                        PARSING_WARNINGS=
+                    elif [ -n "${PARSING_WARNINGS}" ] ; then
+                        WARNING=$( echo "${line}" | sed 's/|\ *//' )
+                        if [ -n "${WARNINGS}" ] ; then
+                            debuglog "Cipher warning '${WARNING}'"
+                            WARNINGS="${WARNINGS}\n${WARNING}"
+                        else
+                            WARNINGS="${WARNING}"
+                        fi
+                    fi
+                    
+                done < "${NMAP_OUT}"
+
+                WARNINGS=$( echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed 's/,/,\ /g' | sed 's/,\ $//' )
+                prepend_critical_message "${HOST} offers ciphers with warning: ${WARNINGS}"
+                
+            fi
+            
+        fi
+        
+    fi
+    
     ################################################################################
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then

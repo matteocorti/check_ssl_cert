@@ -683,6 +683,17 @@ testSCT() {
     fi
 }
     
+testCiphersOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --check-ciphers A --check-ciphers-warnings
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testCiphersError() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers A --check-ciphers-warnings
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
 
 # SSL Labs (last one as it usually takes a lot of time
 

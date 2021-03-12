@@ -1,4 +1,3 @@
-* Use nmap --script ssl-enum-ciphers  instead of SSL Labs?
 * Get rid of the CN checks and just use the subjectAlternativeName
   http://unmitigatedrisk.com/?p=381
   https://nameconstraints.bettertls.com/#!about
