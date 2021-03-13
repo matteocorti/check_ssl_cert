@@ -684,9 +684,13 @@ testSCT() {
 }
     
 testCiphersOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers C --check-ciphers-warnings
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers C --check-ciphers-warnings
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Skipping nmap cipher warnings tests as nmap is too old"
+    fi
 }
 
 testCiphersError() {
