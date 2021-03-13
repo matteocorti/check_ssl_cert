@@ -690,9 +690,13 @@ testCiphersOK() {
 }
 
 testCiphersError() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers A --check-ciphers-warnings
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -z "${TRAVIS+x}" ] ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping nmap cipher warnings tests as nmap is too old"
+    fi
 }
 
 # SSL Labs (last one as it usually takes a lot of time
