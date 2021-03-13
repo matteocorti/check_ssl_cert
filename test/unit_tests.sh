@@ -685,7 +685,7 @@ testSCT() {
     
 testCiphersOK() {
     if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers C --check-ciphers-warnings
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
