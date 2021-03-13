@@ -528,9 +528,9 @@ exec_with_timeout() {
     if [ -n "$3" ] ; then
         ERRFILE=$3
     fi
-    
+
     start_time=$( date +%s )
-    
+
     debuglog "executing with timeout (${time}s): $1"
 
     if [ -n "${TIMEOUT_BIN}" ] ; then
@@ -562,7 +562,7 @@ exec_with_timeout() {
         end_time=$( date +%s )
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
 	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
-        
+
         return "${RET}"
 
     elif [ -n "${EXPECT}" ] ; then
@@ -620,7 +620,7 @@ EOT
 
         eval "${command}" > "${OUTFILE}" 2> "${ERRFILE}"
         RET=$?
-        
+
         end_time=$( date +%s )
 
         # we deduce the command duration from the total specified timeout
@@ -630,8 +630,8 @@ EOT
         return "${RET}"
 
     fi
-    
-    
+
+
 }
 
 ################################################################################
@@ -730,7 +730,7 @@ check_crl() {
 #   $1 cert
 #   $2 element number
 check_ocsp() {
-    
+
     el_number=1
     if [ -n "$2" ]; then
         el_number=$2
@@ -779,7 +779,7 @@ check_ocsp() {
 
         # shellcheck disable=SC2086,SC2016
         ELEMENT_ISSUER_URIS="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
-        
+
         if [ -z "${ELEMENT_ISSUER_URIS}" ] ; then
             verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks on element ${el_number}"
             return
@@ -801,7 +801,7 @@ check_ocsp() {
 
 
             if [ -z "${ISSUER_CERT}" ] ; then
-                
+
                 debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
 
                 if [ -n "${CURL_USER_AGENT}" ] ; then
@@ -863,11 +863,11 @@ check_ocsp() {
                     debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
 
                     cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
-                    
+
                 fi
 
                 if [ -n "${ISSUER_CERT_CACHE}" ] ; then
-                    
+
                     if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
                         unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writeable!"
                     fi
@@ -889,9 +889,9 @@ check_ocsp() {
         OCSP_URIS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout)"
 
         debuglog "OSCP: URIs = ${OCSP_URIS}"
-                
+
         for OCSP_URI in ${OCSP_URIS} ; do
-        
+
             debuglog "OSCP: URI = ${OCSP_URI}"
 
             OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
@@ -1275,7 +1275,7 @@ fetch_certificate() {
 		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
                     "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2> "${PKCS12_ERROR}"
                 fi
-                
+
                 if [ $? -eq 1 ] ; then
                     unknown "Error converting ${FILE}: $( head -n 1 "${PKCS12_ERROR}" ) "
                 fi
@@ -1284,18 +1284,18 @@ fetch_certificate() {
 
                 debuglog 'converting DER to PEM'
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}"
-                
+
             else
-                
+
                 debuglog "Copying the certificate to ${CERT}"
                 /bin/cat "${FILE}" > "${CERT}"
                 RET=$?
 
             fi
-                
+
             debuglog "storing the certificate to ${CERT}"
             debuglog "certificate type (2): $(${FILE_BIN} "${CERT}" | sed 's/.*://' )"
-            
+
         else
             unknown "Error: option 'file' works with -H localhost only"
         fi
@@ -1493,10 +1493,10 @@ main() {
     while true; do
 
         case "$1" in
-            
+
             ########################################
             # Options without arguments
-            
+
             -A|--noauth)
                 NOAUTH=1
                 shift
@@ -2296,7 +2296,7 @@ main() {
 
     # nmap
     if [ -z "${NMAP_BIN}" ] ; then
-        
+
         if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
 
             if [ -n "${DISALLOWED_PROTOCOLS}" ] ; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}" ; fi
@@ -2311,11 +2311,11 @@ main() {
         else
             debuglog "nmap binary not needed. No disallowed protocols"
         fi
-        
+
     else
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
-        
+
     fi
 
     # Expect (optional)
@@ -2739,7 +2739,7 @@ main() {
     trap_with_arg cleanup ${SIGNALS}
 
     fetch_certificate
-    
+
     if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}" ; then
 
         if [ -n "${SERVERNAME}" ] ; then
@@ -2761,11 +2761,11 @@ main() {
 
     # check for TLS renegotiation
     if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] ; then
-        
+
         verboselog "Checking TLS renegotiation"
 
         # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
-        
+
         exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST}:${PORT} 2>&1 | grep -F -q err"
         RET=$?
 
@@ -2774,10 +2774,10 @@ main() {
             if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}" ; then
                 prepend_critical_message 'TLS renegotiation is supported but not secure'
             fi
-            
+
         fi
 
-    fi        
+    fi
 
     if ascii_grep "BEGIN X509 CRL" "${CERT}" ; then
         # we are dealing with a CRL file
@@ -3289,14 +3289,14 @@ main() {
                 debuglog "${LINE}"
             done < "${NMAP_ERR}"
         fi
-        
+
         if [ -s "${NMAP_ERR}" ] ; then
             NMAP_ERROR=$( head -n 1 "${NMAP_ERR}" )
             unknown "nmap exited with error: ${NMAP_ERROR}"
         fi
-        
+
         if [ -n "${CHECK_CIPHERS}" ] ; then
-        
+
             NMAP_GRADE=$( grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //' )
             convert_grade "${NMAP_GRADE}"
             NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
@@ -3313,11 +3313,11 @@ main() {
         if [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
 
             if grep -F -q 'warnings:' "${NMAP_OUT}" ; then
-                
+
                 PARSING_WARNINGS=
                 WARNINGS=
                 while IFS= read -r line; do
-                    
+
                     if echo "${line}" | grep -q -F 'warnings:' ; then
                         PARSING_WARNINGS=1
                     elif echo "${line}" | grep -q -F ':' ; then
@@ -3331,18 +3331,18 @@ main() {
                             WARNINGS="${WARNING}"
                         fi
                     fi
-                    
+
                 done < "${NMAP_OUT}"
 
                 WARNINGS=$( echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed 's/,/,\ /g' | sed 's/,\ $//' )
                 prepend_critical_message "${HOST} offers ciphers with warning: ${WARNINGS}"
-                
+
             fi
-            
+
         fi
-        
+
     fi
-    
+
     ################################################################################
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
@@ -3467,7 +3467,7 @@ main() {
     if [ -n "${ORGANIZATION}" ] ; then
 
         debuglog "Checking organization ${ORGANIZATION}"
-        
+
         ORG=$(${OPENSSL} x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
 
         if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}" ; then
@@ -3533,17 +3533,17 @@ main() {
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] ; then
-        
+
 	debuglog 'Checking Signed Certificate Timestamps (SCTs)'
 
         # check if OpenSSL supoort SCTs
         if env GZIP=-q man verify | grep -F -q SCT ; then
-        
+
 	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
             fi
 
-        else            
+        else
             verboselog 'Skipping SCTs check as not supported by OpenSSL'
 	fi
     fi

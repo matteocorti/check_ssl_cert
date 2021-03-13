@@ -178,7 +178,7 @@ testWildcardAltNames2() {
         --cn otherhost.sPaPPs.ethz.ch \
         --cn spapps.ethz.ch \
         --altnames \
-       
+
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -502,7 +502,7 @@ testIPv6() {
         if ifconfig -a | grep -q inet6 ; then
 
             if ping -6 www.google.com > /dev/null 2>&1  ; then
-            
+
                 ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -682,7 +682,7 @@ testSCT() {
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
 }
-    
+
 testCiphersOK() {
     if [ -z "${TRAVIS+x}" ] ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings

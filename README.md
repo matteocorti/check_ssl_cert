@@ -104,7 +104,7 @@ Options:
    -o,--org org                    pattern to match the organization of the certificate
       --openssl path               path of the openssl binary to be used
       --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section
-                                   openssl(1)      
+                                   openssl(1)
    -p,--port port                  TCP port
    -P,--protocol protocol          use the specific protocol
                                    {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
