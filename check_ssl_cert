@@ -1104,12 +1104,13 @@ check_cert_end_date() {
 
 
 ################################################################################
-# Converts SSL Labs grades to a numeric value
-#   (see https://www.ssllabs.com/downloads/SSL_Server_Rating_Guide.pdf)
+# Converts SSL Labs or nmap grades to a numeric value
+#   (see https://www.ssllabs.com/downloads/SSL_Server_Rating_Guide.pdf and
+#    https://nmap.org/nsedoc/scripts/ssl-enum-ciphers.html)
 # Params
 #   $1 program name
 # Sets NUMERIC_SSL_LAB_GRADE
-convert_ssl_lab_grade() {
+convert_grade() {
 
     GRADE="$1"
 
@@ -1121,7 +1122,7 @@ convert_ssl_lab_grade() {
             NUMERIC_SSL_LAB_GRADE=85
             shift
             ;;
-        A|a)
+        A|a|strong|Strong)
             NUMERIC_SSL_LAB_GRADE=80
             shift
             ;;
@@ -1134,7 +1135,7 @@ convert_ssl_lab_grade() {
             NUMERIC_SSL_LAB_GRADE=65
             shift
             ;;
-        C|c)
+        C|c|weak|Weak)
             NUMERIC_SSL_LAB_GRADE=50
             shift
             ;;
@@ -1150,7 +1151,7 @@ convert_ssl_lab_grade() {
             NUMERIC_SSL_LAB_GRADE=0
             shift
             ;;
-        T|t)
+        T|t|unknown|Unknown)
             # No trust: value not in documentation
             NUMERIC_SSL_LAB_GRADE=0
             shift
@@ -2205,12 +2206,12 @@ main() {
     fi
 
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
-        convert_ssl_lab_grade "${SSL_LAB_CRIT_ASSESSMENT}"
+        convert_grade "${SSL_LAB_CRIT_ASSESSMENT}"
         SSL_LAB_CRIT_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
 
     if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then
-        convert_ssl_lab_grade "${SSL_LAB_WARN_ASSESTMENT}"
+        convert_grade "${SSL_LAB_WARN_ASSESTMENT}"
         SSL_LAB_WARN_ASSESTMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
         if [ "${SSL_LAB_WARN_ASSESTMENT_NUMERIC}" -lt "${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}" ]; then
             unknown  '--check-ssl-labs-warn must be greater than -L|--check-ssl-labs'
@@ -2218,7 +2219,7 @@ main() {
     fi
 
     if [ -n "${CHECK_CIPHERS}" ] ; then
-        convert_ssl_lab_grade "${CHECK_CIPHERS}"
+        convert_grade "${CHECK_CIPHERS}"
         CHECK_CIPHERS_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
     fi
 
@@ -3297,7 +3298,7 @@ main() {
         if [ -n "${CHECK_CIPHERS}" ] ; then
         
             NMAP_GRADE=$( grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //' )
-            convert_ssl_lab_grade "${NMAP_GRADE}"
+            convert_grade "${NMAP_GRADE}"
             NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
             verboselog "nmap cipher grade ${NMAP_GRADE}: ${NMAP_GRADE_NUMERIC}"
@@ -3410,7 +3411,7 @@ main() {
 
                             verboselog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
-                            convert_ssl_lab_grade "${SSL_LABS_HOST_GRADE}"
+                            convert_grade "${SSL_LABS_HOST_GRADE}"
                             SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
                             add_performance_data "ssllabs=${SSL_LABS_HOST_GRADE_NUMERIC}%;;${SSL_LAB_CRIT_ASSESSMENT_NUMERIC}"
