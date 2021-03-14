@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.143.0
+VERSION=1.144.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -321,6 +321,82 @@ EOF
 
     debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
     echo "${HOURS_UNTIL}"
+
+}
+
+################################################################################
+# checks if OpenSSL version is at least the given parameter
+# Params
+#   $1 minumum version
+openssl_version() {
+
+    # See https://wiki.openssl.org/index.php/Versioning
+    
+    # Required version
+    MIN_VERSION=$1
+
+    IFS='.' read -r MIN_MAJOR1 MIN_MAJOR2 MIN_MINOR <<EOF
+${MIN_VERSION}
+EOF
+
+    if echo "${MIN_MINOR}" | grep -q '[:alpha:]' ; then
+        MIN_FIX=$( echo "${MIN_MINOR}" | sed 's/[[:digit:]][[:digit:]]*//' )
+        MIN_MINOR=$( echo "${MIN_MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//' )
+    fi
+
+    if [ -n "${MIN_FIX}" ] ; then MIN_FIX_NUM=$( printf '%d' "'${MIN_FIX}" ) ; else MIN_FIX_NUM=0 ; fi
+    debuglog "Checking if OpenSSL version is at least ${MIN_VERSION} ( '${MIN_MAJOR1}' '${MIN_MAJOR2}' '${MIN_MINOR}' '${MIN_FIX}:${MIN_FIX_NUM}' )"
+
+    # current version
+    
+    OPENSSL_VERSION=$( ${OPENSSL} version | sed 's/^OpenSSL\ \([^ ]*\).*/\1/' )
+
+    IFS='.' read -r MAJOR1 MAJOR2 MINOR <<EOF
+${OPENSSL_VERSION}
+EOF
+
+    if echo "${MINOR}" | grep -q '[[:alpha:]]' ; then
+        FIX=$( echo "${MINOR}" | sed 's/[[:digit:]][[:digit:]]*//' )
+        MINOR=$( echo "${MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//' )
+    fi
+
+    if [ -n "${FIX}" ] ; then FIX_NUM=$( printf '%d' "'${FIX}" ) ; else FIX_NUM=0 ; fi
+    debuglog "Current version ${OPENSSL_VERSION} ( '${MAJOR1}' '${MAJOR2}' '${MINOR}' '${FIX}:${FIX_NUM}' )"
+
+    # return 0 for true and 1 for false
+    # check MAJOR1
+    if [ "${MAJOR1}" -gt "${MIN_MAJOR1}" ] ; then
+        RET=0
+    elif [ "${MAJOR1}" -lt "${MIN_MAJOR1}" ] ; then
+        RET=1
+    else
+        # check MAJOR2
+        if [ "${MAJOR2}" -gt "${MIN_MAJOR2}" ] ; then
+            RET=0
+        elif [ "${MAJOR2}" -lt "${MIN_MAJOR2}" ] ; then
+            RET=1
+        else
+            # check MINOR
+            if [ "${MINOR}" -gt "${MIN_MINOR}" ] ; then
+                RET=0
+            elif [ "${MINOR}" -lt "${MIN_MINOR}" ] ; then
+                RET=1
+            else
+                # check FIX
+                RET=$( [ "${FIX_NUM}" -ge "${MIN_FIX_NUM}" ]  )
+            fi
+        fi
+    fi
+
+    if [ -n "${DEBUG}" ] ; then
+        if [ "${RET}" -eq 0 ] ; then
+            debuglog '  true'
+        else
+            debuglog '  false'
+        fi
+    fi
+    
+    return "${RET}"
 
 }
 
@@ -2399,8 +2475,10 @@ main() {
     if [ -n "${DEBUG}" ] ; then
         debuglog "check_ssl_cert version: ${VERSION}"
         debuglog "OpenSSL binary: ${OPENSSL}"
-        debuglog "OpenSSL version: $( ${OPENSSL} version )"
-
+        if [ -n "${DEBUG}" ] ; then
+            debuglog "OpenSSL info:"
+            ${OPENSSL} version -a | sed 's/^/[DBG]/'
+        fi
         OPENSSL_DIR="$( ${OPENSSL} version -d | sed -E 's/OPENSSLDIR: "([^"]*)"/\1/' )"
 
         debuglog "OpenSSL configuration directory: ${OPENSSL_DIR}"
@@ -3533,11 +3611,11 @@ main() {
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] ; then
-
-	debuglog 'Checking Signed Certificate Timestamps (SCTs)'
-
+              
         # check if OpenSSL supoort SCTs
-        if env GZIP=-q man verify | grep -F -q SCT ; then
+        if openssl_version '1.1.0' ; then
+
+            debuglog 'Checking Signed Certificate Timestamps (SCTs)'
 
 	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"

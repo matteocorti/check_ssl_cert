@@ -1,3 +1,4 @@
+2021-03-14 Version 1.144.0: Getting rid of the man dependency
 2021-03-12 Version 1.143.0: Better handling of the timeout
                             Checks ciphers with nmap (--check-ciphers and --check-ciphers-warnings)
                             Checks oll the supplied OCSP URIs

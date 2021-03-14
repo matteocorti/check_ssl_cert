@@ -1,3 +1,7 @@
+2021-03-14  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (openssl_version): added a function to compare OpenSSL versions. Getting rid of the man dependency
+
 2021-03-12  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (exec_with_timeout): fixing timeout on systems using 'timeout'
