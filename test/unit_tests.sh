@@ -679,15 +679,31 @@ testCertificsteWithEmptySubject() {
 }
 
 testCiphersOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if command -v nmap > /dev/null ; then
+        if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
+            ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings
+            EXIT_CODE=$?
+            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        else
+            echo "no ssl-enum-ciphers nmap script found: skipping ciphers test"
+        fi
+    else
+        echo "no nmap found: skipping ciphers test"
+    fi
 }
 
 testCiphersError() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if command -v nmap > /dev/null ; then
+        if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
+            ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
+            EXIT_CODE=$?
+            assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        else
+            echo "no ssl-enum-ciphers nmap script found: skipping ciphers test"
+        fi
+    else
+        echo "no nmap found: skipping ciphers test"
+    fi
 }
 
 # SSL Labs (last one as it usually takes a lot of time
