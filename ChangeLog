@@ -1,3 +1,7 @@
+2021-03-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (openssl_version): works on systems which add a string to the OpenSSL version output
+
 2021-03-14  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (openssl_version): added a function to compare OpenSSL versions. Getting rid of the man dependency
