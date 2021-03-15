@@ -68,7 +68,7 @@ testHoursUntil42Hours() {
 testOpenSSLVersion1() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.2.0a'
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 1 "${RET}"
@@ -78,7 +78,7 @@ testOpenSSLVersion1() {
 testOpenSSLVersion2() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.1.1j'
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -88,7 +88,7 @@ testOpenSSLVersion2() {
 testOpenSSLVersion3() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -98,7 +98,7 @@ testOpenSSLVersion3() {
 testOpenSSLVersion4() {
     export OPENSSL_VERSION='OpenSSL 1.0.2k-fips 26 Jan 2017'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -108,7 +108,7 @@ testOpenSSLVersion4() {
 testOpenSSLVersion5() {
     export OPENSSL_VERSION='OpenSSL 1.1.1h-freebsd 22 Sep 2020'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -123,7 +123,7 @@ testDependencies() {
 }
 
 testSCT() {
-    OPENSSL=$( which openssl ) # needed by openssl_version
+    OPENSSL=$( command -v openssl ) # needed by openssl_version
     ${OPENSSL} version
     if openssl_version '1.1.0' ; then
 	echo "OpenSSL >= 1.1.0: SCTs supported"
