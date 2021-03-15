@@ -3371,9 +3371,11 @@ main() {
                 debuglog "${LINE}"
             done < "${NMAP_OUT}"
             debuglog 'nmap errors:'
-            while read -r LINE; do
-                debuglog "${LINE}"
-            done < "${NMAP_ERR}"
+            if [ -s "${NMAP_ERR}" ] ; then
+                while read -r LINE; do
+                    debuglog "${LINE}"
+                done < "${NMAP_ERR}"
+            fi
         fi
 
         if [ -s "${NMAP_ERR}" ] ; then
@@ -3381,7 +3383,7 @@ main() {
             unknown "nmap exited with error: ${NMAP_ERROR}"
         fi
 
-        if ! grep -F -q '| ssl-enum-ciphers' ; then
+        if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}" ; then
             unknkown "empty nmap result while checking ciphers"
         fi
         
