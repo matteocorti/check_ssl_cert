@@ -71,6 +71,7 @@ testOpenSSLVersion1() {
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 1 "${RET}"
+    export OPENSSL_VERSION=
 }
 
 testOpenSSLVersion2() {
@@ -79,6 +80,7 @@ testOpenSSLVersion2() {
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+    export OPENSSL_VERSION=
 }
 
 testOpenSSLVersion3() {
@@ -87,6 +89,7 @@ testOpenSSLVersion3() {
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+    export OPENSSL_VERSION=
 }
 
 testOpenSSLVersion4() {
@@ -95,6 +98,7 @@ testOpenSSLVersion4() {
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+    export OPENSSL_VERSION=
 }
 
 testOpenSSLVersion5() {
@@ -103,6 +107,7 @@ testOpenSSLVersion5() {
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+    export OPENSSL_VERSION=
 }
 
 testDependencies() {
