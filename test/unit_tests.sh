@@ -689,7 +689,7 @@ testCertificsteWithEmptySubject() {
 testCiphersOK() {
     if command -v nmap > /dev/null ; then
         if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
-            ${SCRIPT} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C --check-ciphers-warnings
+            ${SCRIPT} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C
             EXIT_CODE=$?
             assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
         else

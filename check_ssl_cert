@@ -3381,6 +3381,10 @@ main() {
             unknown "nmap exited with error: ${NMAP_ERROR}"
         fi
 
+        if ! grep -F -q '| ssl-enum-ciphers' ; then
+            unknkown "empty nmap result while checking ciphers"
+        fi
+        
         if [ -n "${CHECK_CIPHERS}" ] ; then
 
             NMAP_GRADE=$( grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //' )
