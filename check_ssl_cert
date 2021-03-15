@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.144.0
+VERSION=1.145.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -349,7 +349,7 @@ EOF
 
     # current version
     
-    OPENSSL_VERSION=$( ${OPENSSL} version | sed 's/^OpenSSL\ \([^ ]*\).*/\1/' )
+    OPENSSL_VERSION=$( ${OPENSSL} version | sed 's/^OpenSSL\ \([^ \-]*\).*/\1/' )
 
     IFS='.' read -r MAJOR1 MAJOR2 MINOR <<EOF
 ${OPENSSL_VERSION}
