@@ -559,12 +559,16 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
-    ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if command -v dig > /dev/null ; then
+        ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+        EXIT_CODE=$?
+        if [ -n "${DANE}" ] ; then
+            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        else
+            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        fi
     else
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        echo "dig not available: skipping DANE test"
     fi
 }
 
@@ -590,12 +594,16 @@ testDANE211() {
 #}
 
 testDANE301ECDSA() {
-    ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org
-    EXIT_CODE=$?
-    if [ -n "${DANE}" ] ; then
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if command -v dig > /dev/null ; then
+        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org
+        EXIT_CODE=$?
+        if [ -n "${DANE}" ] ; then
+            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        else
+            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        fi
     else
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+        echo "dig not available: skipping DANE test"
     fi
 }
 
