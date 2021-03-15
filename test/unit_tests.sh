@@ -712,7 +712,7 @@ testCertificsteWithEmptySubject() {
 }
 
 testSCT() {
-    if man verify | grep -F -q SCT ; then
+    if openssl_version '1.1.0' ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
