@@ -340,7 +340,6 @@ openssl_version() {
     IFS='.' read -r MIN_MAJOR1 MIN_MAJOR2 MIN_MINOR <<EOF
 ${MIN_VERSION}
 EOF
-
     
     if echo "${MIN_MINOR}" | grep -q '[[:alpha:]]' ; then
         MIN_FIX=$( echo "${MIN_MINOR}" | sed 's/[[:digit:]][[:digit:]]*//' )
