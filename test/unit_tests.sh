@@ -270,18 +270,12 @@ testMultipleAltNamesFailTwo() {
 }
 
 testXMPPHost() {
-    # $TRAVIS is set an environment variable
-    # shellcheck disable=SC2154
-    if [ -z "${TRAVIS+x}" ] ; then
-        out=$(${SCRIPT} --rootcert-file cabundle.crt -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is )
-        EXIT_CODE=$?
-        if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
-            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-        else
-            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-        fi
+    out=$(${SCRIPT} --rootcert-file cabundle.crt -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is )
+    EXIT_CODE=$?
+    if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
+        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     else
-        echo "Skipping XMPP tests on Travis CI"
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
 }
 
@@ -292,55 +286,35 @@ testTimeOut() {
 }
 
 testIMAP() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        # minimal critical and warning as they renew pretty late
-        ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --critical 1 --warning 2
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping IMAP tests on Travis CI"
-    fi
+    # minimal critical and warning as they renew pretty late
+    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIMAPS() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping IMAP tests on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPOP3S() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping POP3S tests on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 
 testSMTP() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping SMTP tests on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPSubmbission() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping SMTP tests on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPS() {
@@ -432,33 +406,21 @@ testBadSSLDH512(){
 }
 
 testBadSSLRC4MD5(){
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    else
-        echo "Skipping RC4 MD5 with badssl.com on Travis CI (OpenSSL too old)"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRC4(){
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    else
-        echo "Skipping RC4 with badssl.com on Travis CI (OpenSSL too old)"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSL3DES(){
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    else
-        echo "Skipping 3DES with badssl.com on Travis CI (OpenSSL too old)"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLNULL(){
@@ -468,63 +430,39 @@ testBadSSLNULL(){
 }
 
 testBadSSLSHA256() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H sha256.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping SHA 256 with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H sha256.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc256() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping ECC 256 with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc384() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H ecc384.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping ECC 384 with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H ecc384.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLRSA8192() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rsa8192.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping RSA8192 with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H rsa8192.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomainWithDashes() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping long subdomain with dashes with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomain() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping long subdomain with badssl.com on Travis CI"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA12016() {
@@ -621,18 +559,12 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
-    # $TRAVIS is set an environment variable
-    # shellcheck disable=SC2154
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
-        EXIT_CODE=$?
-        if [ -n "${DANE}" ] ; then
-            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-        else
-            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-        fi
+    ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+    EXIT_CODE=$?
+    if [ -n "${DANE}" ] ; then
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-        echo "Skipping SMTP tests on Travis CI"
+        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
     fi
 }
 
@@ -747,23 +679,15 @@ testCertificsteWithEmptySubject() {
 }
 
 testCiphersOK() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping nmap cipher warnings tests as nmap is too old"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.wikipedia.org --check-ciphers A --check-ciphers-warnings
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCiphersError() {
-    if [ -z "${TRAVIS+x}" ] ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    else
-        echo "Skipping nmap cipher warnings tests as nmap is too old"
-    fi
+    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 # SSL Labs (last one as it usually takes a lot of time
