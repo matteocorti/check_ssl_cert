@@ -65,6 +65,46 @@ testHoursUntil42Hours() {
     assertEquals "error computing the missing hours until now" 42 "${HOURS_UNTIL}"
 }
 
+testOpenSSLVersion1() {
+    export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
+    export REQUIRED_VERSION='1.2.0a'
+    openssl_version "${REQUIRED_VERSION}"
+    RET=$?
+    assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 1 "${RET}"
+}
+
+testOpenSSLVersion2() {
+    export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
+    export REQUIRED_VERSION='1.1.1j'
+    openssl_version "${REQUIRED_VERSION}"
+    RET=$?
+    assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+}
+
+testOpenSSLVersion3() {
+    export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
+    export REQUIRED_VERSION='1.0.0b'
+    openssl_version "${REQUIRED_VERSION}"
+    RET=$?
+    assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+}
+
+testOpenSSLVersion4() {
+    export OPENSSL_VERSION='OpenSSL 1.0.2k-fips 26 Jan 2017'
+    export REQUIRED_VERSION='1.0.0b'
+    openssl_version "${REQUIRED_VERSION}"
+    RET=$?
+    assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+}
+
+testOpenSSLVersion5() {
+    export OPENSSL_VERSION='OpenSSL 1.1.1h-freebsd 22 Sep 2020'
+    export REQUIRED_VERSION='1.0.0b'
+    openssl_version "${REQUIRED_VERSION}"
+    RET=$?
+    assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
+}
+
 testDependencies() {
     check_required_prog openssl
     # $PROG is defined in the script

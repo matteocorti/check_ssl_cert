@@ -335,11 +335,14 @@ openssl_version() {
     # Required version
     MIN_VERSION=$1
 
+    debuglog "openssl_version ${MIN_VERSION}"
+
     IFS='.' read -r MIN_MAJOR1 MIN_MAJOR2 MIN_MINOR <<EOF
 ${MIN_VERSION}
 EOF
 
-    if echo "${MIN_MINOR}" | grep -q '[:alpha:]' ; then
+    
+    if echo "${MIN_MINOR}" | grep -q '[[:alpha:]]' ; then
         MIN_FIX=$( echo "${MIN_MINOR}" | sed 's/[[:digit:]][[:digit:]]*//' )
         MIN_MINOR=$( echo "${MIN_MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//' )
     fi
@@ -348,8 +351,13 @@ EOF
     debuglog "Checking if OpenSSL version is at least ${MIN_VERSION} ( '${MIN_MAJOR1}' '${MIN_MAJOR2}' '${MIN_MINOR}' '${MIN_FIX}:${MIN_FIX_NUM}' )"
 
     # current version
-    
-    OPENSSL_VERSION=$( ${OPENSSL} version | sed 's/^OpenSSL\ \([^ \-]*\).*/\1/' )
+
+    # the OPENSSL_VERSION can be set externally to be able to test
+    if [ -z "${OPENSSL_VERSION}" ] ; then
+        OPENSSL_VERSION=$( ${OPENSSL} version )
+    fi
+    debuglog "openssl version: ${OPENSSL_VERSION}"
+    OPENSSL_VERSION=$( echo "${OPENSSL_VERSION}" | sed 's/^OpenSSL\ \([^ \-]*\).*/\1/' )
 
     IFS='.' read -r MAJOR1 MAJOR2 MINOR <<EOF
 ${OPENSSL_VERSION}
@@ -383,7 +391,8 @@ EOF
                 RET=1
             else
                 # check FIX
-                RET=$( [ "${FIX_NUM}" -ge "${MIN_FIX_NUM}" ]  )
+                [ "${FIX_NUM}" -ge "${MIN_FIX_NUM}" ]
+                RET=$?
             fi
         fi
     fi
