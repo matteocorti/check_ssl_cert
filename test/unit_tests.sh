@@ -1,5 +1,3 @@
-bg
-bg
 #!/bin/sh
 
 # $SHUNIT2 should be defined as an environment variable before running the tests
