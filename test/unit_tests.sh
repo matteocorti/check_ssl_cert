@@ -1,3 +1,5 @@
+bg
+bg
 #!/bin/sh
 
 # $SHUNIT2 should be defined as an environment variable before running the tests
@@ -565,7 +567,16 @@ testIPv4() {
 testIPv6() {
     if openssl s_client -help 2>&1 | grep -q -- -6 ; then
 
-        if ifconfig -a | grep -q inet6 ; then
+	IPV6=
+	if command -v ifconfig > /dev/null && ifconfig -a | grep -q -F inet6 ; then
+	    IPV6=1
+	elif command -v ip > /dev/null && ip addr | grep -q -F inet6 ; then
+	    IPV6=1
+	fi
+	    
+        if [ -n "${IPV6}" ] ; then
+
+	    echo "IPv6 is configured"
 
             if ping -6 www.google.com > /dev/null 2>&1  ; then
 
