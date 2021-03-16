@@ -29,4 +29,6 @@ jobs:
       - name: Run test
         run: |
           echo Running tests
+          ls -l shunit2
+          chmod +x shunit2/shunit2
           make test
