@@ -23,25 +23,44 @@ jobs:
           - 'fedora:33'
         include:
           - distro: 'debian:testing'
-            pre: 'apt-get update && apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl'
+            pre: >-
+              apt-get update &&
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
           - distro: 'debian:10'
-            pre: 'apt-get update && apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl'
+            pre: >-
+              apt-get update &&
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
           - distro: 'ubuntu:20.10'
-            pre: 'apt-get update && apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl'
+            pre: >-
+              apt-get update &&
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
           - distro: 'ubuntu:20.04'
-            pre: 'apt-get update && apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl'
+            pre: >-
+              apt-get update &&
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
           - distro: 'alpine:edge'
-            pre: 'apk add -U nmap shellcheck curl sudo perl make wget bzip2 file openssl bash'
+            pre: >-
+              apk add -U bash &&
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl
           - distro: 'alpine:3.13'
-            pre: 'apk add -U nmap shellcheck curl sudo perl make wget bzip2 file openssl bash'
+            pre: >-
+              apk add -U bash &&
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl
           - distro: 'fedora:rawhide'
-            pre: 'dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl'
+            pre: >-
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
           - distro: 'fedora:34'
-            pre: 'dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl hostname'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
           - distro: 'fedora:33'
-            pre: 'dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl hostname'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
           - distro: 'centos:8'
-            pre: 'dnf install -y nmap curl sudo perl make bzip2 file openssl && scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/'
+            pre: >-
+              dnf install -y nmap curl sudo perl make bzip2 file openssl &&
+              scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
         uses: actions/checkout@v2
