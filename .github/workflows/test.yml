@@ -1,3 +1,6 @@
+
+name: Tests
+
 on:
   push:
     branches:
@@ -20,8 +23,9 @@ jobs:
           - 'ubuntu:20.10'
           - 'alpine:3.13'
           - 'centos:8'
+          - 'centos:7'
           - 'fedora:33'
-        include:
+        Include:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
