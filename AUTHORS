@@ -108,5 +108,6 @@ Thanks:
 * Many thanks to cbiedl (https://github.com/cbiedl) for the proxy patch
 * Many thanks to Robin Schneider (https://github.com/ypid-geberit) for the --long-output all patch
 * Many thanks to Robin Pronk (https://github.com/rfpronk) for the -u patch
-* Many thanks to tunnelpr0 (https://github.com/tunnelpr0) fot --inetproto patch
+* Many thanks to tunnelpr0 (https://github.com/tunnelpr0) for the --inetproto patch
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the OpenSSL version patch
+* Many thanks to waja (https://github.com/waja) for the GitHub workflows

@@ -445,7 +445,7 @@ prepend_critical_message() {
         CRITICAL_MSG="${MSG}"
     fi
 
-    ALL_MSG="\n    ${MSG}${ALL_MSG}"
+    ALL_MSG="\\n    ${MSG}${ALL_MSG}"
 
     debuglog "prepend_critical_message: MSG 2          = ${MSG}"
     debuglog "prepend_critical_message: CRITICAL_MSG 2 = ${CRITICAL_MSG}"
@@ -514,7 +514,7 @@ append_warning_message() {
         WARNING_MSG="${MSG}"
     fi
 
-    ALL_MSG="${ALL_MSG}\n    ${MSG}"
+    ALL_MSG="${ALL_MSG}\\n    ${MSG}"
 
 
     debuglog "prepend_warning_message: MSG 2          = ${MSG}"
@@ -619,7 +619,7 @@ exec_with_timeout() {
 
     if [ -n "${TIMEOUT_BIN}" ] ; then
 
-        debuglog "$(printf "%s %s %s\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
+        debuglog "$(printf "%s %s %s\\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
 
         # We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
         # https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
@@ -700,7 +700,7 @@ EOT
 
     else
 
-        debuglog "$(printf "%s\n" eval "${command}")"
+        debuglog "$(printf "%s\\n" eval "${command}")"
 
         eval "${command}" > "${OUTFILE}" 2> "${ERRFILE}"
         RET=$?
@@ -1319,7 +1319,7 @@ fetch_certificate() {
                 RET=$?
                 ;;
             postgres)
-                exec_with_timeout "printf 'X\0\0\0\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
+                exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
                 RET=$?
                 ;;
             sieve)
@@ -2989,7 +2989,7 @@ main() {
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
     # shellcheck disable=SC2086
-    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \/)?//" | awk  '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
+    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \\/)?//" | awk  '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
 
     debuglog 'ISSUERS = '
     debuglog "${ISSUERS}"
@@ -3418,7 +3418,7 @@ main() {
                         WARNING=$( echo "${line}" | sed 's/|\ *//' )
                         if [ -n "${WARNINGS}" ] ; then
                             debuglog "Cipher warning '${WARNING}'"
-                            WARNINGS="${WARNINGS}\n${WARNING}"
+                            WARNINGS="${WARNINGS}\\n${WARNING}"
                         else
                             WARNINGS="${WARNING}"
                         fi
