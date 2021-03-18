@@ -972,11 +972,11 @@ check_ocsp() {
         # shellcheck disable=SC2086
         OCSP_URIS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout)"
 
-        debuglog "OSCP: URIs = ${OCSP_URIS}"
+        debuglog "OCSP: URIs = ${OCSP_URIS}"
 
         for OCSP_URI in ${OCSP_URIS} ; do
 
-            debuglog "OSCP: URI = ${OCSP_URI}"
+            debuglog "OCSP: URI = ${OCSP_URI}"
 
             OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//' )"
 
