@@ -2330,7 +2330,7 @@ main() {
         if "${OPENSSL}" ciphers "${SSL_AU}" > /dev/null 2>&1 ; then
             unknown "OpenSSL does not support cipher ${SSL_AU}"
         fi
-        SSL_AU="-sigalgs 'SSL_AU'"
+        SSL_AU="-sigalgs '${SSL_AU}'"
     fi
 
     #######################
