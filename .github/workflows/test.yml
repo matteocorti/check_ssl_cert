@@ -1,6 +1,3 @@
-
-name: Tests
-
 on:
   push:
     branches:
@@ -24,7 +21,7 @@ jobs:
           - 'alpine:3.13'
           - 'centos:8'
           - 'fedora:33'
-        Include:
+        include:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
@@ -51,7 +48,7 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl
           - distro: 'fedora:rawhide'
             pre: >-
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl hostname
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
