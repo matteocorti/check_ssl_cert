@@ -417,15 +417,25 @@ testBadSSLRC4MD5(){
 }
 
 testBadSSLRC4(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4
+    if ! openssl ciphers RC4 > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "OpenSSL too old to test RC4-MD5 ciphers"
+    fi
 }
 
 testBadSSL3DES(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4
+    if ! openssl ciphers 3DES > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+      else
+        echo "OpenSSL too old to test 3DES ciphers"
+    fi  
 }
 
 testBadSSLNULL(){
