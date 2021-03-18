@@ -2311,20 +2311,26 @@ main() {
     fi
     if [ -n "${ECDSA}" ] ; then
         # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-        SSL_AU="-sigalgs 'ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512'"
+        SSL_AU="ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512"
     fi
     if [ -n "${RSA}" ] ; then
         if echo "${SSL_VERSION_DISABLED}" | grep -F -q -- '-no_tls1_3' ||
-            [ "${SSL_VERSION}" = '-tls1' ] ||
-            [ "${SSL_VERSION}" = '-tls1_1' ] ||
-            [ "${SSL_VERSION}" = '-tls1_2' ] ; then
-                # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-                # see https://github.com/matteocorti/check_ssl_cert/issues/167
-                 SSL_AU="-sigalgs 'RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"
+                [ "${SSL_VERSION}" = '-tls1' ] ||
+                [ "${SSL_VERSION}" = '-tls1_1' ] ||
+                [ "${SSL_VERSION}" = '-tls1_2' ] ; then
+            # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
+            # see https://github.com/matteocorti/check_ssl_cert/issues/167
+            SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"
         else
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
-              SSL_AU="-sigalgs 'RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1'"
+            SSL_AU="RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"
         fi
+    fi
+    if [ -n "${SSL_AU}" ] ; then
+        if "${OPENSSL}" ciphers "${SSL_AU}" > /dev/null 2>&1 ; then
+            unknown "OpenSSL does not support cipher ${SSL_AU}"
+        fi
+        SSL_AU="-sigalgs 'SSL_AU'"
     fi
 
     #######################
