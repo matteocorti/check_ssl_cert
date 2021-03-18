@@ -406,10 +406,14 @@ testBadSSLDH512(){
 }
 
 testBadSSLRC4MD5(){
-    openssl ciphers RC4
-    ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4-MD5
+    if ! openssl ciphers RC4-MD5 > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "OpenSSL too old to test RC4-MD5 ciphers"
+    fi
 }
 
 testBadSSLRC4(){
