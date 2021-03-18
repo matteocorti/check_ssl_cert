@@ -406,6 +406,7 @@ testBadSSLDH512(){
 }
 
 testBadSSLRC4MD5(){
+    openssl ciphers RC4
     ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
