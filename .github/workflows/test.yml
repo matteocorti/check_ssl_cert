@@ -23,6 +23,7 @@ jobs:
           - 'centos:7'
           - 'centos:8'
           - 'fedora:33'
+          - 'fedora:32'
         include:
           - distro: 'debian:testing'
             pre: >-
@@ -60,6 +61,10 @@ jobs:
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
           - distro: 'fedora:33'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
+          - distro: 'fedora:32'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl
