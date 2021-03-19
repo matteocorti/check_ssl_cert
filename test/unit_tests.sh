@@ -406,21 +406,36 @@ testBadSSLDH512(){
 }
 
 testBadSSLRC4MD5(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4-MD5
+    if ! openssl ciphers RC4-MD5 > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "OpenSSL too old to test RC4-MD5 ciphers"
+    fi
 }
 
 testBadSSLRC4(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4
+    if ! openssl ciphers RC4 > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "OpenSSL too old to test RC4-MD5 ciphers"
+    fi
 }
 
 testBadSSL3DES(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # older versions of OpenSSL validate RC4
+    if ! openssl ciphers 3DES > /dev/null 2>&1 ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --host-cn
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+      else
+        echo "OpenSSL too old to test 3DES ciphers"
+    fi  
 }
 
 testBadSSLNULL(){
@@ -617,16 +632,6 @@ testRequiredProgramPermissions() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /etc/hosts
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-}
-
-testSieveRSA() {
-    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --rsa
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping sieve tests (not supported)"
-    fi
 }
 
 testSieveECDSA() {
