@@ -694,7 +694,7 @@ testCertificsteWithEmptySubject() {
 testCiphersOK() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
-    if [ -f /etc/redhat/release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release ; then
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release ; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
     else
     
@@ -723,7 +723,7 @@ testCiphersOK() {
 testCiphersError() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
-    if [ -f /etc/redhat/release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release ; then
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release ; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
     else
 
