@@ -1,7 +1,7 @@
 PLUGIN=check_ssl_cert
 VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
-DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
+DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 YEAR=`date +"%Y"`
 
 dist: version_check formatting_check copyright_check shellcheck
@@ -27,7 +27,7 @@ version_check:
 
 formatting_check:
 	grep -v -q '\\t' check_ssl_cert test/unit_tests.sh
-	grep -v -q '[[:blank:]]$$' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md TODO VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
+	grep -v -q '[[:blank:]]$$' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
 
 clean:
 	rm -f *~
