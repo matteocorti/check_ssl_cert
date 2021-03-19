@@ -6,6 +6,7 @@ on:
       - master
   # Run tests for any PRs
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build_job:
