@@ -331,7 +331,7 @@ EOF
 openssl_version() {
 
     # See https://wiki.openssl.org/index.php/Versioning
-    
+
     # Required version
     MIN_VERSION=$1
 
@@ -340,7 +340,7 @@ openssl_version() {
     IFS='.' read -r MIN_MAJOR1 MIN_MAJOR2 MIN_MINOR <<EOF
 ${MIN_VERSION}
 EOF
-    
+
     if echo "${MIN_MINOR}" | grep -q '[[:alpha:]]' ; then
         MIN_FIX=$( echo "${MIN_MINOR}" | sed 's/[[:digit:]][[:digit:]]*//' )
         MIN_MINOR=$( echo "${MIN_MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//' )
@@ -403,7 +403,7 @@ EOF
             debuglog '  false'
         fi
     fi
-    
+
     return "${RET}"
 
 }
@@ -1401,7 +1401,7 @@ fetch_certificate() {
 
         debuglog "storing a copy of the OpenSSL errors in ${HOST}.error"
         cp "${ERROR}" "${HOST}.error"
-        
+
         debuglog "Return value of the command = ${RET}"
     fi
 
@@ -3388,7 +3388,7 @@ main() {
         if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}" ; then
             unknkown "empty nmap result while checking ciphers"
         fi
-        
+
         if [ -n "${CHECK_CIPHERS}" ] ; then
 
             NMAP_GRADE=$( grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //' )
@@ -3627,7 +3627,7 @@ main() {
     ##############################################################################
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] ; then
-              
+
         # check if OpenSSL supoort SCTs
         if openssl_version '1.1.0' ; then
 

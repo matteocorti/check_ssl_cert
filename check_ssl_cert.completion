@@ -1,9 +1,6 @@
 #/usr/bin/env bash
 
 _check_ssl_cert() {
-
-    
-    
 }
 
 complete -F _check_ssl_cert check_ssl_cert
