@@ -17,6 +17,7 @@ jobs:
       matrix:
         distro:
           - 'debian:10'
+          - 'debian:9'
           - 'ubuntu:20.10'
           - 'alpine:3.13'
           - 'centos:7'
@@ -28,6 +29,10 @@ jobs:
               apt-get update &&
               apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
           - distro: 'debian:10'
+            pre: >-
+              apt-get update &&
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
+          - distro: 'debian:9'
             pre: >-
               apt-get update &&
               apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl
