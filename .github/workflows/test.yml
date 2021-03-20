@@ -21,11 +21,13 @@ jobs:
         distro:
           - 'debian:9'
           - 'debian:10'
+          - 'debian:testing'
           - 'ubuntu:16.04'
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
           - 'ubuntu:20.10'
           - 'alpine:3.13'
+          - 'alpine:edge'
           - 'centos:7'
           - 'centos:8'
           - 'fedora:32'
