@@ -11,7 +11,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_job:
+  macos:
+    runs-on: macos-latest
+    steps:
+    
+      - name: Git clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          
+      - name: Install shellcheck
+        run: brew install shellcheck
+
+      - name: Install Date::Parse
+        run: curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus \
+              && cpanm --sudo install Date::Parse
+              
+      - name: Run the tests
+        run:  make test
+  linux:
     # The host should always be linux
     runs-on: ubuntu-latest
     name: Running tests on ${{ matrix.distro }}
