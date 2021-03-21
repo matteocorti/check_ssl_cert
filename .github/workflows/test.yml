@@ -38,7 +38,9 @@ jobs:
           install: Date::Parse
               
       - name: Run the tests
-        run:  make test
+        run:  |
+          uname -a \
+          && make test
         
   linux:
     # The host should always be linux
@@ -135,6 +137,7 @@ jobs:
               /bin/sh -c 'sh ./prep-cmd.sh \
               && curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus \
               && cpanm --sudo install Date::Parse \
+              && uname -a
               && make test \
               && if command -v shellcheck > /dev/null 2>&1  ; then ./shell-ci-build.sh ; fi \
               && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi'
