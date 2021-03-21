@@ -21,12 +21,12 @@ jobs:
           - macos-11.0
     runs-on: ${{ matrix.os }}
     steps:
-    
+
       - name: Git clone repository
         uses: actions/checkout@v2
         with:
           submodules: true
-          
+
       - name: Install shellcheck
         run: brew install shellcheck
 
@@ -34,12 +34,12 @@ jobs:
         uses: perl-actions/install-with-cpanm@v1
         with:
           install: Date::Parse
-              
+
       - name: Run the tests
         run:  |
           uname -a \
           && make test
-        
+
   linux:
     # The host should always be linux
     runs-on: ubuntu-latest

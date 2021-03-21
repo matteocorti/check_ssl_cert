@@ -25,9 +25,11 @@ version_check:
 	grep -q "${VERSION}" NEWS
 	echo "Version check: OK"
 
+# we check for tabs
+# and remove trailing blanks
 formatting_check:
-	grep -v -q '\\t' check_ssl_cert test/unit_tests.sh
-	grep -v -q '[[:blank:]]$$' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
+	! grep -q '\\t' check_ssl_cert test/unit_tests.sh
+	sed -i '' 's/[[:blank:]]*$$//' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/*
 
 clean:
 	rm -f *~
