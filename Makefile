@@ -3,6 +3,7 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 YEAR=`date +"%Y"`
+FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/*
 
 dist: version_check formatting_check copyright_check shellcheck
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -29,7 +30,10 @@ version_check:
 # and remove trailing blanks
 formatting_check:
 	! grep -q '\\t' check_ssl_cert test/unit_tests.sh
-	sed -i '' 's/[[:blank:]]*$$//' test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/*
+	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
+
+remove_blanks:
+	sed -i '' 's/[[:blank:]]*$$//' $(FORMATTED_FILES)
 
 clean:
 	rm -f *~
