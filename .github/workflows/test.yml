@@ -12,7 +12,7 @@ on:
 
 jobs:
   macos:
-    name: Running tests on ${{ matrix.distro }}
+    name: Running tests on ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
