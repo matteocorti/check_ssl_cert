@@ -60,6 +60,8 @@ jobs:
           - 'centos:8'
           - 'fedora:32'
           - 'fedora:33'
+          - 'fedora:34'
+          - 'fedora:rawhide'
         include:
           - distro: 'debian:testing'
             pre: >-

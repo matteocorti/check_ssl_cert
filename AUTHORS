@@ -111,3 +111,4 @@ Thanks:
 * Many thanks to tunnelpr0 (https://github.com/tunnelpr0) for the --inetproto patch
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the OpenSSL version patch
 * Many thanks to waja (https://github.com/waja) for the GitHub workflows
+* Many thanks to Tobias Grünewald (https://github.com/tobias-gruenewald) for the client certificate
