@@ -1418,7 +1418,7 @@ fetch_certificate() {
         debuglog "$(sed 's/^/SSL error: /' "${ERROR}")"
 
         # s_client could verify the server certificate because the server requires a client certificate
-        if ascii_grep '^Acceptable client certificate CA names' "${CERT}" ; then
+        if ascii_grep '^Client Certificate Types' "${CERT}" ; then
 
             verboselog "The server requires a client certificate"
 
