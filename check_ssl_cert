@@ -616,6 +616,7 @@ exec_with_timeout() {
     start_time=$( date +%s )
 
     debuglog "executing with timeout (${time}s): $1"
+    debuglog "  start time = ${start_time}"
 
     if [ -n "${TIMEOUT_BIN}" ] ; then
 
@@ -645,6 +646,8 @@ exec_with_timeout() {
 
         end_time=$( date +%s )
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
+	debuglog "  end time = ${end_time}"
+	debuglog "  new timeout = ${TIMEOUT}"
 	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
@@ -694,6 +697,8 @@ EOT
 
         end_time=$( date +%s )
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
+	debuglog "  end time = ${end_time}"
+	debuglog "  new timeout = ${TIMEOUT}"
 	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
@@ -709,6 +714,8 @@ EOT
 
         # we deduce the command duration from the total specified timeout
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
+	debuglog "  end time = ${end_time}"
+	debuglog "  new timeout = ${TIMEOUT}"
 	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
@@ -1427,6 +1434,12 @@ fetch_certificate() {
             ERROR='Connection refused'
             prepend_critical_message "${ERROR}"
             critical "${SHORTNAME} CRITICAL: ${ERROR}"
+
+	elif ascii_grep 'Connection timed out' "${ERROR}" ; then
+
+	    ERROR='OpenSSL connection timed out'
+	    prepend_critical_message "${ERROR}"
+	    critical "${SHORTNAME} CRITICAL: ${ERROR}"
 
         elif ascii_grep 'dh\ key\ too\ small' "${ERROR}" ; then
 
