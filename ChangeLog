@@ -1,3 +1,7 @@
+2021-03-22  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (usage): adds a --all option to allow all the optional checks at the maximum level
+
 2021-03-22  Matteo Corti  <corti@matteo.ethz.ch>
 
 	* check_ssl_cert (fetch_certificate): detecting a timeout on the OpenSSL level

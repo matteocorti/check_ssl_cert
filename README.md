@@ -22,6 +22,7 @@ Arguments:
 
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
+      --all                        enables all the possible optional checks at the maximum level
       --altnames                   matches the pattern specified in -n with
                                    alternate names too
       --check-ciphers grade        checks the offered ciphers

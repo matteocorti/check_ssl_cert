@@ -64,6 +64,7 @@ usage() {
     echo
     echo "Options:"
     echo "   -A,--noauth                     ignore authority warnings (expiration only)"
+    echo "      --all                        enables all the possible optional checks at the maximum level"
     echo "      --altnames                   matches the pattern specified in -n with"
     echo "                                   alternate names too"
     echo "      --check-ciphers grade        checks the offered ciphers"
@@ -1594,6 +1595,10 @@ main() {
                 NOAUTH=1
                 shift
                 ;;
+            --all)
+                ALL=1
+                shift
+                ;;
             --altnames)
                 ALTNAMES=1
                 shift
@@ -2142,6 +2147,21 @@ main() {
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
+
+    if [ -n "${ALL}" ] ; then
+
+        # enable ciphers checks (level A)
+        CHECK_CIPHERS='A'
+
+        # enable ciphers warnings
+        CHECK_CIPHERS_WARNINGS=1
+
+        # enable ciphers checks (level A)
+        SSL_LAB_CRIT_ASSESSMENT='A'
+
+        REQUIRE_SAN=1
+
+    fi
 
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.
