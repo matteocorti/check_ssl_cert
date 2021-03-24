@@ -54,10 +54,10 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Mar  12 2021 Matteo Corti <matteo@corti.li> - 1.143.0-0
 - Updated to 1.143.0
 
-* Thu Mar  10 2021 Matteo Corti <matteo@corti.li> - 1.142.0-0
+* Wed Mar  10 2021 Matteo Corti <matteo@corti.li> - 1.142.0-0
 - Updated to 1.142.0
 
-* Thu Mar   9 2021 Matteo Corti <matteo@corti.li> - 1.141.0-0
+* Tue Mar   9 2021 Matteo Corti <matteo@corti.li> - 1.141.0-0
 - Updated to 1.141.0
 
 * Thu Feb  25 2021 Matteo Corti <matteo@corti.li> - 1.140.0-0
@@ -108,7 +108,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Dec  11 2020 Matteo Corti <matteo@corti.li> - 1.125.0-0
 - Updated to 1.125.0
 
-* Mon Dec   1 2020 Matteo Corti <matteo@corti.li> - 1.124.0-0
+* Tue Dec   1 2020 Matteo Corti <matteo@corti.li> - 1.124.0-0
 - Updated to 1.124.0
 
 * Mon Nov  30 2020 Matteo Corti <matteo@corti.li> - 1.123.0-0
@@ -213,7 +213,7 @@ w
 * Thu Aug 22 2019 Matteo Corti <matteo@corti.li> - 1.89.0-0
 - Updated to 1.89.0
 
-* Thu Aug  9 2019 Matteo Corti <matteo@corti.li> - 1.88.0-0
+* Fri Aug  9 2019 Matteo Corti <matteo@corti.li> - 1.88.0-0
 - Updated to 1.88.0
 
 * Thu Aug  8 2019 Matteo Corti <matteo@corti.li> - 1.87.0-0
@@ -234,7 +234,7 @@ w
 * Fri Feb  8 2019 Matteo Corti <matteo@corti.li> - 1.82.0-0
 - Updated to 1.82.0
 
-* Fri Feb  2 2019 Matteo Corti <matteo@corti.li> - 1.81.0-0
+* Sat Feb  2 2019 Matteo Corti <matteo@corti.li> - 1.81.0-0
 - Updated to 1.81.0
 
 * Wed Jan 16 2019 Matteo Corti <matteo@corti.li> - 1.80.1-0
@@ -246,13 +246,13 @@ w
 * Tue Dec 11 2018 Matteo Corti <matteo@corti.li> - 1.79.0-0
 - Updated to 1.79.0
 
-* Thu Nov  7 2018 Matteo Corti <matteo@corti.li> - 1.78.0-0
+* Wed Nov  7 2018 Matteo Corti <matteo@corti.li> - 1.78.0-0
 - Updated to 1.78.0
 
-* Thu Nov  5 2018 Matteo Corti <matteo@corti.li> - 1.77.0-0
+* Mon Nov  5 2018 Matteo Corti <matteo@corti.li> - 1.77.0-0
 - Updated to 1.77.0
 
-* Thu Oct 19 2018 Matteo Corti <matteo@corti.li> - 1.76.0-0
+* Fri Oct 19 2018 Matteo Corti <matteo@corti.li> - 1.76.0-0
 - Updated to 1.76.0
 
 * Thu Oct 18 2018 Matteo Corti <matteo@corti.li> - 1.75.0-0
@@ -264,13 +264,13 @@ w
 * Mon Sep 10 2018 Matteo Corti <matteo@corti.li> - 1.73.0-0
 - Updated to 1.73.0
 
-* Sun Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.72.0-0
+* Mon Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.72.0-0
 - Updated to 1.72.0
 
-* Sun Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.71.0-0
+* Mon Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.71.0-0
 - Updated to 1.71.0
 
-* Mon Jun 28 2018 Matteo Corti <matteo@corti.li> - 1.70.0-0
+* Sat Jun 28 2018 Matteo Corti <matteo@corti.li> - 1.70.0-0
 - Updated to 1.70.0
 
 * Mon Jun 25 2018 Matteo Corti <matteo@corti.li> - 1.69.0-0
@@ -351,13 +351,13 @@ w
 * Fri Apr 28 2017 Matteo Corti <matteo@corti.li> - 1.44.0-0
 - Updated to 1.44.0
 
-* Thu Mar  7 2017 Matteo Corti <matteo@corti.li> - 1.43.0-0
+* Tue Mar  7 2017 Matteo Corti <matteo@corti.li> - 1.43.0-0
 - Updated to 1.43.0
 
 * Thu Feb 16 2017 Matteo Corti <matteo@corti.li> - 1.42.0-0
 - Updated to 1.42.0
 
-* Wed Feb 10 2017 Matteo Corti <matteo@corti.li> - 1.41.0-0
+* Fri Feb 10 2017 Matteo Corti <matteo@corti.li> - 1.41.0-0
 - Updated to 1.41.0
 
 * Wed Feb  8 2017 Matteo Corti <matteo@corti.li> - 1.40.0-0
