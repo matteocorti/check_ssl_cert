@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NAME=check_updates
+NAME=check_ssl_cert
 VERSION=$( grep "our\ \$VERSION\ =\ " "${NAME}" | sed "s/^[^']*'\([0-9.]*\)';/\1/" )
 TARBALL="${NAME}-${VERSION}.tar.gz"
 
