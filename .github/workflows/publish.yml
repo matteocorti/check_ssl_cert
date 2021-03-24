@@ -53,13 +53,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo $PRE > ./prep-cmd.sh
-          mkdir .ssh
-          chmod 700 .ssh
-          echo PWD
-          pwd
-          echo WHOAMI
-          whoami
-          echo "${SSH_PRIVATE_KEY}" > .ssh/id_rsa
+          echo "${SSH_PRIVATE_KEY}" > id_rsa
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
               /bin/sh -c 'sh ./prep-cmd.sh \
               && uname -a \
@@ -68,4 +62,9 @@ jobs:
               && echo . ./prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
+              && pwd \
+              && cd \
+              && pwd \
+              && mkdir .ssh \
+              && chmod 700
               && ssh -vvv -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
