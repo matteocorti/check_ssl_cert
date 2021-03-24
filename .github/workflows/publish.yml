@@ -53,7 +53,9 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo $PRE > ./prep-cmd.sh
+          echo "Secret"
           echo $SSH_PRIVATE_KEY
+          echo "Docker"
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
               /bin/sh -c 'sh ./prep-cmd.sh \
               && uname -a \
