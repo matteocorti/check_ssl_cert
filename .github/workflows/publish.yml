@@ -61,5 +61,5 @@ jobs:
               && echo "Creating SSH keys" \
               && mkdir .ssh \
               && chmod 700 .ssh \
-              && echo ${{ secrets.SSH_PRIVATE_KEY }} > .ssh/id_rsa \
+              && echo ${{ secrets.SSH_PRIVATE_KEY }} \
               && ls -l .ssh'
