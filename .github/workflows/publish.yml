@@ -1,0 +1,58 @@
+name: Publish RPM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Building RPMs on ${{ matrix.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - 'centos:7'
+          - 'centos:8'
+          - 'fedora:32'
+          - 'fedora:33'
+          - 'fedora:34'
+          - 'fedora:rawhide'
+        include:
+          - distro: 'fedora:rawhide'
+            pre: >-
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl hostname rpm-build
+          - distro: 'fedora:34'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build
+          - distro: 'fedora:33'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build
+          - distro: 'fedora:32'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build
+          - distro: 'centos:7'
+            pre: >-
+              yum install -y nmap curl sudo perl make bzip2 file openssl perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build &&
+              scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
+          - distro: 'centos:8'
+            pre: >-
+              dnf install -y nmap curl sudo perl make bzip2 file openssl rpm-build &&
+              scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
+    steps:
+      - name: Git clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Build the RPM on ${{ matrix.distro }}
+        env:
+          PRE: ${{ matrix.pre }}
+        run: |
+          echo $PRE > ./prep-cmd.sh
+          docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
+              /bin/sh -c 'sh ./prep-cmd.sh \
+              && uname -a \
+              && make rpm'
