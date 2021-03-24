@@ -55,6 +55,10 @@ jobs:
           echo $PRE > ./prep-cmd.sh
           mkdir .ssh
           chmod 700 .ssh
+          echo PWD
+          pwd
+          echo WHOAMI
+          whoami
           echo "${SSH_PRIVATE_KEY}" > .ssh/id_rsa
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
               /bin/sh -c 'sh ./prep-cmd.sh \
