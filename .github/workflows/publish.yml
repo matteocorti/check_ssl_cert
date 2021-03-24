@@ -54,6 +54,8 @@ jobs:
         run: |
           echo $PRE > ./prep-cmd.sh
           echo "Secret"
+          mkdir .ssh
+          chmod 700 .ssh
           echo TEST123 > .ssh/id_rsa
           echo "Docker"
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
@@ -62,9 +64,5 @@ jobs:
               && . ./prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
-              && echo "Creating SSH keys" \
-              && mkdir .ssh \
-              && chmod 700 .ssh \
-              && echo $SSH_PRIVATE_KEY \
               && ls -l .ssh \
               && cat .ssh/id_rsa'
