@@ -62,4 +62,4 @@ jobs:
               && . ./prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
-              && ssh -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
+              && ssh -vvv -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
