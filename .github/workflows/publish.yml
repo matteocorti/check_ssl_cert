@@ -62,9 +62,8 @@ jobs:
               && echo . ./prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
-              && pwd \
-              && cd \
-              && pwd \
-              && mkdir .ssh \
-              && chmod 700
+              && mkdir /root/.ssh \
+              && chmod 700 /root/.ssh \
+              && cp id_rsa /root/.ssh \
+              && chmod 600 /root/.ssh/id_rsa \
               && ssh -vvv -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
