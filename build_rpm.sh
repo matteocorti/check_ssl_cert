@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NAME=check_ssl_cert
-VERSION=$( grep "our\ \$VERSION\ =\ " "${NAME}" | sed "s/^[^']*'\([0-9.]*\)';/\1/" )
+VERSION=$( cat VERSION )
 TARBALL="${NAME}-${VERSION}.tar.gz"
 
 # delete current distribution
