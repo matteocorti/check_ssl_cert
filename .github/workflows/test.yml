@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Run the tests on ${{ matrix.distro }}
+      - name: Build the RPM on ${{ matrix.distro }}
         env:
           PRE: ${{ matrix.pre }}
         run: |
