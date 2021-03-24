@@ -50,6 +50,7 @@ jobs:
       - name: Build the RPM on ${{ matrix.distro }}
         env:
           PRE: ${{ matrix.pre }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo $PRE > ./prep-cmd.sh
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
@@ -61,5 +62,5 @@ jobs:
               && echo "Creating SSH keys" \
               && mkdir .ssh \
               && chmod 700 .ssh \
-              && echo ${{ secrets.SSH_PRIVATE_KEY }} \
+              && echo $SSH_PRIVATE_KEY > .ssh/id_rsa \
               && ls -l .ssh'
