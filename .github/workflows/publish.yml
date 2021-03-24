@@ -56,7 +56,7 @@ jobs:
           echo "Secret"
           mkdir .ssh
           chmod 700 .ssh
-          echo "${SSH_PRIVATE_KEY" > .ssh/id_rsa
+          echo "${SSH_PRIVATE_KEY}" > .ssh/id_rsa
           ls -l .ssh
           echo "Docker"
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
