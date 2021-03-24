@@ -35,12 +35,25 @@ case ${DIST} in
         RPMDIR="${WEBROOT}/fedora/33/${ARCH}"
         SRPMDIR="${WEBROOT}/fedora/33/SRPMS"
         ;;
+    fc34)
+        RPMDIR="${WEBROOT}/fedora/34/${ARCH}"
+        SRPMDIR="${WEBROOT}/fedora/34/SRPMS"
+        ;;
+    fc35)
+        RPMDIR="${WEBROOT}/fedora/35/${ARCH}"
+        SRPMDIR="${WEBROOT}/fedora/35/SRPMS"
+        ;;
     el7)
         RPMDIR="${WEBROOT}/epel/7/${ARCH}"
         SRPMDIR="${WEBROOT}/epel/7/SRPMS"
         ;;
+    el8)
+        RPMDIR="${WEBROOT}/epel/8/${ARCH}"
+        SRPMDIR="${WEBROOT}/epel/8/SRPMS"
+        ;;
     *)
-        error "Unknown distribution ${DIST}"
+        echo "Unknown distribution ${DIST}" 1>&2
+        exit 1
         ;;
 esac
 
