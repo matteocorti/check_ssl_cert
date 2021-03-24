@@ -63,7 +63,9 @@ jobs:
           docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
               /bin/sh -c 'sh ./prep-cmd.sh \
               && uname -a \
-              && . ./prepare_rpm.sh \
+              && whoami \
+              && pwd \
+              && echo . ./prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
               && ssh -vvv -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
