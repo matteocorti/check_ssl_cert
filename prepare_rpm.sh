@@ -59,6 +59,10 @@ esac
 
 echo "RPMDIR:  ${RPMDIR}"
 echo "SRPMDIR: ${SRPMDIR}"
+echo "RPM:     ${RPM}"
+echo "SRPM:    ${SRPM}"
 
 export RPMDIR
 export SRPMDIR
+export RPM
+export SRPM

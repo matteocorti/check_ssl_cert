@@ -56,4 +56,5 @@ jobs:
               /bin/sh -c 'sh ./prep-cmd.sh \
               && uname -a \
               && . ./prepare_rpm.sh \
-              && echo $RPMDIR'
+              && echo "$RPM  --> $RPMDIR" \
+              && echo "$SRPM --> $SRPMDIR"'
