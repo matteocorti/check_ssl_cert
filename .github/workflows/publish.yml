@@ -2,7 +2,8 @@ name: Publish RPM
 
 on:
   workflow_dispatch:
-
+  release:
+    types: [published]
 jobs:
   linux:
     # The host should always be linux
