@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.145.0
+VERSION=1.146.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1450,6 +1450,10 @@ fetch_certificate() {
 
             prepend_critical_message 'Handshake failure'
 
+        elif ascii_grep 'wrong\ version\ number' "${ERROR}" ; then
+
+            prepend_critical_message 'No TLS connection possible'
+
         else
 
             # Try to clean up the error message
@@ -1459,7 +1463,10 @@ fetch_certificate() {
                 grep -v '^depth' "${ERROR}" \
                     | grep -v '^verify' \
                     | head -n 1
-                 )
+                         )
+
+            debuglog "Unknown error: ${ERROR_MESSAGE}"
+
             prepend_critical_message "SSL error: ${ERROR_MESSAGE}"
 
         fi

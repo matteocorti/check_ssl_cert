@@ -1,3 +1,7 @@
+2021-03-25  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (fetch_certificate): Better error handling in case a TLS connection is not possible
+
 2021-03-22  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (usage): adds a --all option to allow all the optional checks at the maximum level
