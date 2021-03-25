@@ -66,4 +66,7 @@ jobs:
               && chmod 700 /root/.ssh \
               && cp id_rsa /root/.ssh \
               && chmod 600 /root/.ssh/id_rsa \
-              && scp -oStrictHostKeyChecking=no $RPM github@rpm.corti.li:$RPMDIR'
+              && scp -oStrictHostKeyChecking=no $RPM  github@rpm.corti.li:$RPMDIR \
+              && scp -oStrictHostKeyChecking=no $SRPM github@rpm.corti.li:$SRPMDIR \
+              && ssh -oStrictHostKeyChecking=no createrepo github@rpm.corti.li:/var/www/rpm \
+              && ssh -oStrictHostKeyChecking=no createrepo github@rpm.corti.li:/var/www/rpm/epel '
