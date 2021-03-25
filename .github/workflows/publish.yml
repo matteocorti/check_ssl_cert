@@ -66,4 +66,4 @@ jobs:
               && chmod 700 /root/.ssh \
               && cp id_rsa /root/.ssh \
               && chmod 600 /root/.ssh/id_rsa \
-              && ssh -vvv -oStrictHostKeyChecking=no github@rpm.corti.li uptime'
+              && scp -oStrictHostKeyChecking=no $RPM github@rpm.corti.li:$RPMDIR'
