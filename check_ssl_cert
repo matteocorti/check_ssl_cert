@@ -295,7 +295,7 @@ hours_until() {
         "BUSYBOX")
             BUSYBOX_DATE=$( echo "${DATE}" | sed 's/[ ][^ ]*$//' )
             debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
-            verboselog "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
+            verboselog "warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
             HOURS_UNTIL=$(( ( $(${DATEBIN} -d "${BUSYBOX_DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
             ;;
         "GNU")
@@ -1420,7 +1420,7 @@ fetch_certificate() {
         # s_client could verify the server certificate because the server requires a client certificate
         if ascii_grep '^Client Certificate Types' "${CERT}" ; then
 
-            verboselog "The server requires a client certificate"
+            verboselog "the server requires a client certificate"
 
         elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
              ascii_grep 'connect\ argument\ or\ target\ parameter\ malformed\ or\ ambiguous' "${ERROR}" ; then
@@ -2890,7 +2890,7 @@ main() {
     # check for TLS renegotiation
     if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] ; then
 
-        verboselog "Checking TLS renegotiation"
+        verboselog "checking TLS renegotiation"
 
         # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
@@ -2947,7 +2947,7 @@ main() {
                 # - finally the substitution replaces every newline with a space on
                 #   the pattern space
                 ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
-                verboselog "Error: ${ERROR_MESSAGE}"
+                verboselog "error: ${ERROR_MESSAGE}"
                 prepend_critical_message "No certificate returned"
                 critical "${CRITICAL_MSG}"
             fi
@@ -2984,7 +2984,7 @@ main() {
         else
             CN='CN unavailable'
             if [ -z "${ALTNAMES}" ] ; then
-                verboselog "Certificate without common name (CN), enabling altername names"
+                verboselog "certificate without common name (CN), enabling altername names"
                 ALTNAMES=1
             fi
         fi
@@ -3396,7 +3396,7 @@ main() {
     # Check SSL Labs
     if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] ; then
 
-        verboselog "Checking offered ciphers with nmap"
+        verboselog "checking offered ciphers with nmap"
 
         if [ -n "${CHECK_CIPHERS}" ] ; then
             debuglog "Checking offered ciphers (minimum level ${CHECK_CIPHERS}: ${CHECK_CIPHERS_NUMERIC})"
@@ -3481,7 +3481,7 @@ main() {
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then
 
-        verboselog "Checking SSL Labs assessment"
+        verboselog "checking SSL Labs assessment"
 
         while true; do
 
@@ -3568,7 +3568,7 @@ main() {
                         ;;
                     'IN_PROGRESS')
                         # Data not yet available: warn and continue
-                        verboselog "Warning: no cached data by SSL Labs, check initiated"
+                        verboselog "warning: no cached data by SSL Labs, check initiated"
                         ;;
                     'DNS')
                         verboselog "SSL Labs cannot resolve the domain name"
@@ -3588,7 +3588,7 @@ main() {
             fi
 
             WAIT_TIME=60
-            verboselog "Waiting ${WAIT_TIME} seconds"
+            verboselog "waiting ${WAIT_TIME} seconds"
 
             sleep "${WAIT_TIME}"
 

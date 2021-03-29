@@ -1,3 +1,7 @@
+2021-03-29  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: All the verbose messages are not beginning with a lowercase letter
+
 2021-03-25  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): Better error handling in case a TLS connection is not possible
