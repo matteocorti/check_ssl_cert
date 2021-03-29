@@ -40,6 +40,8 @@ STATUS_UNKNOWN=3
 WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
+DEBUG=0
+
 ################################################################################
 # Functions
 
@@ -212,20 +214,42 @@ usage() {
 # Prints the given message to STDERR with the prefix '[DBG] ' if the debug
 # command line option was specified
 # $1: string
+# $2: level (optional default 1)
 debuglog() {
-    if [ -n "${DEBUG}" ] ; then
+
+    MESSAGE=$1
+    LEVEL=$2
+
+    if [ -z "${LEVEL}" ] ; then
+        #default
+        LEVEL=1
+    fi
+
+    if [ "${LEVEL}" -le "${DEBUG}" ] ; then
         echo "${1}" | sed 's/^/[DBG] /' >&2
     fi
+
 }
 
 ################################################################################
 # Prints the given message to STDOUT if the verbose command line opttion was
 # specified
 # $1: string
+# $2: level (optional default 1)
 verboselog() {
-    if [ -n "${VERBOSE}" ] ; then
-        echo "${1}" >&2
+
+    MESSAGE=$1
+    LEVEL=$2
+
+    if [ -z "${LEVEL}" ] ; then
+        #default
+        LEVEL=1
     fi
+
+    if [ "${LEVEL}" -le "${VERBOSE}" ] ; then
+        echo "${MESSAGE}" >&2
+    fi
+
 }
 
 ################################################################################
@@ -1537,7 +1561,7 @@ check_option_argument() {
 main() {
 
     # Default values
-    DEBUG=""
+    DEBUG="0"
     FILE_BIN=""
     CURL_BIN=""
     CURL_PROXY=""
@@ -1551,7 +1575,7 @@ main() {
     XMPPHOST=""
     SNI=""
     TIMEOUT="120"
-    VERBOSE=""
+    VERBOSE="0"
     FORCE_PERL_DATE=""
     REQUIRE_SAN=""
     REQUIRE_OCSP_STAPLING=""
@@ -1619,8 +1643,7 @@ main() {
                 shift
                 ;;
             -d|--debug)
-                DEBUG=1
-                VERBOSE=1
+                DEBUG=$(( DEBUG + 1 ))
                 shift
                 ;;
             -h|--help|-\?)
@@ -1767,7 +1790,7 @@ main() {
                 shift
                 ;;
             -v|--verbose)
-                VERBOSE=1
+                VERBOSE=$((VERBOSE+1))
                 shift
                 ;;
             -V|--version)
@@ -2522,7 +2545,8 @@ main() {
         DATETYPE="PERL"
     fi
 
-    if [ -n "${DEBUG}" ] ; then
+    if [ "${DEBUG}" -ge 1 ] ; then
+
         debuglog "check_ssl_cert version: ${VERSION}"
         debuglog "OpenSSL binary: ${OPENSSL}"
         if [ -n "${DEBUG}" ] ; then
