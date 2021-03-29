@@ -421,7 +421,7 @@ EOF
         fi
     fi
 
-    if [ -n "${DEBUG}" ] ; then
+    if [ "${DEBUG}" -ge 1 ] ; then
         if [ "${RET}" -eq 0 ] ; then
             debuglog '  true'
         else
@@ -968,7 +968,7 @@ check_ocsp() {
 
                 debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-                if [ -n "${DEBUG}" ] ; then
+                if [ "${DEBUG}" -ge 1 ] ; then
 
                     # remove trailing /
                     FILE_NAME=${ELEMENT_ISSUER_URI%/}
@@ -1310,7 +1310,8 @@ fetch_certificate() {
         STATUS='-status'
     fi
 
-    if [ -n "${DEBUG}" ] ; then
+    if [ "${DEBUG}" -ge 1 ] ; then
+        debuglog "Adding -ign_eof to the options"
         IGN_EOF='-ign_eof'
     fi
 
@@ -1427,7 +1428,7 @@ fetch_certificate() {
 
     fi
 
-    if [ -n "${DEBUG}" ] ; then
+    if [ "${DEBUG}" -ge 1 ] ; then
         debuglog "storing a copy of the retrieved certificate in ${HOST}.crt"
         cp "${CERT}" "${HOST}.crt"
 
@@ -2424,10 +2425,8 @@ main() {
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] || [ -n "${CRL}" ] ; then
-            if [ -n "${DEBUG}" ] ; then
-                debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}"
-                debuglog "cURL binary not specified"
-            fi
+            debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}"
+            debuglog "cURL binary not specified"
 
             check_required_prog curl
             CURL_BIN=${PROG}
@@ -2549,7 +2548,7 @@ main() {
 
         debuglog "check_ssl_cert version: ${VERSION}"
         debuglog "OpenSSL binary: ${OPENSSL}"
-        if [ -n "${DEBUG}" ] ; then
+        if [ "${DEBUG}" -ge 1 ] ; then
             debuglog "OpenSSL info:"
             ${OPENSSL} version -a | sed 's/^/[DBG]/'
         fi
@@ -3097,7 +3096,7 @@ main() {
     # shellcheck disable=SC2086
     SIGNATURE_ALGORITHM="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep -m 1 -F 'Signature Algorithm')"
 
-    if [ -n "${DEBUG}" ] ; then
+    if [ "${DEBUG}" -ge 1 ] ; then
         debuglog "${SUBJECT}"
         debuglog "CN         = ${CN}"
         # shellcheck disable=SC2162
@@ -3431,7 +3430,7 @@ main() {
 
         exec_with_timeout "nmap -sV --script ssl-enum-ciphers ${HOST} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
-        if [ -n "${DEBUG}" ] ; then
+        if [ "${DEBUG}" -ge 1 ] ; then
             debuglog 'nmap output:'
             while read -r LINE; do
                 debuglog "${LINE}"
