@@ -3,9 +3,9 @@
 # list all the command line options
 OPTIONS=$( grep -- '^\ *-[-A-Za-z0-9|]*)' check_ssl_cert | sed 's/^\ *\(.*\))/\1/' | sed 's/.*|//'  | grep -v -- '^--$' | sort | uniq )
 
-FAILED=
+FAILED=0
 for option in ${OPTIONS} ; do
-    
+
     if ! grep -- "${option}" check_ssl_cert | grep -q echo ; then
         echo "${option} is not documented in check_ssl_cert"
         FAILED=1
@@ -25,7 +25,7 @@ for option in ${OPTIONS} ; do
         echo "${option} is not documented in ../check_ssl_cert.homepage/index.html"
         FAILED=1
     fi
-    
+
 done
-    
+
 exit "${FAILED}"

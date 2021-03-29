@@ -96,6 +96,9 @@ path of the file binary to be used
 .BR "   --fingerprint" " SHA1"
 pattern to match the SHA1-Fingerprint
 .TP
+.BR "   --first-element-only"
+verify just the first cert element, not the whole chain
+.TP
 .BR "   --force-perl-date"
 force the usage of Perl for date computations
 .TP
@@ -129,6 +132,9 @@ Forces a new check by SSL Labs (see -L)
 .BR "   --ignore-tls-renegotiation"
 Ignores the TLS renegotiation check
 .TP
+.BR "   --inetproto protocol"
+Force IP version 4 or 6
+.TP
 .BR "   --issuer-cert-cache" " dir"
 directory where to store issuer certificates cache
 .TP
@@ -150,6 +156,9 @@ Valid attributes are: enddate, startdate, subject, issuer, modulus, serial, hash
 .TP
 .BR "-n,--cn" " name"
 pattern to match the CN of the certificate (can be specified multiple times)
+.TP
+.BR "   --nmap-bin" " path"
+path of the nmap binary to be used
 .TP
 .BR "   --no-proxy"
 ignores the http_proxy and https_proxy environment variables

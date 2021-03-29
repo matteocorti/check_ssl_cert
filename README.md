@@ -87,6 +87,7 @@ Options:
    -n,--cn name                    pattern to match the CN of the certificate (can be
                                    specified multiple times)
       --nmap-bin path              path of the nmap binary to be used
+      --no-proxy                   ignores the http_proxy and https_proxy environment variables
       --no_ssl2                    disable SSL version 2
       --no_ssl3                    disable SSL version 3
       --no_tls1                    disable TLS version 1
@@ -121,6 +122,7 @@ Options:
       --require-no-tls1_1          critical if TLS 1.1 is offered
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
+      --skip-element number        skip checks on N cert element from the begining of the chain
       --sni name                   sets the TLS SNI (Server Name Indication) extension
                                    in the ClientHello message to 'name'
       --ssl2                       forces SSL version 2
