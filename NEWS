@@ -1,3 +1,4 @@
+2021-03-29 Version 1.147.0: Fixed the documentation of various options
 2021-03-25 Version 1.146.0: Added --all to enable oll the optional checks
                             Fixed a bug in the processing of client certificate requirements
                             Improved the error handling in case a TLS connection is not possible
