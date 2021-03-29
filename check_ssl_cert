@@ -87,7 +87,7 @@ usage() {
     echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "      --date path                  path of the datebinary to be used"
-    echo "   -d,--debug                      produces debugging output"
+    echo "   -d,--debug                      produces debugging output (can be specified more than once)"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "      --element number             checks N cert element from the begining of the chain"
@@ -188,7 +188,7 @@ usage() {
     echo "      --tls1_2                     force TLS version 1.2"
     echo "      --tls1_3                     force TLS version 1.3"
     echo "   -u,--url URL                    HTTP request URL"
-    echo "   -v,--verbose                    verbose output"
+    echo "   -v,--verbose                    verbose output (can be specified more than once)"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid"
     echo "                                   to issue a warning status. Default: ${WARNING_DAYS}"
@@ -2471,18 +2471,18 @@ main() {
     EXPECT="$(command -v expect 2> /dev/null)"
     test -x "${EXPECT}" || EXPECT=""
     if [ -z "${EXPECT}" ] ; then
-        verboselog "expect not available"
+        verboselog "expect not available" 2
     else
-        verboselog "expect available (${EXPECT})"
+        verboselog "expect available (${EXPECT})" 2
     fi
 
     # Timeout (optional)
     TIMEOUT_BIN="$(command -v timeout 2> /dev/null)"
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
     if [ -z "${TIMEOUT_BIN}" ] ; then
-        verboselog "timeout not available"
+        verboselog "timeout not available" 2
     else
-        verboselog "timeout available (${TIMEOUT_BIN})"
+        verboselog "timeout available (${TIMEOUT_BIN})" 2
     fi
 
     if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ] ; then
@@ -2537,7 +2537,7 @@ main() {
             DATETYPE='BSD'
         fi
 
-        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"
+        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations" 2
 
     fi
 
@@ -3450,7 +3450,7 @@ main() {
         fi
 
         if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}" ; then
-            unknkown "empty nmap result while checking ciphers"
+            unknown "empty nmap result while checking ciphers"
         fi
 
         if [ -n "${CHECK_CIPHERS}" ] ; then

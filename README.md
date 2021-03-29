@@ -43,7 +43,7 @@ Options:
       --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
       --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
       --date path                  path of the date binary to be used
-   -d,--debug                      produces debugging output
+   -d,--debug                      produces debugging output (can be specified more than once)
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
       --element number             checks N cert element from the begining of the chain
@@ -144,7 +144,7 @@ Options:
       --tls1_2                     force TLS version 1.2
       --tls1_3                     force TLS version 1.3
    -u,--url URL                    HTTP request URL
-   -v,--verbose                    verbose output
+   -v,--verbose                    verbose output (can be specified more than once)
    -V,--version                    version
    -w,--warning days               minimum number of days a certificate has to be valid
                                    to issue a warning status. Default: 20

@@ -2,6 +2,7 @@
 
 	* check_ssl_cert: All the verbose messages are not beginning with a lowercase letter
 	* check_ssl_cert: Added the possibility to have different verbose and debug levels
+	* check_ssl_cert: Cleaner verbose output
 
 2021-03-25  Matteo Corti  <matteo@corti.li>
 
