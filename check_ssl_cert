@@ -164,6 +164,7 @@ usage() {
     echo "      --require-no-ssl3            critical if SSL version 3 is offered"
     echo "      --require-no-tls1            critical if TLS 1 is offered"
     echo "      --require-no-tls1_1          critical if TLS 1.1 is offered"
+    echo "      --resolve ip                 provides a custop IP address for the specified host"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
     echo "      --skip-element number        skip checks on N cert element from the begining of the chain"
@@ -1950,6 +1951,11 @@ parse_command_line_options() {
                 export http_proxy="$2"
                 shift 2
                 ;;
+            --resolve)
+                check_option_argument '--resolve' "$2"
+                RESOLVE="$2"
+                shift 2
+                ;;
             -r|--rootcert)
                 check_option_argument '-r|--rootcert' "$2"
                 ROOT_CA="$2"
@@ -2236,6 +2242,11 @@ main() {
         *__HOST__*) COMMON_NAME=$(echo "${COMMON_NAME}" | sed "s/__HOST__/${HOST}/") ;;
         *) ;;
     esac
+
+    if [ -n "${RESOLVE}" ] ; then
+        SNI="${HOST}" # as we are using an IP we need SNI
+        HOST="${RESOLVE}"
+    fi
 
     ################################################################################
     # Sanity checks
