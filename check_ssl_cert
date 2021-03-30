@@ -267,9 +267,9 @@ trap_with_arg() {
 # Cleanup temporary files
 remove_temporary_files() {
     debuglog "cleaning up temporary files"
-    debuglog "$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
     # shellcheck disable=SC2086
     if [ -n "${TEMPORARY_FILES}" ]; then
+        debuglog "$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
         rm -f ${TEMPORARY_FILES}
     fi
 }
@@ -1557,68 +1557,26 @@ check_option_argument() {
 }
 
 ################################################################################
-# Main
-################################################################################
-main() {
+# Parse command line options
+#
+# Params
+#  $* options
+parse_command_line_options() {
 
-    # Default values
-    DEBUG="0"
-    FILE_BIN=""
-    CURL_BIN=""
-    CURL_PROXY=""
-    CURL_USER_AGENT=""
-    CUSTOM_HTTP_HEADER=""
-    DIG_BIN=""
-    NMAP_BIN=""
-    IGNORE_SSL_LABS_CACHE=""
-    PORT=""
-    XMPPPORT="5222"
-    XMPPHOST=""
-    SNI=""
-    TIMEOUT="120"
-    VERBOSE="0"
-    FORCE_PERL_DATE=""
-    REQUIRE_SAN=""
-    REQUIRE_OCSP_STAPLING=""
-    OCSP="1" # enabled by default
-    OCSP_IGNORE_TIMEOUT=""
-    FORMAT=""
-    HTTP_METHOD="HEAD"
-    RSA=""
-    ECDSA=""
-    DANE=""
-    DISALLOWED_PROTOCOLS=""
-    WARNING_DAYS=20
-    CRITICAL_DAYS=15
-    ELEMENT=0
-    SKIP_ELEMENT=0
-    NO_PROXY=""
-    PROXY=""
-    CRL=""
-    SCT="1" # enabled by default
-    HTTP_REQUEST_URL="/"
+     COMMAND_LINE_ARGUMENTS=$*
 
-    # after 2020-09-01 we could set the default to 398 days because of Apple
-    # https://support.apple.com/en-us/HT211025
-    NOT_VALID_LONGER_THAN=""
-    FIRST_ELEMENT_ONLY=""
+     # we didn't parse the options yet. Let's see if -d was specified at least once
+     DEBUG_OPTIONS=
+     if [ "${DEBUG}" -gt 0 ] ||
+            echo "${COMMAND_LINE_ARGUMENTS}" | grep -q -- '-[a-z]*d' ||
+            echo "${COMMAND_LINE_ARGUMENTS}" | grep -q -- --debug ; then
+         echo "[DBG] parsing command line options: ${COMMAND_LINE_ARGUMENTS}" >&2
+         DEBUG_OPTIONS=1
+     fi
 
-    # Set the default temp dir if not set
-    if [ -z "${TMPDIR}" ] ; then
-        TMPDIR="/tmp"
-    fi
+     while true; do
 
-    ################################################################################
-    # Process command line options
-    #
-    # We do not use getopts since it is unable to process long options and it is
-    # Bash specific.
-
-    COMMAND_LINE_ARGUMENTS=$*
-
-    while true; do
-
-        case "$1" in
+         case "$1" in
 
             ########################################
             # Options without arguments
@@ -2099,7 +2057,21 @@ main() {
                 break
                 ;;
             -*)
-                unknown "invalid option: ${1}"
+                # we try to check for grouped variables
+                OPTION="${1}"
+                # if the option begins with a single dash and it's longer than one character
+                if ! echo "${OPTION}" | grep -q -- '^--' &&
+                        [ "$( echo "${OPTION}" | wc -c | sed 's/\ //g' )" -gt 3 ] ; then
+                    if [ -n "${DEBUG_OPTIONS}" ] ; then
+                        echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group"
+                    fi
+                    for letter in $( echo "${OPTION}" | sed 's/^-//' | grep -o . ) ; do
+                        parse_command_line_options "-${letter}"
+                    done
+                    shift
+                else
+                    unknown "invalid option: ${1}"
+                fi
                 ;;
             *)
                 if [ -n "$1" ] ; then
@@ -2110,6 +2082,69 @@ main() {
         esac
 
     done
+
+}
+
+
+################################################################################
+# Main
+################################################################################
+main() {
+
+    # Default values
+    DEBUG="0"
+    FILE_BIN=""
+    CURL_BIN=""
+    CURL_PROXY=""
+    CURL_USER_AGENT=""
+    CUSTOM_HTTP_HEADER=""
+    DIG_BIN=""
+    NMAP_BIN=""
+    IGNORE_SSL_LABS_CACHE=""
+    PORT=""
+    XMPPPORT="5222"
+    XMPPHOST=""
+    SNI=""
+    TIMEOUT="120"
+    VERBOSE="0"
+    FORCE_PERL_DATE=""
+    REQUIRE_SAN=""
+    REQUIRE_OCSP_STAPLING=""
+    OCSP="1" # enabled by default
+    OCSP_IGNORE_TIMEOUT=""
+    FORMAT=""
+    HTTP_METHOD="HEAD"
+    RSA=""
+    ECDSA=""
+    DANE=""
+    DISALLOWED_PROTOCOLS=""
+    WARNING_DAYS=20
+    CRITICAL_DAYS=15
+    ELEMENT=0
+    SKIP_ELEMENT=0
+    NO_PROXY=""
+    PROXY=""
+    CRL=""
+    SCT="1" # enabled by default
+    HTTP_REQUEST_URL="/"
+
+    # after 2020-09-01 we could set the default to 398 days because of Apple
+    # https://support.apple.com/en-us/HT211025
+    NOT_VALID_LONGER_THAN=""
+    FIRST_ELEMENT_ONLY=""
+
+    # Set the default temp dir if not set
+    if [ -z "${TMPDIR}" ] ; then
+        TMPDIR="/tmp"
+    fi
+
+    ################################################################################
+    # Process command line options
+    #
+    # We do not use getopts since it is unable to process long options and it is
+    # Bash specific.
+
+    parse_command_line_options "$@"
 
     ################################################################################
     # Default ports
