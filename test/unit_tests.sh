@@ -40,7 +40,7 @@ oneTimeSetUp() {
         echo "dane checks supported"
         DANE=1
     fi
-    
+
 }
 
 testHoursUntilNow() {
