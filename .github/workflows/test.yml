@@ -101,26 +101,26 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl dig
           - distro: 'fedora:rawhide'
             pre: >-
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig hostname
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils hostname
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
           - distro: 'fedora:33'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
           - distro: 'fedora:32'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
           - distro: 'centos:7'
             pre: >-
               yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
           - distro: 'centos:8'
             pre: >-
-              dnf install -y nmap curl sudo perl make bzip2 file openssl dig &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
