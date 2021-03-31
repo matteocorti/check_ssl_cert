@@ -1568,19 +1568,6 @@ parse_command_line_options() {
 
      COMMAND_LINE_ARGUMENTS=$*
 
-     # we didn't parse the options yet. Let's see if -d was specified at least once
-     # the check discards --dane without looking at an additional -d
-     # will fail in case --dane -d is specified
-     DEBUG_OPTIONS=
-     if [ "${DEBUG}" -gt 0 ] ||
-            echo "${COMMAND_LINE_ARGUMENTS}" | grep -q -- '-[a-z]*d' ||
-            echo "${COMMAND_LINE_ARGUMENTS}" | grep -q -- --debug ; then
-         if ! echo "${COMMAND_LINE_ARGUMENTS}" | grep -q -- --dane ; then
-             echo "[DBG] parsing command line options: ${COMMAND_LINE_ARGUMENTS}" >&2
-             DEBUG_OPTIONS=1
-         fi
-     fi
-
      while true; do
 
          case "$1" in
@@ -2074,7 +2061,7 @@ parse_command_line_options() {
                 # if the option begins with a single dash and it's longer than one character
                 if ! echo "${OPTION}" | grep -q -- '^--' &&
                         [ "$( echo "${OPTION}" | wc -c | sed 's/\ //g' )" -gt 3 ] ; then
-                    if [ -n "${DEBUG_OPTIONS}" ] ; then
+                    if [ -n "${DEBUG}" ] ; then
                         echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group"
                     fi
                     for letter in $( echo "${OPTION}" | sed 's/^-//' | grep -o . ) ; do
