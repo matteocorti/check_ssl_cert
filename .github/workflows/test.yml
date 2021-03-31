@@ -66,31 +66,31 @@ jobs:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'debian:10'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'debian:9'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:20.10'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:20.04'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:16.04'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:18.04'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dig
+              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'alpine:edge'
             pre: >-
               apk add -U bash &&
