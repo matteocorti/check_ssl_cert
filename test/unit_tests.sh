@@ -587,7 +587,11 @@ testMoreErrors2() {
 testDANE211() {
     # dig is needed for DANE
     if command -v dig > /dev/null ; then
-        # check if a connection is possible
+
+        # debugging
+        dig +short TLSA _25._tcp.hummus.csx.cam.ac.uk 
+        
+        # check if a connection is possible        
         if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
             ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
             EXIT_CODE=$?
