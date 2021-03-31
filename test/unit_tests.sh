@@ -37,11 +37,10 @@ oneTimeSetUp() {
 
     # check in OpenSSL supports dane checks
     if openssl s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || openssl s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
-
-    echo "dane checks supported"
-    DANE=1
+        echo "dane checks supported"
+        DANE=1
     fi
-
+    
 }
 
 testHoursUntilNow() {
@@ -586,13 +585,19 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
+    # dig is needed for DANE
     if command -v dig > /dev/null ; then
-        ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
-        EXIT_CODE=$?
-        if [ -n "${DANE}" ] ; then
-            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        # check if a connection is possible
+        if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
+            ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+            EXIT_CODE=$?
+            if [ -n "${DANE}" ] ; then
+                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+            else
+                assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+            fi
         else
-            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+            echo "connection to hummus.csx.cam.ac.uk:25 not possible: skipping test"
         fi
     else
         echo "dig not available: skipping DANE test"
