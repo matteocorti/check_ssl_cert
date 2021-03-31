@@ -158,26 +158,26 @@ jobs:
         include:
           - distro: 'fedora:rawhide'
             pre: >-
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig hostname rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils hostname rpm-build
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
           - distro: 'fedora:33'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
           - distro: 'fedora:32'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl dig rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
           - distro: 'centos:7'
             pre: >-
               yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
           - distro: 'centos:8'
             pre: >-
-              dnf install -y nmap curl sudo perl make bzip2 file openssl dig rpm-build &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
