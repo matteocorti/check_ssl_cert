@@ -1,6 +1,7 @@
-Short options can be grouped (e.g., -vs -c 10 -w 15)
-                            Different verbosity levels can be specified (-v can be used more than once)
 2021-03-29 Version 1.147.0: Fixed the documentation of various options
+                            Short options can be grouped (e.g., -vs -c 10 -w 15)
+                            Different verbosity levels can now be specified (-v can be used more than once)
+                            Added the --resolve option to specify a custom IP for the checked host
 2021-03-25 Version 1.146.0: Added --all to enable oll the optional checks
                             Fixed a bug in the processing of client certificate requirements
                             Improved the error handling in case a TLS connection is not possible

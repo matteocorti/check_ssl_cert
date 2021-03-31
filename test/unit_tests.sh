@@ -703,6 +703,30 @@ testCertificsteWithEmptySubject() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testResolveSameName() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve corti.li --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testResolveDifferentName() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testResolveCorrectIP() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )" --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testResolveWrongIP() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short www.google.com )" --host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testCiphersOK() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7

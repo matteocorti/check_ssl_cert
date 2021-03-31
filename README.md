@@ -120,7 +120,7 @@ Options:
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
       --require-no-tls1_1          critical if TLS 1.1 is offered
-      --resolve ip                 provides a custop IP address for the specified host
+      --resolve ip                 provides a custom IP address for the specified host
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
       --skip-element number        skip checks on N cert element from the begining of the chain
