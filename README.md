@@ -6,10 +6,7 @@
 
 # check_ssl_cert
 
-A shell script (that can be used as a Nagios plugin) to check an X.509 certificate:
- - checks if the server is running and delivers a valid certificate
- - checks if the CA matches a given pattern
- - checks the validity
+A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection
 
 ## Usage
 
