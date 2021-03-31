@@ -593,7 +593,7 @@ testDANE211() {
 
         # check if a connection is possible
         if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
-            ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+            ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk -d
             EXIT_CODE=$?
             if [ -n "${DANE}" ] ; then
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
