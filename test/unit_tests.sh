@@ -588,22 +588,23 @@ testDANE211() {
     # dig is needed for DANE
     if command -v dig > /dev/null ; then
 
-        echo "100"
-        # debugging
-        dig +short TLSA _25._tcp.hummus.csx.cam.ac.uk
-        echo "200"
+        # on github actions the dig command produces no output
+        if dig +short TLSA _25._tcp.hummus.csx.cam.ac.uk | grep -q -f 'hummus' ; then
 
-        # check if a connection is possible
-        if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
-            ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk -d
-            EXIT_CODE=$?
-            if [ -n "${DANE}" ] ; then
-                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+            # check if a connection is possible
+            if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
+                ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+                EXIT_CODE=$?
+                if [ -n "${DANE}" ] ; then
+                    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+                else
+                    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+                fi
             else
-                assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+                echo "connection to hummus.csx.cam.ac.uk:25 not possible: skipping test"
             fi
         else
-            echo "connection to hummus.csx.cam.ac.uk:25 not possible: skipping test"
+            echo "no TLSA entries in DNS: skipping DANE test"
         fi
     else
         echo "dig not available: skipping DANE test"
