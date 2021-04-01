@@ -1,3 +1,7 @@
+2021-04-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: The host name must now always match with the certificate
+
 2021-03-31  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Added the --resolve option

@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=1.147.0
+VERSION=2.0.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -67,8 +67,6 @@ usage() {
     echo "Options:"
     echo "   -A,--noauth                     ignore authority warnings (expiration only)"
     echo "      --all                        enables all the possible optional checks at the maximum level"
-    echo "      --altnames                   matches the pattern specified in -n with"
-    echo "                                   alternate names too"
     echo "      --check-ciphers grade        checks the offered ciphers"
     echo "      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher"
     echo "   -C,--clientcert path            use client certificate to authenticate"
@@ -107,7 +105,9 @@ usage() {
     echo "   -h,--help,-?                    this help message"
     echo "      --http-use-get               use GET instead of HEAD (default) for the HTTP"
     echo "                                   related checks"
+    echo "      --ignore-altnames            ignores alternative names when matching pattern specified in -n (or the host name)"
     echo "      --ignore-exp                 ignore expiration date"
+    echo "      --ignore-host-cn             do not complain if the CN does not match the host name"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
     echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
@@ -142,7 +142,6 @@ usage() {
     echo "                                   the given pattern"
     echo "      --not-valid-longer-than days critical if the certificate validity is longer than"
     echo "                                   the specified period"
-    echo "   -N,--host-cn                    match CN with the host name"
     echo "      --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to"
     echo "                                   issue a critical status"
     echo "      --ocsp-warning hours         minimum number of hours an OCSP response has to be valid to"
@@ -198,9 +197,12 @@ usage() {
     echo "   -6                              force IPv6"
     echo
     echo "Deprecated options:"
+    echo "      --altnames                   matches the pattern specified in -n with"
+    echo "                                   alternate names too (enabled by default)"
     echo "      --days days                  minimum number of days a certificate has to be valid"
     echo "                                   (see --critical and --warning)"
-    echo "      --ocsp                       check revocation via OCSP"
+    echo "   -N,--host-cn                    match CN with the host name (enabled by default)"
+    echo "      --ocsp                       check revocation via OCSP (enabled by default)"
     echo "   -S,--ssl version                force SSL version (2,3)"
     echo "                                   (see: --ssl2 or --ssl3)"
     echo
@@ -1482,6 +1484,13 @@ fetch_certificate() {
 
             prepend_critical_message 'No TLS connection possible'
 
+        elif ascii_grep 'write:errno=54' "${ERROR}" ; then
+
+            ERROR='No certificate returned (SNI reqired?)'
+            SHORTNAME="${HOST_NAME}"
+            prepend_critical_message "${ERROR}"
+            critical "${SHORTNAME} CRITICAL: ${ERROR}"
+
         else
 
             # Try to clean up the error message
@@ -1616,6 +1625,15 @@ parse_command_line_options() {
                 ;;
             --ignore-exp)
                 NOEXP=1
+                shift
+                ;;
+            --ignore-altnames)
+                ALTNAMES=
+                shift
+                ;;
+            --ignore-host-cn)
+                COMMON_NAME=
+                ALTNAMES=
                 shift
                 ;;
             --ignore-sig-alg)
@@ -1821,6 +1839,8 @@ parse_command_line_options() {
             -f|--file)
                 check_option_argument ' -f|--file' "$2"
                 FILE="$2"
+                COMMON_NAME=
+                ALTNAMES=
                 shift 2
                 ;;
             --file-bin)
@@ -1885,11 +1905,7 @@ parse_command_line_options() {
                 ;;
             -n|--cn)
                 check_option_argument ' -n|--cn' "$2"
-                if [ -n "${COMMON_NAME}" ]; then
-                    COMMON_NAME="${COMMON_NAME} ${2}"
-                else
-                    COMMON_NAME="${2}"
-                fi
+                COMMON_NAME="${2}"
                 shift 2
                 ;;
             --not-issued-by)
@@ -2127,6 +2143,9 @@ main() {
     SCT="1" # enabled by default
     HTTP_REQUEST_URL="/"
 
+    COMMON_NAME="__HOST__" # enabled by default
+    ALTNAMES=1 # enabled by default
+
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
     NOT_VALID_LONGER_THAN=""
@@ -2270,9 +2289,15 @@ main() {
     # Set COMMON_NAME to hostname if -N was given as argument.
     # COMMON_NAME may be a space separated list of hostnames.
     case ${COMMON_NAME} in
-        *__HOST__*) COMMON_NAME=$(echo "${COMMON_NAME}" | sed "s/__HOST__/${HOST_NAME}/") ;;
+        *__HOST__*)
+            # localhost is used for files to be checked: we ignore it
+            if [ "${HOST_NAME}" != 'localhost' ] ; then
+                COMMON_NAME=$(echo "${COMMON_NAME}" | sed "s/__HOST__/${HOST_NAME}/")
+            fi
+            ;;
         *) ;;
     esac
+    debuglog "COMMON_NAME = ${COMMON_NAME}"
 
     if [ -n "${ALTNAMES}" ] && [ -z "${COMMON_NAME}" ] ; then
         unknown "--altnames requires a common name to match (--cn or --host-cn)"
@@ -3256,6 +3281,7 @@ main() {
 
         debuglog "check CN: ${CN}"
         debuglog "COMMON_NAME = ${COMMON_NAME}"
+        debuglog "ALTNAMES    = ${ALTNAMES}"
 
         # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
 

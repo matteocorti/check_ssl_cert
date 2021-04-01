@@ -1,4 +1,5 @@
-2021-03-29 Version 1.147.0: Fixed the documentation of various options
+2021-03-29 Version   2.0.0: Fixed the documentation of various options
+                            The host name must now always match with the certificate
                             Short options can be grouped (e.g., -vs -c 10 -w 15)
                             Different verbosity levels can now be specified (-v can be used more than once)
                             Added the --resolve option to specify a custom IP for the checked host

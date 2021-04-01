@@ -60,7 +60,9 @@ Options:
    -h,--help,-?                    this help message
       --http-use-get               use GET instead of HEAD (default) for the HTTP
                                    related checks
+      --ignore-altnames            ignores alternative names when matching pattern specified in -n (or the host name)
       --ignore-exp                 ignore expiration date
+      --ignore-host-cn             do not complain if the CN does not match the host name
       --ignore-ocsp                do not check revocation with OCSP
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
