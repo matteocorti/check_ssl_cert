@@ -588,8 +588,10 @@ testDANE211() {
     # dig is needed for DANE
     if command -v dig > /dev/null ; then
 
+        echo "100"
         # debugging
         dig +short TLSA _25._tcp.hummus.csx.cam.ac.uk
+        echo "200"
 
         # check if a connection is possible
         if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
