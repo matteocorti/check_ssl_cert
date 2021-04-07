@@ -8,9 +8,11 @@ for option in ${OPTIONS} ; do
 
     LINE=$( ./check_ssl_cert --help | grep -- "${option}" | grep '^\ *--' )
 
-    echo $option
-    ./check_ssl_cert --help | grep -- "${option}"
-    echo $LINE
+    # Debugging
+    #    echo $option
+    #    ./check_ssl_cert --help | grep -- "${option}"
+    #    echo $LINE
+    
     echo ==============================================================================
 
     # check the script
