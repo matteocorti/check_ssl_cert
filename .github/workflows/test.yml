@@ -52,6 +52,7 @@ jobs:
           - 'debian:testing'
           - 'ubuntu:16.04'
           - 'ubuntu:18.04'
+          - 'ubuntu:20.04'
           - 'ubuntu:20.10'
           - 'alpine:3.13'
           - 'alpine:edge'
@@ -65,27 +66,31 @@ jobs:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'debian:10'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'debian:9'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:20.10'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:16.04'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'ubuntu:18.04'
             pre: >-
               apt-get update &&
-              apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+          - distro: 'ubuntu:20.04'
+            pre: >-
+              apt-get update &&
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
           - distro: 'alpine:edge'
             pre: >-
               apk update &&
