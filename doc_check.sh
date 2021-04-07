@@ -12,7 +12,7 @@ for option in ${OPTIONS} ; do
     #    echo $option
     #    ./check_ssl_cert --help | grep -- "${option}"
     #    echo $LINE
-    
+
     echo ==============================================================================
 
     # check the script
