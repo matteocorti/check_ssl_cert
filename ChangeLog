@@ -1,6 +1,11 @@
+2021-04-07  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): adding -starttls to the renegotiation check if needed
+
 2021-04-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: The host name must now always match with the certificate
+	* check_ssl_cert: (fetch_certificate): Fixed the errors messages (and added a new one for missing STARTTLS)
 
 2021-03-31  Matteo Corti  <matteo@corti.li>
 

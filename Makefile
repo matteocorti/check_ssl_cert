@@ -6,7 +6,7 @@ YEAR=`date +"%Y"`
 MONTH_YEAR=`date +"%B, %Y"`
 FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* doc_check.sh
 
-dist: version_check formatting_check copyright_check doc_check shellcheck
+dist: version_check formatting_check copyright_check shellcheck
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)

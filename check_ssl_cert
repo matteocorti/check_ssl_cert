@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.0.0
+VERSION=2.0.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -84,7 +84,7 @@ usage() {
     echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
     echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
-    echo "      --date path                  path of the datebinary to be used"
+    echo "      --date path                  path of the date binary to be used"
     echo "   -d,--debug                      produces debugging output (can be specified more than once)"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
@@ -1457,20 +1457,20 @@ fetch_certificate() {
 
             ERROR="${HOST_ADDR} is not a valid hostname"
             prepend_critical_message "${ERROR}"
-            critical "${SHORTNAME} CRITICAL: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
 
         elif ascii_grep 'Connection\ refused' "${ERROR}" ; then
 
             ERROR='Connection refused'
             prepend_critical_message "${ERROR}"
-            critical "${SHORTNAME} CRITICAL: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
 	elif ascii_grep 'Connection timed out' "${ERROR}" ; then
 
 	    ERROR='OpenSSL connection timed out'
 	    prepend_critical_message "${ERROR}"
-	    critical "${SHORTNAME} CRITICAL: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
         elif ascii_grep 'dh\ key\ too\ small' "${ERROR}" ; then
 
@@ -1487,9 +1487,14 @@ fetch_certificate() {
         elif ascii_grep 'write:errno=54' "${ERROR}" ; then
 
             ERROR='No certificate returned (SNI reqired?)'
-            SHORTNAME="${HOST_NAME}"
             prepend_critical_message "${ERROR}"
-            critical "${SHORTNAME} CRITICAL: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+
+        elif ascii_grep "Didn't find STARTTLS in server response, trying anyway..." "${ERROR}" ; then
+
+            ERROR="Didn't find STARTTLS in server response"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
         else
 
@@ -3005,8 +3010,16 @@ main() {
 
         # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
-        exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
-        RET=$?
+        case "${PROTOCOL}" in
+            pop3|ftp|smtp|irc|ldap|imap|postgres|sieve|xmpp|xmpp-server|mysql)
+                exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
+                RET=$?
+                ;;
+            *)
+                exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
+                RET=$?
+                ;;
+        esac
 
         if [ "${RET}" -eq 1 ] ; then
 
