@@ -4,7 +4,7 @@ DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 test
 YEAR=`date +"%Y"`
 MONTH_YEAR=`date +"%B, %Y"`
-FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* doc_check.sh
+FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/*
 
 dist: version_check formatting_check copyright_check shellcheck
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -34,9 +34,6 @@ formatting_check:
 	! grep -q '\\t' check_ssl_cert test/unit_tests.sh
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
 
-doc_check:
-	./doc_check.sh
-
 remove_blanks:
 	sed -i '' 's/[[:blank:]]*$$//' $(FORMATTED_FILES)
 
@@ -58,7 +55,7 @@ shellcheck:
 ifndef SHELLCHECK
 	echo "No shellcheck installed: skipping test"
 else
-	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all check_ssl_cert test/unit_tests.sh prepare_rpm.sh publish_release.sh ; else shellcheck check_ssl_cert test/unit_tests.sh prepare_rpm.sh publish_release.sh doc_check.sh ; fi
+	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all check_ssl_cert test/unit_tests.sh prepare_rpm.sh publish_release.sh ; else shellcheck check_ssl_cert test/unit_tests.sh prepare_rpm.sh publish_release.sh ; fi
 endif
 
 copyright_check:
