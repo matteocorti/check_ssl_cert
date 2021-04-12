@@ -1,3 +1,7 @@
+2021-04-12  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (critical): Fixed the output when the CN is not available
+
 2021-04-07  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): adding -starttls to the renegotiation check if needed

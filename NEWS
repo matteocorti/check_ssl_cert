@@ -1,3 +1,4 @@
+Fixed a bug in the critical and warning output when the CN is not available
 2021-04-07 Version   2.0.1: Fixed a bug in renegotiation checks with STARTTLS
 2021-03-29 Version   2.0.0: Fixed the documentation of various options
                             The host name must now always match with the certificate

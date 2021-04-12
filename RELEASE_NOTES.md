@@ -1,1 +1,1 @@
-Bug fix in the TLS renegotiation check
+Fixed a bug in the critical and warning output when the CN is not available

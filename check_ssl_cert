@@ -455,7 +455,11 @@ prepend_critical_message() {
     debuglog "prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
 
     if [ -n "${CN}" ] ; then
-        tmp=" ${CN}"
+        if echo "${CN}" | grep -q -F 'unavailable' ; then
+            tmp=" ${SUBJECT_ALTERNATIVE_NAME}"
+        else
+            tmp=" ${CN}"
+        fi
     else
         if [ -n "${HOST_NAME}" ] ; then
             if [ -n "${SNI}" ] ; then
@@ -525,7 +529,11 @@ append_warning_message() {
     debuglog "prepend_warning_message: ALL_MSG 1   = ${ALL_MSG}"
 
     if [ -n "${CN}" ] ; then
-        tmp=" ${CN}"
+        if echo "${CN}" | grep -q -F 'unavailable' ; then
+            tmp=" ${SUBJECT_ALTERNATIVE_NAME}"
+        else
+            tmp=" ${CN}"
+        fi
     else
         if [ -n "${HOST_NAME}" ] ; then
             if [ -n "${SNI}" ] ; then
