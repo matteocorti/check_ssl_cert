@@ -168,7 +168,7 @@ Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 check\_ssl\_cert requires 'expect' or 'timeout' to enable timeouts. If 'expect' or 'timeout' is not
 present on your system timeouts will be disabled.
 
-See: [http://en.wikipedia.org/wiki/Expect and https://man7.org/linux/man-pages/man1/timeout.1.html](http://en.wikipedia.org/wiki/Expect and https://man7.org/linux/man-pages/man1/timeout.1.html)
+See: [http://en.wikipedia.org/wiki/Expect](http://en.wikipedia.org/wiki/Expect) and [https://man7.org/linux/man-pages/man1/timeout.1.html](https://man7.org/linux/man-pages/man1/timeout.1.html)
 
 
 ## Virtual servers
