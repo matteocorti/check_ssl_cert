@@ -4,7 +4,7 @@
  (c) Matteo Corti, 2007-2021
   see AUTHORS for the complete list of contributors
 
-# check_ssl_cert
+# check\_ssl\_cert
 
 A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection
 
@@ -165,15 +165,15 @@ Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 
 ## Expect & timeout
 
-check_ssl_cert requires 'expect' or 'timeout' to enable timeouts. If 'expect' or 'timeout' is not
+check\_ssl\_cert requires 'expect' or 'timeout' to enable timeouts. If 'expect' or 'timeout' is not
 present on your system timeouts will be disabled.
 
-See: http://en.wikipedia.org/wiki/Expect and https://man7.org/linux/man-pages/man1/timeout.1.html
+See: [http://en.wikipedia.org/wiki/Expect and https://man7.org/linux/man-pages/man1/timeout.1.html](http://en.wikipedia.org/wiki/Expect and https://man7.org/linux/man-pages/man1/timeout.1.html)
 
 
 ## Virtual servers
 
-check_ssl_cert supports the servername TLS extension in ClientHello
+check\_ssl\_cert supports the servername TLS extension in ClientHello
 if the installed openssl version provides it. This is needed if you
 are checking a machine with virtual hosts.
 
@@ -218,4 +218,4 @@ and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
 The timeout is applied to each action involving a download.
 
-Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
+Report bugs to [https://github.com/matteocorti/check_ssl_cert/issues](https://github.com/matteocorti/check_ssl_cert/issues)
