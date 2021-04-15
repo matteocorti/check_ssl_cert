@@ -62,7 +62,7 @@ else
 endif
 
 copyright_check:
-	grep -q "(c) Matteo Corti, 2007-$(YEAR)" README.md
+	grep -q "&copy; Matteo Corti, 2007-$(YEAR)" README.md
 	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti" COPYRIGHT
 	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti <matteo@corti.li>" $(PLUGIN)
 	echo "Copyright year check: OK"
