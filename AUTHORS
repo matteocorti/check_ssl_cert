@@ -112,3 +112,4 @@ Thanks:
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the OpenSSL version patch
 * Many thanks to waja (https://github.com/waja) for the GitHub workflows
 * Many thanks to Tobias Grünewald (https://github.com/tobias-gruenewald) for the client certificate
+* Many thanks to chornberger-c2c (https://github.com/chornberger-c2c) for the critical and warning output fix

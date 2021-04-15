@@ -1,4 +1,4 @@
-%define version          2.0.0
+%define version          2.0.1
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -22,10 +22,7 @@ Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v%{ve
 Requires:  nagios-plugins expect perl(Date::Parse)
 
 %description
-Checks an X.509 certificate:
- - checks if the server is running and delivers a valid certificate
- - checks if the CA matches a given pattern
- - checks the validity
+A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection
 
 %prep
 %setup -q -n %{sourcename}-%{version}
@@ -45,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Wed Apr   7 2021 Matteo Corti <matteo@corti.li> - 2.0.1-0
+- Updated to 2.0.1
+
 * Mon Apr   1 2021 Matteo Corti <matteo@corti.li> - 2.0.0-0
 - Updated to 2.0.0
 
