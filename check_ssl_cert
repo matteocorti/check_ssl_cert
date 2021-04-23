@@ -1467,7 +1467,6 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
-
         elif ascii_grep 'Connection\ refused' "${ERROR}" ; then
 
             ERROR='Connection refused'
@@ -1491,6 +1490,12 @@ fetch_certificate() {
         elif ascii_grep 'wrong\ version\ number' "${ERROR}" ; then
 
             prepend_critical_message 'No TLS connection possible'
+
+        elif ascii_grep 'Operation\ timed\ out' "${ERROR}" ; then
+
+            ERROR='OpenSSL timed out'
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
         elif ascii_grep 'write:errno=54' "${ERROR}" ; then
 
