@@ -168,25 +168,25 @@ testGroupedVariablesError() {
 }
 
 testETHZ() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch
+    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testLetsEncrypt() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H helloworld.letsencrypt.org
+    ${SCRIPT} --rootcert-file cabundle.crt -H helloworld.letsencrypt.org --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testGoDaddy() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.godaddy.com --cn www.godaddy.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.godaddy.com --cn www.godaddy.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ETHZ.CH
+    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ETHZ.CH --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -194,7 +194,7 @@ testETHZCaseInsensitive() {
 testETHZWildCard() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sp.ethz.ch --ignore-altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sp.ethz.ch --ignore-altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -202,25 +202,25 @@ testETHZWildCard() {
 testETHZWildCardCaseInsensitive() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --ignore-altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --ignore-altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch
+    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSubCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH
+    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H google.com --issuer 'GlobalSign'
+    ${SCRIPT} --rootcert-file cabundle.crt -H google.com --issuer 'GlobalSign' --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -239,14 +239,14 @@ testValidityWithPerl() {
 }
 
 testAltNames() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn www.inf.ethz.ch --altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn www.inf.ethz.ch --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -257,6 +257,7 @@ testWildcardAltNames2() {
         --cn somehost.spapps.ethz.ch \
         --cn otherhost.sPaPPs.ethz.ch \
         --cn spapps.ethz.ch \
+         --critical 1 --warning 2 \
         --altnames \
 
     EXIT_CODE=$?
@@ -264,27 +265,27 @@ testWildcardAltNames2() {
 }
 
 testAltNamesCaseInsensitve() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n wrong.ch -n www.ethz.ch --altnames
+    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n wrong.ch -n www.ethz.ch --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testXMPPHost() {
-    out=$(${SCRIPT} --rootcert-file cabundle.crt -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is )
+    out=$(${SCRIPT} --rootcert-file cabundle.crt -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is  --critical 1 --warning 2)
     EXIT_CODE=$?
     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'" ; then
         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
@@ -294,7 +295,7 @@ testXMPPHost() {
 }
 
 testTimeOut() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout  1
+    ${SCRIPT} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout  1 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -307,32 +308,32 @@ testIMAP() {
 }
 
 testIMAPS() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps
+    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPOP3S() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s
+    ${SCRIPT} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 
 testSMTP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60
+    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPSubmbission() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60
+    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPS() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60
+    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -354,7 +355,7 @@ testSMTPS() {
 # From https://badssl.com
 
 testBadSSLExpired() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -366,55 +367,55 @@ testBadSSLExpiredAndWarnThreshold() {
 }
 
 testBadSSLWrongHost() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H wrong.host.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H wrong.host.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSelfSigned() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H self-signed.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H self-signed.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLUntrustedRoot() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H untrusted-root.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H untrusted-root.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRevoked() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRevokedCRL() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp
+    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testGRCRevoked() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.grc.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.grc.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLIncompleteChain() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLDH480(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H dh480.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H dh480.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLDH512(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H dh512.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H dh512.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -422,7 +423,7 @@ testBadSSLDH512(){
 testBadSSLRC4MD5(){
     # older versions of OpenSSL validate RC4-MD5
     if ! openssl ciphers RC4-MD5 > /dev/null 2>&1 ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -433,7 +434,7 @@ testBadSSLRC4MD5(){
 testBadSSLRC4(){
     # older versions of OpenSSL validate RC4
     if ! openssl ciphers RC4 > /dev/null 2>&1 ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com
+        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -444,7 +445,7 @@ testBadSSLRC4(){
 testBadSSL3DES(){
     # older versions of OpenSSL validate RC4
     if ! openssl ciphers 3DES > /dev/null 2>&1 ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com
+        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
       else
@@ -453,61 +454,61 @@ testBadSSL3DES(){
 }
 
 testBadSSLNULL(){
-    ${SCRIPT} --rootcert-file cabundle.crt -H null.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H null.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA256() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha256.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H sha256.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc256() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc384() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ecc384.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H ecc384.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLRSA8192() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H rsa8192.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H rsa8192.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomainWithDashes() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomain() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA12016() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2016.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2016.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA12017() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2017.badssl.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2017.badssl.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleOCSPHosts() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H netlock.hu
+    ${SCRIPT} --rootcert-file cabundle.crt -H netlock.hu --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -521,7 +522,7 @@ testRequireOCSP() {
 # tests for -4 and -6
 testIPv4() {
     if openssl s_client -help 2>&1 | grep -q -- -4 ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -4
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -4 --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -545,7 +546,7 @@ testIPv6() {
 
             if ping -6 www.google.com > /dev/null 2>&1  ; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6
+                ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6 --critical 1 --warning 2
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -563,7 +564,7 @@ testIPv6() {
 }
 
 testFormatShort() {
-    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
+    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch  --critical 1 --warning 2 --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
@@ -596,7 +597,7 @@ testDANE211() {
 
             # check if a connection is possible
             if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
-                ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk
+                ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk --critical 1 --warning 2
                 EXIT_CODE=$?
                 if [ -n "${DANE}" ] ; then
                     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -637,7 +638,7 @@ testDANE211() {
 
 testDANE301ECDSA() {
     if command -v dig > /dev/null ; then
-        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org
+        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org --critical 1 --warning 2
         EXIT_CODE=$?
         if [ -n "${DANE}" ] ; then
             assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -650,20 +651,20 @@ testDANE301ECDSA() {
 }
 
 testRequiredProgramFile() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testRequiredProgramPermissions() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /etc/hosts
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /etc/hosts --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testSieveECDSA() {
     if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa
+        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -679,7 +680,7 @@ testHTTP2() {
 
 testForceHTTP2() {
     if openssl s_client -help 2>&1 | grep -q -F alpn ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2 --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -688,56 +689,56 @@ testForceHTTP2() {
 }
 
 testNotLongerValidThan() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --not-valid-longer-than 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --not-valid-longer-than 2 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testDERCert() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./der.cer --ignore-sct
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./der.cer --ignore-sct --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPKCS12Cert() {
     export PASS=
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificsteWithoutCN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificsteWithEmptySubject() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testResolveSameName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve corti.li
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --resolve www.ethz.ch --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testResolveDifferentName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testResolveCorrectIP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )"
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )" --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testResolveWrongIP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short www.google.com )"
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short www.google.com )" --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -755,7 +756,7 @@ testCiphersOK() {
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C
+                ${SCRIPT} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C --critical 1 --warning 2
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -784,7 +785,7 @@ testCiphersError() {
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings
+                ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings --critical 1 --warning 2
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
@@ -804,7 +805,7 @@ testCiphersError() {
 
 testETHZWithSSLLabs() {
     # we assume www.ethz.ch gets at least a B
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --check-ssl-labs B
+    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --check-ssl-labs B --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
