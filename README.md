@@ -86,6 +86,7 @@ Options:
    -n,--cn name                    pattern to match the CN of the certificate (can be
                                    specified multiple times)
       --nmap-bin path              path of the nmap binary to be used
+      --no-perf                    do not show performance data
       --no-proxy                   ignores the http_proxy and https_proxy environment variables
       --no_ssl2                    disable SSL version 2
       --no_ssl3                    disable SSL version 3
