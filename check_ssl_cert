@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.0.1
+VERSION=2.1.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -131,6 +131,7 @@ usage() {
     echo "   -n,--cn name                    pattern to match the CN of the certificate (can be"
     echo "                                   specified multiple times)"
     echo "      --nmap-bin path              path of the nmap binary to be used"
+    echo "      --no-perf                    do not show performance data"
     echo "      --no-proxy                   ignores the http_proxy and https_proxy environment variables"
     echo "      --no-ssl2                    disable SSL version 2"
     echo "      --no-ssl3                    disable SSL version 3"
@@ -1668,6 +1669,10 @@ parse_command_line_options() {
                 ;;
             --ignore-tls-renegotiation)
                 IGNORE_TLS_RENEGOTIATION='1'
+                shift
+                ;;
+            --no-perf)
+                NO_PERF=1
                 shift
                 ;;
             --no-proxy)
@@ -3889,10 +3894,13 @@ main() {
         fi
     fi
 
-    if [ -n "${TERSE}" ]; then
-        EXTRA_OUTPUT="${PERFORMANCE_DATA}"
-    else
-        EXTRA_OUTPUT="${LONG_OUTPUT}${PERFORMANCE_DATA}"
+    # long output
+    if [ -z "${TERSE}" ] ; then
+       EXTRA_OUTPUT="${LONG_OUTPUT}"
+    fi
+    # performance
+    if [ -z "${NO_PERF}" ] ; then
+        EXTRA_OUTPUT="${EXTRA_OUTPUT}${PERFORMANCE_DATA}"
     fi
 
     debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"

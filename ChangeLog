@@ -1,3 +1,7 @@
+2021-04-28  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): adds and option to remove performance data
+
 2021-04-23  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): Better handling of timeouts

@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "April, 2021" "2.0.1" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "April, 2021" "2.1.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -165,6 +165,9 @@ pattern to match the CN of the certificate (can be specified multiple times)
 .TP
 .BR "   --nmap-bin" " path"
 path of the nmap binary to be used
+.TP
+.BR "   --no-perf"
+do not show performance data
 .TP
 .BR "   --no-proxy"
 ignores the http_proxy and https_proxy environment variables
