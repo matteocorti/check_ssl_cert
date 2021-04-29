@@ -2,7 +2,14 @@
 
 VERSION=$( head -n 1 VERSION )
 
-echo 'Did you update the RELEASE_NOTES.md? '
+echo 'RELEASE_NOTES.md:'
+echo '------------------------------------------------------------------------------'
+
+cat RELEASE_NOTES.md
+
+echo '------------------------------------------------------------------------------'
+
+echo 'Did you update the RELEASE_NOTES.md file? '
 read -r ANSWER
 if [ "${ANSWER}" = "y" ] ; then
     
