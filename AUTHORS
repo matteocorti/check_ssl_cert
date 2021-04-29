@@ -113,3 +113,4 @@ Thanks:
 * Many thanks to waja (https://github.com/waja) for the GitHub workflows
 * Many thanks to Tobias Grünewald (https://github.com/tobias-gruenewald) for the client certificate
 * Many thanks to chornberger-c2c (https://github.com/chornberger-c2c) for the critical and warning output fix
+* Many thanks to Claus-Theodor Riegg (https://github.com/ctriegg-mak) for the domain with underscores fix

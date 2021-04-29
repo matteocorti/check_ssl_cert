@@ -1,3 +1,4 @@
+2021-04-29 Version   2.1.1: Correct handling of subdomains with underscores
 2021-04-25 Version   2.1.0: Added an option to hide performance data
                             Fixed a bug in the critical and warning output when the CN is not available
 2021-04-07 Version   2.0.1: Fixed a bug in renegotiation checks with STARTTLS

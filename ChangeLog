@@ -1,3 +1,7 @@
+2021-04-29  Claus-Theodor Riegg (https://github.com/ctriegg-mak)
+
+	* check_ssl_cert: match underscores in subdomains when matching name to wildcard certs
+
 2021-04-28  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): adds and option to remove performance data
