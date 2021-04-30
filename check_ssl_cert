@@ -2277,7 +2277,7 @@ main() {
     fi
 
     # we need the FQDN of an host to check the CN
-    if ! echo "${HOST}" | grep -q '[.]' ; then
+    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] ; then
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$( nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2- )
         if [ -z "${DOMAIN}" ] ; then
