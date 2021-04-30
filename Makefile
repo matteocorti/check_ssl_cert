@@ -10,8 +10,10 @@ dist: version_check formatting_check copyright_check shellcheck
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)
-	tar cfz $(DIST_DIR).tar.gz  $(DIST_DIR)
-	tar cfj $(DIST_DIR).tar.bz2 $(DIST_DIR)
+# avoid to include extended attribute data files
+# see https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives
+	env COPYFILE_DISABLE=1 tar cfz $(DIST_DIR).tar.gz  $(DIST_DIR)
+	env COPYFILE_DISABLE=1 tar cfj $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
 install:
 	mkdir -p $(DESTDIR)

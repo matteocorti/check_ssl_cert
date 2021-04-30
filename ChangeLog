@@ -1,3 +1,7 @@
+2021-04-30  Matteo Corti  <matteo@corti.li>
+
+	* Makefile: avoid putting extended attribute files in the archives
+
 2021-04-29  Claus-Theodor Riegg (https://github.com/ctriegg-mak)
 
 	* check_ssl_cert: match underscores in subdomains when matching name to wildcard certs
