@@ -2,6 +2,10 @@
 
 	* Makefile: avoid putting extended attribute files in the archives
 
+2021-04-29  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): Do not remove parenthesis from URI
+
 2021-04-29  Claus-Theodor Riegg (https://github.com/ctriegg-mak)
 
 	* check_ssl_cert: match underscores in subdomains when matching name to wildcard certs
