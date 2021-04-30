@@ -1,1 +1,1 @@
-Correct handling of subdomains with underscores
+Add domain if FQDN is missing
