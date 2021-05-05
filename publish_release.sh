@@ -2,6 +2,8 @@
 
 VERSION=$( head -n 1 VERSION )
 
+echo "Publishing release ${VERSION}"
+
 echo 'RELEASE_NOTES.md:'
 echo '------------------------------------------------------------------------------'
 
