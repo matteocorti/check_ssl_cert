@@ -3690,6 +3690,7 @@ main() {
                             SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" \
                                                           | sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
                             prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
+                            break
 
                         else
 
