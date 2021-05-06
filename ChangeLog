@@ -1,3 +1,7 @@
+2021-05-06  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Fixed an error in the parameter validation
+
 2021-05-05  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): do not wait if SSL Labs is giving an error
