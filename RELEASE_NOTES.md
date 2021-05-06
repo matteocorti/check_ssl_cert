@@ -1,1 +1,1 @@
-Bug fix in the Qualy's SSL Lab check of non-reachable machines
+Bug fix in the handling of Qualy's SSL Lab command line options
