@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.1.4
+VERSION=2.2.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -86,6 +86,7 @@ usage() {
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
     echo "      --date path                  path of the date binary to be used"
     echo "   -d,--debug                      produces debugging output (can be specified more than once)"
+    echo "      --debug-cert                 stores the retrieved certificates in the current directory"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "      --element number             checks N cert element from the begining of the chain"
@@ -982,15 +983,15 @@ check_ocsp() {
 
                 debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
-                if [ "${DEBUG}" -ge 1 ] ; then
+                if [ -n "${DEBUG_CERT}" ] ; then
 
                     # remove trailing /
                     FILE_NAME=${ELEMENT_ISSUER_URI%/}
 
                     # remove everything up to the last slash
-                    FILE_NAME="${TMPDIR}/${FILE_NAME##*/}"
+                    FILE_NAME="${FILE_NAME##*/}"
 
-                    debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME}"
+                    debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME} for debugging purposes"
 
                     cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
 
@@ -1442,15 +1443,17 @@ fetch_certificate() {
 
     fi
 
-    if [ "${DEBUG}" -ge 1 ] ; then
-        debuglog "storing a copy of the retrieved certificate in ${HOST_NAME}.crt"
+    if [ -n "${DEBUG_CERT}" ] ; then
+
+        debuglog "storing a copy of the retrieved certificate in ${HOST_NAME}.crt for debugging purposes"
         cp "${CERT}" "${HOST_NAME}.crt"
 
-        debuglog "storing a copy of the OpenSSL errors in ${HOST_NAME}.error"
+        debuglog "storing a copy of the OpenSSL errors in ${HOST_NAME}.error for debugging purposes"
         cp "${ERROR}" "${HOST_NAME}.error"
 
-        debuglog "Return value of the command = ${RET}"
     fi
+
+    debuglog "Return value of the command = ${RET}"
 
     if [ "${RET}" -ne 0 ] ; then
 
@@ -1625,6 +1628,10 @@ parse_command_line_options() {
                 ;;
             -d|--debug)
                 DEBUG=$(( DEBUG + 1 ))
+                shift
+                ;;
+            --debug-cert)
+                DEBUG_CERT=1
                 shift
                 ;;
             -h|--help|-\?)

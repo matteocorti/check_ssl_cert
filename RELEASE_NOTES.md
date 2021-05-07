@@ -1,1 +1,3 @@
-Bug fix in the handling of Qualy's SSL Lab command line options
+ * Bug fix: `--debug` does not store any information in `$TMPDIR` anymore
+ * To locally store the retrieved certificates in debug mode the option` --debug-cert` has to be specified
+

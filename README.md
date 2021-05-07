@@ -41,6 +41,7 @@ Options:
       --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
       --date path                  path of the date binary to be used
    -d,--debug                      produces debugging output (can be specified more than once)
+      --debug-cert                 stores the retrieved certificates in the current directory
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
       --element number             checks N cert element from the begining of the chain
