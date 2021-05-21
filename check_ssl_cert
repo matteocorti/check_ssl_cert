@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.2.0
+VERSION=2.3.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -41,6 +41,7 @@ WARNING_MSG=""
 CRITICAL_MSG=""
 ALL_MSG=""
 DEBUG=0
+DEBUG_FILE=""
 
 ################################################################################
 # Functions
@@ -87,6 +88,7 @@ usage() {
     echo "      --date path                  path of the date binary to be used"
     echo "   -d,--debug                      produces debugging output (can be specified more than once)"
     echo "      --debug-cert                 stores the retrieved certificates in the current directory"
+    echo "      --debug-file file            writes the debug messages to file"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "      --element number             checks N cert element from the begining of the chain"
@@ -232,6 +234,10 @@ debuglog() {
 
     if [ "${LEVEL}" -le "${DEBUG}" ] ; then
         echo "${1}" | sed 's/^/[DBG] /' >&2
+    fi
+
+    if [ -n "${DEBUG_FILE}" ] ; then
+        echo "${1}" >> "${DEBUG_FILE}"
     fi
 
 }
@@ -1845,6 +1851,11 @@ parse_command_line_options() {
             --days)
                 check_option_argument '--days' "$2"
                 WARNING_DAYS="$2"
+                shift 2
+                ;;
+            --debug-file)
+                check_option_argument '--debug-file' "$2"
+                DEBUG_FILE="$2"
                 shift 2
                 ;;
             --dig-bin)

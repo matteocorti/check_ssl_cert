@@ -1,3 +1,7 @@
+2021-05-21  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: added the --debug-file option
+
 2021-05-07  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_ocsp): Do not store the debugging copy of the certificate in the $TMPDIR
