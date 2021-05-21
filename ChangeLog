@@ -1,6 +1,8 @@
 2021-05-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added the --debug-file option
+	* check_ssl_cert(check_ocsp): append .crt to the debug certificates
+	* check_ssl_cert: sanity checks for file write operations
 
 2021-05-07  Matteo Corti  <matteo@corti.li>
 
