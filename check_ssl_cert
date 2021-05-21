@@ -236,9 +236,43 @@ debuglog() {
         echo "${1}" | sed 's/^/[DBG] /' >&2
     fi
 
-    if [ -n "${DEBUG_FILE}" ] ; then
+    # debuglog is also called during the --debug-file sanity checks: we have
+    # to check if the file exists
+    if [ -n "${DEBUG_FILE}" ] && [ -e "${DEBUG_FILE}" ] && ! [ -d "${DEBUG_FILE}" ] && [ -w "${DEBUG_FILE}" ] ; then
         echo "${1}" >> "${DEBUG_FILE}"
     fi
+
+}
+
+################################################################################
+# Checks if the given file can be created and written
+# $1: file name
+open_for_writing() {
+
+    FILE_TO_OPEN=$1
+
+            if [ -d "${FILE_TO_OPEN}" ] ; then
+
+            unknown "${FILE_TO_OPEN} is a directory"
+
+        elif [ -e "${FILE_TO_OPEN}" ] ; then
+
+                # file already exists
+                if [ ! -w "${FILE_TO_OPEN}" ] ; then
+                    unknown "Cannot write to ${FILE_TO_OPEN}"
+                fi
+
+        else
+
+            FILE_TO_OPEN_DIRECTORY=$( dirname "${FILE_TO_OPEN}" )
+            if [ ! -w "${FILE_TO_OPEN_DIRECTORY}" ] ; then
+                unknown "Cannot write to ${FILE_TO_OPEN}"
+            fi
+
+        fi
+
+        # clear / create the file
+        true > "${FILE_TO_OPEN}"
 
 }
 
@@ -952,6 +986,7 @@ check_ocsp() {
                 if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c' ; then
                     debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
 
+                    open_for_writing "${ISSUER_CERT_TMP2}"
                     cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
                     ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
@@ -967,6 +1002,7 @@ check_ocsp() {
 
                         debuglog "OCSP: converting issuer certificate from DER to PEM"
 
+                        open_for_writing "${ISSUER_CERT_TMP2}"
                         cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
                         ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
@@ -999,6 +1035,7 @@ check_ocsp() {
 
                     debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME} for debugging purposes"
 
+                    open_for_writing "${FILE_NAME}"
                     cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
 
                 fi
@@ -1011,6 +1048,7 @@ check_ocsp() {
 
                     debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
 
+                    open_for_writing "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
                     cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
 
                 fi
@@ -1452,9 +1490,11 @@ fetch_certificate() {
     if [ -n "${DEBUG_CERT}" ] ; then
 
         debuglog "storing a copy of the retrieved certificate in ${HOST_NAME}.crt for debugging purposes"
+        open_for_writing "${HOST_NAME}.crt"
         cp "${CERT}" "${HOST_NAME}.crt"
 
         debuglog "storing a copy of the OpenSSL errors in ${HOST_NAME}.error for debugging purposes"
+        open_for_writing "${HOST_NAME}.error"
         cp "${ERROR}" "${HOST_NAME}.error"
 
     fi
@@ -2271,6 +2311,10 @@ main() {
         fi
     fi
 
+    if [ -n "${DEBUG_FILE}" ] ; then
+        open_for_writing "${DEBUG_FILE}"
+    fi
+
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
 
     if [ -n "${ALL}" ] ; then
@@ -2288,8 +2332,9 @@ main() {
 
     fi
 
-    ###############
-    # Check options
+    ##############################
+    # Check options: sanity checks
+
     if [ -z "${HOST}" ] ; then
         usage "No host specified"
     fi

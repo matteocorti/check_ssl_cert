@@ -1,1 +1,2 @@
-Added the ```--debug-file``` option
+Added sanity checks for file write operations
+

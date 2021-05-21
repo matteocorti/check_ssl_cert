@@ -42,7 +42,7 @@ Options:
       --date path                  path of the date binary to be used
    -d,--debug                      produces debugging output (can be specified more than once)
       --debug-cert                 stores the retrieved certificates in the current directory
-      --debug-file file            writes the debug messages to file      
+      --debug-file file            writes the debug messages to file
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
       --element number             checks N cert element from the begining of the chain
