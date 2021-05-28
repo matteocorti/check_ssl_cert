@@ -1,3 +1,7 @@
+2021-05-28  Igor Mironov  <mcs6502-sek@yahoo.com.au>
+
+	* check_ssl_cert: compatibility fixes for LibreSSL 2.8.3 on macOS Catalina
+
 2021-05-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: added the --debug-file option
