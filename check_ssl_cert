@@ -426,7 +426,7 @@ EOF
         OPENSSL_VERSION=$( ${OPENSSL} version )
     fi
     debuglog "openssl version: ${OPENSSL_VERSION}"
-    OPENSSL_VERSION=$( echo "${OPENSSL_VERSION}" | sed 's/^OpenSSL\ \([^ \-]*\).*/\1/' )
+    OPENSSL_VERSION=$( echo "${OPENSSL_VERSION}" | sed -E 's/^(Libre|Open)SSL\ ([^ \-]*).*/\2/' )
 
     IFS='.' read -r MAJOR1 MAJOR2 MINOR <<EOF
 ${OPENSSL_VERSION}
@@ -3894,7 +3894,7 @@ main() {
 
             debuglog 'Checking Signed Certificate Timestamps (SCTs)'
 
-	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -F -q 'SCTs' ; then
+	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2' ; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
             fi
 
