@@ -1,2 +1,2 @@
-Added sanity checks for file write operations
+Compatibility fixes for LibreSSL on macOS
 

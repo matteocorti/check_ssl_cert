@@ -36,10 +36,14 @@ oneTimeSetUp() {
     curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
 
     # check in OpenSSL supports dane checks
-    if openssl s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || openssl s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || "${OPENSSL}" s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
         echo "dane checks supported"
         DANE=1
     fi
+
+    # print the openssl version
+    echo 'OpenSSL version'
+    "${OPENSSL}" version
 
 }
 
@@ -67,7 +71,9 @@ testHoursUntil42Hours() {
 testOpenSSLVersion1() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.2.0a'
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 1 "${RET}"
@@ -77,7 +83,9 @@ testOpenSSLVersion1() {
 testOpenSSLVersion2() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.1.1j'
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -87,7 +95,9 @@ testOpenSSLVersion2() {
 testOpenSSLVersion3() {
     export OPENSSL_VERSION='OpenSSL 1.1.1j  16 Feb 2021'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -97,7 +107,9 @@ testOpenSSLVersion3() {
 testOpenSSLVersion4() {
     export OPENSSL_VERSION='OpenSSL 1.0.2k-fips 26 Jan 2017'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -107,7 +119,9 @@ testOpenSSLVersion4() {
 testOpenSSLVersion5() {
     export OPENSSL_VERSION='OpenSSL 1.1.1h-freebsd 22 Sep 2020'
     export REQUIRED_VERSION='1.0.0b'
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     openssl_version "${REQUIRED_VERSION}"
     RET=$?
     assertEquals "error comparing required version ${REQUIRED_VERSION} to current version ${OPENSSL_VERSION}" 0 "${RET}"
@@ -122,7 +136,9 @@ testDependencies() {
 }
 
 testSCT() {
-    OPENSSL=$( command -v openssl ) # needed by openssl_version
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     ${OPENSSL} version
     if openssl_version '1.1.0' ; then
 	echo "OpenSSL >= 1.1.0: SCTs supported"
@@ -422,7 +438,7 @@ testBadSSLDH512(){
 
 testBadSSLRC4MD5(){
     # older versions of OpenSSL validate RC4-MD5
-    if ! openssl ciphers RC4-MD5 > /dev/null 2>&1 ; then
+    if ! "${OPENSSL}" ciphers RC4-MD5 > /dev/null 2>&1 ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -433,7 +449,7 @@ testBadSSLRC4MD5(){
 
 testBadSSLRC4(){
     # older versions of OpenSSL validate RC4
-    if ! openssl ciphers RC4 > /dev/null 2>&1 ; then
+    if ! "${OPENSSL}" ciphers RC4 > /dev/null 2>&1 ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -444,7 +460,7 @@ testBadSSLRC4(){
 
 testBadSSL3DES(){
     # older versions of OpenSSL validate RC4
-    if ! openssl ciphers 3DES > /dev/null 2>&1 ; then
+    if ! "${OPENSSL}" ciphers 3DES > /dev/null 2>&1 ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -521,7 +537,7 @@ testRequireOCSP() {
 
 # tests for -4 and -6
 testIPv4() {
-    if openssl s_client -help 2>&1 | grep -q -- -4 ; then
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -4 ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -4 --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -531,7 +547,7 @@ testIPv4() {
 }
 
 testIPv6() {
-    if openssl s_client -help 2>&1 | grep -q -- -6 ; then
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6 ; then
 
 	IPV6=
 	if command -v ifconfig > /dev/null && ifconfig -a | grep -q -F inet6 ; then
@@ -596,7 +612,7 @@ testDANE211() {
         if dig +short TLSA _25._tcp.hummus.csx.cam.ac.uk | grep -q -f 'hummus' ; then
 
             # check if a connection is possible
-            if printf 'QUIT\\n' | openssl s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
+            if printf 'QUIT\\n' | "${OPENSSL}" s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp > /dev/null 2>&1 ; then
                 ${SCRIPT} --rootcert-file cabundle.crt --dane 211  --port 25 -P smtp -H hummus.csx.cam.ac.uk --critical 1 --warning 2
                 EXIT_CODE=$?
                 if [ -n "${DANE}" ] ; then
@@ -663,7 +679,7 @@ testRequiredProgramPermissions() {
 }
 
 testSieveECDSA() {
-    if ! { openssl s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || openssl s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
+    if ! { "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'usage:' ; } ; then
         ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -679,7 +695,7 @@ testHTTP2() {
 }
 
 testForceHTTP2() {
-    if openssl s_client -help 2>&1 | grep -q -F alpn ; then
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -F alpn ; then
         ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2 --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
