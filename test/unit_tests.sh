@@ -43,6 +43,9 @@ oneTimeSetUp() {
 
     # print the openssl version
     echo 'OpenSSL version'
+    if [ -z "${OPENSSL}" ] ; then
+        OPENSSL=$( command -v openssl ) # needed by openssl_version
+    fi
     "${OPENSSL}" version
 
 }
@@ -651,20 +654,20 @@ testDANE211() {
 #        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 #    fi
 #}
-
-testDANE301ECDSA() {
-    if command -v dig > /dev/null ; then
-        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org --critical 1 --warning 2
-        EXIT_CODE=$?
-        if [ -n "${DANE}" ] ; then
-            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-        else
-            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-        fi
-    else
-        echo "dig not available: skipping DANE test"
-    fi
-}
+#
+#testDANE301ECDSA() {
+#    if command -v dig > /dev/null ; then
+#        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org --critical 1 --warning 2
+#        EXIT_CODE=$?
+#        if [ -n "${DANE}" ] ; then
+#            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#        else
+#            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+#        fi
+#    else
+#        echo "dig not available: skipping DANE test"
+#    fi
+#}
 
 testRequiredProgramFile() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist --critical 1 --warning 2
