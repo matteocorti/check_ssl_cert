@@ -1204,7 +1204,13 @@ check_cert_end_date() {
     debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
+
+    debuglog "  valid for ${HOURS_UNTIL} hours"
+
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
+
+    debuglog "  valid for ${ELEM_DAYS_VALID} days"
+
     if [ -z "${DAYS_VALID}" ] || [ "${ELEM_DAYS_VALID}" -lt "${DAYS_VALID}" ]; then
         DAYS_VALID="${ELEM_DAYS_VALID}"
     fi
@@ -1216,7 +1222,14 @@ check_cert_end_date() {
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number}"
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 > /dev/null ; then
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE})"
+            if [ "${ELEM_DAYS_VALID}" -eq 0 ] ; then
+                DAYS_AGO='today'
+            elif [ "${ELEM_DAYS_VALID}" -eq -1 ] ; then
+                DAYS_AGO='yesterday'
+            else
+                DAYS_AGO="$(( - ELEM_DAYS_VALID )) days ago"
+            fi
+            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
             return 2
         fi
 

@@ -1,3 +1,7 @@
+2021-05-31  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_cert_end_date): Display since how many days the certificate was valid
+
 2021-05-28  Igor Mironov  <mcs6502-sek@yahoo.com.au>
 
 	* check_ssl_cert: compatibility fixes for LibreSSL 2.8.3 on macOS Catalina
