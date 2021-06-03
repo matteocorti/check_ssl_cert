@@ -1,1 +1,1 @@
-Compatibility fixes for LibreSSL on macOS
+Bug fix: always uses the specifies OpenSSL binary and respects the specified IP version

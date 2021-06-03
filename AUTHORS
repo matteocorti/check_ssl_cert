@@ -116,3 +116,4 @@ Thanks:
 * Many thanks to Claus-Theodor Riegg (https://github.com/ctriegg-mak) for the domain with underscores fix
 * Many thanks to Ed Sabol (https://github.com/esabol) for the FQDN patch
 * Many thanks to Igor Mironov (https://github.com/mcs6502) for the LibreSSL patch
+* Many thanks to jalbstmeijer (https://github.com/jalbstmeijer) for the OpenSSL and INETPROTO patch

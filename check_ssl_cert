@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.3.1
+VERSION=2.3.2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2765,8 +2765,9 @@ main() {
         fi
         debuglog "${DEFAULT_CA} root certificates installed by default"
 
-         debuglog " System info: $( uname -a )"
-         debuglog "Date computation: ${DATETYPE}"
+        debuglog " System info: $( uname -a )"
+        debuglog "Date computation: ${DATETYPE}"
+
     fi
 
     ################################################################################
@@ -2797,7 +2798,7 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the specified protocol
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'sieve' ] ; then
-        if ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; then
+        if ${OPENSSL} s_client "${INETPROTO}" -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:' ; then
             unknown "OpenSSL does not support the protocol sieve"
         fi
     fi
@@ -3120,11 +3121,11 @@ main() {
 
         case "${PROTOCOL}" in
             pop3|ftp|smtp|irc|ldap|imap|postgres|sieve|xmpp|xmpp-server|mysql)
-                exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
                 RET=$?
                 ;;
             *)
-                exec_with_timeout "printf 'R\\n' | openssl s_client -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
                 RET=$?
                 ;;
         esac
