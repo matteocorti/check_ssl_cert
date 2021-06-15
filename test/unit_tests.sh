@@ -751,15 +751,25 @@ testResolveDifferentName() {
 }
 
 testResolveCorrectIP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )" --critical 1 --warning 2
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    # dig is needed to resolve the IP address
+    if command -v dig > /dev/null ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )" --critical 1 --warning 2
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo 'dig missing: skipping test'
+    fi
 }
 
 testResolveWrongIP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short www.google.com )" --critical 1 --warning 2
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    # dig is needed to resolve the IP address
+    if command -v dig > /dev/null ; then
+        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short www.google.com )" --critical 1 --warning 2
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo 'dig missing: skipping test'
+    fi
 }
 
 testCiphersOK() {
