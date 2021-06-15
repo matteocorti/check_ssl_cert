@@ -239,7 +239,7 @@ testETHZWildCardSubCaseInsensitive() {
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H google.com --issuer 'GlobalSign' --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --issuer 'R3' --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
