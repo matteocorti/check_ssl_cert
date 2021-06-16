@@ -6,7 +6,7 @@
 
 # check\_ssl\_cert
 
-A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection
+A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection
 
 ## Usage
 

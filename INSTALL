@@ -15,5 +15,5 @@ Optional dependencies
 Installation
 ============
 
-Simply copy the plugin to your nagios plugin directory
+Simply copy the plugin to your Nagios/Icinga plugin directory
 
