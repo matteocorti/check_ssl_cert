@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.3.2
+VERSION=2.3.3
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -3639,7 +3639,7 @@ main() {
         create_temporary_file; NMAP_OUT=${TEMPFILE}
         create_temporary_file; NMAP_ERR=${TEMPFILE}
 
-        exec_with_timeout "nmap -sV --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+        exec_with_timeout "nmap --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
         if [ "${DEBUG}" -ge 1 ] ; then
             debuglog 'nmap output:'

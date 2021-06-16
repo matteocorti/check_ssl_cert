@@ -1,6 +1,7 @@
 2021-06-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): show the progress in % by SSL labs
+	* check_ssl_cert (check_attr): removing unnecessary port probing with nmap
 
 2021-05-31  Matteo Corti  <matteo@corti.li>
 
