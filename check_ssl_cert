@@ -3803,10 +3803,15 @@ main() {
                         ;;
                     'IN_PROGRESS')
                         # Data not yet available: warn and continue
-                        verboselog "warning: no cached data by SSL Labs, check initiated"
+                        PROGRESS=$( echo "${JSON}" | sed 's/.*progress"://' | sed 's/,.*//' )
+                        if [ "${PROGRESS}" -eq -1 ] ; then
+                            verboselog "warning: no cached data by SSL Labs, check in progress"
+                        else
+                            verboselog "warning: no cached data by SSL Labs, check in progress ${PROGRESS}%"
+                        fi
                         ;;
                     'DNS')
-                        verboselog "SSL Labs cannot resolve the domain name"
+                        verboselog "SSL Labs resolving the domain name"
                         ;;
                     *)
                         # Try to extract a message
