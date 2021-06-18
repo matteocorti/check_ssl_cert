@@ -1,1 +1,1 @@
-Speedup the offered ciphers check
+Stop the SSL Labs checks after an error

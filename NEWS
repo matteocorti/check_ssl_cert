@@ -1,3 +1,4 @@
+2021-06-18 Version   2.3.4: Stop the SSL Labs checks after an error
 2021-06-16 Version   2.3.3: Speedup the offered ciphers check
 2021-06-03 Version   2.3.2: Bug fix: always uses the specifies OpenSSL binary and respects the specified IP version
 2021-05-28 Version   2.3.1: Compatibility fixes for LibreSSL on macOS
