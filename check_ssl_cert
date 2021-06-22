@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.3.4
+VERSION=2.3.5
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -981,7 +981,7 @@ check_ocsp() {
                     exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
 
-                debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+                debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} -b "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
                 if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c' ; then
                     debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
@@ -993,12 +993,12 @@ check_ocsp() {
 
                 fi
 
-                debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+                debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} -b "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
                 # check the result
-                if ! "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q ': (ASCII|PEM)' ; then
+                if ! "${FILE_BIN}" -b "${ISSUER_CERT_TMP}" | grep -E -q '(ASCII|PEM)' ; then
 
-                    if "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
+                    if "${FILE_BIN}" -b "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)' ; then
 
                         debuglog "OCSP: converting issuer certificate from DER to PEM"
 
@@ -1007,7 +1007,7 @@ check_ocsp() {
 
                         ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
-                    elif "${FILE_BIN}" "${ISSUER_CERT_TMP}" | grep -E -q 'empty' ; then
+                    elif "${FILE_BIN}" -b "${ISSUER_CERT_TMP}" | grep -E -q 'empty' ; then
 
                         # empty certs are allowed
                         debuglog "OCSP empty certificate detected: skipping"
@@ -1015,7 +1015,7 @@ check_ocsp() {
 
                     else
 
-                        debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} "${ISSUER_CERT_TMP}" )"
+                        debuglog "OCSP: complete issuer certificate type $( ${FILE_BIN} -b "${ISSUER_CERT_TMP}" )"
 
                         unknown "Unable to fetch a valid certificate issuer certificate."
 
@@ -1023,7 +1023,7 @@ check_ocsp() {
 
                 fi
 
-                debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
+                debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} -b "${ISSUER_CERT_TMP}" | sed 's/.*://' )"
 
                 if [ -n "${DEBUG_CERT}" ] ; then
 
@@ -1449,30 +1449,33 @@ fetch_certificate() {
         if [ "${HOST_NAME}" = "localhost" ] ; then
 
             debuglog "check if we have to convert the file ${FILE} to PEM"
-            debuglog "certificate type (1): $(${FILE_BIN} "${FILE}" | sed 's/.*://' )"
+            debuglog "certificate type (1): $(${FILE_BIN} -b "${FILE}" | sed 's/.*://' )"
+            create_temporary_file; CONVERSION_ERROR=${TEMPFILE}
 
             if echo "${FILE}" | grep -q -E '[.](p12|pfx)$' ; then
 
                 debuglog 'converting PKCS #12 to PEM'
 
-                create_temporary_file; PKCS12_ERROR=${TEMPFILE}
-
 		if [ -n "${PASSWORD_SOURCE}" ] ; then
 		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
-                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2> "${PKCS12_ERROR}"
+                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2> "${CONVERSION_ERROR}"
                 else
 		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
-                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2> "${PKCS12_ERROR}"
+                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2> "${CONVERSION_ERROR}"
                 fi
 
                 if [ $? -eq 1 ] ; then
-                    unknown "Error converting ${FILE}: $( head -n 1 "${PKCS12_ERROR}" ) "
+                    unknown "Error converting ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
                 fi
 
-            elif "${FILE_BIN}" "${FILE}" | grep -q -E '(data|Certificate)' ; then
+            elif "${FILE_BIN}" -b "${FILE}" | grep -q -E '(data|Certificate)' ; then
 
                 debuglog 'converting DER to PEM'
-                "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}"
+                "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}" 2> "${CONVERSION_ERROR}"
+
+                if [ $? -eq 1 ] ; then
+                    unknown "Error converting ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
+                fi
 
             else
 
@@ -1483,7 +1486,7 @@ fetch_certificate() {
             fi
 
             debuglog "storing the certificate to ${CERT}"
-            debuglog "certificate type (2): $(${FILE_BIN} "${CERT}" | sed 's/.*://' )"
+            debuglog "certificate type (2): $(${FILE_BIN} -b "${CERT}" | sed 's/.*://' )"
 
         else
             unknown "Error: option 'file' works with -H localhost only"

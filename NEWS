@@ -1,3 +1,4 @@
+2021-06-22 Version   2.3.5: Bug fix: correct parsing of file(1) output
 2021-06-18 Version   2.3.4: Stop the SSL Labs checks after an error
 2021-06-16 Version   2.3.3: Speedup the offered ciphers check
 2021-06-03 Version   2.3.2: Bug fix: always uses the specifies OpenSSL binary and respects the specified IP version

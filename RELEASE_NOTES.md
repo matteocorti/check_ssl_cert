@@ -1,1 +1,1 @@
-Stop the SSL Labs checks after an error
+Bug fix: correct parsing of ```file(1)``` output

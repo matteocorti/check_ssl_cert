@@ -1,3 +1,7 @@
+2021-06-22  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert: removes the file name from file(1) output
+
 2021-06-18  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): stop the SSL Labs checks after an error

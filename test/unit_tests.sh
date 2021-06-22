@@ -753,7 +753,7 @@ testResolveDifferentName() {
 testResolveCorrectIP() {
     # dig is needed to resolve the IP address
     if command -v dig > /dev/null ; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$( dig +short corti.li )" --critical 1 --warning 2
+        ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --resolve "$( dig +short ethz.ch )" --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
