@@ -1,1 +1,1 @@
-Bug fix: correct parsing of ```file(1)``` output
+Bug fix: symbolic links are followed

@@ -719,6 +719,12 @@ testDERCert() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testDERCertSymbolicLink() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./derlink.cer --ignore-sct --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testPKCS12Cert() {
     export PASS=
     ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2
