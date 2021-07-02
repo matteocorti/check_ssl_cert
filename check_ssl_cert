@@ -1498,8 +1498,8 @@ fetch_certificate() {
               ALPN='-alpn h2'
           fi
 
-        exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
-        RET=$?
+          exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${IGN_EOF} ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} 2> ${ERROR} 1> ${CERT}"
+          RET=$?
 
     fi
 
@@ -3885,6 +3885,8 @@ main() {
         debuglog 'Checking if the certificate was self signed'
 
         if ascii_grep '^verify\ error:num=[0-9][0-9]*:self\ signed\ certificate' "${ERROR}" ; then
+
+            debuglog 'Self signed certificate'
 
             if [ -z "${SELFSIGNED}" ] ; then
                 prepend_critical_message "Cannot verify certificate, self signed certificate"
