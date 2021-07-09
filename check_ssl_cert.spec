@@ -42,7 +42,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
-* Fri Jun   9 2021 Matteo Corti <matteo@corti.li> - 2.3.7-0
+* Fri Jul   9 2021 Matteo Corti <matteo@corti.li> - 2.3.7-0
 - Updated to 2.3.7
 
 * Wed Jun  23 2021 Matteo Corti <matteo@corti.li> - 2.3.6-0
