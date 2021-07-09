@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.3.6
+VERSION=2.3.7
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -544,6 +544,10 @@ critical() {
 
     debuglog "number of errors = ${NUMBER_OF_ERRORS}"
 
+    if [ -n "${NO_PERF}" ] ; then
+        PERFORMANCE_DATA=
+    fi
+
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ] ; then
         printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
     else
@@ -614,6 +618,10 @@ warning() {
     remove_temporary_files
 
     NUMBER_OF_ERRORS=$( printf '%b' "${ALL_MSG}" | wc -l )
+
+    if [ -n "${NO_PERF}" ] ; then
+        PERFORMANCE_DATA=
+    fi
 
     if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ]; then
         printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
