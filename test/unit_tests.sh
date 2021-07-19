@@ -756,11 +756,11 @@ testResolveDifferentName() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testNewQuoVadis() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H matteo.ethz.ch
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
+#testNewQuoVadis() {
+#    ${SCRIPT} --rootcert-file cabundle.crt -H matteo.ethz.ch
+#    EXIT_CODE=$?
+#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#}
 
 testResolveCorrectIP() {
     # dig is needed to resolve the IP address
