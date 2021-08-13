@@ -2404,6 +2404,12 @@ main() {
     debuglog "HOST_ADDR   = ${HOST_ADDR}"
     debuglog "COMMON_NAME = ${COMMON_NAME}"
 
+    # if the host name contains a / (e.g., a URL) the regex for COMMON_NAME substitution fails
+    #   we check that only allowed characters are present
+    #   we don't need a complete validation since a wrong host name will fail anyway
+    if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\-]*$' ; then
+        unknown "Invalid host name: ${HOST_NAME}"
+    fi
 
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.

@@ -2,6 +2,7 @@
 
 	* test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
 	* check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was ovewritten each time)
+	* check_ssl_cert (main): Better validation of the host command line argument
 
 2021-07-09  Matteo Corti  <matteo@corti.li>
 

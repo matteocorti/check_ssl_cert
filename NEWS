@@ -1,4 +1,5 @@
 2021-08-13 Version   2.3.8: Bug fix: fixed the parsing of the --cn command line option
+                            Bug fix: better validation of the host command line argument
 2021-07-09 Version   2.3.7: Bug fix: performance data is no more shown by critical and warning message when --no-perf is specified
 2021-06-23 Version   2.3.6: Bug fix: follows symbolic links
 2021-06-22 Version   2.3.5: Bug fix: correct parsing of file(1) ou
@@ -37,7 +38,7 @@
                             Supports local PCKS #12 and DER formatted certificates
 2021-02-25 Version 1.140.0: Fixed a bug in the SCT check
 2021-02-24 Version 1.139.0: Fixed a bug in the TLS renegotiation check
-2021-02-24 Version 1.138.0: Checks for TLS renegotiation
+2021-02-24 Version 1.138.0: Checks for TLS renegotiation<
 2021-02-18 Version 1.137.0: Added  the --url option to specify the URL for the HTTP request
 2021-02-16 Version 1.136.0: Fixed the signed certificate timestamps spelling (command line option)
 2021-01-28 Version 1.135.0: Checks for signed certificate timestamps (SCTs)

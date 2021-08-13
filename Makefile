@@ -49,7 +49,7 @@ distclean: clean
 	rm -f *.error
 
 test: dist
-	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && cd test && ./unit_tests.sh )
+	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && export LC_ALL=C && cd test && ./unit_tests.sh )
 
 SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
 
