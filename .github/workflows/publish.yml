@@ -18,11 +18,7 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
-          - 'fedora:rawhide'
         include:
-          - distro: 'fedora:rawhide'
-            pre: >-
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl hostname rpm-build openssh-clients
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&

@@ -61,7 +61,6 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
-          - 'fedora:rawhide'
         include:
           - distro: 'debian:testing'
             pre: >-
@@ -103,10 +102,6 @@ jobs:
               apk upgrade &&
               apk add -U bash &&
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools
-          - distro: 'fedora:rawhide'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils hostname
           - distro: 'fedora:34'
             pre: >-
               dnf upgrade -y &&
@@ -164,11 +159,7 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
-          - 'fedora:rawhide'
         include:
-          - distro: 'fedora:rawhide'
-            pre: >-
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils hostname rpm-build
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
