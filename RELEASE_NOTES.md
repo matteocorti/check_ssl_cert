@@ -1,1 +1,1 @@
-Bug fix: performance data is no more shown by critical and warning message when ```--no-perf``` is specified
+Bug fix: fixed the parsing of the ```--cn``` command line option

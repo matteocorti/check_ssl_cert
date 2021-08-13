@@ -1,3 +1,8 @@
+2021-08-13  Matteo Corti  <matteo@corti.li>
+
+	* test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
+	* check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was ovewritten each time)
+
 2021-07-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert: performance data is no more shown by critical and warning message when --no-perf is specified

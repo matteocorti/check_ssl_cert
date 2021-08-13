@@ -289,6 +289,13 @@ testAltNamesCaseInsensitve() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testMultipleAltNamesOK() {
+    # Test with multiple CN's
+    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li -n www.corti.li -n rpm.corti.li --altnames --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
     ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --altnames --critical 1 --warning 2
@@ -819,8 +826,7 @@ testCiphersError() {
 
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine' ; then
-
-                ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --check-ciphers A --check-ciphers-warnings --critical 1 --warning 2
+                ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers A --check-ciphers-warnings --critical 1 --warning 2
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 

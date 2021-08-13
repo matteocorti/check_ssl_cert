@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.3.7
+VERSION=2.3.8
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -486,13 +486,6 @@ prepend_critical_message() {
 
     debuglog "CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     debuglog "prepend_critical_message: new message    = $1"
-    debuglog "prepend_critical_message: HOST_NAME      = ${HOST_NAME}"
-    debuglog "prepend_critical_message: HOST_ADDR      = ${HOST_ADDR}"
-    debuglog "prepend_critical_message: CN             = ${CN}"
-    debuglog "prepend_critical_message: SNI            = ${SNI}"
-    debuglog "prepend_critical_message: FILE           = ${FILE}"
-    debuglog "prepend_critical_message: SHORTNAME      = ${SHORTNAME}"
-    debuglog "prepend_critical_message: MSG            = ${MSG}"
     debuglog "prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
     debuglog "prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
 
@@ -2010,7 +2003,11 @@ parse_command_line_options() {
                 ;;
             -n|--cn)
                 check_option_argument ' -n|--cn' "$2"
-                COMMON_NAME="${2}"
+                if [ -z "${COMMON_NAME}" ] ; then
+                    COMMON_NAME="${2}"
+                else
+                    COMMON_NAME="${COMMON_NAME} ${2}"
+                fi
                 shift 2
                 ;;
             --not-issued-by)
@@ -2402,9 +2399,10 @@ main() {
 
     fi
 
-    debuglog "SNI       = ${SNI}"
-    debuglog "HOST_NAME = ${HOST_NAME}"
-    debuglog "HOST_ADDR = ${HOST_ADDR}"
+    debuglog "SNI         = ${SNI}"
+    debuglog "HOST_NAME   = ${HOST_NAME}"
+    debuglog "HOST_ADDR   = ${HOST_ADDR}"
+    debuglog "COMMON_NAME = ${COMMON_NAME}"
 
 
     ################################################################################
@@ -3452,6 +3450,7 @@ main() {
 
                 debuglog '==============================='
                 debuglog "checking altnames against ${cn}"
+                debuglog "  SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
 
                 for alt_name in ${SUBJECT_ALTERNATIVE_NAME} ; do
 
