@@ -118,3 +118,4 @@ Thanks:
 * Many thanks to Igor Mironov (https://github.com/mcs6502) for the LibreSSL patch
 * Many thanks to jalbstmeijer (https://github.com/jalbstmeijer) for the OpenSSL and INETPROTO patch
 * Many thanks to Pim Rupert (https://github.com/prupert) for the file(1) patches
+* Many thanks to Alexander Aleksandrovič Klimov (https://github.com/Al2Klimov) for the DANE 312 patch

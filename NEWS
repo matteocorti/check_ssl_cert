@@ -1,3 +1,4 @@
+2021-08-16 Version   2.4.0: Support DANE TLSA 312
 2021-08-13 Version   2.3.8: Bug fix: fixed the parsing of the --cn command line option
                             Bug fix: better validation of the host command line argument
 2021-07-09 Version   2.3.7: Bug fix: performance data is no more shown by critical and warning message when --no-perf is specified

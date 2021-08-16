@@ -1,3 +1,7 @@
+2021-08-16  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Support DANE TLSA 312
+
 2021-08-13  Matteo Corti  <matteo@corti.li>
 
 	* test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
