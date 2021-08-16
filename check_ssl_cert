@@ -85,6 +85,7 @@ usage() {
     echo "      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists"
     echo "      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists"
     echo "      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists"
+    echo "      --dane 312                   verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record exists"
     echo "      --date path                  path of the date binary to be used"
     echo "   -d,--debug                      produces debugging output (can be specified more than once)"
     echo "      --debug-cert                 stores the retrieved certificates in the current directory"
@@ -3044,6 +3045,9 @@ main() {
                 ;;
             311)
                 DANE=$( echo "${DIG_RESULT}" | grep -F '3 1 1' | tr -d '\n')
+                ;;
+            312)
+                DANE=$( echo "${DIG_RESULT}" | grep -F '3 1 2' | tr -d '\n')
                 ;;
             302)
                 DANE=$( echo "${DIG_RESULT}" | grep -F '3 0 2' | tr -d '\n')
