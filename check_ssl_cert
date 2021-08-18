@@ -2180,7 +2180,7 @@ parse_command_line_options() {
                 # if the option begins with a single dash and it's longer than one character
                 if ! echo "${OPTION}" | grep -q -- '^--' &&
                         [ "$( echo "${OPTION}" | wc -c | sed 's/\ //g' )" -gt 3 ] ; then
-                    if [ -n "${DEBUG}" ] ; then
+                    if [ "${DEBUG}" -gt 0 ] ; then
                         echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group"
                     fi
                     for letter in $( echo "${OPTION}" | sed 's/^-//' | grep -o . ) ; do

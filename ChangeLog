@@ -1,3 +1,7 @@
+2021-08-18  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (parse_command_line_options): Fixed the debugging output by the command line arguments splitting
+
 2021-08-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Support DANE TLSA 312
