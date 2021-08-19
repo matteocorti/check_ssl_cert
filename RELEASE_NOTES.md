@@ -1,1 +1,1 @@
-Support DANE TLSA 312
+Fixed the handling of --file and --cn
