@@ -1938,7 +1938,8 @@ parse_command_line_options() {
             -f|--file)
                 check_option_argument ' -f|--file' "$2"
                 FILE="$2"
-                COMMON_NAME=
+                # remove _HOST_ from COMMON_NAME
+                COMMON_NAME=$( echo "${COMMON_NAME}" | sed 's/__HOST__\ *//' )
                 ALTNAMES=
                 shift 2
                 ;;
@@ -2009,6 +2010,7 @@ parse_command_line_options() {
                 else
                     COMMON_NAME="${COMMON_NAME} ${2}"
                 fi
+                debuglog "--cn specified: COMMON_MANE = ${COMMON_NAME}"
                 shift 2
                 ;;
             --not-issued-by)
