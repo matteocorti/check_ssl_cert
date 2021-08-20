@@ -56,7 +56,7 @@ jobs:
               && uname -a \
               && whoami \
               && pwd \
-              && . ./prepare_rpm.sh \
+              && . ./utils/prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
               && mkdir /root/.ssh \
