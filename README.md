@@ -190,7 +190,7 @@ The plugin will ask for a cached result (maximum age 1 day) to avoid
 to many checks. The first time you issue the check you could therefore
 get an outdated result.
 
-## Notes
+## Root Certificate
 
 The root certificate corresponding to the checked certificate must be
 available to openssl or specified with the `-r cabundle` or
@@ -216,6 +216,10 @@ and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 ```
  ./check_ssl_cert -H www.google.com -r ./cabundle.crt
 ```
+
+## Quoting in Nagios
+
+An asterisk ```*``` is automatically escaped by nagios. If you need to specify an option (e.g., ```--cn```) with an argument containing an asterisk you need to enclose it in double quotes (e.g., ```''*.ethz.ch''```)
 
 ## Bugs
 
