@@ -48,6 +48,8 @@ distclean: clean
 	rm -f *.crt
 	rm -f *.error
 
+check: test
+
 test: dist
 	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && export LC_ALL=C && cd test && ./unit_tests.sh )
 
@@ -73,4 +75,4 @@ rpm: dist
 
 
 
-.PHONY: install clean test rpm distclean
+.PHONY: install clean test rpm distclean check
