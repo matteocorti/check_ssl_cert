@@ -485,6 +485,8 @@ EOF
 #   $1 error message
 prepend_critical_message() {
 
+    verboselog "CRITICAL error: $1"
+    
     debuglog "CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     debuglog "prepend_critical_message: new message    = $1"
     debuglog "prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
@@ -556,6 +558,8 @@ critical() {
 # Params
 #   $1 warning message
 append_warning_message() {
+
+    verboselog "WARNING: $1"
 
     debuglog "WARNING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     debuglog "append_warning_message: HOST_NAME    = ${HOST_NAME}"
@@ -3691,7 +3695,7 @@ main() {
             convert_grade "${NMAP_GRADE}"
             NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
-            verboselog "nmap cipher grade ${NMAP_GRADE}: ${NMAP_GRADE_NUMERIC}"
+            verboselog "  nmap cipher grade ${NMAP_GRADE}: ${NMAP_GRADE_NUMERIC}"
 
             # Check the grade
             if [ "${NMAP_GRADE_NUMERIC}" -lt "${CHECK_CIPHERS_NUMERIC}" ] ; then
