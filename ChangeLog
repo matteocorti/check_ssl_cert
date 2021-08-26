@@ -1,3 +1,7 @@
+2021-08-25  Matteo Corti  <matteo@corti.li>
+
+	* README.md: Info about quoting *
+
 2021-08-19  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (parse_command_line_options): do not delete COMMON_NAME by --file
