@@ -3770,7 +3770,7 @@ main() {
             IGNORE_SSL_LABS_CACHE=""
 
             if echo "${JSON}" | grep -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' ; then
-                verboselog 'SSL Labs running at full capacity'
+                verboselog '  SSL Labs running at full capacity'
             else
 
                 SSL_LABS_HOST_STATUS=$(echo "${JSON}" \
@@ -3801,7 +3801,7 @@ main() {
 
                             debuglog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
-                            verboselog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+                            verboselog "  SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
                             convert_grade "${SSL_LABS_HOST_GRADE}"
                             SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
@@ -3828,13 +3828,13 @@ main() {
                         # Data not yet available: warn and continue
                         PROGRESS=$( echo "${JSON}" | sed 's/.*progress"://' | sed 's/,.*//' )
                         if [ "${PROGRESS}" -eq -1 ] ; then
-                            verboselog "warning: no cached data by SSL Labs, check in progress"
+                            verboselog "  warning: no cached data by SSL Labs, check in progress"
                         else
-                            verboselog "warning: no cached data by SSL Labs, check in progress ${PROGRESS}%"
+                            verboselog "  warning: no cached data by SSL Labs, check in progress ${PROGRESS}%"
                         fi
                         ;;
                     'DNS')
-                        verboselog "SSL Labs resolving the domain name"
+                        verboselog "  SSL Labs resolving the domain name"
                         ;;
                     *)
                         # Try to extract a message
@@ -3851,7 +3851,7 @@ main() {
             fi
 
             WAIT_TIME=60
-            verboselog "waiting ${WAIT_TIME} seconds"
+            verboselog "  waiting ${WAIT_TIME} seconds"
 
             sleep "${WAIT_TIME}"
 

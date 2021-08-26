@@ -1,3 +1,7 @@
+2021-08-26  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): small improvement in the verbose output of SSL Labs
+
 2021-08-25  Matteo Corti  <matteo@corti.li>
 
 	* README.md: Info about quoting *
