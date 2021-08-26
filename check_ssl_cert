@@ -486,7 +486,7 @@ EOF
 prepend_critical_message() {
 
     verboselog "CRITICAL error: $1"
-    
+
     debuglog "CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     debuglog "prepend_critical_message: new message    = $1"
     debuglog "prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
