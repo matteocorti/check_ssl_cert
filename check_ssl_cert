@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.4.1
+VERSION=2.4.2
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1363,6 +1363,25 @@ convert_grade() {
 }
 
 ################################################################################
+# Check if the specified host is an IP (does not check the validity
+#   $1 string to check
+is_ip() {
+    ARGUMENT=$1
+    debuglog "Checking if ${ARGUMENT} is an IP address"
+    if [ "${ARGUMENT}" != "${ARGUMENT#*[0-9].[0-9]}" ]; then
+        debuglog "${ARGUMENT} is an IPv4 address"
+        echo '1'
+    elif [ "${ARGUMENT}" != "${ARGUMENT#*:[0-9a-fA-F]}" ]; then
+       debuglog "${ARGUMENT} is an IPv6 address"
+       echo '1'
+    else
+        debuglog "${ARGUMENT} is not an IP address"
+        echo '0'
+    fi
+}
+
+
+################################################################################
 # Tries to fetch the certificate
 
 fetch_certificate() {
@@ -1371,7 +1390,7 @@ fetch_certificate() {
 
     # IPv6 addresses need brackets in a URI
     if [ "${HOST_ADDR}" != "${HOST_ADDR#*[0-9].[0-9]}" ]; then
-       debuglog "${HOST_ADDR} is an IPv4 address"
+        debuglog "${HOST_ADDR} is an IPv4 address"
     elif [ "${HOST_ADDR}" != "${HOST_ADDR#*:[0-9a-fA-F]}" ]; then
        debuglog "${HOST_ADDR} is an IPv6 address"
        if [ -z "${HOST_ADDR##*\[*}" ] ; then
@@ -3426,34 +3445,43 @@ main() {
 
         ok=""
 
-        debuglog "check CN: ${CN}"
-        debuglog "COMMON_NAME = ${COMMON_NAME}"
-        debuglog "ALTNAMES    = ${ALTNAMES}"
+        debuglog "check CN                   ${CN}"
+        debuglog "COMMON_NAME              = ${COMMON_NAME}"
+        debuglog "ALTNAMES                 = ${ALTNAMES}"
+        debuglog "SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
 
-        # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
+        if [ "$( is_ip "${COMMON_NAME}" )" -eq 0 ] ; then
 
-        if echo "${CN}" | grep -q -i "^\\*\\." ; then
+            # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
+            if echo "${CN}" | grep -q -i "^\\*\\." ; then
 
-            # Or the literal with the wildcard
-            debuglog "checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
-            if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$" ; then
-                debuglog "the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
-                ok="true"
-            fi
+                # Or the literal with the wildcard
+                debuglog "checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
+                if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$" ; then
+                    debuglog "the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
+                    ok="true"
+                fi
 
-            # Or if both are exactly the same
-            debuglog "checking if the common name matches ^${CN}\$"
+                # Or if both are exactly the same
+                debuglog "checking if the common name matches ^${CN}\$"
 
-            if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$" ; then
-                debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
-                ok="true"
+                if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$" ; then
+                    debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
+                    ok="true"
+                fi
+
+            else
+
+                if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
+                    ok="true"
+                fi
+
             fi
 
         else
 
-            if echo "${COMMON_NAME}" | grep -q -i "^${CN}$" ; then
-                ok="true"
-            fi
+            verboselog "Skipping the matching of the host name (${COMMON_NAME}) as it is an IP adress"
+            COMMON_NAME_IS_AN_IP=1
 
         fi
 
@@ -3461,6 +3489,11 @@ main() {
         if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
 
             for cn in ${COMMON_NAME} ; do
+
+                if [ "$( is_ip "${cn}" )" -eq 1 ] ; then
+                    verboselog "Skipping the matching of ${cn} as it is an IP address"
+                    continue
+                fi
 
                 ok=""
 
@@ -3526,7 +3559,7 @@ main() {
         if [ -n "${fail}" ] ; then
             prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
         else
-            if [ -z "${ok}" ] ; then
+            if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ] ; then
                 prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
             fi
         fi

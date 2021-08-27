@@ -1,1 +1,1 @@
-Fixed the handling of --file and --cn
+Fixed the handling of IP addresses

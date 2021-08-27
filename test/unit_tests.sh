@@ -210,6 +210,24 @@ testETHZCaseInsensitive() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testIPOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testIPOKAltName() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --cn pasi.corti.li --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testIPFailAltName() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --cn bogus.corti.li --critical 1 --warning 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testETHZWildCard() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed

@@ -1,3 +1,4 @@
+2021-08-27 Version   2.4.2: Fixed the handling of IP addresses
 2021-08-19 Version   2.4.1: Fixed the handling of --file and --cn
 2021-08-16 Version   2.4.0: Support DANE TLSA 312
 2021-08-13 Version   2.3.8: Bug fix: fixed the parsing of the --cn command line option
