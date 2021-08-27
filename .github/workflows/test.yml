@@ -56,8 +56,6 @@ jobs:
           - 'ubuntu:20.10'
           - 'alpine:3.13'
           - 'alpine:edge'
-          - 'centos:7'
-          - 'centos:8'
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
@@ -125,18 +123,6 @@ jobs:
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2
-
-
-          - distro: 'centos:7'
-            pre: >-
-              yum upgrade -y &&
-              yum install -y nmap curl sudo perl make bzip2 file openssl bind-utils perl-ExtUtils-MakeMaker perl-Test-Simple git shunit2 &&
-              scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
-          - distro: 'centos:8'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils git  shunit2 &&
-              scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
 
 
     steps:
