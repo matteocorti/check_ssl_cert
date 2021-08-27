@@ -221,6 +221,15 @@ and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
 An asterisk ```*``` is automatically escaped by nagios. If you need to specify an option (e.g., ```--cn```) with an argument containing an asterisk you need to enclose it in double quotes (e.g., ```''*.ethz.ch''```)
 
+## Development
+
+### Tesing
+
+To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
+
+ * Manual install: [github](https://github.com/kward/shunit2)
+ * macOS with [Homebrew](https://brew.sh): ```brew install shunit2```
+
 ## Bugs
 
 The timeout is applied to each action involving a download.

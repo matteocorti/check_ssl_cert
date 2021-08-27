@@ -50,14 +50,21 @@ distclean: clean
 
 check: test
 
-test: dist
-	( export SHUNIT2="$$(pwd)/shunit2/shunit2" && export LC_ALL=C && cd test && ./unit_tests.sh )
-
 SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
+SHUNIT := $(shell command -v shunit2 2> /dev/null)
+
+test: dist
+ifndef SHUNIT
+	echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./unit_tests.sh )
+endif
+
 
 shellcheck:
 ifndef SHELLCHECK
-	echo "No shellcheck installed: skipping test"
+	echo "No shellcheck installed: skipping check"
 else
 	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh utils/format_files.sh ; else shellcheck check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh ; fi
 endif
