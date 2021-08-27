@@ -101,13 +101,13 @@ jobs:
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2
           - distro: 'alpine:3.13'
             pre: >-
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2
 
 
           - distro: 'fedora:34'
