@@ -62,6 +62,8 @@ jobs:
           - 'fedora:33'
           - 'fedora:34'
         include:
+
+
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
@@ -74,6 +76,8 @@ jobs:
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+
+
           - distro: 'ubuntu:20.10'
             pre: >-
               apt-get update &&
@@ -90,43 +94,49 @@ jobs:
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils
+
+
           - distro: 'alpine:edge'
             pre: >-
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git
           - distro: 'alpine:3.13'
             pre: >-
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git
+
+
           - distro: 'fedora:34'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git
           - distro: 'fedora:33'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git
           - distro: 'fedora:32'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git
           - distro: 'centos:7'
             pre: >-
               yum upgrade -y &&
-              yum install -y nmap curl sudo perl make bzip2 file openssl bind-utils perl-ExtUtils-MakeMaker perl-Test-Simple &&
+              yum install -y nmap curl sudo perl make bzip2 file openssl bind-utils perl-ExtUtils-MakeMaker perl-Test-Simple git &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
           - distro: 'centos:8'
             pre: >-
               dnf upgrade -y &&
-              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils git &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
+
+
     steps:
       - name: Git clone repository
         uses: actions/checkout@v2
@@ -163,22 +173,22 @@ jobs:
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'fedora:33'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'fedora:32'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'centos:7'
             pre: >-
               yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
           - distro: 'centos:8'
             pre: >-
-              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build git &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
