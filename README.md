@@ -229,6 +229,8 @@ To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
 
  * Manual install: [github](https://github.com/kward/shunit2)
  * macOS with [Homebrew](https://brew.sh): ```brew install shunit2```
+ * Debian, Ubuntu: ```apt-get install shunit2```
+ * Fedora: ```dnf install shunit2```
 
 ## Bugs
 
