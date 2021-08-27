@@ -27,7 +27,7 @@ jobs:
           submodules: true
 
       - name: Install shellcheck
-        run: brew install shellcheck
+        run: brew install shellcheck shunit2
 
       - name: install cpanm and Date::Parse
         uses: perl-actions/install-with-cpanm@v1
