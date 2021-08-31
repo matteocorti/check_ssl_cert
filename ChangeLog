@@ -1,3 +1,7 @@
+2021-08-31  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): added -crlf to the connection for the renegotiation test
+
 2021-08-27  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): skipping the CN check on IP addresses
