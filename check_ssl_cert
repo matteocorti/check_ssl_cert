@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.4.2
+VERSION=2.4.3
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2774,8 +2774,12 @@ main() {
             DATETYPE='GNU'
         elif "${DATEBIN}" --version 2>&1 | grep -F -q BusyBox ; then
             DATETYPE='BUSYBOX'
-       else
+        else
             DATETYPE='BSD'
+            if "${DATEBIN}" -f "%b %d %T %Y %Z" 'Aug  7 07:39:37 2023 GMT' 2>&1 | grep -q -F 'date:\ unknown\ option\ --\ f' ; then
+                debuglog "Old BSD date without -f: fallback to BusyBox date computation"
+                DATETYPE='BUSYBOX'
+            fi
         fi
 
         verboselog "found ${DATETYPE} date with timestamp support: enabling date computations" 2

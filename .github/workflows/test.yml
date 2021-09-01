@@ -11,6 +11,10 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  ##############################################################################
+  # macOS
+
   macos:
     name: Running tests on ${{ matrix.os }}
     strategy:
@@ -23,8 +27,6 @@ jobs:
 
       - name: Git clone repository
         uses: actions/checkout@v2
-        with:
-          submodules: true
 
       - name: Install shellcheck
         run: brew install shellcheck shunit2
@@ -38,6 +40,9 @@ jobs:
         run:  |
           uname -a \
           && make test
+
+  ##############################################################################
+  # Linuxes
 
   linux:
     # The host should always be linux
@@ -126,10 +131,10 @@ jobs:
 
 
     steps:
+
       - name: Git clone repository
         uses: actions/checkout@v2
-        with:
-          submodules: true
+
       - name: Run the tests on ${{ matrix.distro }}
         env:
           PRE: ${{ matrix.pre }}
@@ -178,10 +183,10 @@ jobs:
               dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build git &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
+
       - name: Git clone repository
         uses: actions/checkout@v2
-        with:
-          submodules: true
+
       - name: Build the RPM on ${{ matrix.distro }}
         env:
           PRE: ${{ matrix.pre }}
