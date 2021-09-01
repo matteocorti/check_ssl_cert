@@ -2776,7 +2776,7 @@ main() {
             DATETYPE='BUSYBOX'
         else
             DATETYPE='BSD'
-            if "${DATEBIN}" -f "%b %d %T %Y %Z" 'Aug  7 07:39:37 2023 GMT' 2>&1 | grep -q -F 'date:\ unknown\ option\ --\ f' ; then
+            if "${DATEBIN}" -f "%b %d %T %Y %Z" '' 2>&1 | grep -q -F 'date: unknown option -- f' ; then
                 debuglog "Old BSD date without -f: fallback to BusyBox date computation"
                 DATETYPE='BUSYBOX'
             fi
