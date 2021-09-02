@@ -103,6 +103,7 @@ usage() {
     echo "      --file-bin path              path of the file binary to be used"
     echo "      --fingerprint SHA1           pattern to match the SHA1-Fingerprint"
     echo "      --first-element-only         verify just the first cert element, not the whole chain"
+    echo "      --force-dcovn-date           force the usage of dconf for date computations"
     echo "      --force-perl-date            force the usage of Perl for date computations"
     echo "      --format FORMAT              format output template on success, for example"
     echo "                                   \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
@@ -360,8 +361,47 @@ hours_until() {
 
     case "${DATETYPE}" in
         "BSD")
+
+            # new BSD date
             HOURS_UNTIL=$(( ( $(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s) ) / 3600 ))
+
             ;;
+
+        "DCONV")
+
+            debuglog "Computing date with dconv"
+
+            # detect the date -j required format
+            if date -help 2>&1 | grep -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]' ; then
+
+                # e.g., macOS
+
+                debuglog "date -j format [[[mm]dd]HH]MM[[cc]yy][.ss]]"
+
+                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | dconv -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
+                debuglog "date converted with dconv: ${CONVERTED_DATE}"
+
+                HOURS_UNTIL=$(( ( $( ${DATEBIN} -j "${CONVERTED_DATE}" +%s ) - $(${DATEBIN} +%s) ) / 3600 ))
+
+                debuglog "hours computed with dconv: ${HOURS_UNTIL}"
+
+            elif date -help 2>&1 | grep -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]' ; then
+
+                # e.g., old BSD
+
+                debuglog "date -j format [[[[[[cc]yy]mm]dd]HH]MM[.SS]]"
+
+                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | dconv -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z" )
+                debuglog "date converted with dconv: ${CONVERTED_DATE}"
+
+                HOURS_UNTIL=$(( ( $( ${DATEBIN} -j +%s "${CONVERTED_DATE}" ) - $(${DATEBIN} +%s) ) / 3600 ))
+
+            else
+                unknown "Unknow date fomat"
+            fi
+
+            ;;
+
         "BUSYBOX")
             BUSYBOX_DATE=$( echo "${DATE}" | sed 's/[ ][^ ]*$//' )
             debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
@@ -391,6 +431,7 @@ EOF
     esac
 
     debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
+
     echo "${HOURS_UNTIL}"
 
 }
@@ -1211,7 +1252,7 @@ check_cert_end_date() {
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
 
-    debuglog "  valid for ${HOURS_UNTIL} hours"
+    debuglog "  valid for >>>${HOURS_UNTIL} hours<<<"
 
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
 
@@ -1726,6 +1767,10 @@ parse_command_line_options() {
                 ;;
             --first-element-only)
                 FIRST_ELEMENT_ONLY=1
+                shift
+                ;;
+            --force-dconv-date)
+                FORCE_DCONV_DATE=1
                 shift
                 ;;
             --force-perl-date)
@@ -2250,6 +2295,7 @@ main() {
     SNI=""
     TIMEOUT="120"
     VERBOSE="0"
+    FORCE_DCONV_DATE=""
     FORCE_PERL_DATE=""
     REQUIRE_SAN=""
     REQUIRE_OCSP_STAPLING=""
@@ -2777,8 +2823,16 @@ main() {
         else
             DATETYPE='BSD'
             if "${DATEBIN}" -f "%b %d %T %Y %Z" '' 2>&1 | grep -q -F 'date: unknown option -- f' ; then
-                debuglog "Old BSD date without -f: fallback to BusyBox date computation"
-                DATETYPE='BUSYBOX'
+                debuglog "Old BSD date without -f: checking for dconv"
+
+                check_required_prog "dconv"
+                DCONV=$( command -v dconv )
+                if [ -z "${DCONV}" ] ; then
+                    uknown "Old version of date without the -f option detected and no dconv installed"
+                else
+                    debuglog "dconv detected: ${DCONV}"
+                    DATETYPE='DCONV'
+                fi
             fi
         fi
 
@@ -2786,8 +2840,16 @@ main() {
 
     fi
 
+    if [ -n "${FORCE_DCONV_DATE}" ] && [ -n "${FORCE_PERL_DATE}" ] ; then
+        unknown "--force-dconv-date and --force-perl-date cannot be specified at the same time"
+    fi
     if [ -n "${FORCE_PERL_DATE}" ] ; then
         DATETYPE="PERL"
+    fi
+    if [ -n "${FORCE_DCONV_DATE}" ] ; then
+        DATETYPE="DCONV"
+        check_required_prog "dconv"
+        DCONV="{PROG}"
     fi
 
     if [ "${DEBUG}" -ge 1 ] ; then
@@ -2796,7 +2858,7 @@ main() {
         debuglog "OpenSSL binary: ${OPENSSL}"
         if [ "${DEBUG}" -ge 1 ] ; then
             debuglog "OpenSSL info:"
-            ${OPENSSL} version -a | sed 's/^/[DBG]/'
+            ${OPENSSL} version -a | sed 's/^/[DBG] /'
         fi
         OPENSSL_DIR="$( ${OPENSSL} version -d | sed -E 's/OPENSSLDIR: "([^"]*)"/\1/' )"
 

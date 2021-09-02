@@ -1,3 +1,7 @@
+2021-09-02  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (hours_until): computes the date with dconv if date -f is missing
+
 2021-09-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): detects old BSD date without -f

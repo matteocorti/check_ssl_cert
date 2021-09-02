@@ -56,6 +56,7 @@ Options:
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --first-element-only         verify just the first cert element, not the whole chain
+      --force-dconv-date           force the usage of dconv for date computations
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
