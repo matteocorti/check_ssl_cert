@@ -369,7 +369,7 @@ hours_until() {
 
         "DCONV")
 
-            debuglog "Computing date with dconv/dateconv"
+            debuglog "Computing date with dconv"
 
             # detect the date -j required format
             if date --help 2>&1 | grep -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]' ; then
@@ -377,28 +377,14 @@ hours_until() {
                 # e.g., macOS
 
                 debuglog "date -j format [[[mm]dd]HH]MM[[cc]yy][.ss]]"
-                debuglog "executing: echo '${DATE}' | sed 's/  / /g' | $DCONV -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
+                debuglog "executing: echo '${DATE}' | sed 's/  / /g' | ${DCONV_BIN} -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
 
-                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | $DCONV -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
+                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
                 debuglog "date converted with dconv: ${CONVERTED_DATE}"
 
                 HOURS_UNTIL=$(( ( $( ${DATEBIN} -j "${CONVERTED_DATE}" +%s ) - $(${DATEBIN} +%s) ) / 3600 ))
 
-                debuglog "hours computed with dconv: ${HOURS_UNTIL}"
-
-            elif date --help 2>&1 | grep -q '\[MMDDhhmm\[\[CC\]YY\]\[\.ss\]\]' ; then
-
-                # e.g., Linux
-
-                debuglog "date -j format [MMDDhhmm[[CC]YY][.ss]]"
-                debuglog "executing: echo '${DATE}' | sed 's/  / /g' | $DCONV -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
-
-                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | $DCONV -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
-                debuglog "date converted with dconv/dateconv: ${CONVERTED_DATE}"
-
-                HOURS_UNTIL=$(( ( $( ${DATEBIN} -j "${CONVERTED_DATE}" +%s ) - $(${DATEBIN} +%s) ) / 3600 ))
-
-                debuglog "hours computed with dconv: ${HOURS_UNTIL}"
+                debuglog "hours computed with ${DCONV_BIN}: ${HOURS_UNTIL}"
 
             elif date --help 2>&1 | grep -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]' ; then
 
@@ -406,8 +392,8 @@ hours_until() {
 
                 debuglog "date -j format [[[[[[cc]yy]mm]dd]HH]MM[.SS]]"
 
-                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | $DCONV -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z" )
-                debuglog "date converted with $DCONV: ${CONVERTED_DATE}"
+                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z" )
+                debuglog "date converted with ${DCONV_BIN}: ${CONVERTED_DATE}"
 
                 HOURS_UNTIL=$(( ( $( ${DATEBIN} -j +%s "${CONVERTED_DATE}" ) - $(${DATEBIN} +%s) ) / 3600 ))
 
@@ -2838,11 +2824,11 @@ main() {
             if "${DATEBIN}" -f "%b %d %T %Y %Z" '' 2>&1 | grep -q -F 'date: unknown option -- f' ; then
                 debuglog "Old BSD date without -f: checking for dconv"
 
-                DCONV=$( command -v dconv )
-                if [ -z "${DCONV}" ] ; then
+                DCONV_BIN=$( command -v dconv )
+                if [ -z "${DCONV_BIN}" ] ; then
                     uknown "Old version of date without the -f option detected and no dconv installed"
                 else
-                    debuglog "dconv detected: ${DCONV}"
+                    debuglog "dconv detected: ${DCONV_BIN}"
                     DATETYPE='DCONV'
                 fi
             fi
@@ -2861,21 +2847,13 @@ main() {
     fi
     if [ -n "${FORCE_DCONV_DATE}" ] ; then
 
-	debuglog "Forcing date computations with dconv/dateconv"
-	
+	debuglog "Forcing date computations with dconv"
+
         DATETYPE="DCONV"
-        DCONV=$( command -v dconv )
-        if [ -z "${DCONV}" ] ; then
-            # on Linux the dconv binary is named dateconv
-            DCONV=$( command -v dateconv )
-            if [ -z "${DCONV}" ] ; then
-                unknown "Cannot find dconv or dateconv"
-            fi
-        fi
-        if [ ! -x "${DCONV}" ] ; then
-            unknown "${DCONV} is no executable"
-        fi
-	debuglog "dconv/dateconv binary: ${DCONV}"
+        check_required_prog dconv
+        DCONV_BIN=${PROG}
+	debuglog "dconv binary: ${DCONV_BIN}"
+
     fi
 
     if [ "${DEBUG}" -ge 1 ] ; then
