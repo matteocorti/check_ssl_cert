@@ -378,7 +378,7 @@ hours_until() {
 
                 debuglog "date -j format [[[mm]dd]HH]MM[[cc]yy][.ss]]"
                 debuglog "executing: echo '${DATE}' | sed 's/  / /g' | dconv -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
-                
+
                 CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | dconv -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
                 debuglog "date converted with dconv: ${CONVERTED_DATE}"
 
