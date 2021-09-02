@@ -372,7 +372,7 @@ hours_until() {
             debuglog "Computing date with dconv"
 
             # detect the date -j required format
-            if date -help 2>&1 | grep -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]' ; then
+            if date --help 2>&1 | grep -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]' ; then
 
                 # e.g., macOS
 
@@ -386,7 +386,21 @@ hours_until() {
 
                 debuglog "hours computed with dconv: ${HOURS_UNTIL}"
 
-            elif date -help 2>&1 | grep -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]' ; then
+            elif date --help 2>&1 | grep -q '\[MMDDhhmm\[\[CC\]YY\]\[\.ss\]\]' ; then
+
+                # e.g., Linux
+
+                debuglog "date -j format [MMDDhhmm[[CC]YY][.ss]]"
+                debuglog "executing: echo '${DATE}' | sed 's/  / /g' | dconv -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
+
+                CONVERTED_DATE=$( echo "${DATE}" | sed 's/  / /g' | dconv -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z" )
+                debuglog "date converted with dconv: ${CONVERTED_DATE}"
+
+                HOURS_UNTIL=$(( ( $( ${DATEBIN} -j "${CONVERTED_DATE}" +%s ) - $(${DATEBIN} +%s) ) / 3600 ))
+
+                debuglog "hours computed with dconv: ${HOURS_UNTIL}"
+
+            elif date --help 2>&1 | grep -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]' ; then
 
                 # e.g., old BSD
 
@@ -398,7 +412,7 @@ hours_until() {
                 HOURS_UNTIL=$(( ( $( ${DATEBIN} -j +%s "${CONVERTED_DATE}" ) - $(${DATEBIN} +%s) ) / 3600 ))
 
             else
-                unknown "Unknow date fomat"
+                unknown "Unknown date(1) input fomat"
             fi
 
             ;;
@@ -1252,8 +1266,6 @@ check_cert_end_date() {
     debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
-
-    debuglog "  valid for >>>${HOURS_UNTIL} hours<<<"
 
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
 
