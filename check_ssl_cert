@@ -92,7 +92,7 @@ usage() {
     echo "      --debug-file file            writes the debug messages to file"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
-    echo "      --element number             checks N cert element from the begining of the chain"
+    echo "      --element number             checks up to the N cert element from the beginning of the chain"
     echo "   -e,--email address              pattern to match the email address contained"
     echo "                                   in the certificate"
     echo "   -f,--file file                  local file path (works with -H localhost only)"
@@ -3366,7 +3366,7 @@ main() {
                                ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
-            if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+            if ! [ "${ELEMENT}" -eq 0 ] && [ $(( ELEMENT - CERT_IN_CHAIN )) -lt 0 ]; then
                 break
             fi
         done
@@ -3748,7 +3748,7 @@ main() {
                 fi
 
                 CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
-                if ! [ "${ELEMENT}" -eq 0 ] && [ $(( CERT_IN_CHAIN - ELEMENT )) -lt 0 ]; then
+                if ! [ "${ELEMENT}" -eq 0 ] && [ $(( ELEMENT - CERT_IN_CHAIN )) -lt 0 ]; then
                     break
                 fi
             done
