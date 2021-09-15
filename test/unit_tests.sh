@@ -611,15 +611,15 @@ testFormatShort() {
     OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch  --critical 1 --warning 2 --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Global SSL ICA G2'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Europe SSL CA G2'" "${OUTPUT}"
 }
 
 testMoreErrors() {
-    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --email doesnotexist --critical 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
-    assertEquals "wrong number of errors" 5 "${OUTPUT}"
+    assertEquals "wrong number of errors" 4 "${OUTPUT}"
 }
 
 testMoreErrors2() {
@@ -627,7 +627,7 @@ testMoreErrors2() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
-    assertEquals "wrong number of errors" 5 "${OUTPUT}"
+    assertEquals "wrong number of errors" 4 "${OUTPUT}"
 }
 
 # dane
