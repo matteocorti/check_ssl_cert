@@ -115,6 +115,7 @@ usage() {
     echo "      --ignore-host-cn             do not complain if the CN does not match the host name"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
     echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
+    echo "      --ignore-ocsp-errors         continue if the OCSP status cannot be checked"
     echo "      --ignore-sig-alg             do not check if the certificate was signed with SHA1"
     echo "                                   or MD5"
     echo "      --ignore-sct                 do not check for signed certificate timestamps (SCT)"
@@ -1182,6 +1183,10 @@ check_ocsp() {
 
                         prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
 
+                    elif echo "${OCSP_RESP}" | grep -F -q -i "internal error"  && [ -n "${OCSP_IGNORE_ERRORS}" ] ; then
+
+                        verbose 'the OCSP server returned an internal error'
+
                     elif ! echo "${OCSP_RESP}" | grep -F -q -i "good" ; then
 
                         debuglog "OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
@@ -1913,6 +1918,10 @@ parse_command_line_options() {
                 OCSP=""
                 shift
                 ;;
+            --ignore-ocsp-errors)
+                OCSP_IGNORE_ERRORS=1
+                shift
+                ;;
             --ignore-ocsp-timeout)
                 OCSP_IGNORE_TIMEOUT=1
                 shift
@@ -2299,6 +2308,7 @@ main() {
     REQUIRE_SAN=""
     REQUIRE_OCSP_STAPLING=""
     OCSP="1" # enabled by default
+    OCSP_IGNORE_ERRORS=""
     OCSP_IGNORE_TIMEOUT=""
     FORMAT=""
     HTTP_METHOD="HEAD"

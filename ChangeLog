@@ -1,3 +1,7 @@
+2021-09-15  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (usage): Added an option to ignore OCSP server errors
+
 2021-09-02  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (hours_until): computes the date with dconv if date -f is missing
