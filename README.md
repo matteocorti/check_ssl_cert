@@ -45,7 +45,7 @@ Options:
       --debug-file file            writes the debug messages to file
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
-      --element number             checks N cert element from the begining of the chain
+      --element number             checks up to the N cert element from the beginning of the chain
    -e,--email address              pattern to match the email address contained
                                    in the certificate
    -f,--file file                  local file path (works with -H localhost only)
