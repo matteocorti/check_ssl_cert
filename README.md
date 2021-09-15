@@ -67,6 +67,7 @@ Options:
       --ignore-exp                 ignore expiration date
       --ignore-host-cn             do not complain if the CN does not match the host name
       --ignore-ocsp                do not check revocation with OCSP
+      --ignore-ocsp-errors         continue if the OCSP status cannot be checked
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking
       --ignore-sig-alg             do not check if the certificate was signed with SHA1
                                    or MD5
