@@ -1,2 +1,2 @@
-Fixed the connection to the TLS renegotiation on FreeBSD
-Detects old BSD date without -f and computes the date with dconv
+ * Added the ```--ignore-ocsp-errors``` command line option
+ * Bug fix: fixed the behavior of the ```--element`` command line option
