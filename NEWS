@@ -1,3 +1,4 @@
+2021-09-15 Version   2.5.1: Bug fix: fixed the detection of server internal errors by OCSP checks
 2021-09-15 Version   2.5.0: Added the --ignore-ocsp-errors command line option
                             Bug fix: fixed the behavior of the --element command line option
 2021-08-31 Version   2.4.3: Fixed the connection to the TLS renegotiation on FreeBSD

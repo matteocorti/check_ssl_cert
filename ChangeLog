@@ -1,6 +1,7 @@
 2021-09-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (usage): Added an option to ignore OCSP server errors
+	* check_ssl_cert (check_ocsp): Fixed the detection of an internal error
 
 2021-09-02  Matteo Corti  <matteo@corti.li>
 

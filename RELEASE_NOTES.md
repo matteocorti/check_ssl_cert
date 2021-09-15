@@ -1,2 +1,1 @@
- * Added the ```--ignore-ocsp-errors``` command line option
- * Bug fix: fixed the behavior of the ```--element`` command line option
+Bug fix: fixed the detection of server internal errors by OCSP checks
