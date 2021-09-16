@@ -1,1 +1,1 @@
-Bug fix: fixed the detection of server internal errors by OCSP checks
+Bug fix: fixed the output in case or multiple errors

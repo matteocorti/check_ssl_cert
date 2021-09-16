@@ -1,3 +1,7 @@
+2021-09-16  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (critical): Applied a patch to fix the output of multiple errors
+
 2021-09-15  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (usage): Added an option to ignore OCSP server errors

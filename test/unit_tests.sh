@@ -615,7 +615,7 @@ testFormatShort() {
 }
 
 testMoreErrors() {
-    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -623,7 +623,7 @@ testMoreErrors() {
 }
 
 testMoreErrors2() {
-    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g' )
+    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g' )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors

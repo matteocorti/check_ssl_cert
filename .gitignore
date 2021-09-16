@@ -1,2 +1,4 @@
 check_ssl_cert-**
 **~
+**.crt
+**.error
