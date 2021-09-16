@@ -2437,8 +2437,10 @@ main() {
     ##############################
     # Check options: sanity checks
 
-    if [ -z "${HOST}" ] ; then
+    if [ -z "${HOST}" ] && [ -z "${FILE}" ] ; then
         usage "No host specified"
+    elif [ -z "${HOST}" ] && [ -n "${FILE}" ] ; then
+        HOST='localhost'
     fi
 
     # we need the FQDN of an host to check the CN

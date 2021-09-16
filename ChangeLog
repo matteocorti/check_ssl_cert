@@ -1,6 +1,7 @@
 2021-09-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (critical): Applied a patch to fix the output of multiple errors
+	* check_ssl_cert (main): Automatically assume localhost if --file is specified
 
 2021-09-15  Matteo Corti  <matteo@corti.li>
 
