@@ -587,7 +587,7 @@ critical() {
         PERFORMANCE_DATA=
     fi
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ] ; then
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ] ; then
         printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
     else
         printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
@@ -664,7 +664,7 @@ warning() {
         PERFORMANCE_DATA=
     fi
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ -n "${VERBOSE}" ]; then
+    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
         printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
     else
         printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
