@@ -60,7 +60,6 @@ jobs:
           - 'ubuntu:20.04'
           - 'ubuntu:20.10'
           - 'alpine:3.13'
-          - 'alpine:edge'
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
@@ -99,12 +98,6 @@ jobs:
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2
 
 
-          - distro: 'alpine:edge'
-            pre: >-
-              apk update &&
-              apk upgrade &&
-              apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2
           - distro: 'alpine:3.13'
             pre: >-
               apk update &&
