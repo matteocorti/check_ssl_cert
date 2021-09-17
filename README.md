@@ -112,6 +112,7 @@ Options:
       --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section
                                    openssl(1)
    -p,--port port                  TCP port
+      --prometheus                 generates Prometheus/OpenMetrics output
    -P,--protocol protocol          use the specific protocol
                                    {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
                                     postgres|sieve|smtp|smtps|xmpp|xmpp-server}

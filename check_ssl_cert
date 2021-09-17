@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.5.2
+VERSION=2.6.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -157,8 +157,8 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     echo "      --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section"
     echo "                                   openssl(1)"
-    echo "      --prometheus                 generates Prometheus/OpenMetrics output"
     echo "   -p,--port port                  TCP port"
+    echo "      --prometheus                 generates Prometheus/OpenMetrics output"
     echo "   -P,--protocol protocol          use the specific protocol"
     echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|"
     echo "                                    postgres|sieve|smtp|smtps|xmpp|xmpp-server}"
@@ -582,7 +582,7 @@ add_prometheus_status_output_line() {
     if [ -n "${PROMETHEUS}" ] ; then
 
         if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ] ; then
-            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_OUTPUT_STATUS}\n${PROMETHEUS_LINE}"
+            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_OUTPUT_STATUS}\\n${PROMETHEUS_LINE}"
         else
             PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_LINE}"
         fi
@@ -604,7 +604,7 @@ add_prometheus_valid_output_line() {
     if [ -n "${PROMETHEUS}" ] ; then
 
         if [ -n "${PROMETHEUS_OUTPUT_VALID}" ] ; then
-            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_OUTPUT_VALID}\n${PROMETHEUS_LINE}"
+            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_OUTPUT_VALID}\\n${PROMETHEUS_LINE}"
         else
             PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_LINE}"
         fi
@@ -626,7 +626,7 @@ add_prometheus_days_output_line() {
     if [ -n "${PROMETHEUS}" ] ; then
 
         if [ -n "${PROMETHEUS_OUTPUT_DAYS}" ] ; then
-            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_OUTPUT_DAYS}\n${PROMETHEUS_LINE}"
+            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_OUTPUT_DAYS}\\n${PROMETHEUS_LINE}"
         else
             PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_LINE}"
         fi
@@ -4302,7 +4302,7 @@ main() {
     debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
     debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
 
-    if [ -z "${PROMETHEUS_OUTPUT}" ] ; then
+    if [ -z "${PROMETHEUS}" ] ; then
 
         echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
                                               -e "$( var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}" )" \

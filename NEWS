@@ -1,5 +1,6 @@
-Automatically assume localhost if --file is specified
-2011-09-16 Version   2.5.2: Bug fix: fixed the output in case or multiple errors
+2021-09-17 Version   2.6.0: Added the --prometheus command line option to generate output for Prometheus/OpenMetrics
+                            Automatically assume localhost if --file is specified
+2021-09-16 Version   2.5.2: Bug fix: fixed the output in case or multiple errors
 2021-09-15 Version   2.5.1: Bug fix: fixed the detection of server internal errors by OCSP checks
 2021-09-15 Version   2.5.0: Added the --ignore-ocsp-errors command line option
                             Bug fix: fixed the behavior of the --element command line option
