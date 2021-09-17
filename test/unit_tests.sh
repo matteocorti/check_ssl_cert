@@ -787,7 +787,7 @@ testResolveSameName() {
 testResolveDifferentName() {
     ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --critical 1 --warning 2
     EXIT_CODE=$?
-<    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 #testNewQuoVadis() {
