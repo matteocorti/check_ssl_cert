@@ -186,6 +186,15 @@ testGroupedVariablesError() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
+testPrometheus() {
+    OUTPUT=$( ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --prometheus --critical 1000 --warning 1100 )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertContains "wrong output" "${OUTPUT}" '# HELP cert_valid '
+    assertContains "wrong output" "${OUTPUT}" 'cert_valid_chain_elem{cn="ethz.ch", element=1} 2'
+    assertContains "wrong output" "${OUTPUT}" 'cert_days_chain_elem{cn="ethz.ch", element=1}'
+}
+
 testETHZ() {
     ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --critical 1 --warning 2
     EXIT_CODE=$?
@@ -778,7 +787,7 @@ testResolveSameName() {
 testResolveDifferentName() {
     ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --critical 1 --warning 2
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+<    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 #testNewQuoVadis() {

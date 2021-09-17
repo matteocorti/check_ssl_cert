@@ -1,5 +1,7 @@
 2021-09-17  Matteo Corti  <matteo@corti.li>
 
+	* test/unit_tests.sh (testPrometheus): added test for --prometheus
+
 	* check_ssl_cert: Adding output for Prometheus
 
 2021-09-16  Matteo Corti  <matteo@corti.li>
