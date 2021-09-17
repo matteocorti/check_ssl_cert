@@ -570,6 +570,103 @@ prepend_critical_message() {
 }
 
 ################################################################################
+# Adda a line to the prometheus status output
+# Params
+#   $1 line to be added
+add_prometheus_status_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus status output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ] ; then
+            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_OUTPUT_STATUS}\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+
+}
+
+################################################################################
+# Adda a line to the prometheus validity output
+# Params
+#   $1 line to be added
+add_prometheus_valid_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus validity output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_VALID}" ] ; then
+            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_OUTPUT_VALID}\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+
+}
+
+################################################################################
+# Adda a line to the prometheus days output
+# Params
+#   $1 line to be added
+add_prometheus_days_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus days output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_DAYS}" ] ; then
+            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_OUTPUT_DAYS}\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+}
+
+################################################################################
+# Prometheus output
+prometheus_output() {
+
+    if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ] ; then
+        echo "# HELP cert_valid   If cert is ok (0), warning (1) or critical (2)"
+        echo "# TYPE cert_valid gauge"
+        echo "${PROMETHEUS_OUTPUT_STATUS}"
+        NL=1
+    fi
+
+    if [ -n "${PROMETHEUS_OUTPUT_VALID}" ] ; then
+        if [ -n "${NL}" ] ; then
+            echo
+        fi
+        echo "# HELP cert_valid_chain_elem  If chain element is ok (0), warning (1) or critical (2)"
+        echo "# TYPE cert_valid_chain_elem gauge"
+        echo "${PROMETHEUS_OUTPUT_VALID}"
+        NL=1
+    fi
+
+    if [ -n "${PROMETHEUS_OUTPUT_DAYS}" ] ; then
+        if [ -n "${NL}" ] ; then
+            echo
+        fi
+        echo "# HELP cert_days_chain_elem Days until chain element expires"
+        echo "# TYPE cert_days_chain_elem gauge"
+        echo "${PROMETHEUS_OUTPUT_DAYS}"
+    fi
+}
+
+
+################################################################################
 # Exits with a critical message
 # Params
 #   $1 error message
@@ -599,14 +696,12 @@ critical() {
     else
 
         if [ -n "${CN}" ] ; then
-            echo "cert_valid{cn=\"${CN}\"} 2"
+            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 2"
         else
-            echo "cert_valid 2"
+            add_prometheus_status_output_line "cert_valid 2"
         fi
 
-        if [ -n "${PROMETHEUS_OUTPUT}" ] ; then
-            echo "${PROMETHEUS_OUTPUT}"
-        fi
+        prometheus_output
 
     fi
 
@@ -693,14 +788,12 @@ warning() {
     else
 
         if [ -n "${CN}" ] ; then
-            echo "cert_valid{cn=\"${CN}\"} 1"
+            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 1"
         else
-            echo "cert_valid 1"
+            add_prometheus_status_output_line "cert_valid 1"
         fi
 
-        if [ -n "${PROMETHEUS_OUTPUT}" ] ; then
-            echo "${PROMETHEUS_OUTPUT}"
-        fi
+        prometheus_output
 
     fi
 
@@ -1272,28 +1365,6 @@ check_ocsp() {
 }
 
 ################################################################################
-# Adda a line to the prometheus output
-# Params
-#   $1 line to be added
-add_prometheus_output_line() {
-
-    PROMETHEUS_LINE=$1
-
-    debuglog "Adding line to prometheus output: ${PROMETHEUS_LINE}"
-
-    if [ -n "${PROMETHEUS}" ] ; then
-
-            if [ -n "${PROMETHEUS_OUTPUT}" ] ; then
-            PROMETHEUS_OUTPUT="${PROMETHEUS_OUTPUT}\n${PROMETHEUS_LINE}"
-        else
-            PROMETHEUS_OUTPUT="${PROMETHEUS_LINE}"
-        fi
-
-    fi
-}
-
-
-################################################################################
 # Checks cert end date validity
 # Params
 #   $1 cert
@@ -1315,7 +1386,7 @@ check_cert_end_date() {
 
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
 
-    add_prometheus_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
+    add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
 
     debuglog "  valid for ${ELEM_DAYS_VALID} days"
 
@@ -1338,7 +1409,7 @@ check_cert_end_date() {
                 DAYS_AGO="$(( - ELEM_DAYS_VALID )) days ago"
             fi
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
-            add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
 
@@ -1348,7 +1419,7 @@ check_cert_end_date() {
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
 
@@ -1360,7 +1431,7 @@ check_cert_end_date() {
 
             if ! echo "$1" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
 
@@ -1371,7 +1442,7 @@ check_cert_end_date() {
             if [ "${DAYS_VALID}" -gt "${NOT_VALID_LONGER_THAN}" ] ; then
                 debuglog "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
                 prepend_critical_message "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
-                add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
         fi
@@ -1381,14 +1452,14 @@ check_cert_end_date() {
         # We always check expired certificates
         if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} is expired (was valid until ${ELEM_END_DATE})"
-            add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
 
         if [ -n "${CRITICAL_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
 
@@ -1397,14 +1468,14 @@ check_cert_end_date() {
         if [ -n "${WARNING_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
 
         fi
     fi
 
-    add_prometheus_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
+    add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
 
 }
 
@@ -2387,7 +2458,9 @@ main() {
     OCSP_IGNORE_ERRORS=""
     OCSP_IGNORE_TIMEOUT=""
     PORT=""
-    PROMETHEUS_OUTPUT=""
+    PROMETHEUS_OUTPUT_STATUS=""
+    PROMETHEUS_OUTPUT_VALID=""
+    PROMETHEUS_OUTPUT_DAYS=""
     PROXY=""
     REQUIRE_OCSP_STAPLING=""
     REQUIRE_SAN=""
@@ -4246,8 +4319,8 @@ main() {
 
     else
 
-        echo "cert_valid{cn=\"${CN}\"} 0"
-        echo "${PROMETHEUS_OUTPUT}"
+        add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 0"
+        prometheus_output
 
     fi
 
