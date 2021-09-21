@@ -719,6 +719,92 @@ set_variable() {
 }
 
 ################################################################################
+# Extract specific attributes from a certificate
+# $1 attribute name
+# $2 cert file or cert content
+extract_cert_attribute() {
+
+    if [ -f "${2}" ]; then
+        cert_content="$(cat "${2}")"
+    else
+        cert_content="${2}"
+    fi
+
+    # shellcheck disable=SC2086,SC2016
+    case $1 in
+        cn)
+            if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject | grep -F -q 'CN' > /dev/null ; then
+                echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject |
+                sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//"
+            else
+                echo 'CN unavailable'
+                return 1
+            fi
+        ;;
+        subject)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject
+        ;;
+        serial)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -serial | sed -e "s/^serial=//"
+        ;;
+        fingerprint)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -fingerprint -sha1 | sed -e "s/^SHA1 Fingerprint=//"
+        ;;
+        oscp_uri)
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -ocsp_uri
+        ;;
+        oscp_uri_single)
+            extract_cert_attribute 'oscp_uri' "${cert_content}" | head -n 1
+        ;;
+        issuer)
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -issuer
+        ;;
+        issuer_uri)
+           echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
+        ;;
+        issuer_uri_single)
+            extract_cert_attribute 'issuer_uri' "${cert_content}" | head -n 1
+        ;;
+        issuer_hash)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
+        ;;
+        org)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject | sed -e "s/.*\\/O=//" -e "s/\\/.*//"
+        ;;
+        email)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
+        ;;
+        crl_uri)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -text |
+               grep -F -A 4 'X509v3 CRL Distribution Points' |
+               grep -F URI |
+               sed 's/^.*URI://'
+        ;;
+        sig_algo)
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Signature Algorithm'
+        ;;
+        enddate)
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
+        ;;
+        sct)
+            echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
+        ;;
+        subjectAlternativeName)
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text |
+               grep -F -A 1 "509v3 Subject Alternative Name:" |
+               tail -n 1 |
+               sed -e "s/DNS://g" |
+               sed -e "s/,//g" |
+               sed -e "s/^\\ *//"
+        ;;
+        *)
+            return 1
+        ;;
+    esac
+
+}
+
+################################################################################
 # Executes command with a timeout
 # Params:
 #   $1 command
@@ -897,11 +983,7 @@ check_crl() {
 
     # See https://raymii.org/s/articles/OpenSSL_manually_verify_a_certificate_against_a_CRL.html
 
-    CRL_URI=$( "${OPENSSL}" x509 -noout -text -in "${CERT_ELEMENT}" |
-                   grep -F -A 4 'X509v3 CRL Distribution Points' |
-                   grep -F URI |
-                   sed 's/^.*URI://'
-           )
+    CRL_URI="$(extract_cert_attribute 'crl_uri' "${CERT_ELEMENT}")"
     if [ -n "${CRL_URI}" ] ; then
 
         debuglog "Certificate revokation list available (${CRL_URI})"
@@ -972,7 +1054,7 @@ check_ocsp() {
 
         debuglog "Checking revokation via OCSP"
 
-        ISSUER_HASH="$(${OPENSSL} x509 -in "${CERT_ELEMENT}" -noout -issuer_hash)"
+        ISSUER_HASH="$(extract_cert_attribute 'issuer_hash' "${CERT_ELEMENT}")"
         debuglog "Issuer hash: ${ISSUER_HASH}"
 
         if [ -z "${ISSUER_HASH}" ] ; then
@@ -996,8 +1078,7 @@ check_ocsp() {
 
         fi
 
-        # shellcheck disable=SC2086,SC2016
-        ELEMENT_ISSUER_URIS="$( ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text -noout -in ${CERT_ELEMENT} | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&')"
+        ELEMENT_ISSUER_URIS="$(extract_cert_attribute 'issuer_uri' "${CERT_ELEMENT}")"
 
         if [ -z "${ELEMENT_ISSUER_URIS}" ] ; then
             verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks on element ${el_number}"
@@ -1108,8 +1189,7 @@ check_ocsp() {
 
         done
 
-        # shellcheck disable=SC2086
-        OCSP_URIS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT_ELEMENT}" -ocsp_uri -noout)"
+        OCSP_URIS="$(extract_cert_attribute 'oscp_uri' "${CERT_ELEMENT}")"
 
         debuglog "OCSP: URIs = ${OCSP_URIS}"
 
@@ -1251,8 +1331,7 @@ check_cert_end_date() {
 
     debuglog "Checking expiration date of element ${el_number}"
 
-    # shellcheck disable=SC2086
-    ELEM_END_DATE=$(echo "${1}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -noout "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/.*=//")
+    ELEM_END_DATE="$(extract_cert_attribute 'enddate' "$1")"
     debuglog "Validity date on cert element ${el_number} is ${ELEM_END_DATE}"
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
@@ -3321,8 +3400,7 @@ main() {
 
     ################################################################################
     # Parse the X.509 certificate or crl
-    # shellcheck disable=SC2086
-    DATE="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" "${OPENSSL_ENDDATE_OPTION}" -noout | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//")"
+    DATE="$(extract_cert_attribute 'enddate' "${CERT}")"
 
     if [ "${OPENSSL_COMMAND}" = "crl" ]; then
         CN=""
@@ -3330,32 +3408,24 @@ main() {
         SERIAL=0
         OCSP_URI=""
         VALID_ATTRIBUTES=",lastupdate,nextupdate,issuer,"
-        # shellcheck disable=SC2086
-        ISSUERS="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -issuer -noout)"
+        ISSUERS="$(extract_cert_attribute 'issuer' "${CERT}")"
     else
         # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
-        # shellcheck disable=SC2086
-        if ${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} | grep -F -q 'CN' ; then
-            CN="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS} |
-            sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//" )"
-        else
-            CN='CN unavailable'
+        if ! CN="$(extract_cert_attribute 'cn' "${CERT}")"; then
             if [ -z "${ALTNAMES}" ] ; then
                 verboselog "certificate without common name (CN), enabling altername names"
                 ALTNAMES=1
             fi
         fi
 
-        # shellcheck disable=SC2086
-        SUBJECT="$(${OPENSSL} x509 -in "${CERT}" -subject -noout ${OPENSSL_PARAMS})"
+        SUBJECT="$(extract_cert_attribute 'subject' "${CERT}")"
 
-        SERIAL="$(${OPENSSL} x509 -in "${CERT}" -serial -noout  | sed -e "s/^serial=//")"
+        SERIAL="$(extract_cert_attribute 'serial' "${CERT}")"
 
-        FINGERPRINT="$(${OPENSSL} x509 -in "${CERT}" -fingerprint -sha1 -noout  | sed -e "s/^SHA1 Fingerprint=//")"
+        FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
 
         # TO DO: we just take the first result: a loop over all the hosts should
-        # shellcheck disable=SC2086
-        OCSP_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -ocsp_uri -noout | head -n 1)"
+        OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
 
         # count the certificates in the chain
         NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
@@ -3364,15 +3434,13 @@ main() {
         debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
         CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
 
-        # shellcheck disable=SC2086
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
             if [ -n "${ISSUERS}" ]; then
                 ISSUERS="${ISSUERS}\\n"
             fi
-            # shellcheck disable=SC2086
-            ISSUERS="${ISSUERS}$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
-                               awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' | \
-                               ${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -issuer -noout)"
+            CERT_ELEMENT="$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
+                               awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')"
+            ISSUERS="${ISSUERS}$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}")"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
             if ! [ "${ELEMENT}" -eq 0 ] && [ $(( ELEMENT - CERT_IN_CHAIN )) -lt 0 ]; then
@@ -3393,10 +3461,7 @@ main() {
     debuglog "${ISSUERS}"
 
     # we just consider the first HTTP(S) URI
-    # TODO check SC2016
-    # shellcheck disable=SC2086,SC2016
-
-    ISSUER_URI="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep -F "CA Issuers" | grep -F -i "http" | head -n 1 | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;$(){}<>`&')"
+    ISSUER_URI="$(extract_cert_attribute 'issuer_uri_single' "${CERT}")"
 
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ] ; then
@@ -3424,8 +3489,7 @@ main() {
 
     fi
 
-    # shellcheck disable=SC2086
-    SIGNATURE_ALGORITHM="$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text -noout | grep -m 1 -F 'Signature Algorithm')"
+    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}")"
 
     if [ "${DEBUG}" -ge 1 ] ; then
         debuglog "${SUBJECT}"
@@ -3503,14 +3567,7 @@ main() {
 
     # Do not use grep --after-context=NUM but -A NUM so that it works on BusyBox
 
-    # shellcheck disable=SC2086
-    SUBJECT_ALTERNATIVE_NAME=$(${OPENSSL} "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in "${CERT}" -text |
-           grep -F -A 1 "509v3 Subject Alternative Name:" |
-           tail -n 1 |
-           sed -e "s/DNS://g" |
-           sed -e "s/,//g" |
-           sed -e "s/^\\ *//"
-        )
+    SUBJECT_ALTERNATIVE_NAME="$(extract_cert_attribute 'subjectAlternativeName' "${CERT}")"
     debuglog "subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ "${OPENSSL_COMMAND}" != "crl" ] ; then
         prepend_critical_message "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
@@ -3979,7 +4036,7 @@ main() {
 
         debuglog "Checking organization ${ORGANIZATION}"
 
-        ORG=$(${OPENSSL} x509 -in "${CERT}" -subject -noout | sed -e "s/.*\\/O=//" -e "s/\\/.*//")
+        ORG="$(extract_cert_attribute 'org' "${CERT}")"
 
         if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}" ; then
             prepend_critical_message "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
@@ -3991,7 +4048,7 @@ main() {
     # Check the organization
     if [ -n "${ADDR}" ] ; then
 
-        EMAIL=$(${OPENSSL} x509 -in "${CERT}" -email -noout)
+        EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
 
         verboselog "checking email (${ADDR}): ${EMAIL}"
 
@@ -4052,7 +4109,7 @@ main() {
 
             debuglog 'Checking Signed Certificate Timestamps (SCTs)'
 
-	    if [ -n "${SCT}" ] && ! "${OPENSSL}" x509 -in "${CERT}" -text -noout | grep -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2' ; then
+        if [ -n "${SCT}" ] && ! extract_cert_attribute 'sct' "${CERT}" ; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
             fi
 
