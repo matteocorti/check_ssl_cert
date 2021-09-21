@@ -1771,7 +1771,25 @@ fetch_certificate() {
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}" 2> "${CONVERSION_ERROR}"
 
                 if [ $? -eq 1 ] ; then
-                    unknown "Error converting ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
+
+                    debuglog "Error converting ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
+                    debuglog "Checking if ${FILE} is DER encoded CRL"
+
+                    if "${OPENSSL}" crl -in "${FILE}" -inform DER 2> /dev/null | grep -F -q "BEGIN X509 CRL" ; then
+
+                        debuglog "The input file is a CRL in DER format: converting to PEM"
+
+                        debuglog "Executing ${OPENSSL} crl -inform der -in ${FILE} -out ${CERT} 2> /dev/null"
+                        "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2> "${CONVERSION_ERROR}"
+
+                        if [ $? -eq 1 ] ; then
+                            unkown "Error converting CRL ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
+                        fi
+
+                    else
+                        unknown "Error converting ${FILE}: $( head -n 1 "${CONVERSION_ERROR}" ) "
+                    fi
+
                 fi
 
             else

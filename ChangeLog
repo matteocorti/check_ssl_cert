@@ -1,3 +1,7 @@
+2021-09-21  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (fetch_certificate): converts local CRLs from DER to PEM
+
 2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
 
 	* test/unit_tests.sh: fixing error with endless ping if IPv6 enabled
