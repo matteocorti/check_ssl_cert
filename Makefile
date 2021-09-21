@@ -16,10 +16,15 @@ dist: version_check formatting_check copyright_check shellcheck
 	env COPYFILE_DISABLE=1 tar cfj $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
 install:
+ifndef DESTDIR
+	echo "Please define DESTDIR and MANDIR variables with the installation targets"
+	echo "e.g, make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install"
+else
 	mkdir -p $(DESTDIR)
 	install -m 755 $(PLUGIN) $(DESTDIR)
 	mkdir -p ${MANDIR}/man1
 	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
+endif
 
 version_check:
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)

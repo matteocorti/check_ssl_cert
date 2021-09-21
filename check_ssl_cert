@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.5.2
+VERSION=2.6.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -159,6 +159,7 @@ usage() {
     echo "      --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section"
     echo "                                   openssl(1)"
     echo "   -p,--port port                  TCP port"
+    echo "      --prometheus                 generates Prometheus/OpenMetrics output"
     echo "   -P,--protocol protocol          use the specific protocol"
     echo "                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|"
     echo "                                    postgres|sieve|smtp|smtps|xmpp|xmpp-server}"
@@ -571,6 +572,103 @@ prepend_critical_message() {
 }
 
 ################################################################################
+# Adda a line to the prometheus status output
+# Params
+#   $1 line to be added
+add_prometheus_status_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus status output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ] ; then
+            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_OUTPUT_STATUS}\\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_STATUS="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+
+}
+
+################################################################################
+# Adda a line to the prometheus validity output
+# Params
+#   $1 line to be added
+add_prometheus_valid_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus validity output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_VALID}" ] ; then
+            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_OUTPUT_VALID}\\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_VALID="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+
+}
+
+################################################################################
+# Adda a line to the prometheus days output
+# Params
+#   $1 line to be added
+add_prometheus_days_output_line() {
+
+    PROMETHEUS_LINE=$1
+
+    debuglog "Adding line to prometheus days output: ${PROMETHEUS_LINE}"
+
+    if [ -n "${PROMETHEUS}" ] ; then
+
+        if [ -n "${PROMETHEUS_OUTPUT_DAYS}" ] ; then
+            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_OUTPUT_DAYS}\\n${PROMETHEUS_LINE}"
+        else
+            PROMETHEUS_OUTPUT_DAYS="${PROMETHEUS_LINE}"
+        fi
+
+    fi
+}
+
+################################################################################
+# Prometheus output
+prometheus_output() {
+
+    if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ] ; then
+        echo "# HELP cert_valid   If cert is ok (0), warning (1) or critical (2)"
+        echo "# TYPE cert_valid gauge"
+        echo "${PROMETHEUS_OUTPUT_STATUS}"
+        NL=1
+    fi
+
+    if [ -n "${PROMETHEUS_OUTPUT_VALID}" ] ; then
+        if [ -n "${NL}" ] ; then
+            echo
+        fi
+        echo "# HELP cert_valid_chain_elem  If chain element is ok (0), warning (1) or critical (2)"
+        echo "# TYPE cert_valid_chain_elem gauge"
+        echo "${PROMETHEUS_OUTPUT_VALID}"
+        NL=1
+    fi
+
+    if [ -n "${PROMETHEUS_OUTPUT_DAYS}" ] ; then
+        if [ -n "${NL}" ] ; then
+            echo
+        fi
+        echo "# HELP cert_days_chain_elem Days until chain element expires"
+        echo "# TYPE cert_days_chain_elem gauge"
+        echo "${PROMETHEUS_OUTPUT_DAYS}"
+    fi
+}
+
+
+################################################################################
 # Exits with a critical message
 # Params
 #   $1 error message
@@ -589,11 +687,26 @@ critical() {
         PERFORMANCE_DATA=
     fi
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ] ; then
-        printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+    if [ -z "${PROMETHEUS}" ] ; then
+
+        if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ] ; then
+            printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+        else
+            printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
+        fi
+
     else
-        printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
+
+        if [ -n "${CN}" ] ; then
+            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 2"
+        else
+            add_prometheus_status_output_line "cert_valid 2"
+        fi
+
+        prometheus_output
+
     fi
+
 
     exit "${STATUS_CRITICAL}"
 }
@@ -667,10 +780,24 @@ warning() {
         PERFORMANCE_DATA=
     fi
 
-    if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
-        printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+    if [ -z "${PROMETHEUS}" ] ; then
+
+        if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
+            printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+        else
+            printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
+        fi
+
     else
-        printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
+
+        if [ -n "${CN}" ] ; then
+            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 1"
+        else
+            add_prometheus_status_output_line "cert_valid 1"
+        fi
+
+        prometheus_output
+
     fi
 
     exit "${STATUS_WARNING}"
@@ -1319,7 +1446,6 @@ check_ocsp() {
 
 }
 
-
 ################################################################################
 # Checks cert end date validity
 # Params
@@ -1343,6 +1469,8 @@ check_cert_end_date() {
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
 
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
+
+    add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
 
     debuglog "  valid for ${ELEM_DAYS_VALID} days"
 
@@ -1370,6 +1498,7 @@ check_cert_end_date() {
                 DAYS_AGO="$(( - ELEM_DAYS_VALID )) days ago"
             fi
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})" "${replace_current_message}"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
 
@@ -1379,6 +1508,7 @@ check_cert_end_date() {
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
 
@@ -1390,6 +1520,7 @@ check_cert_end_date() {
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
 
@@ -1400,6 +1531,7 @@ check_cert_end_date() {
             if [ "${DAYS_VALID}" -gt "${NOT_VALID_LONGER_THAN}" ] ; then
                 debuglog "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
                 prepend_critical_message "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days" "${replace_current_message}"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
         fi
@@ -1409,12 +1541,14 @@ check_cert_end_date() {
         # We always check expired certificates
         if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE})" "${replace_current_message}"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
 
         if [ -n "${CRITICAL_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
 
@@ -1423,11 +1557,15 @@ check_cert_end_date() {
         if [ -n "${WARNING_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
 
         fi
     fi
+
+    add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
+
 }
 
 
@@ -1939,8 +2077,8 @@ parse_command_line_options() {
                 COMMON_NAME="__HOST__"
                 shift
                 ;;
-            -s|--selfsigned)
-                SELFSIGNED=1
+            --prometheus)
+                PROMETHEUS=1
                 shift
                 ;;
             --rsa)
@@ -1969,6 +2107,10 @@ parse_command_line_options() {
                 ;;
             --require-san)
                 REQUIRE_SAN=1
+                shift
+                ;;
+            -s|--selfsigned)
+                SELFSIGNED=1
                 shift
                 ;;
             --ecdsa)
@@ -2377,46 +2519,49 @@ parse_command_line_options() {
 main() {
 
     # Default values
-    DEBUG="0"
-    FILE_BIN=""
+
+    ALTNAMES=1 # enabled by default
+    COMMON_NAME="__HOST__" # enabled by default
+    CRITICAL_DAYS=15
+    CRL=""
     CURL_BIN=""
     CURL_PROXY=""
     CURL_USER_AGENT=""
     CUSTOM_HTTP_HEADER=""
+    DANE=""
+    DEBUG="0"
     DIG_BIN=""
-    NMAP_BIN=""
-    IGNORE_SSL_LABS_CACHE=""
-    PORT=""
-    XMPPPORT="5222"
-    XMPPHOST=""
-    SNI=""
-    TIMEOUT="120"
-    VERBOSE="0"
+    DISALLOWED_PROTOCOLS=""
+    ECDSA=""
+    ELEMENT=0
+    FILE_BIN=""
     FORCE_DCONV_DATE=""
     FORCE_PERL_DATE=""
-    REQUIRE_SAN=""
-    REQUIRE_OCSP_STAPLING=""
+    FORMAT=""
+    HTTP_METHOD="HEAD"
+    HTTP_REQUEST_URL="/"
+    IGNORE_SSL_LABS_CACHE=""
+    NMAP_BIN=""
+    NO_PROXY=""
     OCSP="1" # enabled by default
     OCSP_IGNORE_ERRORS=""
     OCSP_IGNORE_TIMEOUT=""
-    FORMAT=""
-    HTTP_METHOD="HEAD"
-    RSA=""
-    ECDSA=""
-    DANE=""
-    DISALLOWED_PROTOCOLS=""
-    WARNING_DAYS=20
-    CRITICAL_DAYS=15
-    ELEMENT=0
-    SKIP_ELEMENT=0
-    NO_PROXY=""
+    PORT=""
+    PROMETHEUS_OUTPUT_STATUS=""
+    PROMETHEUS_OUTPUT_VALID=""
+    PROMETHEUS_OUTPUT_DAYS=""
     PROXY=""
-    CRL=""
+    REQUIRE_OCSP_STAPLING=""
+    REQUIRE_SAN=""
+    RSA=""
     SCT="1" # enabled by default
-    HTTP_REQUEST_URL="/"
-
-    COMMON_NAME="__HOST__" # enabled by default
-    ALTNAMES=1 # enabled by default
+    SKIP_ELEMENT=0
+    SNI=""
+    TIMEOUT="120"
+    VERBOSE="0"
+    WARNING_DAYS=20
+    XMPPHOST=""
+    XMPPPORT="5222"
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025
@@ -2526,8 +2671,10 @@ main() {
     ##############################
     # Check options: sanity checks
 
-    if [ -z "${HOST}" ] ; then
+    if [ -z "${HOST}" ] && [ -z "${FILE}" ] ; then
         usage "No host specified"
+    elif [ -z "${HOST}" ] && [ -n "${FILE}" ] ; then
+        HOST='localhost'
     fi
 
     # we need the FQDN of an host to check the CN
@@ -4219,18 +4366,27 @@ main() {
     debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
     debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
 
-    echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-        -e "$( var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}" )" \
-        -e "$( var_for_sed CHECKEDNAMES "${CHECKEDNAMES}" )" \
-        -e "$( var_for_sed CN "${CN}" )" \
-        -e "$( var_for_sed DATE "${DATE}" )" \
-        -e "$( var_for_sed DAYS_VALID "${DAYS_VALID}" )" \
-        -e "$( var_for_sed DISPLAY_CN "${DISPLAY_CN}" )" \
-        -e "$( var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}" )" \
-        -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
-        -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
-        -e "$( var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}" )" \
-        -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
+    if [ -z "${PROMETHEUS}" ] ; then
+
+        echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
+                                              -e "$( var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}" )" \
+                                              -e "$( var_for_sed CHECKEDNAMES "${CHECKEDNAMES}" )" \
+                                              -e "$( var_for_sed CN "${CN}" )" \
+                                              -e "$( var_for_sed DATE "${DATE}" )" \
+                                              -e "$( var_for_sed DAYS_VALID "${DAYS_VALID}" )" \
+                                              -e "$( var_for_sed DISPLAY_CN "${DISPLAY_CN}" )" \
+                                              -e "$( var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}" )" \
+                                              -e "$( var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}" )" \
+                                              -e "$( var_for_sed SHORTNAME "${SHORTNAME}" )" \
+                                              -e "$( var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}" )" \
+                                              -e "$( var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}" )"
+
+    else
+
+        add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 0"
+        prometheus_output
+
+    fi
 
     remove_temporary_files
 

@@ -1,4 +1,4 @@
-%define version          2.5.2
+%define version          2.6.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Fri Sep  17 2021 Matteo Corti <matteo@corti.li> - 2.6.0-0
+- Updated to 2.6.0
+
 * Thu Sep  16 2021 Matteo Corti <matteo@corti.li> - 2.5.2-0
 - Updated to 2.5.2
 

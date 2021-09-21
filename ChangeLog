@@ -1,6 +1,13 @@
+2021-09-17  Matteo Corti  <matteo@corti.li>
+
+	* test/unit_tests.sh (testPrometheus): added test for --prometheus
+
+	* check_ssl_cert: Adding output for Prometheus
+
 2021-09-16  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (critical): Applied a patch to fix the output of multiple errors
+	* check_ssl_cert (main): Automatically assume localhost if --file is specified
 
 2021-09-15  Matteo Corti  <matteo@corti.li>
 
