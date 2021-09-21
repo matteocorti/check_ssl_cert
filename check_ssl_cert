@@ -526,6 +526,7 @@ EOF
 # prepends critical messages to list of all messages
 # Params
 #   $1 error message
+#   $2 replace current critical message
 prepend_critical_message() {
 
     verboselog "CRITICAL error: $1"
@@ -555,7 +556,7 @@ prepend_critical_message() {
 
     MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${LONG_OUTPUT}"
 
-    if [ "${CRITICAL_MSG}" = "" ]; then
+    if [ "${CRITICAL_MSG}" = "" ] || [ -n "${2-}" ]; then
         CRITICAL_MSG="${MSG}"
     fi
 
@@ -600,6 +601,7 @@ critical() {
 # append all warning messages to list of all messages
 # Params
 #   $1 warning message
+#   $2 replace current warning message
 append_warning_message() {
 
     verboselog "WARNING: $1"
@@ -635,7 +637,7 @@ append_warning_message() {
 
     MSG="${SHORTNAME} WARN${tmp}: ${1}${LONG_OUTPUT}"
 
-    if [ "${WARNING_MSG}" = "" ]; then
+    if [ "${WARNING_MSG}" = "" ] || [ -n "${2-}" ]; then
         WARNING_MSG="${MSG}"
     fi
 
