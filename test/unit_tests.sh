@@ -597,7 +597,7 @@ testIPv6() {
 
 	    echo "IPv6 is configured"
 
-            if ping -6 www.google.com > /dev/null 2>&1  ; then
+            if ping -c 3 -6 www.google.com > /dev/null 2>&1  ; then
 
                 ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6 --critical 1 --warning 2
                 EXIT_CODE=$?

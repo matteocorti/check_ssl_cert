@@ -1,3 +1,11 @@
+2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* test/unit_tests.sh: fixing error with endless ping if IPv6 enabled
+
+2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* check_ssl_cert: fixing error with SCT when checking a CRL file
+
 2021-09-17  Matteo Corti  <matteo@corti.li>
 
 	* test/unit_tests.sh (testPrometheus): added test for --prometheus
