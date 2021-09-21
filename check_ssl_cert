@@ -854,6 +854,8 @@ set_variable() {
 # $2 cert file or cert content
 extract_cert_attribute() {
 
+    debuglog "extracting cert attribute ${1}"
+
     if [ -f "${2}" ]; then
         cert_content="$(cat "${2}")"
     else
@@ -863,73 +865,73 @@ extract_cert_attribute() {
     # shellcheck disable=SC2086,SC2016
     case $1 in
         cn)
-            if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject | grep -F -q 'CN' > /dev/null ; then
+            if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject 2> /dev/null | grep -F -q 'CN' > /dev/null ; then
                 echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject |
-                sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//"
+                    sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//"  -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//"
             else
                 echo 'CN unavailable'
                 return 1
             fi
-        ;;
+            ;;
         subject)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject
-        ;;
+            ;;
         serial)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -serial | sed -e "s/^serial=//"
-        ;;
+            ;;
         fingerprint)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -fingerprint -sha1 | sed -e "s/^SHA1 Fingerprint=//"
-        ;;
+            ;;
         oscp_uri)
             echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -ocsp_uri
-        ;;
+            ;;
         oscp_uri_single)
             extract_cert_attribute 'oscp_uri' "${cert_content}" | head -n 1
-        ;;
+            ;;
         issuer)
             echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -issuer
-        ;;
+            ;;
         issuer_uri)
-           echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
-        ;;
+            echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
+            ;;
         issuer_uri_single)
             extract_cert_attribute 'issuer_uri' "${cert_content}" | head -n 1
-        ;;
+            ;;
         issuer_hash)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
-        ;;
+            ;;
         org)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject | sed -e "s/.*\\/O=//" -e "s/\\/.*//"
-        ;;
+            ;;
         email)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
-        ;;
+            ;;
         crl_uri)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -text |
-               grep -F -A 4 'X509v3 CRL Distribution Points' |
-               grep -F URI |
-               sed 's/^.*URI://'
-        ;;
+                grep -F -A 4 'X509v3 CRL Distribution Points' |
+                grep -F URI |
+                sed 's/^.*URI://'
+            ;;
         sig_algo)
             echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Signature Algorithm'
-        ;;
+            ;;
         enddate)
             echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
-        ;;
+            ;;
         sct)
             echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
-        ;;
+            ;;
         subjectAlternativeName)
             echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text |
-               grep -F -A 1 "509v3 Subject Alternative Name:" |
-               tail -n 1 |
-               sed -e "s/DNS://g" |
-               sed -e "s/,//g" |
-               sed -e "s/^\\ *//"
-        ;;
+                grep -F -A 1 "509v3 Subject Alternative Name:" |
+                tail -n 1 |
+                sed -e "s/DNS://g" |
+                sed -e "s/,//g" |
+                sed -e "s/^\\ *//"
+            ;;
         *)
             return 1
-        ;;
+            ;;
     esac
 
 }
@@ -1453,9 +1455,12 @@ check_ocsp() {
 #   $2 element number
 # Returns number of days
 check_cert_end_date() {
+
     el_number=1
     if [ -n "$2" ]; then
         el_number=$2
+    else
+        debuglog "No certificate element specified: default 1"
     fi
 
     replace_current_message=''
