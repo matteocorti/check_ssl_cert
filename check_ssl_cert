@@ -1703,7 +1703,7 @@ fetch_certificate() {
     fi
 
     debuglog "fetch_certificate: PROTICOL = ${PROTOCOL}"
-    
+
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ] ; then
 
