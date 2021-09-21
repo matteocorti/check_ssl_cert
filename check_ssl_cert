@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.6.0
+VERSION=2.6.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1498,6 +1498,9 @@ check_cert_end_date() {
                 DAYS_AGO="$(( - ELEM_DAYS_VALID )) days ago"
             fi
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})" "${replace_current_message}"
+            if [ -z "${CN}" ] ; then
+                CN='unavailable'
+            fi
             add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
@@ -1508,6 +1511,9 @@ check_cert_end_date() {
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                if [ -z "${CN}" ] ; then
+                    CN='unavailable'
+                fi
                 add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
@@ -1520,6 +1526,9 @@ check_cert_end_date() {
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                if [ -z "${CN}" ] ; then
+                    CN='unavailable'
+                fi
                 add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
@@ -1548,6 +1557,9 @@ check_cert_end_date() {
         if [ -n "${CRITICAL_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                if [ -z "${CN}" ] ; then
+                    CN='unavailable'
+                fi
                 add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
                 return 2
             fi
@@ -1557,6 +1569,9 @@ check_cert_end_date() {
         if [ -n "${WARNING_DAYS}" ] ; then
             if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                if [ -z "${CN}" ] ; then
+                    CN='unavailable'
+                fi
                 add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
                 return 1
             fi
@@ -1564,6 +1579,9 @@ check_cert_end_date() {
         fi
     fi
 
+    if [ -z "${CN}" ] ; then
+        CN='unavailable'
+    fi
     add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
 
 }
@@ -1684,6 +1702,8 @@ fetch_certificate() {
         IGN_EOF='-ign_eof'
     fi
 
+    debuglog "fetch_certificate: PROTICOL = ${PROTOCOL}"
+    
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ] ; then
 
@@ -3449,7 +3469,9 @@ main() {
         create_temporary_file; OCSP_RESPONSE_TMP=${TEMPFILE}
     fi
 
-    verboselog "downloading certificate to ${TMPDIR}"
+    if [ -z "${FILE}" ] ; then
+        verboselog "downloading certificate to ${TMPDIR}"
+    fi
 
     CLIENT=""
     if [ -n "${CLIENT_CERT}" ] ; then
@@ -3962,6 +3984,7 @@ main() {
 
         debuglog "Checking expiration date"
         if [ -n "${FIRST_ELEMENT_ONLY}" ] || [ "${OPENSSL_COMMAND}" = "crl" ]; then
+            debuglog "Only one element or CRL"
             check_cert_end_date "$(cat "${CERT}")"
         else
             # count the certificates in the chain
