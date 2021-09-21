@@ -3491,7 +3491,7 @@ main() {
     fi
 
     # check for TLS renegotiation
-    if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] ; then
+    if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] && [ -z "${FILE}" ] ; then
 
         verboselog "checking TLS renegotiation"
         debuglog "checking TLS renegotiation"

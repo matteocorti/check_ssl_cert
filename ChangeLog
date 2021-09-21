@@ -1,6 +1,7 @@
 2021-09-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): converts local CRLs from DER to PEM
+	* check_ssl_cert (main): does not check renegotiation when checking files
 
 2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
 
