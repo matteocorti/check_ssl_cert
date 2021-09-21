@@ -775,9 +775,9 @@ exec_with_timeout() {
 
         end_time=$( date +%s )
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
-	debuglog "  end time = ${end_time}"
-	debuglog "  new timeout = ${TIMEOUT}"
-	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
+        debuglog "  end time = ${end_time}"
+        debuglog "  new timeout = ${TIMEOUT}"
+        if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -826,9 +826,9 @@ EOT
 
         end_time=$( date +%s )
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
-	debuglog "  end time = ${end_time}"
-	debuglog "  new timeout = ${TIMEOUT}"
-	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
+        debuglog "  end time = ${end_time}"
+        debuglog "  new timeout = ${TIMEOUT}"
+        if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -843,9 +843,9 @@ EOT
 
         # we deduce the command duration from the total specified timeout
         TIMEOUT=$(( TIMEOUT - end_time + start_time ))
-	debuglog "  end time = ${end_time}"
-	debuglog "  new timeout = ${TIMEOUT}"
-	if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
+        debuglog "  end time = ${end_time}"
+        debuglog "  new timeout = ${TIMEOUT}"
+        if [ "${TIMEOUT}" -lt 1 ] ; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -925,10 +925,10 @@ check_crl() {
 
         debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
         CRL_RESULT=$( "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}"  "${CERT_ELEMENT}" 2>&1 |
-                          grep -F ':' |
-                          head -n 1 |
-                          sed 's/^.*:\ //'
-                  )
+            grep -F ':' |
+            head -n 1 |
+            sed 's/^.*:\ //'
+        )
 
         debuglog "  result: ${CRL_RESULT}"
 
@@ -991,7 +991,6 @@ check_ocsp() {
             else
 
                 debuglog "Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
 
             fi
 
@@ -1299,8 +1298,8 @@ check_cert_end_date() {
 
             debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
 
-            if ! echo "$1" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
                 return 1
             fi
 
@@ -1526,11 +1525,11 @@ fetch_certificate() {
 
                 debuglog 'converting PKCS #12 to PEM'
 
-		if [ -n "${PASSWORD_SOURCE}" ] ; then
-		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
+                if [ -n "${PASSWORD_SOURCE}" ] ; then
+                    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
                     "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2> "${CONVERSION_ERROR}"
                 else
-		    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
+                    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
                     "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2> "${CONVERSION_ERROR}"
                 fi
 
@@ -1609,11 +1608,11 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
-	elif ascii_grep 'Connection timed out' "${ERROR}" ; then
+        elif ascii_grep 'Connection timed out' "${ERROR}" ; then
 
-	    ERROR='OpenSSL connection timed out'
-	    prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            ERROR='OpenSSL connection timed out'
+            prepend_critical_message "${ERROR}"
+                critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
         elif ascii_grep 'dh\ key\ too\ small' "${ERROR}" ; then
 
@@ -2119,11 +2118,11 @@ parse_command_line_options() {
                 OPENSSL="$2"
                 shift 2
                 ;;
-	    --password)
-		check_option_argument '--password' "$2"
-		PASSWORD_SOURCE="$2"
-		shift 2
-		;;
+            --password)
+                check_option_argument '--password' "$2"
+                PASSWORD_SOURCE="$2"
+                shift 2
+                ;;
             -p|--port)
                 check_option_argument '-p|--port' "$2"
                 PORT="$2"
@@ -2857,12 +2856,12 @@ main() {
     fi
     if [ -n "${FORCE_DCONV_DATE}" ] ; then
 
-	debuglog "Forcing date computations with dconv"
+        debuglog "Forcing date computations with dconv"
 
         DATETYPE="DCONV"
         check_required_prog dconv
         DCONV_BIN=${PROG}
-	debuglog "dconv binary: ${DCONV_BIN}"
+        debuglog "dconv binary: ${DCONV_BIN}"
 
     fi
 
@@ -3388,7 +3387,6 @@ main() {
     # Handle properly openssl x509 -issuer -noout output format differences:
     # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
     # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-    # shellcheck disable=SC2086
     ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \\/)?//" | awk  '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
 
     debuglog 'ISSUERS = '
@@ -3414,8 +3412,6 @@ main() {
         else
             verboselog "  OCSP stapling enabled"
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
-
-
 
             OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
             verboselog "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
@@ -4062,7 +4058,7 @@ main() {
 
         else
             verboselog 'Skipping SCTs check as not supported by OpenSSL'
-	fi
+        fi
     fi
 
     # if errors exist at this point return
