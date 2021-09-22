@@ -1,3 +1,7 @@
+2021-09-22  Matteo Corti  <matteo@corti.li>
+
+	* Makefile (dist): make dist does not check the format (just builds the distribution)
+
 2021-09-21  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): converts local CRLs from DER to PEM
