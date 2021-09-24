@@ -1,3 +1,7 @@
+2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* check_ssl_cert: --warning and --critical now also accept floating point numbers
+
 2021-09-22  Matteo Corti  <matteo@corti.li>
 
 	* Makefile (dist): make dist does not check the format (just builds the distribution)
