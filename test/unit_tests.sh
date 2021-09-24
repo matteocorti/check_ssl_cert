@@ -48,7 +48,7 @@ remove_temporary_files() {
     fi
 }
 
-cleanup() {
+cleanup_temporary_files() {
     SIGNAL=$1
     remove_temporary_files
     # shellcheck disable=SC2086
@@ -70,12 +70,12 @@ oneTimeSetUp() {
     SIGNALS="HUP INT QUIT TERM ABRT"
 
     LC_ALL=C
-    
+
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
     # shellcheck disable=SC2086
     trap_with_arg cleanup ${SIGNALS}
-    
+
     # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
     echo 'Starting SSL Lab test (to cache the result)'
     curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
@@ -93,6 +93,10 @@ oneTimeSetUp() {
     fi
     "${OPENSSL}" version
 
+}
+
+oneTimeTearDown() {
+   cleanup_temporary_files
 }
 
 testHoursUntilNow() {
@@ -930,25 +934,24 @@ testETHZWithSSLLabs() {
 }
 
 testGithubComCRL () {
-    
+
     # get current certificate of github.com, download the CRL named in that certificate
     # and use it for local CRL check
 
     create_temporary_file; TEMPFILE_GITHUB_CERT=${TEMPFILE}
-    
+
     echo Q | "${OPENSSL}" s_client -connect github.com:443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
 
     GITHUB_CRL_URI=$( ${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
 
     create_temporary_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
-    
+
     wget --no-verbose -O "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    rm -f "${TEMPFILE_GITHUB_CERT}" >/dev/null 2>/dev/null
-    rm -f "${TEMPFILE_CRL}" >/dev/null 2>/dev/null
+
 }
 
 # the script will exit without executing main
