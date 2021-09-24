@@ -20,14 +20,13 @@ Arguments:
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
       --all                        enables all the possible optional checks at the maximum level
-      --altnames                   matches the pattern specified in -n with
-                                   alternate names too
       --check-ciphers grade        checks the offered ciphers
       --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher
    -C,--clientcert path            use client certificate to authenticate
       --clientpass phrase          set passphrase for client certificate.
-   -c,--critical days              minimum number of days a certificate has to
-                                   be valid to issue a critical status. Default: 15
+   -c,--critical days              minimum number of days a certificate has to be valid to issue a
+                                   critical status. Might be a floating point number, e.g., 0.5
+                                   Default: 15
       --crl                        checks revokation via CRL (requires --rootcert-file)
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain the
@@ -39,6 +38,7 @@ Options:
       --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
       --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
       --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
+      --dane 312                   verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record exists
       --date path                  path of the date binary to be used
    -d,--debug                      produces debugging output (can be specified more than once)
       --debug-cert                 stores the retrieved certificates in the current directory
@@ -56,7 +56,7 @@ Options:
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --first-element-only         verify just the first cert element, not the whole chain
-      --force-dconv-date           force the usage of dconv for date computations
+      --force-dcovn-date           force the usage of dconf for date computations
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
@@ -92,17 +92,16 @@ Options:
       --nmap-bin path              path of the nmap binary to be used
       --no-perf                    do not show performance data
       --no-proxy                   ignores the http_proxy and https_proxy environment variables
-      --no_ssl2                    disable SSL version 2
-      --no_ssl3                    disable SSL version 3
-      --no_tls1                    disable TLS version 1
-      --no_tls1_1                  disable TLS version 1.1
-      --no_tls1_2                  disable TLS version 1.2
-      --no_tls1_3                  disable TLS version 1.3
+      --no-ssl2                    disable SSL version 2
+      --no-ssl3                    disable SSL version 3
+      --no-tls1                    disable TLS version 1
+      --no-tls1_1                  disable TLS version 1.1
+      --no-tls1_2                  disable TLS version 1.2
+      --no-tls1_3                  disable TLS version 1.3
       --not-issued-by issuer       check that the issuer of the certificate does not match
                                    the given pattern
       --not-valid-longer-than days critical if the certificate validity is longer than
                                    the specified period
-   -N,--host-cn                    match CN with the host name
       --ocsp-critical hours        minimum number of hours an OCSP response has to be valid to
                                    issue a critical status
       --ocsp-warning hours         minimum number of hours an OCSP response has to be valid to
@@ -114,7 +113,7 @@ Options:
    -p,--port port                  TCP port
       --prometheus                 generates Prometheus/OpenMetrics output
    -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|pop3|pop3s|
+                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
                                     postgres|sieve|smtp|smtps|xmpp|xmpp-server}
                                    https:                             default
                                    h2:                                forces HTTP/2
@@ -152,16 +151,20 @@ Options:
    -u,--url URL                    HTTP request URL
    -v,--verbose                    verbose output (can be specified more than once)
    -V,--version                    version
-   -w,--warning days               minimum number of days a certificate has to be valid
-                                   to issue a warning status. Default: 20
+   -w,--warning days               minimum number of days a certificate has to be valid to issue a
+                                   warning status. Might be a floating point number, e.g., 0.5
+                                   Default: 20
       --xmpphost name              specifies the host for the 'to' attribute of the stream element
    -4                              force IPv4
    -6                              force IPv6
 
 Deprecated options:
+      --altnames                   matches the pattern specified in -n with
+                                   alternate names too (enabled by default)
       --days days                  minimum number of days a certificate has to be valid
                                    (see --critical and --warning)
-      --ocsp                       check revocation via OCSP
+   -N,--host-cn                    match CN with the host name (enabled by default)
+      --ocsp                       check revocation via OCSP (enabled by default)
    -S,--ssl version                force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
 
