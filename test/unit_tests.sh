@@ -23,6 +23,42 @@ if [ ! -r "${SCRIPT}" ] ; then
     echo "Error: the script to test (${SCRIPT}) is not a readable file"
 fi
 
+##############################################################################
+# Utilities
+
+create_temporary_file() {
+
+    SUFFIX=$1
+
+    # create a temporary file
+    TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2> /dev/null )"
+    if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
+        fail 'temporary file creation failure.'
+    fi
+
+    # add the file to the list of temporary files
+    TEMPORARY_FILES="${TEMPORARY_FILES} ${TEMPFILE}"
+
+}
+
+remove_temporary_files() {
+    # shellcheck disable=SC2086
+    if [ -n "${TEMPORARY_FILES}" ]; then
+        rm -f ${TEMPORARY_FILES}
+    fi
+}
+
+cleanup() {
+    SIGNAL=$1
+    remove_temporary_files
+    # shellcheck disable=SC2086
+    trap - ${SIGNALS}
+    exit
+}
+
+##############################################################################
+# Initial setuop
+
 oneTimeSetUp() {
     # constants
 
@@ -31,6 +67,15 @@ oneTimeSetUp() {
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
 
+    SIGNALS="HUP INT QUIT TERM ABRT"
+
+    LC_ALL=C
+    
+    # Cleanup before program termination
+    # Using named signals to be POSIX compliant
+    # shellcheck disable=SC2086
+    trap_with_arg cleanup ${SIGNALS}
+    
     # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
     echo 'Starting SSL Lab test (to cache the result)'
     curl --silent 'https://www.ssllabs.com/ssltest/analyze.html?d=ethz.ch&latest' > /dev/null
@@ -885,12 +930,18 @@ testETHZWithSSLLabs() {
 }
 
 testGithubComCRL () {
+    
     # get current certificate of github.com, download the CRL named in that certificate
     # and use it for local CRL check
-    TEMPFILE_GITHUB_CERT="$(mktemp)"
-    openssl s_client -connect github.com:443 </dev/null 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
-    GITHUB_CRL_URI=$(openssl x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
-    TEMPFILE_CRL="$(mktemp --suffix=.crl)"
+
+    create_temporary_file; TEMPFILE_GITHUB_CERT=${TEMPFILE}
+    
+    echo Q | "${OPENSSL}" s_client -connect github.com:443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
+
+    GITHUB_CRL_URI=$( ${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
+
+    create_temporary_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
+    
     wget --no-verbose -O "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
