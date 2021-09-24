@@ -2,6 +2,14 @@
 
 	* check_ssl_cert: --warning and --critical now also accept floating point numbers
 
+2021-09-24  Matteo Corti  <corti@precise>
+
+	* test/unit_tests.sh (oneTimeSetup): defining TMPDIR if not defined
+
+2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* test/unit_tests.sh: adding a test for checking a local CRL file
+
 2021-09-22  Matteo Corti  <matteo@corti.li>
 
 	* Makefile (dist): make dist does not check the format (just builds the distribution)

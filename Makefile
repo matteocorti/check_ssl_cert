@@ -58,6 +58,7 @@ check: test
 SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
 SHUNIT := $(shell command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi )
 
+distcheck: disttest
 disttest: dist formatting_check copyright_check shellcheck
 
 test: disttest
