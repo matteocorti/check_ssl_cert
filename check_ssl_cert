@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.6.1
+VERSION=2.7.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -74,7 +74,7 @@ usage() {
     echo "   -C,--clientcert path            use client certificate to authenticate"
     echo "      --clientpass phrase          set passphrase for client certificate."
     echo "   -c,--critical days              minimum number of days a certificate has to be valid to issue a"
-    echo "                                   critical status. Might be a floating point number, e. g. 0.5"
+    echo "                                   critical status. Might be a floating point number, e.g., 0.5"
     echo "                                   Default: ${CRITICAL_DAYS}"
     echo "      --crl                        checks revokation via CRL (requires --rootcert-file)"
     echo "      --curl-bin path              path of the curl binary to be used"
@@ -201,7 +201,7 @@ usage() {
     echo "   -v,--verbose                    verbose output (can be specified more than once)"
     echo "   -V,--version                    version"
     echo "   -w,--warning days               minimum number of days a certificate has to be valid to issue a"
-    echo "                                   warning status. Might be a floating point number, e. g. 0.5"
+    echo "                                   warning status. Might be a floating point number, e.g., 0.5"
     echo "                                   Default: ${WARNING_DAYS}"
     echo "      --xmpphost name              specifies the host for the 'to' attribute of the stream element"
     echo "   -4                              force IPv4"
