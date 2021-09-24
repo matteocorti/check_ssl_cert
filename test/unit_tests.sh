@@ -56,7 +56,6 @@ cleanup_temporary_files() {
     remove_temporary_files
     # shellcheck disable=SC2086
     trap - ${SIGNALS}
-    exit
 }
 
 ##############################################################################
