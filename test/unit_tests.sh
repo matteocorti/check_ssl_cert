@@ -76,7 +76,7 @@ oneTimeSetUp() {
     NAGIOS_UNKNOWN=3
 
     if [ -z "${TMPDIR}" ] ; then
-	TMPDIR=/tmp
+        TMPDIR=/tmp
     fi
 
     # Cleanup before program termination
@@ -107,7 +107,7 @@ oneTimeTearDown() {
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
     # shellcheck disable=SC2086
-   cleanup_temporary_test_files ${SIGNALS}
+    cleanup_temporary_test_files ${SIGNALS}
 }
 
 ##############################################################################
@@ -207,12 +207,12 @@ testSCT() {
     fi
     ${OPENSSL} version
     if openssl_version '1.1.0' ; then
-	echo "OpenSSL >= 1.1.0: SCTs supported"
+        echo "OpenSSL >= 1.1.0: SCTs supported"
         ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
-	echo "OpenSSL < 1.1.0: SCTs not supported"
+        echo "OpenSSL < 1.1.0: SCTs not supported"
         ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -649,16 +649,16 @@ testIPv4() {
 testIPv6() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6 ; then
 
-	IPV6=
-	if command -v ifconfig > /dev/null && ifconfig -a | grep -q -F inet6 ; then
-	    IPV6=1
-	elif command -v ip > /dev/null && ip addr | grep -q -F inet6 ; then
-	    IPV6=1
-	fi
+        IPV6=
+        if command -v ifconfig > /dev/null && ifconfig -a | grep -q -F inet6 ; then
+            IPV6=1
+        elif command -v ip > /dev/null && ip addr | grep -q -F inet6 ; then
+            IPV6=1
+        fi
 
         if [ -n "${IPV6}" ] ; then
 
-	    echo "IPv6 is configured"
+            echo "IPv6 is configured"
 
             if ping -c 3 -6 www.google.com > /dev/null 2>&1  ; then
 
