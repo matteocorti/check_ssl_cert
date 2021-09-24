@@ -884,6 +884,22 @@ testETHZWithSSLLabs() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testGithubComCRL () {
+    # get current certificate of github.com, download the CRL named in that certificate
+    # and use it for local CRL check
+    TEMPFILE_GITHUB_CERT="$(mktemp)"
+    openssl s_client -connect github.com:443 </dev/null 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
+    GITHUB_CRL_URI=$(openssl x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
+    TEMPFILE_CRL="$(mktemp --suffix=.crl)"
+    wget --no-verbose -O "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
+
+    ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    rm -f "${TEMPFILE_GITHUB_CERT}" >/dev/null 2>/dev/null
+    rm -f "${TEMPFILE_CRL}" >/dev/null 2>/dev/null
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
