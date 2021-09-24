@@ -1545,7 +1545,7 @@ check_cert_end_date() {
 
             debuglog "executing: ${OPENSSL} x509 -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend ${CRITICAL_SECONDS} > /dev/null ; then
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${CRITICAL_SECONDS}" > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -1560,7 +1560,7 @@ check_cert_end_date() {
 
             debuglog "executing: ${OPENSSL} x509 -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend ${WARNING_SECONDS} > /dev/null ; then
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${WARNING_SECONDS}" > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -2903,7 +2903,7 @@ main() {
 
         debuglog "-c specified: ${CRITICAL_DAYS}"
 
-        if ! echo "${CRITICAL_DAYS}" | egrep -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
+        if ! echo "${CRITICAL_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
             unknown "invalid number of days '${CRITICAL_DAYS}'"
         fi
 
@@ -2913,7 +2913,7 @@ main() {
 
         debuglog "-w specified: ${WARNING_DAYS}"
 
-        if ! echo "${WARNING_DAYS}" | egrep -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
+        if ! echo "${WARNING_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
             unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
