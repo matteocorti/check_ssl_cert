@@ -1584,7 +1584,7 @@ check_cert_end_date() {
         # CRL certificates
 
         # We always check expired certificates
-        if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
+        if [ "${ELEM_SECONDS_VALID}" -lt 1 ] ; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE})" "${replace_current_message}"
             add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
@@ -2910,6 +2910,8 @@ main() {
     fi
 
     if [ -n "${WARNING_DAYS}" ] ; then
+
+        debuglog "-w specified: ${WARNING_DAYS}"
 
         if ! echo "${WARNING_DAYS}" | egrep -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
             unknown "invalid number of days '${WARNING_DAYS}'"
