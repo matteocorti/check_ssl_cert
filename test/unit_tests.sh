@@ -890,7 +890,7 @@ testGithubComCRL () {
     TEMPFILE_GITHUB_CERT="$(mktemp)"
     openssl s_client -connect github.com:443 </dev/null 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
     GITHUB_CRL_URI=$(openssl x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
-    TEMPFILE_CRL="$(mktemp --suffix=.crl)"
+    TEMPFILE_CRL="$(mktemp)"
     wget --no-verbose -O "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
