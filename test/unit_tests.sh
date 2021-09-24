@@ -33,12 +33,8 @@ create_temporary_test_file() {
 
     SUFFIX=$1
 
-    echo $TMPDIR
-
     # create a temporary file
     TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2> /dev/null )"
-
-    echo $TEMPFILE
 
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
         fail 'temporary file creation failure.'
