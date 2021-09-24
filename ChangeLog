@@ -1,3 +1,7 @@
+2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* check_ssl_cert: --warning and --critical now also accept floating point numbers
+
 2021-09-24  Matteo Corti  <corti@precise>
 
 	* test/unit_tests.sh (oneTimeSetup): defining TMPDIR if not defined

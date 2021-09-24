@@ -73,8 +73,9 @@ usage() {
     echo "      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher"
     echo "   -C,--clientcert path            use client certificate to authenticate"
     echo "      --clientpass phrase          set passphrase for client certificate."
-    echo "   -c,--critical days              minimum number of days a certificate has to"
-    echo "                                   be valid to issue a critical status. Default: ${CRITICAL_DAYS}"
+    echo "   -c,--critical days              minimum number of days a certificate has to be valid to issue a"
+    echo "                                   critical status. Might be a floating point number, e. g. 0.5"
+    echo "                                   Default: ${CRITICAL_DAYS}"
     echo "      --crl                        checks revokation via CRL (requires --rootcert-file)"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain the"
@@ -199,8 +200,9 @@ usage() {
     echo "   -u,--url URL                    HTTP request URL"
     echo "   -v,--verbose                    verbose output (can be specified more than once)"
     echo "   -V,--version                    version"
-    echo "   -w,--warning days               minimum number of days a certificate has to be valid"
-    echo "                                   to issue a warning status. Default: ${WARNING_DAYS}"
+    echo "   -w,--warning days               minimum number of days a certificate has to be valid to issue a"
+    echo "                                   warning status. Might be a floating point number, e. g. 0.5"
+    echo "                                   Default: ${WARNING_DAYS}"
     echo "      --xmpphost name              specifies the host for the 'to' attribute of the stream element"
     echo "   -4                              force IPv4"
     echo "   -6                              force IPv6"
@@ -437,6 +439,34 @@ EOF
     debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
 
     echo "${HOURS_UNTIL}"
+
+}
+
+################################################################################
+# Convert a number of days into according number of seconds
+# Params
+#   $1 NUMBER_OF_DAYS
+# return NUMBER_OF_SECONDS
+days_to_seconds() {
+
+    NUMBER_OF_DAYS=$1
+
+    if echo "${NUMBER_OF_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
+        debuglog "Converting ${NUMBER_OF_DAYS} days into seconds by shell function"
+        NUMBER_OF_SECONDS=$(( NUMBER_OF_DAYS * 86400 ))
+    else
+        if command -v perl >/dev/null ; then
+            debuglog "Converting ${NUMBER_OF_DAYS} days into seconds with perl"
+            NUMBER_OF_SECONDS=$(perl -E "say ${NUMBER_OF_DAYS}*86400")
+        else
+            debuglog "Converting ${NUMBER_OF_DAYS} days into seconds with awk"
+            NUMBER_OF_SECONDS=$(awk "BEGIN {print ${NUMBER_OF_DAYS} * 86400}")
+        fi
+    fi
+
+    debuglog "Converted ${NUMBER_OF_DAYS} days into seconds: ${NUMBER_OF_SECONDS}"
+
+    echo "${NUMBER_OF_SECONDS}"
 
 }
 
@@ -1474,6 +1504,7 @@ check_cert_end_date() {
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
 
     ELEM_DAYS_VALID=$(( HOURS_UNTIL / 24 ))
+    ELEM_SECONDS_VALID=$(( HOURS_UNTIL * 3600 ))
 
     add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
 
@@ -1510,11 +1541,11 @@ check_cert_end_date() {
             return 2
         fi
 
-        if [ -n "${CRITICAL_DAYS}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] ; then
 
-            debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) on cert element ${el_number} (${element_cn})"
+            debuglog "executing: ${OPENSSL} x509 -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( CRITICAL_DAYS * 86400 )) > /dev/null ; then
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${CRITICAL_SECONDS}" > /dev/null ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -1525,11 +1556,11 @@ check_cert_end_date() {
 
         fi
 
-        if [ -n "${WARNING_DAYS}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] && [ -n "${WARNING_SECONDS}" ] ; then
 
-            debuglog "executing: ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) on cert element ${el_number}"
+            debuglog "executing: ${OPENSSL} x509 -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend $(( WARNING_DAYS * 86400 )) > /dev/null ; then
+            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${WARNING_SECONDS}" > /dev/null ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -1553,14 +1584,15 @@ check_cert_end_date() {
         # CRL certificates
 
         # We always check expired certificates
-        if [ "${ELEM_DAYS_VALID}" -lt 1 ] ; then
+        if [ "${ELEM_SECONDS_VALID}" -lt 1 ] ; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE})" "${replace_current_message}"
             add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
         fi
 
-        if [ -n "${CRITICAL_DAYS}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${CRITICAL_DAYS}" ] ; then
+        if [ -n "${CRITICAL_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] ; then
+            # When comparing, always use values in seconds, because values in days might be floating point numbers
+            if [ "${ELEM_SECONDS_VALID}" -lt "${CRITICAL_SECONDS}" ] ; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -1571,8 +1603,9 @@ check_cert_end_date() {
 
         fi
 
-        if [ -n "${WARNING_DAYS}" ] ; then
-            if [ "${ELEM_DAYS_VALID}" -lt "${WARNING_DAYS}" ] ; then
+        if [ -n "${WARNING_DAYS}" ] && [ -n "${WARNING_SECONDS}" ] ; then
+            # When comparing, always use values in seconds, because values in days might be floating point numbers
+            if [ "${ELEM_SECONDS_VALID}" -lt "${WARNING_SECONDS}" ] ; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ] ; then
                     CN='unavailable'
@@ -2228,6 +2261,7 @@ parse_command_line_options() {
             -c|--critical)
                 check_option_argument '-c,--critical' "$2"
                 CRITICAL_DAYS="$2"
+                CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
                 shift 2
                 ;;
             --check-ciphers)
@@ -2259,6 +2293,7 @@ parse_command_line_options() {
             --days)
                 check_option_argument '--days' "$2"
                 WARNING_DAYS="$2"
+                WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
                 shift 2
                 ;;
             --debug-file)
@@ -2485,6 +2520,7 @@ parse_command_line_options() {
             -w|--warning)
                 check_option_argument '-w|--warning' "$2"
                 WARNING_DAYS="$2"
+                WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
                 shift 2
                 ;;
             --xmpphost)
@@ -2566,6 +2602,7 @@ main() {
     ALTNAMES=1 # enabled by default
     COMMON_NAME="__HOST__" # enabled by default
     CRITICAL_DAYS=15
+    CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
     CRL=""
     CURL_BIN=""
     CURL_PROXY=""
@@ -2603,6 +2640,7 @@ main() {
     TIMEOUT="120"
     VERBOSE="0"
     WARNING_DAYS=20
+    WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
     XMPPHOST=""
     XMPPPORT="5222"
 
@@ -2865,7 +2903,7 @@ main() {
 
         debuglog "-c specified: ${CRITICAL_DAYS}"
 
-        if ! echo "${CRITICAL_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
+        if ! echo "${CRITICAL_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
             unknown "invalid number of days '${CRITICAL_DAYS}'"
         fi
 
@@ -2873,15 +2911,18 @@ main() {
 
     if [ -n "${WARNING_DAYS}" ] ; then
 
-        if ! echo "${WARNING_DAYS}" | grep -q '^[0-9][0-9]*$' ; then
+        debuglog "-w specified: ${WARNING_DAYS}"
+
+        if ! echo "${WARNING_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$' ; then
             unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
     fi
 
-    if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] ; then
+    if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] && [ -n "${WARNING_SECONDS}" ] ; then
 
-        if [ "${WARNING_DAYS}" -le "${CRITICAL_DAYS}" ] ; then
+        # When comparing, always use values in seconds, because values in days might be floating point numbers
+        if [ "${WARNING_SECONDS}" -le "${CRITICAL_SECONDS}" ] ; then
             unknown "--warning (${WARNING_DAYS}) is less than or equal to --critical (${CRITICAL_DAYS})"
         fi
 
