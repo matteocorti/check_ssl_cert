@@ -948,7 +948,7 @@ testGithubComCRL () {
 
     create_temporary_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
 
-    wget --no-verbose -O "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
+    curl --silent "${TEMPFILE_CRL}" >  "${GITHUB_CRL_URI}"
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
     EXIT_CODE=$?
