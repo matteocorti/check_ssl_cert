@@ -235,6 +235,16 @@ To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
  * Debian, Ubuntu: ```apt-get install shunit2```
  * Fedora: ```dnf install shunit2```
 
+Run ```make test``` to execute the whole test suite.
+
+With ```make disttest``` you can check the formatting of the files (e.g. tabs and blanks at the end of the lines) and run ShellCheck to lint the scripts.
+
+To run a single test:
+
+ * set the ```SHUNIT2``` environment variable with the location of the shUnit2 binary
+ * change the directory to the test suite: ```cd test```
+ * execute the test suite with the tests to be run as argument after ```--```. For example ```./unit_tests.sh -- testName```
+
 ## Bugs
 
 The timeout is applied to each action involving a download.

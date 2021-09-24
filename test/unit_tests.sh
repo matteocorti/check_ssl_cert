@@ -18,10 +18,48 @@ if [ ! -x "${SHUNIT2}" ] ; then
     exit 1
 fi
 
+SIGNALS="HUP INT QUIT TERM ABRT"
+LC_ALL=C
+
 SCRIPT=../check_ssl_cert
 if [ ! -r "${SCRIPT}" ] ; then
     echo "Error: the script to test (${SCRIPT}) is not a readable file"
 fi
+
+##############################################################################
+# Utilities
+
+create_temporary_file() {
+
+    SUFFIX=$1
+
+    # create a temporary file
+    TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2> /dev/null )"
+    if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
+        fail 'temporary file creation failure.'
+    fi
+
+    # add the file to the list of temporary files
+    TEMPORARY_FILES="${TEMPORARY_FILES} ${TEMPFILE}"
+
+}
+
+remove_temporary_files() {
+    # shellcheck disable=SC2086
+    if [ -n "${TEMPORARY_FILES}" ]; then
+        rm -f ${TEMPORARY_FILES}
+    fi
+}
+
+cleanup_temporary_files() {
+    SIGNALS=$1
+    remove_temporary_files
+    # shellcheck disable=SC2086
+    trap - ${SIGNALS}
+}
+
+##############################################################################
+# Initial setuop
 
 oneTimeSetUp() {
     # constants
@@ -30,6 +68,11 @@ oneTimeSetUp() {
     NAGIOS_WARNING=1
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
+
+    # Cleanup before program termination
+    # Using named signals to be POSIX compliant
+    # shellcheck disable=SC2086
+    trap_with_arg cleanup ${SIGNALS}
 
     # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
     echo 'Starting SSL Lab test (to cache the result)'
@@ -48,6 +91,13 @@ oneTimeSetUp() {
     fi
     "${OPENSSL}" version
 
+}
+
+oneTimeTearDown() {
+    # Cleanup before program termination
+    # Using named signals to be POSIX compliant
+    # shellcheck disable=SC2086
+   cleanup_temporary_files ${SIGNALS}
 }
 
 testHoursUntilNow() {
@@ -882,6 +932,27 @@ testETHZWithSSLLabs() {
     ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --check-ssl-labs B --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testGithubComCRL () {
+
+    # get current certificate of github.com, download the CRL named in that certificate
+    # and use it for local CRL check
+
+    create_temporary_file; TEMPFILE_GITHUB_CERT=${TEMPFILE}
+
+    echo Q | "${OPENSSL}" s_client -connect github.com:443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
+
+    GITHUB_CRL_URI=$( ${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
+
+    create_temporary_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
+
+    curl --silent "${GITHUB_CRL_URI}" > "${TEMPFILE_CRL}"
+
+    ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
 }
 
 # the script will exit without executing main
