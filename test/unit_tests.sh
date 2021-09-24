@@ -29,12 +29,17 @@ fi
 ##############################################################################
 # Utilities
 
-create_temporary_file() {
+create_temporary_test_file() {
 
     SUFFIX=$1
 
+    echo $TMPDIR
+
     # create a temporary file
     TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2> /dev/null )"
+
+    echo $TEMPFILE
+
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ] ; then
         fail 'temporary file creation failure.'
     fi
@@ -44,22 +49,22 @@ create_temporary_file() {
 
 }
 
-remove_temporary_files() {
+remove_temporary_test_files() {
     # shellcheck disable=SC2086
     if [ -n "${TEMPORARY_FILES}" ]; then
         rm -f ${TEMPORARY_FILES}
     fi
 }
 
-cleanup_temporary_files() {
+cleanup_temporary_test_files() {
     SIGNALS=$1
-    remove_temporary_files
+    remove_temporary_test_files
     # shellcheck disable=SC2086
     trap - ${SIGNALS}
 }
 
 ##############################################################################
-# Initial setuop
+# Initial setup
 
 oneTimeSetUp() {
     # constants
@@ -68,6 +73,10 @@ oneTimeSetUp() {
     NAGIOS_WARNING=1
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
+
+    if [ -z "${TMPDIR}" ] ; then
+	TMPDIR=/tmp
+    fi
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
@@ -97,7 +106,7 @@ oneTimeTearDown() {
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
     # shellcheck disable=SC2086
-   cleanup_temporary_files ${SIGNALS}
+   cleanup_temporary_test_files ${SIGNALS}
 }
 
 testHoursUntilNow() {
@@ -939,13 +948,13 @@ testGithubComCRL () {
     # get current certificate of github.com, download the CRL named in that certificate
     # and use it for local CRL check
 
-    create_temporary_file; TEMPFILE_GITHUB_CERT=${TEMPFILE}
+    create_temporary_test_file; TEMPFILE_GITHUB_CERT=${TEMPFILE}
 
     echo Q | "${OPENSSL}" s_client -connect github.com:443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' > "${TEMPFILE_GITHUB_CERT}"
 
     GITHUB_CRL_URI=$( ${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
 
-    create_temporary_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
+    create_temporary_test_file '.crl'; TEMPFILE_CRL=${TEMPFILE}
 
     curl --silent "${GITHUB_CRL_URI}" > "${TEMPFILE_CRL}"
 
