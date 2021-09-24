@@ -33,6 +33,11 @@ create_temporary_test_file() {
 
     SUFFIX=$1
 
+    if mktemp --help 2>&1 | grep -q 'TEMPLATE must end with XXXXXX' ; then
+        # no suffix possible
+        SUFFIX=
+    fi
+
     # create a temporary file
     TEMPFILE="$( mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2> /dev/null )"
 
@@ -104,6 +109,9 @@ oneTimeTearDown() {
     # shellcheck disable=SC2086
    cleanup_temporary_test_files ${SIGNALS}
 }
+
+##############################################################################
+# Tests
 
 testHoursUntilNow() {
     # testing with perl
