@@ -18,6 +18,9 @@ if [ ! -x "${SHUNIT2}" ] ; then
     exit 1
 fi
 
+SIGNALS="HUP INT QUIT TERM ABRT"
+LC_ALL=C
+
 SCRIPT=../check_ssl_cert
 if [ ! -r "${SCRIPT}" ] ; then
     echo "Error: the script to test (${SCRIPT}) is not a readable file"
@@ -49,7 +52,7 @@ remove_temporary_files() {
 }
 
 cleanup_temporary_files() {
-    SIGNAL=$1
+    SIGNALS=$1
     remove_temporary_files
     # shellcheck disable=SC2086
     trap - ${SIGNALS}
@@ -66,10 +69,6 @@ oneTimeSetUp() {
     NAGIOS_WARNING=1
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
-
-    SIGNALS="HUP INT QUIT TERM ABRT"
-
-    LC_ALL=C
 
     # Cleanup before program termination
     # Using named signals to be POSIX compliant
@@ -96,7 +95,10 @@ oneTimeSetUp() {
 }
 
 oneTimeTearDown() {
-   cleanup_temporary_files
+    # Cleanup before program termination
+    # Using named signals to be POSIX compliant
+    # shellcheck disable=SC2086
+   cleanup_temporary_files ${SIGNALS}
 }
 
 testHoursUntilNow() {
