@@ -968,6 +968,22 @@ testGithubComCRL () {
 
 }
 
+testFloatingPointThresholds () {
+
+    ${SCRIPT} -H github.com --warning 2.5 --critical 1.5
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+}
+
+testFloatingPointThresholdsWrongUsage () {
+
+    ${SCRIPT} -H github.com --warning 1.5 --critical 2.5
+    EXIT_CODE=$?
+    assertEquals "expecting error message about --warning is less or equal --critical, but got wrong exit code, " "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
