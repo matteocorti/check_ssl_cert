@@ -1,3 +1,7 @@
+2021-09-25 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* test/unit_tests.sh: adding tests for using floating point numbers in thresholds
+
 2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
 
 	* check_ssl_cert: --warning and --critical now also accept floating point numbers
