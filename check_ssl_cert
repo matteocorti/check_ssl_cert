@@ -1900,6 +1900,7 @@ fetch_certificate() {
             verboselog "the server requires a client certificate"
 
         elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
+                ascii_grep 'Name or service not known' "${ERROR}" ||
              ascii_grep 'connect\ argument\ or\ target\ parameter\ malformed\ or\ ambiguous' "${ERROR}" ; then
 
             ERROR="${HOST_ADDR} is not a valid hostname"
