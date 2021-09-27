@@ -241,6 +241,9 @@ These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, mysql, pop3,
 .BR "   --proxy" " proxy"
 sets http_proxy
 .TP
+.BR "   --require-client-cert" " [list]"
+the server must accept a client certificate. [list] is an optional comma separated list expected client certificate CAs
+.TP
 .BR "   --require-no-ssl2"
 critical if SSL version 2 is offered
 .TP

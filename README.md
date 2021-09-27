@@ -120,6 +120,8 @@ Options:
                                    ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
                                    TLS using StartTLS
       --proxy proxy                sets http_proxy and the s_client -proxy option
+      --require-client-cert [list] the server must accept a client certificate
+                                   list is an optional comma separated list expected client certificate CAs
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
@@ -169,7 +171,6 @@ Deprecated options:
                                    (see: --ssl2 or --ssl3)
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
-
 ```
 
 ## Expect & timeout
