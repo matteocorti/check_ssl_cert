@@ -364,6 +364,20 @@ hours_until() {
     DATE=$1
 
     debuglog "Date computations: ${DATETYPE}"
+
+    # we check if we are on a 32 bit system and if the date is beyond the max date
+    # we simplify and consider a date invalid after 1.1.2038 instead of 19.1.2038
+    # since date is not able to parse the date we do it manually with a little bit of heuristics ...
+    if [ "$( getconf LONG_BIT )" -eq 32 ] ; then
+	debuglog "32 bit system"
+	CERT_YEAR=$( echo "${DATE}"  | sed 's/.*\ \(2[0-9][0-9][0-9]\).*/\1/')
+	debuglog "Checking if the year ${CERT_YEAR} is beyond the max date for the system 2038-01-19"
+	if [ "${CERT_YEAR}" -gt 2038 ] ; then
+	    verboselog "${DATE} is beyond the maximum date on a 32 bit system: we consider 2038-01-19"
+	    DATE='Jan 19 00:00:00 2038 GMT'
+	fi
+    fi
+
     debuglog "Computing number of hours until '${DATE}'"
 
     case "${DATETYPE}" in
@@ -3629,7 +3643,8 @@ main() {
 
                 debuglog "  checking ${ca}"
 
-                if ! grep "${ca}" "${CERT}" | grep -q '^C\ =\ ' ; then
+                if ! grep "${ca}" "${CERT}" | grep -q '^C\ =\ ' &&
+! grep "${ca}" "${CERT}" | grep -q '^\/C=' ; then
                     prepend_critical_message "${ca} is not listed as an acceptable client certificate CA"
                 fi
 
