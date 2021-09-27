@@ -1041,6 +1041,46 @@ testCertExpiringInLessThanOneDay() {
 
 }
 
+testAcceptableClientCertCAMissing() {
+
+    ${SCRIPT} -H www.ethz.ch --require-client-cert
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+
+
+}
+
+testAcceptableClientCertCAGeneric() {
+
+    ${SCRIPT} -H klik.nlb.si --require-client-cert
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+
+}
+
+testAcceptableClientCertCAList() {
+
+    ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+
+}
+
+testAcceptableClientCertCAListWrong() {
+
+    ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB,fake
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+
+
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

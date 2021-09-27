@@ -169,6 +169,8 @@ usage() {
     echo "                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to"
     echo "                                   TLS using StartTLS"
     echo "      --proxy proxy                sets http_proxy and the s_client -proxy option"
+    echo "      --require-client-cert [list] the server must accept a client certificate"
+    echo "                                   list is an optional comma separated list expected client certificate CAs"
     echo "      --require-no-ssl2            critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            critical if SSL version 3 is offered"
     echo "      --require-no-tls1            critical if TLS 1 is offered"
@@ -2557,6 +2559,25 @@ parse_command_line_options() {
                 fi
 
                 ;;
+
+            --require-client-cert)
+
+                REQUIRE_CLIENT_CERT=1
+
+                # check the second parameter if it exist
+                if [ $# -gt 1 ] ; then
+                    if [ "${2%${2#?}}"x = '-x' ] ; then
+                        shift
+                    else
+                        REQUIRE_CLIENT_CERT_CAS=$2
+                        shift 2
+                    fi
+                else
+                        shift
+                fi
+
+                ;;
+
             ########################################
             # Special
             --)
@@ -2842,6 +2863,13 @@ main() {
             unknown "Root certificate of unknown type $(file "${ROOT_CA}" 2> /dev/null)"
         fi
 
+    fi
+
+    if [ -n "${REQUIRE_CLIENT_CERT}" ] ; then
+        debuglog "Ceck if at at least one client certificate is accepted"
+        if [ -n "${REQUIRE_CLIENT_CERT_CAS}" ] ; then
+            debuglog "  from the following CAs: ${REQUIRE_CLIENT_CERT_CAS}"
+        fi
     fi
 
     if [ -n "${ROOT_CA_DIR}" ] ; then
@@ -3583,6 +3611,29 @@ main() {
             if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}" ; then
                 prepend_critical_message 'TLS renegotiation is supported but not secure'
             fi
+
+        fi
+
+    fi
+
+    # check client certficates
+    if [ -n "${REQUIRE_CLIENT_CERT}" ] ; then
+
+        debuglog "Checking required client cert CAs"
+
+        if ascii_grep "No client certificate CA names sent" "${CERT}" ; then
+            prepend_critical_message "Did not return any client certificate CA names"
+        else
+
+            for ca in $( echo "${REQUIRE_CLIENT_CERT_CAS}" | tr ',' '\n' ) ; do
+
+                debuglog "  checking ${ca}"
+
+                if ! grep "${ca}" "${CERT}" | grep -q '^C\ =\ ' ; then
+                    prepend_critical_message "${ca} is not listed as an acceptable client certificate CA"
+                fi
+
+            done
 
         fi
 

@@ -1,3 +1,4 @@
+Adds a check for acceptable client certificate CAs
 2021-09-24 Version   2.7.0: Critical and warning can now be floating point numbers
 2021-09-21 Version   2.6.1: Fixed the output of several messages
                             Fixed the order of the critical messages

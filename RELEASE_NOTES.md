@@ -1,1 +1,1 @@
-Critical and warning can now be floating point numbers
+Adds a check for acceptable client certificate CAs

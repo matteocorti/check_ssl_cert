@@ -1,5 +1,6 @@
 2021-09-27  Matteo Corti  <matteo@corti.li>
 
+	* check_ssl_cert (main): adds a check for acceptable client certificate CAs
 	* test/unit_tests.sh: added a routine to create a self-signed certificate expiring in a given number of days
 	* test/unit_tests.sh: added a test for a certificate expiring between 0.5 and 1.5 days
 
