@@ -64,6 +64,50 @@ cleanup_temporary_test_files() {
     trap - ${SIGNALS}
 }
 
+createSelfSignedCertificate() {
+
+    DAYS=$1
+
+    if [ -z "${DAYS}" ] ; then
+        DAYS=30 # default
+    fi
+
+    create_temporary_test_file; CONFIGURATION=${TEMPFILE}
+    create_temporary_test_file; KEY=${TEMPFILE}
+    create_temporary_test_file; CERTIFICATE=${TEMPFILE}
+
+    cat<<'EOT' > "${CONFIGURATION}"
+[ req ]
+default_bits = 2048
+
+prompt = no
+distinguished_name=req_distinguished_name
+req_extensions = v3_req
+
+[ req_distinguished_name ]
+countryName=CH
+stateOrProvinceName=ZH
+localityName=Zurich
+organizationName=Matteo Corti
+organizationalUnitName=None
+commonName=localhost
+emailAddress=matteo@corti.li
+
+[ alternate_names ]
+DNS.1        = localhost
+
+[ v3_req ]
+keyUsage=digitalSignature
+subjectKeyIdentifier = hash
+subjectAltName = @alternate_names
+EOT
+
+    ${OPENSSL} genrsa -out "${KEY}" 2048 > /dev/null 2>&1
+
+    ${OPENSSL} req -new -x509 -key "${KEY}" -out "${CERTIFICATE}" -days "${DAYS}" -config "${CONFIGURATION}"
+
+}
+
 ##############################################################################
 # Initial setup
 
@@ -981,6 +1025,17 @@ testFloatingPointThresholdsWrongUsage () {
     ${SCRIPT} -H github.com --warning 1.5 --critical 2.5
     EXIT_CODE=$?
     assertEquals "expecting error message about --warning is less or equal --critical, but got wrong exit code, " "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+
+}
+
+testCertExpiringInLessThanOneDay() {
+
+    CERT=$( createSelfSignedCertificate 1 )
+
+    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 
 }
 
