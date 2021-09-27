@@ -1078,6 +1078,22 @@ testAcceptableClientCertCAListWrong() {
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
+}
+
+testMaxDateOn32BitSystems() {
+
+    # generate a cert expiring after 2038-01-19
+    CERT=$( createSelfSignedCertificate 7000 )
+
+    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned 2>&1 | grep -q 'invalid\ date'
+    EXIT_CODE=$?
+
+    assertEquals "Invalid date" 1 "${EXIT_CODE}"
 
 }
 
