@@ -106,6 +106,8 @@ EOT
 
     ${OPENSSL} req -new -x509 -key "${KEY}" -out "${CERTIFICATE}" -days "${DAYS}" -config "${CONFIGURATION}"
 
+    echo "${CERTIFICATE}"
+
 }
 
 ##############################################################################
