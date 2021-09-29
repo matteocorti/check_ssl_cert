@@ -1,6 +1,8 @@
 Adds a check for acceptable client certificate CAs
                             Supporting certificate expiration after 2038-01-19 on 32 bit systems
                             Adds an option (--ignore-connection-problem)  to set a custom state in case of connection failures
+                            Adds two options to selectively disable proxy setting for cURL and s_client
+                            (--no-proxy-curl and --no-proxy-s_client)
 2021-09-24 Version   2.7.0: Critical and warning can now be floating point numbers
 2021-09-21 Version   2.6.1: Fixed the output of several messages
                             Fixed the order of the critical messages

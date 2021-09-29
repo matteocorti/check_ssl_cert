@@ -142,6 +142,8 @@ usage() {
     echo "      --nmap-bin path              path of the nmap binary to be used"
     echo "      --no-perf                    do not show performance data"
     echo "      --no-proxy                   ignores the http_proxy and https_proxy environment variables"
+    echo "      --no-proxy-curl              ignores the http_proxy and https_proxy environment variables for curl"
+    echo "      --no-proxy-s_client          ignores the http_proxy and https_proxy environment variables for openssl s_client"
     echo "      --no-ssl2                    disable SSL version 2"
     echo "      --no-ssl3                    disable SSL version 3"
     echo "      --no-tls1                    disable TLS version 1"
@@ -2143,6 +2145,14 @@ parse_command_line_options() {
                 NO_PROXY=1
                 shift
                 ;;
+            --no-proxy-s_client)
+                NO_PROXY_S_CLIENT=1
+                shift
+                ;;
+            --no-proxy-curl)
+                NO_PROXY_CURL=1
+                shift
+                ;;
             --no-ssl2|--no_ssl2) # we keep the old variant for compatibility
                 SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2"
                 shift
@@ -2679,6 +2689,8 @@ main() {
     IGNORE_SSL_LABS_CACHE=""
     NMAP_BIN=""
     NO_PROXY=""
+    NO_PROXY_CURL=""
+    NO_PROXY_S_CLIENT=""
     OCSP="1" # enabled by default
     OCSP_IGNORE_ERRORS=""
     OCSP_IGNORE_TIMEOUT=""
@@ -3316,9 +3328,20 @@ main() {
         fi
     fi
 
-    if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
+    if [ -n "${PROXY}" ] &&
+           {
+               [ -n "${NO_PROXY}" ] ||
+                   [ -n "${NO_PROXY_CURL}" ] ||
+                   [ -n "${NO_PROXY_S_CLIENT}" ] ;
+           } ; then
         unknown "Only one of --proxy or --no_proxy can be specfied"
     fi
+
+    debuglog "Proxy settings (before):"
+    debuglog "  http_proxy  = ${http_proxy}"
+    debuglog "  https_proxy = ${https_proxy}"
+    debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
+    debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
 
     ################################################################################
     # If --no-proxy was specified unset the http_proxy variables
@@ -3338,12 +3361,6 @@ main() {
     CURL_PROXY=
     CURL_PROXY_ARGUMENT=
     if [ -n "${http_proxy}" ] || [ -n "${HTTP_PROXY}" ] ; then
-
-        debuglog "Proxy settings (before):"
-        debuglog "  http_proxy  = ${http_proxy}"
-        debuglog "  https_proxy = ${https_proxy}"
-        debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
-        debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
 
         if [ -n "${http_proxy}" ] ; then
             HTTP_PROXY="${http_proxy}"
@@ -3377,15 +3394,25 @@ main() {
 
         fi
 
-        debuglog "Proxy settings (after):"
-        debuglog "  http_proxy  = ${http_proxy}"
-        debuglog "  https_proxy = ${https_proxy}"
-        debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
-        debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
-        debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
-        debuglog "  cURL        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
-
     fi
+
+    if [ -n "${NO_PROXY_CURL}" ] ; then
+        CURL_PROXY=''
+        CURL_PROXY_ARGUMENT=''
+    fi
+
+    if [ -n "${NO_PROXY_S_CLIENT}" ] ; then
+        SCLIENT_PROXY=''
+        SCLIENT_PROXY_ARGUMENT=''
+    fi
+
+    debuglog "Proxy settings (after):"
+    debuglog "  http_proxy  = ${http_proxy}"
+    debuglog "  https_proxy = ${https_proxy}"
+    debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
+    debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
+    debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
+    debuglog "  cURL        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
 
     ################################################################################
     # Check if openssl s_client supports the -name option

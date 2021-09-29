@@ -93,6 +93,8 @@ Options:
       --nmap-bin path              path of the nmap binary to be used
       --no-perf                    do not show performance data
       --no-proxy                   ignores the http_proxy and https_proxy environment variables
+      --no-proxy-curl              ignores the http_proxy and https_proxy environment variables for curl
+      --no-proxy-s_client          ignores the http_proxy and https_proxy environment variables for openssl s_client
       --no-ssl2                    disable SSL version 2
       --no-ssl3                    disable SSL version 3
       --no-tls1                    disable TLS version 1
