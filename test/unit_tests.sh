@@ -1097,6 +1097,36 @@ testMaxDateOn32BitSystems() {
 
 }
 
+testIgnoreConnectionStateOK() {
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_OK}"
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testIgnoreConnectionStateWARNING() {
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_WARNING}"
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
+}
+
+testIgnoreConnectionStateCRITICAL() {
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_CRITICAL}"
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testIgnoreConnectionStateWARNING() {
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_WARNING}"
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
+}
+
+testIgnoreConnectionStateError() {
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state 4
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

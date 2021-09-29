@@ -113,6 +113,7 @@ usage() {
     echo "      --http-use-get               use GET instead of HEAD (default) for the HTTP"
     echo "                                   related checks"
     echo "      --ignore-altnames            ignores alternative names when matching pattern specified in -n (or the host name)"
+    echo "      --ignore-connection-problems [state] in case of connection problems returns OK or the optional state"
     echo "      --ignore-exp                 ignore expiration date"
     echo "      --ignore-host-cn             do not complain if the CN does not match the host name"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
@@ -2578,12 +2579,31 @@ parse_command_line_options() {
 
                 REQUIRE_CLIENT_CERT=1
 
-                # check the second parameter if it exist
+                # check the second optional parameter if it exist
                 if [ $# -gt 1 ] ; then
                     if [ "${2%${2#?}}"x = '-x' ] ; then
                         shift
                     else
                         REQUIRE_CLIENT_CERT_CAS=$2
+                        shift 2
+                    fi
+                else
+                        shift
+                fi
+
+                ;;
+
+            --ignore-connection-state)
+
+                # default OK
+                IGNORE_CONNECTION_STATE="${STATUS_OK}"
+
+                # check the second optional parameter if it exist
+                if [ $# -gt 1 ] ; then
+                    if [ "${2%${2#?}}"x = '-x' ] ; then
+                        shift
+                    else
+                        IGNORE_CONNECTION_STATE=$2
                         shift 2
                     fi
                 else
@@ -3057,6 +3077,12 @@ main() {
         SSL_AU="-sigalgs '${SSL_AU}'"
     fi
 
+    if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+        if ! echo "${IGNORE_CONNECTION_STATE}" | grep -q '^[0-3]$' ; then
+            unknown "The specified state (${IGNORE_CONNECTION_STATE}) is not valid (must be 0,1,2 or 3)"
+        fi
+    fi
+
     #######################
     # Check needed programs
 
@@ -3084,8 +3110,11 @@ main() {
 
     # cURL
     if [ -z "${CURL_BIN}" ] ; then
-        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ] || [ -n "${CRL}" ] ; then
-            debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}"
+        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
+               [ -n "${OCSP}" ] ||
+               [ -n "${CRL}" ] ||
+               [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+            debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}"
             debuglog "cURL binary not specified"
 
             check_required_prog curl
@@ -3536,6 +3565,46 @@ main() {
             unknown 'OpenSSL s_client does not support DNS-based Authentication of Named Entities'
         fi
     fi
+
+    ################################################################################
+    # Connection check
+    if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+
+        debuglog "Testing connection with ${HOST}:${PORT} with timeout ${TIMEOUT}"
+
+        # we check with cURL if a connection is possible
+        "${CURL_BIN}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" > /dev/null
+        if [ $? -eq 28 ]  ; then
+
+            debuglog "  connection timed out: exiting with code ${IGNORE_CONNECTION_STATE}"
+
+            case "${IGNORE_CONNECTION_STATE}" in
+                "${STATUS_OK}")
+                    echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_OK}"
+                    ;;
+                "${STATUS_WARNING}")
+                    echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_WARNING}"
+                    ;;
+                "${STATUS_CRITICAL}")
+                    echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_CRITICAL}"
+                    ;;
+                "${STATUS_UNKNOWN}")
+                    unknown "Cannot connect to ${HOST}:${PORT}"
+                    ;;
+                *)
+                    uknown "Wrong exit code () specified for --ignore-connection-problem"
+                    ;;
+            esac
+
+            exit
+
+        fi
+
+    fi
+
     ################################################################################
     # Fetch the X.509 certificate
 

@@ -1,3 +1,7 @@
+2021-09-29  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (main): Added an option to set a custom state by connection failures
+
 2021-09-27  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (hours_until): supporting certificate expiration after 2038-01-19 on 32 bit systems

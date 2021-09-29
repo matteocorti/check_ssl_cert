@@ -64,6 +64,7 @@ Options:
       --http-use-get               use GET instead of HEAD (default) for the HTTP
                                    related checks
       --ignore-altnames            ignores alternative names when matching pattern specified in -n (or the host name)
+      --ignore-connection-problems [state] in case of connection problems returns OK or the optional state
       --ignore-exp                 ignore expiration date
       --ignore-host-cn             do not complain if the CN does not match the host name
       --ignore-ocsp                do not check revocation with OCSP
