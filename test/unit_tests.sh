@@ -1098,25 +1098,25 @@ testMaxDateOn32BitSystems() {
 }
 
 testIgnoreConnectionStateOK() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_OK}"
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_OK}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateWARNING() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_WARNING}"
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateCRITICAL() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_CRITICAL}"
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_CRITICAL}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateWARNING() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state "${NAGIOS_WARNING}"
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }

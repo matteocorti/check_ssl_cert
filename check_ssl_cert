@@ -2593,7 +2593,7 @@ parse_command_line_options() {
 
                 ;;
 
-            --ignore-connection-state)
+            --ignore-connection-problems)
 
                 # default OK
                 IGNORE_CONNECTION_STATE="${STATUS_OK}"
@@ -3573,8 +3573,18 @@ main() {
         debuglog "Testing connection with ${HOST}:${PORT} with timeout ${TIMEOUT}"
 
         # we check with cURL if a connection is possible
+	debuglog "Executing: ${CURL_BIN} --silent --connect-timeout ${TIMEOUT} ${HOST}:${PORT}"
+
         "${CURL_BIN}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" > /dev/null
-        if [ $? -eq 28 ]  ; then
+	CURL_EXIT_STATUS=$?
+
+	debuglog "  cURL exited with status ${CURL_EXIT_STATUS}"
+
+	# cURL exit codes
+	# -  7 Failed to connect to host
+	# - 28 Timeout
+        if [ "${CURL_EXIT_STATUS}" -eq 28 ] ||
+	       [ "${CURL_EXIT_STATUS}" -eq 7 ] ; then
 
             debuglog "  connection timed out: exiting with code ${IGNORE_CONNECTION_STATE}"
 
