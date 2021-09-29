@@ -669,12 +669,6 @@ testBadSSLSHA12017() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testMultipleOCSPHosts() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H netlock.hu --critical 1 --warning 2
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 testRequireOCSP() {
     ${SCRIPT} --rootcert-file cabundle.crt -H videolan.org --require-ocsp-stapling --critical 1 --warning 2
     EXIT_CODE=$?
