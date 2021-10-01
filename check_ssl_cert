@@ -181,7 +181,7 @@ usage() {
     echo "      --resolve ip                 provides a custom IP address for the specified host"
     echo "   -s,--selfsigned                 allows self-signed certificates"
     echo "      --serial serialnum           pattern to match the serial number"
-    echo "      --skip-element number        skip checks on N cert element from the begining of the chain"
+    echo "      --skip-element number        skips checks on the Nth cert element (can be specified multiple times)"
     echo "      --sni name                   sets the TLS SNI (Server Name Indication) extension"
     echo "                                   in the ClientHello message to 'name'"
     echo "      --ssl2                       forces SSL version 2"
@@ -2403,7 +2403,11 @@ parse_command_line_options() {
                 ;;
             --skip-element)
                 check_option_argument '--skip-element' "$2"
-                SKIP_ELEMENT="$2"
+                if [ -z "${SKIP_ELEMENT}" ] ; then
+                    SKIP_ELEMENT="$2"
+                else
+                    SKIP_ELEMENT="${SKIP_ELEMENT}\n$2"
+                fi
                 shift 2
                 ;;
             --fingerprint)
@@ -2703,7 +2707,7 @@ main() {
     REQUIRE_SAN=""
     RSA=""
     SCT="1" # enabled by default
-    SKIP_ELEMENT=0
+    SKIP_ELEMENT=""
     SNI=""
     TIMEOUT="120"
     VERBOSE="0"
@@ -3827,37 +3831,59 @@ main() {
         VALID_ATTRIBUTES=",lastupdate,nextupdate,issuer,"
         ISSUERS="$(extract_cert_attribute 'issuer' "${CERT}")"
     else
-        # we need to remove everything before 'CN = ', to remove an eventual email supplied with / and additional elements (after ', ')
+
+        # we need to remove everything before 'CN = ', to remove an eventual email
+        # supplied with / and additional elements (after ', ')
+
         if ! CN="$(extract_cert_attribute 'cn' "${CERT}")"; then
             if [ -z "${ALTNAMES}" ] ; then
+                debuglog "certificate without common name (CN), enabling altername names"
                 verboselog "certificate without common name (CN), enabling altername names"
                 ALTNAMES=1
             fi
         fi
 
         SUBJECT="$(extract_cert_attribute 'subject' "${CERT}")"
+        debuglog "SUBJECT = ${SUBJECT}"
 
         SERIAL="$(extract_cert_attribute 'serial' "${CERT}")"
+        debuglog "SERIAL = ${SERIAL}"
 
         FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
+        debuglog "FINGEPRINT = ${FINGERPRINT}"
 
         # TO DO: we just take the first result: a loop over all the hosts should
+        # be implemented
         OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
+        debuglog "OCSP_URI = ${OCSP_URI}"
+
+        # Extract the issuers
+        debuglog "Extracting issuers"
 
         # count the certificates in the chain
         NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+        debuglog "  Number of certificates in the chain: ${NUM_CERTIFICATES}"
+
 
         # start with first certificate
-        debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
-        CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
-
+        CERT_IN_CHAIN=1
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
+
+            debuglog "    extracting issuer for element ${CERT_IN_CHAIN}"
+            if echo "${SKIP_ELEMENT}" | grep -q "${CERT_IN_CHAIN}" ; then
+                debuglog "    skipping element ${CERT_IN_CHAIN}"
+                CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
+                continue
+            fi
+
             if [ -n "${ISSUERS}" ]; then
                 ISSUERS="${ISSUERS}\\n"
             fi
             CERT_ELEMENT="$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
-                               awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')"
-            ISSUERS="${ISSUERS}$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}")"
+                                                   awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')"
+            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}")"
+            debuglog "      ELEMENT_ISSUER=${ELEMENT_ISSUER}"
+            ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
 
             CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
             if ! [ "${ELEMENT}" -eq 0 ] && [ $(( ELEMENT - CERT_IN_CHAIN )) -lt 0 ]; then
@@ -4209,15 +4235,23 @@ main() {
             # count the certificates in the chain
             NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
-            debuglog "Skipping ${SKIP_ELEMENT} element of the chain"
 
-            CERT_IN_CHAIN=$(( SKIP_ELEMENT + 1 ))
-            while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
+            CERT_IN_CHAIN=1
+            while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ] ; do
+
+                debuglog '------------------------------------------------------------------------------'
+                debuglog "-- Checking element ${CERT_IN_CHAIN}"
+
+                if echo "${SKIP_ELEMENT}" | grep -q "${CERT_IN_CHAIN}" ; then
+                    debuglog "    skipping element ${CERT_IN_CHAIN}"
+                    CERT_IN_CHAIN=$(( CERT_IN_CHAIN + 1 ))
+                    continue
+                fi
+
                 elem_number=$((CERT_IN_CHAIN))
                 chain_element=$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" | \
                                     awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')
 
-                debuglog '------------------------------------------------------------------------------'
                 check_cert_end_date "${chain_element}" "${elem_number}"
 
                 debuglog '------------------------------------------------------------------------------'
@@ -4232,7 +4266,9 @@ main() {
                 if ! [ "${ELEMENT}" -eq 0 ] && [ $(( ELEMENT - CERT_IN_CHAIN )) -lt 0 ]; then
                     break
                 fi
+
             done
+
         fi
 
     fi

@@ -1,3 +1,7 @@
+2021-10-01  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_attr): --skip-elemnt now skips a single element and can be specified multiple times
+
 2021-09-29  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Added an option to set a custom state by connection failures

@@ -132,7 +132,7 @@ Options:
       --resolve ip                 provides a custom IP address for the specified host
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
-      --skip-element number        skip checks on N cert element from the begining of the chain
+      --skip-element number        skips checks on the Nth cert element (can be specified multiple times)
       --sni name                   sets the TLS SNI (Server Name Indication) extension
                                    in the ClientHello message to 'name'
       --ssl2                       forces SSL version 2

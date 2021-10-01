@@ -1,3 +1,5 @@
+2021-10-01 Version   2.9.0: The --skip-element option can now be specified multiple times and specifies to skip a single
+                            element of the certificate chain
 2021-09-29 Version   2.8.0: Adds a check for acceptable client certificate CAs (--require-client-cert [list])
                             Supporting certificate expiration after 2038-01-19 on 32 bit systems
                             Adds an option (--ignore-connection-problem)  to set a custom state in case of connection failures
