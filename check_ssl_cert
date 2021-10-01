@@ -1950,6 +1950,10 @@ fetch_certificate() {
 
             prepend_critical_message 'No TLS connection possible'
 
+        elif ascii_grep 'tlsv1 alert decode error' "${ERROR}" ; then
+
+            prepend_critical_message 'Error decoding certificate'
+
         elif ascii_grep 'Operation\ timed\ out' "${ERROR}" ; then
 
             ERROR='OpenSSL timed out'
@@ -2406,7 +2410,7 @@ parse_command_line_options() {
                 if [ -z "${SKIP_ELEMENT}" ] ; then
                     SKIP_ELEMENT="$2"
                 else
-                    SKIP_ELEMENT="${SKIP_ELEMENT}\n$2"
+                    SKIP_ELEMENT="${SKIP_ELEMENT}\\n$2"
                 fi
                 shift 2
                 ;;
