@@ -43,6 +43,7 @@ Options:
    -d,--debug                      produces debugging output (can be specified more than once)
       --debug-cert                 stores the retrieved certificates in the current directory
       --debug-file file            writes the debug messages to file
+      --debug-time                 writes timing information in the debugging output
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
       --element number             checks up to the N cert element from the beginning of the chain

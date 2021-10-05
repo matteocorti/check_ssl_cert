@@ -1,3 +1,4 @@
+added an option (--debug-time) to print the elapsed time in the debugging output
 2021-10-01 Version   2.9.0: The --skip-element option can now be specified multiple times and specifies to skip a single
                             element of the certificate chain
 2021-09-29 Version   2.8.0: Adds a check for acceptable client certificate CAs (--require-client-cert [list])

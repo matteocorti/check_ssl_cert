@@ -1,3 +1,7 @@
+2021-10-05  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (debuglog): added an option (--debug-time) to print the elapsed time in the debugging output
+
 2021-10-01  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_attr): --skip-elemnt now skips a single element and can be specified multiple times

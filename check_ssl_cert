@@ -92,6 +92,7 @@ usage() {
     echo "   -d,--debug                      produces debugging output (can be specified more than once)"
     echo "      --debug-cert                 stores the retrieved certificates in the current directory"
     echo "      --debug-file file            writes the debug messages to file"
+    echo "      --debug-time                 writes timing information in the debugging output"
     echo "      --dig-bin path               path of the dig binary to be used"
     echo "      --ecdsa                      signature algorithm selection: force ECDSA certificate"
     echo "      --element number             checks up to the N cert element from the beginning of the chain"
@@ -239,19 +240,25 @@ debuglog() {
     MESSAGE=$1
     LEVEL=$2
 
+    if [ -n "${DEBUG_TIME}" ] ; then
+        NOW=$( date +%s )
+        ELAPSED=$(( NOW - DEBUG_TIME ))
+        ELAPSED=": ${ELAPSED}"
+    fi
+
     if [ -z "${LEVEL}" ] ; then
         #default
         LEVEL=1
     fi
 
     if [ "${LEVEL}" -le "${DEBUG}" ] ; then
-        echo "${1}" | sed 's/^/[DBG] /' >&2
+        echo "${1}" | sed "s/^/[DBG${ELAPSED}] /" >&2
     fi
 
     # debuglog is also called during the --debug-file sanity checks: we have
     # to check if the file exists
     if [ -n "${DEBUG_FILE}" ] && [ -e "${DEBUG_FILE}" ] && ! [ -d "${DEBUG_FILE}" ] && [ -w "${DEBUG_FILE}" ] ; then
-        echo "${1}" >> "${DEBUG_FILE}"
+        echo "${1}${ELAPSED}" >> "${DEBUG_FILE}"
     fi
 
 }
@@ -2091,6 +2098,11 @@ parse_command_line_options() {
                 ;;
             --debug-cert)
                 DEBUG_CERT=1
+                shift
+                ;;
+            --debug-time)
+                # start time
+                DEBUG_TIME=$( date +%s )
                 shift
                 ;;
             -h|--help|-\?)
