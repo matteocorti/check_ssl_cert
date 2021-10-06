@@ -50,6 +50,10 @@ format:
 ifndef SHFMT
 	echo "No shfmt installed"
 else
+# -p POSIX
+# -w write to file
+# -s simplify
+# -i 4 indent with 4 spaces
 	shfmt -p -w -s -i 4 $(SCRIPTS)
 endif
 
