@@ -69,6 +69,7 @@ usage() {
     echo "Options:"
     echo "   -A,--noauth                     ignore authority warnings (expiration only)"
     echo "      --all                        enables all the possible optional checks at the maximum level"
+    echo "      --all-local                  enables all the possible optional checks at the maximum level (without SSL-Labs)"
     echo "      --allow-empty-san            allow certificates without Subject Alternative Names (SANs)"
     echo "      --check-ciphers grade        checks the offered ciphers"
     echo "      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher"
@@ -189,8 +190,6 @@ usage() {
     echo "      --ssl2                       forces SSL version 2"
     echo "      --ssl3                       forces SSL version 3"
     echo "      --require-ocsp-stapling      require OCSP stapling"
-    echo "      --require-san                require the presence of a Subject Alternative Name"
-    echo "                                   extension"
     echo "   -r,--rootcert path              root certificate or directory to be used for"
     echo "                                   certificate validation"
     echo "      --rootcert-dir path          root directory to be used for certificate validation"
@@ -221,6 +220,8 @@ usage() {
     echo "                                   (see --critical and --warning)"
     echo "   -N,--host-cn                    match CN with the host name (enabled by default)"
     echo "      --ocsp                       check revocation via OCSP (enabled by default)"
+    echo "      --require-san                require the presence of a Subject Alternative Name"
+    echo "                                   extension"
     echo "   -S,--ssl version                force SSL version (2,3)"
     echo "                                   (see: --ssl2 or --ssl3)"
     echo
@@ -2088,8 +2089,12 @@ parse_command_line_options() {
                 ALL=1
                 shift
                 ;;
+            --all-local)
+                ALL_LOCAL=1
+                shift
+                ;;
             --allow-empty-san)
-                ALLOW_EMPTY_SAN=1
+                REQUIRE_SAN=""
                 shift
                 ;;
             --altnames)
@@ -2739,7 +2744,7 @@ main() {
     PROMETHEUS_OUTPUT_DAYS=""
     PROXY=""
     REQUIRE_OCSP_STAPLING=""
-    REQUIRE_SAN=""
+    REQUIRE_SAN=1
     RSA=""
     SCT="1" # enabled by default
     SKIP_ELEMENT=""
@@ -2848,11 +2853,19 @@ main() {
 
         # enable ciphers warnings
         CHECK_CIPHERS_WARNINGS=1
-
+        
         # enable ciphers checks (level A)
         SSL_LAB_CRIT_ASSESSMENT='A'
 
-        REQUIRE_SAN=1
+    fi
+
+    if [ -n "${ALL_LOCAL}" ] ; then
+
+        # enable ciphers checks (level A)
+        CHECK_CIPHERS='A'
+
+        # enable ciphers warnings
+        CHECK_CIPHERS_WARNINGS=1
 
     fi
 
@@ -4097,7 +4110,7 @@ main() {
 
         fi
 
-        if [ -z "${ALLOW_EMPTY_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
+        if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
 
             prepend_critical_message "The certificate does not have any Subject Alternative Names"
 

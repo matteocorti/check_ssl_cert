@@ -24,6 +24,9 @@ ignore authority warnings (expiration only)
 .BR "    --all"
 enables all the possible optional checks at the maximum level
 .TP
+.BT "    --all-local"
+enables all the possible optional checks at the maximum level (without SSL-Labs)
+.TP
 .BR "    --allow-empty-san"
 allow certificates without Subject Alternative Names (SANs)
 .TP
@@ -295,9 +298,6 @@ force SSL version 3
 .BR "   --require-ocsp-stapling"
 require OCSP stapling
 .TP
-.BR "   --require-san"
-require the presence of a Subject Alternative Name extension
-.TP
 .BR "-r,--rootcert" " cert"
 root certificate or directory to be used for certificate validation (passed to openssl's -CAfile or -CApath)
 .TP
@@ -360,6 +360,9 @@ minimum number of days a certificate has to be valid (see --critical and --warni
 .TP
 .BR "   --ocsp"
 check revocation via OCSP
+.TP
+.BR "   --require-san"
+require the presence of a Subject Alternative Name extension
 .TP
 .BR "-S,--ssl" " version"
 force SSL version (2,3) (see: --ssl2 or --ssl3)
