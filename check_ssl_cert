@@ -2853,7 +2853,7 @@ main() {
 
         # enable ciphers warnings
         CHECK_CIPHERS_WARNINGS=1
-        
+
         # enable ciphers checks (level A)
         SSL_LAB_CRIT_ASSESSMENT='A'
 
