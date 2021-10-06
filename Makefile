@@ -50,7 +50,7 @@ format:
 ifndef SHFMT
 	echo "No shfmt installed"
 else
-	shfmt -p -w $(SCRIPTS)
+	shfmt -p -w -s $(SCRIPTS)
 endif
 
 clean:

@@ -923,7 +923,7 @@ extract_cert_attribute() {
 	cn)
 		if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject 2>/dev/null | grep -F -q 'CN' >/dev/null; then
 			echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject |
-				sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//" -e "s/\\/[[:alpha:]][[:alpha:]]*=.*\$//" -e "s/,.*//"
+				sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//" -e 's/\/[[:alpha:]][[:alpha:]]*=.*$//' -e "s/,.*//"
 		else
 			echo 'CN unavailable'
 			return 1
@@ -957,7 +957,7 @@ extract_cert_attribute() {
 		echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
 		;;
 	org)
-		echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject | sed -e "s/.*\\/O=//" -e "s/\\/.*//"
+		echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject | sed -e 's/.*\/O=//' -e 's/\/.*//'
 		;;
 	email)
 		echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
@@ -983,7 +983,7 @@ extract_cert_attribute() {
 			tail -n 1 |
 			sed -e "s/DNS://g" |
 			sed -e "s/,//g" |
-			sed -e "s/^\\ *//"
+			sed -e 's/^\ *//'
 		;;
 	*)
 		return 1
@@ -1023,7 +1023,7 @@ exec_with_timeout() {
 
 	if [ -n "${TIMEOUT_BIN}" ]; then
 
-		debuglog "$(printf "%s %s %s\\n" "${TIMEOUT_BIN}" "${time}" "${command}")"
+		debuglog "$(printf '%s %s %s\n' "${TIMEOUT_BIN}" "${time}" "${command}")"
 
 		# We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
 		# https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
@@ -1108,7 +1108,7 @@ EOT
 
 	else
 
-		debuglog "$(printf "%s\\n" eval "${command}")"
+		debuglog "$(printf '%s\n' eval "${command}")"
 
 		eval "${command}" >"${OUTFILE}" 2>"${ERRFILE}"
 		RET=$?
@@ -1390,7 +1390,7 @@ check_ocsp() {
 
 			debuglog "OCSP: URI = ${OCSP_URI}"
 
-			OCSP_HOST="$(echo "${OCSP_URI}" | sed -e "s@.*//\\([^/]\\+\\)\\(/.*\\)\\?\$@\\1@g" | sed 's/^http:\/\///' | sed 's/\/.*//')"
+			OCSP_HOST="$(echo "${OCSP_URI}" | sed -e 's@.*//\([^/]\+\)\(/.*\)\?$@\1@g' | sed 's/^http:\/\///' | sed 's/\/.*//')"
 
 			debuglog "OCSP: host = ${OCSP_HOST}"
 
@@ -3946,7 +3946,7 @@ main() {
 	# Handle properly openssl x509 -issuer -noout output format differences:
 	# OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
 	# OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-	ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e "s/^issuer=( \\/)?//" | awk '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
+	ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e 's/^issuer=( \/)?//' | awk '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
 
 	debuglog 'ISSUERS = '
 	debuglog "${ISSUERS}"
@@ -4044,7 +4044,7 @@ main() {
 		if [ "${LONG_OUTPUT_ATTR}" = "all" ]; then
 			LONG_OUTPUT_ATTR="${VALID_ATTRIBUTES}"
 		fi
-		attributes=$(echo "${LONG_OUTPUT_ATTR}" | tr ',' "\\n")
+		attributes=$(echo "${LONG_OUTPUT_ATTR}" | tr ',' '\n')
 		for attribute in ${attributes}; do
 			check_attr "${attribute}"
 		done
@@ -4078,7 +4078,7 @@ main() {
 		if [ "$(is_ip "${COMMON_NAME}")" -eq 0 ]; then
 
 			# Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
-			if echo "${CN}" | grep -q -i "^\\*\\."; then
+			if echo "${CN}" | grep -q -i '^\*\.'; then
 
 				# Or the literal with the wildcard
 				debuglog "checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"
@@ -4142,7 +4142,7 @@ main() {
 
 							debuglog "check Altname: ${alt_name}"
 
-							if echo "${alt_name}" | grep -q -i "^\\*\\."; then
+							if echo "${alt_name}" | grep -q -i '^\*\.'; then
 
 								# Match the domain
 								debuglog "the altname ${alt_name} begins with a '*'"
@@ -4224,7 +4224,7 @@ main() {
 			ok="true"
 		else
 			# this looks ugly but preserves spaces in CA name
-			prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+			prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")')"
 		fi
 
 	fi
@@ -4244,7 +4244,7 @@ main() {
 
 		if [ -n "${CA_ISSUER_MATCHED}" ]; then
 			# this looks ugly but preserves spaces in CA name
-			prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed "s/|\$//g" | sed "s/|/\\' or \\'/g")')"
+			prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")')"
 		else
 			ok="true"
 			CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | grep -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
@@ -4656,7 +4656,7 @@ main() {
 	CHECKEDNAMES=""
 	if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
 		CHECKEDNAMES="(${COMMON_NAME}) "
-	elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i "^\\*\\."; then
+	elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
 		CHECKEDNAMES="(${COMMON_NAME}) "
 	fi
 
