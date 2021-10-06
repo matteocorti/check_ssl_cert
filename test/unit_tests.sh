@@ -851,20 +851,20 @@ testNotLongerValidThan() {
 }
 
 testDERCert() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./der.cer --ignore-sct --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./der.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testDERCertSymbolicLink() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./derlink.cer --ignore-sct --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./derlink.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPKCS12Cert() {
     export PASS=
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2 --allow-empty-san
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1028,7 +1028,7 @@ testCertExpiringInLessThanOneDay() {
 
     CERT=$( createSelfSignedCertificate 1 )
 
-    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned
+    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned --allow-empty-san
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
@@ -1079,12 +1079,12 @@ testMaxDateOn32BitSystems() {
     # generate a cert expiring after 2038-01-19
     CERT=$( createSelfSignedCertificate 7000 )
 
-    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned
+    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
-    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned 2>&1 | grep -q 'invalid\ date'
+    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san 2>&1 | grep -q 'invalid\ date'
     EXIT_CODE=$?
 
     assertEquals "Invalid date" 1 "${EXIT_CODE}"
