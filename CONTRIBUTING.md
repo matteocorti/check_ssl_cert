@@ -10,6 +10,7 @@ If possible give a real-life example that can be tested (e.g., a public host)
 
  * Always write clear log messages for your commits
  * Check the code with [ShellCheck](https://www.shellcheck.net)
+ * Always format the code with [shfmt](https://github.com/mvdan/sh)
  * Always log your changes in the ChangeLog file
  * Always test the changes `make test` and be sure that all the tests are passed
  * If possible write some tests to validate the changes you did to the plugin
