@@ -20,6 +20,7 @@ Arguments:
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
       --all                        enables all the possible optional checks at the maximum level
+      --allow-empty-san            allow certificates without Subject Alternative Names (SANs)
       --check-ciphers grade        checks the offered ciphers
       --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher
    -C,--clientcert path            use client certificate to authenticate

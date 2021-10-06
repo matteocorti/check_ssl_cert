@@ -69,6 +69,7 @@ usage() {
     echo "Options:"
     echo "   -A,--noauth                     ignore authority warnings (expiration only)"
     echo "      --all                        enables all the possible optional checks at the maximum level"
+    echo "      --allow-empty-san            allow certificates without Subject Alternative Names (SANs)"
     echo "      --check-ciphers grade        checks the offered ciphers"
     echo "      --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher"
     echo "   -C,--clientcert path            use client certificate to authenticate"
@@ -2087,6 +2088,10 @@ parse_command_line_options() {
                 ALL=1
                 shift
                 ;;
+            --allow-empty-san)
+                ALLOW_EMPTY_SAN=1
+                shift
+                ;;
             --altnames)
                 ALTNAMES=1
                 shift
@@ -2392,6 +2397,13 @@ parse_command_line_options() {
             -H|--host)
                 check_option_argument '-H|--host' "$2"
                 HOST="$2"
+                # remove http[s] from the input
+                if echo "${HOST}" | grep -F -q '://' ; then
+                    # try to remove the protocol (we do not consider URLs withour
+                    # an authority (https://en.wikipedia.org/wiki/URL)
+                    debuglog "Stripping protocol and path from URL"
+                    HOST=$( echo "${HOST}" | sed 's/^[a-z]*:\/\///' | sed 's/\/.*//' )
+                fi
                 shift 2
                 ;;
             -i|--issuer)
@@ -4085,89 +4097,97 @@ main() {
 
         fi
 
-        # Check alternate names
-        #   SUBJECT_ALTERNATIVE_NAME can also be empty
+        if [ -z "${ALLOW_EMPTY_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
 
-        if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
+            prepend_critical_message "The certificate does not have any Subject Alternative Names"
 
-            if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ] ; then
+        else
 
-                debuglog "Checking alternate names"
+            # Check alternate names
+            #   SUBJECT_ALTERNATIVE_NAME can also be empty
 
-                for cn in ${COMMON_NAME} ; do
+            if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ] ; then
 
-                    if [ "$( is_ip "${cn}" )" -eq 1 ] ; then
-                        verboselog "Skipping the matching of ${cn} as it is an IP address"
-                        continue
-                    fi
+                if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ] ; then
 
-                    ok=""
+                    debuglog "Checking alternate names"
 
-                    debuglog '==============================='
-                    debuglog "checking altnames against ${cn}"
-                    debuglog "  SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
+                    for cn in ${COMMON_NAME} ; do
 
-                    for alt_name in ${SUBJECT_ALTERNATIVE_NAME} ; do
-
-                        debuglog "check Altname: ${alt_name}"
-
-                        if echo "${alt_name}" | grep -q -i "^\\*\\." ; then
-
-                            # Match the domain
-                            debuglog "the altname ${alt_name} begins with a '*'"
-                            debuglog "checking if the common name matches ^$(echo "${alt_name}" | cut -c 3-)\$"
-
-                            if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
-                                debuglog "the common name ${cn} matches ^$( echo "${alt_name}" | cut -c 3- )\$"
-                                ok="true"
-
-                            fi
-
-                            # Or the literal with the wildcard
-                            debuglog "checking if the common name matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
-
-                            if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$" ; then
-                                debuglog "the common name ${cn} matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
-                                ok="true"
-                            fi
-
-                            # Or if both are exactly the same
-                            debuglog "checking if the common name matches ^${alt_name}\$"
-
-                            if echo "${cn}" | grep -q -i "^${alt_name}\$" ; then
-                                debuglog "the common name ${cn} matches ^${alt_name}\$"
-                                ok="true"
-                            fi
-
-                        else
-
-                            if echo "${cn}" | grep -q -i "^${alt_name}$" ; then
-                                ok="true"
-                            fi
-
+                        if [ "$( is_ip "${cn}" )" -eq 1 ] ; then
+                            verboselog "Skipping the matching of ${cn} as it is an IP address"
+                            continue
                         fi
 
-                        if [ -n "${ok}" ] ; then
+                        ok=""
+
+                        debuglog '==============================='
+                        debuglog "checking altnames against ${cn}"
+                        debuglog "  SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
+
+                        for alt_name in ${SUBJECT_ALTERNATIVE_NAME} ; do
+
+                            debuglog "check Altname: ${alt_name}"
+
+                            if echo "${alt_name}" | grep -q -i "^\\*\\." ; then
+
+                                # Match the domain
+                                debuglog "the altname ${alt_name} begins with a '*'"
+                                debuglog "checking if the common name matches ^$(echo "${alt_name}" | cut -c 3-)\$"
+
+                                if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | cut -c 3-)\$" ; then
+                                    debuglog "the common name ${cn} matches ^$( echo "${alt_name}" | cut -c 3- )\$"
+                                    ok="true"
+
+                                fi
+
+                                # Or the literal with the wildcard
+                                debuglog "checking if the common name matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
+
+                                if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$" ; then
+                                    debuglog "the common name ${cn} matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/' )\$"
+                                    ok="true"
+                                fi
+
+                                # Or if both are exactly the same
+                                debuglog "checking if the common name matches ^${alt_name}\$"
+
+                                if echo "${cn}" | grep -q -i "^${alt_name}\$" ; then
+                                    debuglog "the common name ${cn} matches ^${alt_name}\$"
+                                    ok="true"
+                                fi
+
+                            else
+
+                                if echo "${cn}" | grep -q -i "^${alt_name}$" ; then
+                                    ok="true"
+                                fi
+
+                            fi
+
+                            if [ -n "${ok}" ] ; then
+                                break;
+                            fi
+
+                        done
+
+                        if [ -z "${ok}" ] ; then
+                            fail="${cn}"
                             break;
                         fi
 
                     done
 
-                    if [ -z "${ok}" ] ; then
-                        fail="${cn}"
-                        break;
-                    fi
-
-                done
-
-            fi
-
-            if [ -n "${fail}" ] ; then
-                prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
-            else
-                if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ] ; then
-                    prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
                 fi
+
+                if [ -n "${fail}" ] ; then
+                    prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
+                else
+                    if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ] ; then
+                        prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
+                    fi
+                fi
+
             fi
 
         fi

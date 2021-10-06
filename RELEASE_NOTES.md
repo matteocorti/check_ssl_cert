@@ -1,2 +1,2 @@
- * Accepts certificates without subject alternative names
- * Added an option (```--debug-time```) to print the elapsed time in the debugging output
+Does not accept certificates without SANs (use ```--allow-empty-san``` to ignore)
+
