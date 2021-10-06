@@ -1,3 +1,8 @@
+2021-10-06  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (check_ocsp): better handling of HTML pages instead of certificates
+	* check_ssl_cert (check_attr): accepts certificates without subject alternative names
+
 2021-10-05  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (debuglog): added an option (--debug-time) to print the elapsed time in the debugging output

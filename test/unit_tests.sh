@@ -1045,25 +1045,25 @@ testAcceptableClientCertCAMissing() {
 
 }
 
-testAcceptableClientCertCAGeneric() {
+# not responding: should find something new
 
-    ${SCRIPT} -H klik.nlb.si --require-client-cert
-    EXIT_CODE=$?
+# testAcceptableClientCertCAGeneric() {
+#
+#     ${SCRIPT} -H klik.nlb.si --require-client-cert
+#     EXIT_CODE=$?
+#
+#     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#
+# }
 
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-
-
-}
-
-testAcceptableClientCertCAList() {
-
-    ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB
-    EXIT_CODE=$?
-
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-
-
-}
+# testAcceptableClientCertCAList() {
+#
+#     ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB
+#     EXIT_CODE=$?
+#
+#     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#
+# }
 
 testAcceptableClientCertCAListWrong() {
 
