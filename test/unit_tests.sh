@@ -1124,6 +1124,12 @@ testIgnoreConnectionStateError() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
+testSubdomainWithUnderscore() {
+    ${SCRIPT} -H _test.github.com
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
