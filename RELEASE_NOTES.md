@@ -1,1 +1,3 @@
-The ```--skip-element``` option can now be specified multiple times and specifies to skip a single element of the certificate chain
+ * Does not accept certificates without SANs (use ```--allow-empty-san``` to ignore)
+ * Bug fix in the handling of errors while fetching certificates
+ * Allows a check on invalid FQDNs containing an underscore

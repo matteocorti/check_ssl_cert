@@ -20,6 +20,8 @@ Arguments:
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
       --all                        enables all the possible optional checks at the maximum level
+      --all-local                  enables all the possible optional checks at the maximum level (without SSL-Labs)
+      --allow-empty-san            allow certificates without Subject Alternative Names (SANs)
       --check-ciphers grade        checks the offered ciphers
       --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher
    -C,--clientcert path            use client certificate to authenticate
@@ -43,6 +45,7 @@ Options:
    -d,--debug                      produces debugging output (can be specified more than once)
       --debug-cert                 stores the retrieved certificates in the current directory
       --debug-file file            writes the debug messages to file
+      --debug-time                 writes timing information in the debugging output
       --dig-bin path               path of the dig binary to be used
       --ecdsa                      signature algorithm selection: force ECDSA certificate
       --element number             checks up to the N cert element from the beginning of the chain
@@ -138,8 +141,6 @@ Options:
       --ssl2                       forces SSL version 2
       --ssl3                       forces SSL version 3
       --require-ocsp-stapling      require OCSP stapling
-      --require-san                require the presence of a Subject Alternative Name
-                                   extension
    -r,--rootcert path              root certificate or directory to be used for
                                    certificate validation
       --rootcert-dir path          root directory to be used for certificate validation
@@ -170,6 +171,8 @@ Deprecated options:
                                    (see --critical and --warning)
    -N,--host-cn                    match CN with the host name (enabled by default)
       --ocsp                       check revocation via OCSP (enabled by default)
+      --require-san                require the presence of a Subject Alternative Name
+                                   extension
    -S,--ssl version                force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
 

@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "October, 2021" "2.9.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "October, 2021" "2.9.1" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -23,6 +23,12 @@ ignore authority warnings (expiration only)
 .TP
 .BR "    --all"
 enables all the possible optional checks at the maximum level
+.TP
+.BT "    --all-local"
+enables all the possible optional checks at the maximum level (without SSL-Labs)
+.TP
+.BR "    --allow-empty-san"
+allow certificates without Subject Alternative Names (SANs)
 .TP
 .BR "   --altnames"
 matches the pattern specified in -n with alternate names too
@@ -80,7 +86,10 @@ produces debugging output (can be specified more than once)
 stores the retrieved certificates in the current directory
 .TP
 .BR "   --debug-file" " file"
-writes the debug messages to file
+writes the debue messages to file
+.TP
+.BR "   --debug-time"
+writes timing information in the debugging output
 .TP
 .BR "   --dig-bin" " path"
 path of the dig binary to be used
@@ -289,9 +298,6 @@ force SSL version 3
 .BR "   --require-ocsp-stapling"
 require OCSP stapling
 .TP
-.BR "   --require-san"
-require the presence of a Subject Alternative Name extension
-.TP
 .BR "-r,--rootcert" " cert"
 root certificate or directory to be used for certificate validation (passed to openssl's -CAfile or -CApath)
 .TP
@@ -354,6 +360,9 @@ minimum number of days a certificate has to be valid (see --critical and --warni
 .TP
 .BR "   --ocsp"
 check revocation via OCSP
+.TP
+.BR "   --require-san"
+require the presence of a Subject Alternative Name extension
 .TP
 .BR "-S,--ssl" " version"
 force SSL version (2,3) (see: --ssl2 or --ssl3)

@@ -5,6 +5,7 @@ DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(P
 YEAR=`date +"%Y"`
 MONTH_YEAR=`date +"%B, %Y"`
 FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* utils/*.sh
+SCRIPTS=check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh utils/format_files.sh
 
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -44,6 +45,18 @@ formatting_check:
 remove_blanks:
 	./utils/format_files.sh $(FORMATTED_FILES)
 
+SHFMT= := $(shell command -v shfmt 2> /dev/null)
+format:
+ifndef SHFMT
+	echo "No shfmt installed"
+else
+# -p POSIX
+# -w write to file
+# -s simplify
+# -i 4 indent with 4 spaces
+	shfmt -p -w -s -i 4 $(SCRIPTS)
+endif
+
 clean:
 	rm -f *~
 	rm -rf rpmroot
@@ -74,7 +87,7 @@ shellcheck:
 ifndef SHELLCHECK
 	echo "No shellcheck installed: skipping check"
 else
-	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh utils/format_files.sh ; else shellcheck check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh ; fi
+	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
 
 copyright_check:
