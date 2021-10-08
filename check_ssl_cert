@@ -2922,6 +2922,12 @@ main() {
         unknown "Invalid host name: ${HOST_NAME}"
     fi
 
+    # we accept unterscrores since some hosts with an underscore exist but these names
+    # are invalid: we issue a small warning
+    if echo "${HOST_NAME}" | grep -q '[\_]' && [ -n "${VERBOSE}" ]; then
+        verboselog "${HOST_NAME} contains an underscore (invalid)"
+    fi
+
     ################################################################################
     # Set COMMON_NAME to hostname if -N was given as argument.
     # COMMON_NAME may be a space separated list of hostnames.
