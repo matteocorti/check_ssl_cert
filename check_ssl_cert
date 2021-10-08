@@ -1965,6 +1965,12 @@ fetch_certificate() {
 
             prepend_critical_message 'Error decoding certificate'
 
+        elif ascii_grep 'gethostbyname failure' "${ERROR}"; then
+
+            ERROR='Invalid host name'
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+
         elif ascii_grep 'Operation\ timed\ out' "${ERROR}"; then
 
             ERROR='OpenSSL timed out'

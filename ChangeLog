@@ -1,1109 +1,1110 @@
 2021-10-08  Matteo Corti  <matteo@corti.li>
 
+        * test/unit_tests.sh (testSubdomainWithUnderscore): does not test with older OpenSSL versions not supporting _
         * check_ssl_cert (fetch_certificate): Fixed a typo
 
 2021-10-06  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_ocsp): better handling of HTML pages instead of certificates
-	* check_ssl_cert (parse_command_line_options): a URL can be given as host (scheme and path will be stripped)
+        * check_ssl_cert (check_ocsp): better handling of HTML pages instead of certificates
+        * check_ssl_cert (parse_command_line_options): a URL can be given as host (scheme and path will be stripped)
 
-	* check_ssl_cert (check_attr): accepts certificates without subject alternative names
+        * check_ssl_cert (check_attr): accepts certificates without subject alternative names
 
 2021-10-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (debuglog): added an option (--debug-time) to print the elapsed time in the debugging output
+        * check_ssl_cert (debuglog): added an option (--debug-time) to print the elapsed time in the debugging output
 
 2021-10-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): --skip-elemnt now skips a single element and can be specified multiple times
+        * check_ssl_cert (check_attr): --skip-elemnt now skips a single element and can be specified multiple times
 
 2021-09-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Added an option to set a custom state by connection failures
+        * check_ssl_cert (main): Added an option to set a custom state by connection failures
 
 2021-09-27  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (hours_until): supporting certificate expiration after 2038-01-19 on 32 bit systems
-	* check_ssl_cert (main): adds a check for acceptable client certificate CAs
-	* test/unit_tests.sh: added a routine to create a self-signed certificate expiring in a given number of days
-	* test/unit_tests.sh: added a test for a certificate expiring between 0.5 and 1.5 days
+        * check_ssl_cert (hours_until): supporting certificate expiration after 2038-01-19 on 32 bit systems
+        * check_ssl_cert (main): adds a check for acceptable client certificate CAs
+        * test/unit_tests.sh: added a routine to create a self-signed certificate expiring in a given number of days
+        * test/unit_tests.sh: added a test for a certificate expiring between 0.5 and 1.5 days
 
 2021-09-25 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* test/unit_tests.sh: adding tests for using floating point numbers in thresholds
+        * test/unit_tests.sh: adding tests for using floating point numbers in thresholds
 
 2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* check_ssl_cert: --warning and --critical now also accept floating point numbers
+        * check_ssl_cert: --warning and --critical now also accept floating point numbers
 
 2021-09-24  Matteo Corti  <corti@precise>
 
-	* test/unit_tests.sh (oneTimeSetup): defining TMPDIR if not defined
+        * test/unit_tests.sh (oneTimeSetup): defining TMPDIR if not defined
 
 2021-09-24 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* test/unit_tests.sh: adding a test for checking a local CRL file
+        * test/unit_tests.sh: adding a test for checking a local CRL file
 
 2021-09-22  Matteo Corti  <matteo@corti.li>
 
-	* Makefile (dist): make dist does not check the format (just builds the distribution)
+        * Makefile (dist): make dist does not check the format (just builds the distribution)
 
 2021-09-21  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): converts local CRLs from DER to PEM
-	* check_ssl_cert (main): does not check renegotiation when checking files
+        * check_ssl_cert (fetch_certificate): converts local CRLs from DER to PEM
+        * check_ssl_cert (main): does not check renegotiation when checking files
 
 2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* test/unit_tests.sh: fixing error with endless ping if IPv6 enabled
+        * test/unit_tests.sh: fixing error with endless ping if IPv6 enabled
 
 2021-09-17 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* check_ssl_cert: fixing error with SCT when checking a CRL file
+        * check_ssl_cert: fixing error with SCT when checking a CRL file
 
 2021-09-17  Matteo Corti  <matteo@corti.li>
 
-	* test/unit_tests.sh (testPrometheus): added test for --prometheus
+        * test/unit_tests.sh (testPrometheus): added test for --prometheus
 
-	* check_ssl_cert: Adding output for Prometheus
+        * check_ssl_cert: Adding output for Prometheus
 
 2021-09-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (critical): Applied a patch to fix the output of multiple errors
-	* check_ssl_cert (main): Automatically assume localhost if --file is specified
+        * check_ssl_cert (critical): Applied a patch to fix the output of multiple errors
+        * check_ssl_cert (main): Automatically assume localhost if --file is specified
 
 2021-09-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (usage): Added an option to ignore OCSP server errors
-	* check_ssl_cert (check_ocsp): Fixed the detection of an internal error
+        * check_ssl_cert (usage): Added an option to ignore OCSP server errors
+        * check_ssl_cert (check_ocsp): Fixed the detection of an internal error
 
 2021-09-02  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (hours_until): computes the date with dconv if date -f is missing
+        * check_ssl_cert (hours_until): computes the date with dconv if date -f is missing
 
 2021-09-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): detects old BSD date without -f
+        * check_ssl_cert (main): detects old BSD date without -f
 
 2021-08-31  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): added -crlf to the connection for the renegotiation test
+        * check_ssl_cert (main): added -crlf to the connection for the renegotiation test
 
 2021-08-27  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): skipping the CN check on IP addresses
+        * check_ssl_cert (check_attr): skipping the CN check on IP addresses
 
 2021-08-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): small improvement in the verbose output of SSL Labs
+        * check_ssl_cert (check_attr): small improvement in the verbose output of SSL Labs
 
 2021-08-25  Matteo Corti  <matteo@corti.li>
 
-	* README.md: Info about quoting *
+        * README.md: Info about quoting *
 
 2021-08-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (parse_command_line_options): do not delete COMMON_NAME by --file
+        * check_ssl_cert (parse_command_line_options): do not delete COMMON_NAME by --file
 
 2021-08-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (parse_command_line_options): Fixed the debugging output by the command line arguments splitting
+        * check_ssl_cert (parse_command_line_options): Fixed the debugging output by the command line arguments splitting
 
 2021-08-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Support DANE TLSA 312
+        * check_ssl_cert (main): Support DANE TLSA 312
 
 2021-08-13  Matteo Corti  <matteo@corti.li>
 
-	* test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
-	* check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was ovewritten each time)
-	* check_ssl_cert (main): Better validation of the host command line argument
+        * test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
+        * check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was ovewritten each time)
+        * check_ssl_cert (main): Better validation of the host command line argument
 
 2021-07-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: performance data is no more shown by critical and warning message when --no-perf is specified
+        * check_ssl_cert: performance data is no more shown by critical and warning message when --no-perf is specified
 
 2021-06-22  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: removes the file name from file(1) output
+        * check_ssl_cert: removes the file name from file(1) output
 
 2021-06-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): stop the SSL Labs checks after an error
+        * check_ssl_cert (check_attr): stop the SSL Labs checks after an error
 
 2021-06-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): show the progress in % by SSL labs
-	* check_ssl_cert (check_attr): removing unnecessary port probing with nmap
+        * check_ssl_cert (check_attr): show the progress in % by SSL labs
+        * check_ssl_cert (check_attr): removing unnecessary port probing with nmap
 
 2021-05-31  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_cert_end_date): Display since how many days the certificate was valid
+        * check_ssl_cert (check_cert_end_date): Display since how many days the certificate was valid
 
 2021-05-28  Igor Mironov  <mcs6502-sek@yahoo.com.au>
 
-	* check_ssl_cert: compatibility fixes for LibreSSL 2.8.3 on macOS Catalina
+        * check_ssl_cert: compatibility fixes for LibreSSL 2.8.3 on macOS Catalina
 
 2021-05-21  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added the --debug-file option
-	* check_ssl_cert(check_ocsp): append .crt to the debug certificates
-	* check_ssl_cert: sanity checks for file write operations
+        * check_ssl_cert: added the --debug-file option
+        * check_ssl_cert(check_ocsp): append .crt to the debug certificates
+        * check_ssl_cert: sanity checks for file write operations
 
 2021-05-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_ocsp): Do not store the debugging copy of the certificate in the $TMPDIR
+        * check_ssl_cert (check_ocsp): Do not store the debugging copy of the certificate in the $TMPDIR
 
 2021-05-06  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Fixed an error in the parameter validation
+        * check_ssl_cert (main): Fixed an error in the parameter validation
 
 2021-05-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): do not wait if SSL Labs is giving an error
+        * check_ssl_cert (check_attr): do not wait if SSL Labs is giving an error
 
 2021-04-30  Matteo Corti  <matteo@corti.li>
 
-	* Makefile: avoid putting extended attribute files in the archives
+        * Makefile: avoid putting extended attribute files in the archives
 
 2021-04-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Do not remove parenthesis from URI
+        * check_ssl_cert (check_attr): Do not remove parenthesis from URI
 
 2021-04-29  Claus-Theodor Riegg (https://github.com/ctriegg-mak)
 
-	* check_ssl_cert: match underscores in subdomains when matching name to wildcard certs
+        * check_ssl_cert: match underscores in subdomains when matching name to wildcard certs
 
 2021-04-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): adds and option to remove performance data
+        * check_ssl_cert (check_attr): adds and option to remove performance data
 
 2021-04-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): Better handling of timeouts
+        * check_ssl_cert (fetch_certificate): Better handling of timeouts
 
 2021-04-12  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (critical): Fixed the output when the CN is not available
+        * check_ssl_cert (critical): Fixed the output when the CN is not available
 
 2021-04-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): adding -starttls to the renegotiation check if needed
+        * check_ssl_cert (main): adding -starttls to the renegotiation check if needed
 
 2021-04-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: The host name must now always match with the certificate
-	* check_ssl_cert: (fetch_certificate): Fixed the errors messages (and added a new one for missing STARTTLS)
+        * check_ssl_cert: The host name must now always match with the certificate
+        * check_ssl_cert: (fetch_certificate): Fixed the errors messages (and added a new one for missing STARTTLS)
 
 2021-03-31  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Added the --resolve option
+        * check_ssl_cert (main): Added the --resolve option
 
 2021-03-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: All the verbose messages are not beginning with a lowercase letter
-	* check_ssl_cert: Added the possibility to have different verbose and debug levels
-	* check_ssl_cert: Cleaner verbose output
-	* check_ssl_cert: Short options can now be grouped
+        * check_ssl_cert: All the verbose messages are not beginning with a lowercase letter
+        * check_ssl_cert: Added the possibility to have different verbose and debug levels
+        * check_ssl_cert: Cleaner verbose output
+        * check_ssl_cert: Short options can now be grouped
 
 2021-03-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): Better error handling in case a TLS connection is not possible
+        * check_ssl_cert (fetch_certificate): Better error handling in case a TLS connection is not possible
 
 2021-03-22  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (usage): adds a --all option to allow all the optional checks at the maximum level
+        * check_ssl_cert (usage): adds a --all option to allow all the optional checks at the maximum level
 
 2021-03-22  Matteo Corti  <corti@matteo.ethz.ch>
 
-	* check_ssl_cert (fetch_certificate): detecting a timeout on the OpenSSL level
+        * check_ssl_cert (fetch_certificate): detecting a timeout on the OpenSSL level
 
 2021-03-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (openssl_version): works on systems which add a string to the OpenSSL version output (+ several fixes)
+        * check_ssl_cert (openssl_version): works on systems which add a string to the OpenSSL version output (+ several fixes)
 
 2021-03-14  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (openssl_version): added a function to compare OpenSSL versions. Getting rid of the man dependency
+        * check_ssl_cert (openssl_version): added a function to compare OpenSSL versions. Getting rid of the man dependency
 
 2021-03-12  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): fixing timeout on systems using 'timeout'
+        * check_ssl_cert (exec_with_timeout): fixing timeout on systems using 'timeout'
 
 2021-03-12  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): reducing the total timeout by each execution
-	* check_ssl_cert (check_attr): check chiphers with nmap
+        * check_ssl_cert (exec_with_timeout): reducing the total timeout by each execution
+        * check_ssl_cert (check_attr): check chiphers with nmap
 
-	* check_ssl_cert (check_ocsp): looping over all the supplied URIs
+        * check_ssl_cert (check_ocsp): looping over all the supplied URIs
 
 2021-03-11  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Setting GZIP to quiet (-q) before using man
+        * check_ssl_cert (check_attr): Setting GZIP to quiet (-q) before using man
 
 2021-03-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Improved renegotiation testing
-	* check_ssl_cert (fetch_certificate): Added --password to specify a password source for PCKS12 certificates
+        * check_ssl_cert (main): Improved renegotiation testing
+        * check_ssl_cert (fetch_certificate): Added --password to specify a password source for PCKS12 certificates
 
 2021-03-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Added missing processing of the --inetproto option
-	* check_ssl_cert (main): Added a sanity check for the protocol support of s_client
-	* check_ssl_cert (check_ocsp): skipping empty certificates
-	* check_ssl_cert (fetch_certificate): supporting local files in PKCS #12 and DER formats
-	* check_ssl_cert (main): Using grep -F when possible
+        * check_ssl_cert (main): Added missing processing of the --inetproto option
+        * check_ssl_cert (main): Added a sanity check for the protocol support of s_client
+        * check_ssl_cert (check_ocsp): skipping empty certificates
+        * check_ssl_cert (fetch_certificate): supporting local files in PKCS #12 and DER formats
+        * check_ssl_cert (main): Using grep -F when possible
 
 2021-02-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Do not check SCTs if the certificate is self signed
+        * check_ssl_cert (check_attr): Do not check SCTs if the certificate is self signed
 
 2021-02-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): fixed the SCT check
+        * check_ssl_cert (check_attr): fixed the SCT check
 
 2021-02-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Check for TLS renegotiation
+        * check_ssl_cert (main): Check for TLS renegotiation
 
 2021-02-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Do not reset $OPENSSL so that a different
+        * check_ssl_cert (main): Do not reset $OPENSSL so that a different
                                  OpenSSL version can be specified with the environment variable
 
 2021-02-17  Robin Pronk  <robin.pronk@nedap.com>
 
-	* check_ssl_cert: Make HTTP request url configurable (default stays /)
+        * check_ssl_cert: Make HTTP request url configurable (default stays /)
 
 2021-02-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Adds a check for grep (to check if basic utilities are in the PATH)
+        * check_ssl_cert (main): Adds a check for grep (to check if basic utilities are in the PATH)
 
 2021-01-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Checks for signed certificate timestamps (SCTs)
-	* check_ssl_cert (fetch_certificate): Better error catching for s_client errors
+        * check_ssl_cert (check_attr): Checks for signed certificate timestamps (SCTs)
+        * check_ssl_cert (fetch_certificate): Better error catching for s_client errors
 
 2021-01-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (hours_until): Warning about BusyBox date dropping the time zone
+        * check_ssl_cert (hours_until): Warning about BusyBox date dropping the time zone
 
 2021-01-26  Matteo Corti  <corti@matteo.ethz.ch>
 
-	* check_ssl_cert: added --date to specify the date binary
-	* check_ssl_cert (hours_until): support for BusyBox date
+        * check_ssl_cert: added --date to specify the date binary
+        * check_ssl_cert (hours_until): support for BusyBox date
 
 2021-01-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): Better handling of wait and kill output
+        * check_ssl_cert (exec_with_timeout): Better handling of wait and kill output
 
 2021-01-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
-	* check_ssl_cert (fetch_certificate): Better error message for DH with a too small key and handshake failure
-	* check_ssl_cert (check_crl): Checks revokation via CRL
+        * check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
+        * check_ssl_cert (fetch_certificate): Better error message for DH with a too small key and handshake failure
+        * check_ssl_cert (check_crl): Checks revokation via CRL
 
 2021-01-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_ocsp): OCSP check on all the chain elements
+        * check_ssl_cert (check_ocsp): OCSP check on all the chain elements
 
 2021-01-14  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): retries when SSL Labs is running at full capacity
+        * check_ssl_cert (check_attr): retries when SSL Labs is running at full capacity
 
 2020-12-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): - instead of _ to separate words in the command line options
+        * check_ssl_cert (main): - instead of _ to separate words in the command line options
 
 2020-12-22  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): added the --no-proxy option
+        * check_ssl_cert (main): added the --no-proxy option
 
 2020-12-21  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): added a sanity check for the -f option
-	* check_ssl_cert (main): better handling of certificates without CN
+        * check_ssl_cert (main): added a sanity check for the -f option
+        * check_ssl_cert (main): better handling of certificates without CN
 
 2020-12-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): fixed the regex for the proxy cleanup for s_client
+        * check_ssl_cert (main): fixed the regex for the proxy cleanup for s_client
 
 2020-12-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (require_s_client_option): Checks if s_client supports the -no_ssl[23] options
-	* check_ssl_cert (main): Better filtering of the nmap output
+        * check_ssl_cert (require_s_client_option): Checks if s_client supports the -no_ssl[23] options
+        * check_ssl_cert (main): Better filtering of the nmap output
 
 2020-12-11  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Corrected the handling of the issuer URI
+        * check_ssl_cert: Corrected the handling of the issuer URI
 
 2020-12-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Correct handling of -proxy by s_client and --proxy by cURL
+        * check_ssl_cert: Correct handling of -proxy by s_client and --proxy by cURL
 
 2020-11-30  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (create_temporary_file): bug fix: temp directory not used
-	* check_ssl_cert: patch for the --element option
-	* check_ssl_cert: bug fix: force -4 or -6 with cURL when specified
+        * check_ssl_cert (create_temporary_file): bug fix: temp directory not used
+        * check_ssl_cert: patch for the --element option
+        * check_ssl_cert: bug fix: force -4 or -6 with cURL when specified
 
 2020-08-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug with the output of --version
+        * check_ssl_cert: Fixed a bug with the output of --version
 
 2020-07-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Fixed a bug in the output with --not-issued-by
+        * check_ssl_cert (check_attr): Fixed a bug in the output with --not-issued-by
 
 2020-07-02  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): MySQL support
+        * check_ssl_cert (fetch_certificate): MySQL support
 
 2020-07-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Adding support for better file(1) certificate parsing
+        * check_ssl_cert: Adding support for better file(1) certificate parsing
 
 2020-06-12  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Fixed a problem on BSD in the processing of the issuers
-	* check_ssl_cert (debuglog): [DBG] prefix for all the lines
+        * check_ssl_cert (main): Fixed a problem on BSD in the processing of the issuers
+        * check_ssl_cert (debuglog): [DBG] prefix for all the lines
 
 2020-06-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed a bug in the output (expiration date of chain elements)
+        * check_ssl_cert: fixed a bug in the output (expiration date of chain elements)
 
 2020-06-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): support for s_client -proxy option
+        * check_ssl_cert (fetch_certificate): support for s_client -proxy option
 
 2020-06-04  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Processes all the certificates in the chain
-	* check_ssl_cert: New option to check that the issuer does not match a given pattern
+        * check_ssl_cert: Processes all the certificates in the chain
+        * check_ssl_cert: New option to check that the issuer does not match a given pattern
 
 2020-05-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Propagates the -6 switch to nmap
+        * check_ssl_cert: Propagates the -6 switch to nmap
 
 2020-03-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): show command line arguments in debug mode
+        * check_ssl_cert (main): show command line arguments in debug mode
 
 2020-03-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): new option (--not-valid-longer-than) to check if a certificate is valid longer than the specified number of days
+        * check_ssl_cert (check_attr): new option (--not-valid-longer-than) to check if a certificate is valid longer than the specified number of days
 
 2020-02-17  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): added support for xmpp-server in the STARTTLS negotiation
+        * check_ssl_cert (fetch_certificate): added support for xmpp-server in the STARTTLS negotiation
 
 2020-01-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): option to force HTTP/2
+        * check_ssl_cert (fetch_certificate): option to force HTTP/2
 
 2019-12-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): better error message in case of connection refused
+        * check_ssl_cert (fetch_certificate): better error message in case of connection refused
 
 2019-12-20  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: better error message in case of an invalid host
+        * check_ssl_cert: better error message in case of an invalid host
 
 2019-11-04  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): fixed a bug in the SMTP connection (using s_client -name)
-	* check_ssl_cert (main): -name only used with OpenSSL versions which supports it
+        * check_ssl_cert (fetch_certificate): fixed a bug in the SMTP connection (using s_client -name)
+        * check_ssl_cert (main): -name only used with OpenSSL versions which supports it
 
 2019-10-31  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): the return value of the command is no more ignored from expect
+        * check_ssl_cert (exec_with_timeout): the return value of the command is no more ignored from expect
 
 2019-10-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Merged a patch fixing a copy and paste error with sieve
+        * check_ssl_cert: Merged a patch fixing a copy and paste error with sieve
 
 2019-10-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): Better handling of timeout return codes
+        * check_ssl_cert (exec_with_timeout): Better handling of timeout return codes
 
 2019-10-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Better error message for non matching DANE records
-	* check_ssl_cert (main): Default ports for other protocols
+        * check_ssl_cert (main): Better error message for non matching DANE records
+        * check_ssl_cert (main): Default ports for other protocols
 
 2019-10-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_required_prog): fixed a couple of small issues and introduced a feature to specify the dig binary
+        * check_ssl_cert (check_required_prog): fixed a couple of small issues and introduced a feature to specify the dig binary
 
 2019-10-22  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Fixed a bug printing both a critical and a warning message when both condition match
+        * check_ssl_cert (main): Fixed a bug printing both a critical and a warning message when both condition match
 
 2019-10-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Fixed a bug ignoring --dane without parameters
+        * check_ssl_cert (main): Fixed a bug ignoring --dane without parameters
 
 2019-10-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Integrated the DANE checks
+        * check_ssl_cert (main): Integrated the DANE checks
 
 2019-10-14  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Remove RSA-PSS if not TLS 1.3 requested
-	* check_ssl_cert (check_attr): Write the OPSP issuer cert to the temporary directory
+        * check_ssl_cert (main): Remove RSA-PSS if not TLS 1.3 requested
+        * check_ssl_cert (check_attr): Write the OPSP issuer cert to the temporary directory
 
 2019-10-10  Matteo Corti  <corti@Matteo-Cortis-Mac-mini.local>
 
-	* check_ssl_cert (main): do not disable TLS 1.3 if --rsa is specified
+        * check_ssl_cert (main): do not disable TLS 1.3 if --rsa is specified
 
 2019-10-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): fixes the ciphers for --rsa and --ecdsa
+        * check_ssl_cert (main): fixes the ciphers for --rsa and --ecdsa
 
 2019-10-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): a wildcard certificate does not match the 'main' domain
+        * check_ssl_cert (check_attr): a wildcard certificate does not match the 'main' domain
 
 2019-10-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: disables TLS 1.3 with --rsa
-	* check_ssl_cert: Validate OCSP stapling expiring date
+        * check_ssl_cert: disables TLS 1.3 with --rsa
+        * check_ssl_cert: Validate OCSP stapling expiring date
 
 2019-09-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: stops if needed programs are not foud
+        * check_ssl_cert: stops if needed programs are not foud
 
 2019-09-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug in the processing of the SSL Labs options
-	* check_ssl_cert: Fixed a bug with POP3S
+        * check_ssl_cert: Fixed a bug in the processing of the SSL Labs options
+        * check_ssl_cert: Fixed a bug with POP3S
 
 2019-09-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: OCSP check does not trigger an additional s_client call
+        * check_ssl_cert: OCSP check does not trigger an additional s_client call
 
 2019-09-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a problem in the critical output
+        * check_ssl_cert: Fixed a problem in the critical output
 
 2019-09-18  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Consolidated the error messages in case of more than one error
-	* check_ssl_cert: Fixed a bug where the cypher was not forced by the OCSP checks
+        * check_ssl_cert: Consolidated the error messages in case of more than one error
+        * check_ssl_cert: Fixed a bug where the cypher was not forced by the OCSP checks
 
 2019-08-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (ascii_grep): Removed NULL characters before 'grepping' a file
-	* check_ssl_cert (critical): Display the CN in a crical or warning message (if present)
-	* check_ssl_cert: merged patch to choose the IP protocol version
+        * check_ssl_cert (ascii_grep): Removed NULL characters before 'grepping' a file
+        * check_ssl_cert (critical): Display the CN in a crical or warning message (if present)
+        * check_ssl_cert: merged patch to choose the IP protocol version
 
 2019-08-08  Matteo Corti <matteo@corti.li>
 
-	* check_ssl_cert: Applied patch to support LDAPS
-	* check_ssl_cert.1: Formatting and ordering
+        * check_ssl_cert: Applied patch to support LDAPS
+        * check_ssl_cert.1: Formatting and ordering
 
 2019-07-26  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Try to detect if LDAP is not supported
+        * check_ssl_cert: Try to detect if LDAP is not supported
 
 2019-06-02  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Return the filename when using --file by warnings
+        * check_ssl_cert: Return the filename when using --file by warnings
 
 2019-03-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added an option to specify a user agent for cURL
+        * check_ssl_cert: added an option to specify a user agent for cURL
 
 2019-02-27  Matteo Corti  <matteo@corti.li>
 
-	* test/unit_tests.sh (testMultipleAltNamesFailTwo): removed outdated tests
+        * test/unit_tests.sh (testMultipleAltNamesFailTwo): removed outdated tests
 
 2019-02-27  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: better error message in case of wrong intermediate certificate
+        * check_ssl_cert: better error message in case of wrong intermediate certificate
 
 2019-02-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Better error message in case of OCSP failure
+        * check_ssl_cert: Better error message in case of OCSP failure
 
 2019-02-08  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Check the readability of the certificate file
+        * check_ssl_cert: Check the readability of the certificate file
 
 2019-02-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: applied patch for the SSLlabs warning
+        * check_ssl_cert: applied patch for the SSLlabs warning
 
 2019-01-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: replaced echo -e with printf
+        * check_ssl_cert: replaced echo -e with printf
 
 2018-12-24  Matteo Corti  <corti@macmini.home>
 
-	* check_ssl_cert: Better output in case of errors while using SNI
+        * check_ssl_cert: Better output in case of errors while using SNI
 
 2018-12-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Better help about IMAP IMAPS POP3 and POP3S
-	* check_ssl_cert: Support for SNI and SSL Labs
+        * check_ssl_cert: Better help about IMAP IMAPS POP3 and POP3S
+        * check_ssl_cert: Support for SNI and SSL Labs
 
 2018-12-11  Matteo Corti  <corti@macmini.home>
 
-	* check_ssl_cert: Differentiate IMAP with STARTTLS on port 143 and IMAPS on 993
-	* check_ssl_cert: Fixed a vulnerability in the parsing of the certificate issuer
+        * check_ssl_cert: Differentiate IMAP with STARTTLS on port 143 and IMAPS on 993
+        * check_ssl_cert: Fixed a vulnerability in the parsing of the certificate issuer
 
 2018-11-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a problem with IMAP on port 993
-	* check_ssl_cert: fixed a problem with newlines in the HTTP request
+        * check_ssl_cert: Fixed a problem with IMAP on port 993
+        * check_ssl_cert: fixed a problem with newlines in the HTTP request
 
 2018-11-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: CA file and directory support
+        * check_ssl_cert: CA file and directory support
 
 2018-10-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed the HTTP request string
+        * check_ssl_cert: Fixed the HTTP request string
 
 2018-10-18  eimamagi  <https://github.com/eimamagi>
 
-	* check_ssl_cert: Allow to specify a client certificate key
+        * check_ssl_cert: Allow to specify a client certificate key
 
 2018-10-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): fixed the check on the the return value
+        * check_ssl_cert (exec_with_timeout): fixed the check on the the return value
 
 2018-08-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: disabling OCSP checks if no OCSP host is found
+        * check_ssl_cert: disabling OCSP checks if no OCSP host is found
 
 2018-07-20  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Applied a patch from Markus Frosch to fix the cleanup of temporary files
+        * check_ssl_cert: Applied a patch from Markus Frosch to fix the cleanup of temporary files
 
 2018-07-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: do not trap on EXIT
-	* check_ssl_cert: remove temporary file when no signals are trapped
+        * check_ssl_cert: do not trap on EXIT
+        * check_ssl_cert: remove temporary file when no signals are trapped
 
 2018-06-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed a bug in the deletion of temporary files when a signal is caught
+        * check_ssl_cert: fixed a bug in the deletion of temporary files when a signal is caught
 
 2018-06-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added a check to require OCSP stapling
+        * check_ssl_cert: added a check to require OCSP stapling
 
 2018-04-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Remooved the SNI name check patch (see #78)
+        * check_ssl_cert: Remooved the SNI name check patch (see #78)
 
 2018-04-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Merged the SNI name check patch
+        * check_ssl_cert: Merged the SNI name check patch
 
 2018-04-17  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Merged the --terse patch, added performance data to the terse output and reordered the help
+        * check_ssl_cert: Merged the --terse patch, added performance data to the terse output and reordered the help
 
 2018-04-12  Matteo Corti  <matteo@corti.li>
 
-	* Makefile: Checks if the copyright year is correct. make test is now dependent on make dist
+        * Makefile: Checks if the copyright year is correct. make test is now dependent on make dist
 
 2018-04-06  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added UTF8 output
+        * check_ssl_cert: Added UTF8 output
 
 2018-04-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added debugging output for cURL
+        * check_ssl_cert: Added debugging output for cURL
 
 2018-03-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug introduced in the last verstion
+        * check_ssl_cert: Fixed a bug introduced in the last verstion
 
 2018-03-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Removed cURL dependency when not checking SSL Labs
+        * check_ssl_cert: Removed cURL dependency when not checking SSL Labs
 
 2018-03-17  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added support for TLS 1.3
+        * check_ssl_cert: Added support for TLS 1.3
 
 2018-03-06  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed OCSP check with LibreSSL
-	* check_ssl_cert: Lists the number or default root certificates in debug mode
+        * check_ssl_cert: Fixed OCSP check with LibreSSL
+        * check_ssl_cert: Lists the number or default root certificates in debug mode
 
 2018-01-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug processing more than one OCSP host
+        * check_ssl_cert: Fixed a bug processing more than one OCSP host
 
 2017-12-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug in the specification of the xmpphost parameter
+        * check_ssl_cert: Fixed a bug in the specification of the xmpphost parameter
 
 2017-12-14  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added an option to specify the 'to' attribute of the XMPP stream element
+        * check_ssl_cert: Added an option to specify the 'to' attribute of the XMPP stream element
 
 2017-11-29  Wim van Ravesteijn https://github.com/wimvr
 
-	* check_ssl_cert: Support for DER encoded CRL files
+        * check_ssl_cert: Support for DER encoded CRL files
 
 2017-11-28  Georg https://github.com/gbotti
 
-	* check_ssl_cert: added --fingerprint to check the SHA1 fingerprint of the certificate
+        * check_ssl_cert: added --fingerprint to check the SHA1 fingerprint of the certificate
 
 2017-11-17  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): adding support for -xmpphost if available
+        * check_ssl_cert (fetch_certificate): adding support for -xmpphost if available
 
 2017-11-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): fixing XMPP support
+        * check_ssl_cert (fetch_certificate): fixing XMPP support
 
 2017-11-16    <corti@corti.li>
 
-	* check_ssl_cert (fetch_certificate): adding support for IPv6 addresses
+        * check_ssl_cert (fetch_certificate): adding support for IPv6 addresses
 
 2017-09-18 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* check_ssl_cert: with -f option you now can also pass a certificate revocation list (CRL) to check its validity period
+        * check_ssl_cert: with -f option you now can also pass a certificate revocation list (CRL) to check its validity period
 
 2017-09-10  Matteo Corti  <corti@mac-mini-1.home>
 
-	* check_ssl_cert: OCSP check is now terminated by a timeout
+        * check_ssl_cert: OCSP check is now terminated by a timeout
 
 2017-09-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: The SAN requirement is now optional
+        * check_ssl_cert: The SAN requirement is now optional
 
 2017-07-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Use openssl s_client's -help option to test for SNI support (thanks to d7415)
+        * check_ssl_cert: Use openssl s_client's -help option to test for SNI support (thanks to d7415)
 
 2017-07-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fix in the Common Name parsing
+        * check_ssl_cert: Fix in the Common Name parsing
 
 2017-06-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Checks for missing subjectAlternativeName extension
+        * check_ssl_cert: Checks for missing subjectAlternativeName extension
 
 2017-06-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Do not try to check OCSP if the protocol is not HTTP or HTTPS
+        * check_ssl_cert: Do not try to check OCSP if the protocol is not HTTP or HTTPS
 
 2017-05-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a problem with the detection of OCSP URLs
+        * check_ssl_cert: Fixed a problem with the detection of OCSP URLs
 
 2017-05-02  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added --location to curl to follow redirects
-	* check_ssl_cert: Fixed the indentation of EOF in the embedded Perl script
+        * check_ssl_cert: Added --location to curl to follow redirects
+        * check_ssl_cert: Fixed the indentation of EOF in the embedded Perl script
         * check_ssl_cert: Added --force-date-perl to force the usage of Perl for date computations and a test to be sure no errors in Perl are left undetected
 
 2017-04-28  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug occurring when more than one issuNer URI is present
+        * check_ssl_cert: Fixed a bug occurring when more than one issuNer URI is present
 
 2017-03-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added LDAP support
+        * check_ssl_cert: Added LDAP support
 
 2017-03-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: By errors it makes more sense to show the supplied host instead of the CN
+        * check_ssl_cert: By errors it makes more sense to show the supplied host instead of the CN
 
 2017-02-16  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Support for newer OpenSSL versions (1.1)
+        * check_ssl_cert: Support for newer OpenSSL versions (1.1)
 
 2017-02-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added the --sni option
+        * check_ssl_cert: Added the --sni option
 
 2017-02-08  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Patch from Pavel Rochnyak: Changed the CN output when --altnames is used
+        * check_ssl_cert: Patch from Pavel Rochnyak: Changed the CN output when --altnames is used
 
 2017-02-02  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed the command line argument parsing
-	* check_ssl_cert: Fixed -servername
+        * check_ssl_cert: Fixed the command line argument parsing
+        * check_ssl_cert: Fixed -servername
 
 2017-01-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added patches from Pavel Rochnyak for the issuer certificate cache patch
-	                  and the wildcard support in alternative names
+        * check_ssl_cert: Added patches from Pavel Rochnyak for the issuer certificate cache patch
+                          and the wildcard support in alternative names
 
 2016-12-23  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35)
+        * check_ssl_cert: Added patch to specify multiple CNs (see https://github.com/matteocorti/check_ssl_cert/pull/35)
 
 2016-12-13  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed a minor problem with --debug
+        * check_ssl_cert: fixed a minor problem with --debug
 
 2016-12-06  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed a problem when specifying a CN beginnging with *
+        * check_ssl_cert: fixed a problem when specifying a CN beginnging with *
 
 2016-12-04  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed problem when file is returning PEM certificate on newer Linux distributions
+        * check_ssl_cert: fixed problem when file is returning PEM certificate on newer Linux distributions
 
 2016-09-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: enabling proxy support in the OCSP check (thanks to Leynos)
+        * check_ssl_cert: enabling proxy support in the OCSP check (thanks to Leynos)
 
 2016-08-04  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: disabling OCSP checks when no issuer URI is found
+        * check_ssl_cert: disabling OCSP checks when no issuer URI is found
 
 2016-07-29  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed case insensitive comparison of CNs
+        * check_ssl_cert: fixed case insensitive comparison of CNs
 
 2016-07-29  https://github.com/bb-Ricardo
 
-	* check_ssl_cert: calculate expiration primary with date
+        * check_ssl_cert: calculate expiration primary with date
 
 2016-07-12  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed the parsing of the CN field
+        * check_ssl_cert: fixed the parsing of the CN field
 
 2016-06-25  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed OSCP header on old OpenSSL versions
+        * check_ssl_cert: fixed OSCP header on old OpenSSL versions
 
 2016-06-24  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: OCSP is now default
+        * check_ssl_cert: OCSP is now default
 
-	* check_ssl_certe: Fixed OCSP host
+        * check_ssl_certe: Fixed OCSP host
 
 2016-06-15  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Better curl error handling
+        * check_ssl_cert: Better curl error handling
 
 2016-06-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Added an option to clear the cached result at SSLLabs
+        * check_ssl_cert: Added an option to clear the cached result at SSLLabs
 
 2016-06-01  juckerf (https://github.com/juckerf)
 
-	* check_ssl_cert: Increase control over which SSL/TLS versions to use
+        * check_ssl_cert: Increase control over which SSL/TLS versions to use
 
 2016-05-17  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added more debugging info (-v is automatic if -d is spefied, system info and cert written to a file)
+        * check_ssl_cert: added more debugging info (-v is automatic if -d is spefied, system info and cert written to a file)
 
 2016-04-27  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixes a bug in the OpenSSL error parsing
+        * check_ssl_cert: Fixes a bug in the OpenSSL error parsing
 
 2016-04-05  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: In case of an s_client error does not output the full (ugly) error. The error is shown in verbose mode
+        * check_ssl_cert: In case of an s_client error does not output the full (ugly) error. The error is shown in verbose mode
 
 2016-03-29  Sergei Shmanko
 
-	* check_ssl_cert: Fix wildcard match regex, add additional unit tests
+        * check_ssl_cert: Fix wildcard match regex, add additional unit tests
 
 2016-03-21  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (exec_with_timeout): issues a critical status
-	when using the 'timout' utility
+        * check_ssl_cert (exec_with_timeout): issues a critical status
+        when using the 'timout' utility
 
 2016-03-19  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixed CN parsing on non-GNU systems
+        * check_ssl_cert: fixed CN parsing on non-GNU systems
 
 2016-03-19  Sergei https://github.com/sshmanko
 
-	* check_ssl_cert: handle wildcard certificates
+        * check_ssl_cert: handle wildcard certificates
 
 2016-03-10  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (check_attr): Better handling of verification errors
+        * check_ssl_cert (check_attr): Better handling of verification errors
 
 2016-03-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (convert_ssl_lab_grade): accepts lowercase letters for SSL Labs grades
-	* check_ssl_cert (check_attr): waits for SSL Labs results
+        * check_ssl_cert (convert_ssl_lab_grade): accepts lowercase letters for SSL Labs grades
+        * check_ssl_cert (check_attr): waits for SSL Labs results
 
 2016-03-08  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Tries to extract an error message from SSL Labs
-			  if no status is returned
+        * check_ssl_cert: Tries to extract an error message from SSL Labs
+                          if no status is returned
 
 2016-03-07  Sam Richards
-	* check_ssl_cert: Support SNI even when we don't want to check cn
+        * check_ssl_cert: Support SNI even when we don't want to check cn
 
 2016-03-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: DNS errors by SSL Labs are ignored (as they are just
-			  a sign that the result is not cached)
+        * check_ssl_cert: DNS errors by SSL Labs are ignored (as they are just
+                          a sign that the result is not cached)
 
 2016-03-03  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Initial support for SSL Labs checks
+        * check_ssl_cert: Initial support for SSL Labs checks
 
 2016-03-01  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: Fixed a bug which prevented the check on the expiration
+        * check_ssl_cert: Fixed a bug which prevented the check on the expiration
 
 2015-10-31  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added a patch to check the certificate's serial number
-	                  (thanks to Milan Koudelka)
+        * check_ssl_cert: added a patch to check the certificate's serial number
+                          (thanks to Milan Koudelka)
 
 2015-10-20  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: fixex a problem with OCSP paths w/o URLs
+        * check_ssl_cert: fixex a problem with OCSP paths w/o URLs
 
 2015-04-07  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
-	* check_ssl_cert: removed check on the openssl binary name
+        * check_ssl_cert: corrected some typos (thanks to Jérémy Lecour)
+        * check_ssl_cert: removed check on the openssl binary name
 
 2014-10-21  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert: added a patch to check revocation via OCSP (thanks
-	                  to Ryan Nowakowski)
+        * check_ssl_cert: added a patch to check revocation via OCSP (thanks
+                          to Ryan Nowakowski)
 
 2014-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* Makefile: added a target to build an rpm
+        * Makefile: added a target to build an rpm
 
 2013-12-23  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added the --tls1 option to force TLS 1
+        * check_ssl_cert: added the --tls1 option to force TLS 1
 
 2013-10-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: whole script reviewed with shellcheck
+        * check_ssl_cert: whole script reviewed with shellcheck
 
 2013-10-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: fixes with shellcheck (quoting)
+        * check_ssl_cert: fixes with shellcheck (quoting)
 
 2013-07-29  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: Added an option to force a given SSL version
+        * check_ssl_cert: Added an option to force a given SSL version
 
 2013-03-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: Fixed a bug occurring with TLS and multiple names in
+        * check_ssl_cert: Fixed a bug occurring with TLS and multiple names in
                           the certificate
 
 2012-12-07  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: removed "test -a/-o" (test has an undefined
+        * check_ssl_cert: removed "test -a/-o" (test has an undefined
                           behavior with more than 4 elements)
 
-	* check_ssl_cert: fixed	#122 (-N was always comparing the CN with 'localhost')
+        * check_ssl_cert: fixed        #122 (-N was always comparing the CN with 'localhost')
 
 2012-11-16  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* simplified the sourcing of the script file for testing
+        * simplified the sourcing of the script file for testing
 
 2012-10-11  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* added some unit tests with shUnit2
+        * added some unit tests with shUnit2
 
 2012-09-19  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: improved the "No certificate returned" error message
+        * check_ssl_cert: improved the "No certificate returned" error message
 
 2012-07-13  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added the number of days from or to expiration in the
-			  plugin output
+        * check_ssl_cert: added the number of days from or to expiration in the
+                          plugin output
 
 2012-07-11  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: fixed a bug with Perl date computation on some systems
+        * check_ssl_cert: fixed a bug with Perl date computation on some systems
 
 2012-07-06  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: performance data in days
-	* check_ssl_cert: long output (certificate attributes)
+        * check_ssl_cert: performance data in days
+        * check_ssl_cert: long output (certificate attributes)
 
 2012-04-05  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: handle broken OpenSSL clients (-servername not working)
+        * check_ssl_cert: handle broken OpenSSL clients (-servername not working)
 
 2012-04-04  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: removed an hard coded reference to the error number by the
-	                  SSL chain verification
+        * check_ssl_cert: removed an hard coded reference to the error number by the
+                          SSL chain verification
 
 2011-10-22  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a --altnames option to match the CN to alternative
+        * check_ssl_cert: added a --altnames option to match the CN to alternative
                           names
 
 2011-09-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: applied a patch from Sven Nierlein
-			  (certificate authentication)
+        * check_ssl_cert: applied a patch from Sven Nierlein
+                          (certificate authentication)
 
 2011-03-10  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: allows http to specified as protocol
-	                  (thanks to Raphael Thoma)
-	* check_ssl_cert: fixes the -N check for certs with wildcards
-	                  (thanks to Raphael Thoma)
+        * check_ssl_cert: allows http to specified as protocol
+                          (thanks to Raphael Thoma)
+        * check_ssl_cert: fixes the -N check for certs with wildcards
+                          (thanks to Raphael Thoma)
 
 2011-01-24  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added an option to specify the openssl executable
+        * check_ssl_cert: added an option to specify the openssl executable
 
 2010-12-16  Dan Wallis
 
-	* check_ssl_cert: Sets $VERBOSE to avoid using value supplied by Nagios
-	* check_ssl_cert: Quotes regular expression for grep to avoid shell globbing
+        * check_ssl_cert: Sets $VERBOSE to avoid using value supplied by Nagios
+        * check_ssl_cert: Quotes regular expression for grep to avoid shell globbing
 
 2010-12-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert.spec: standardized the RPM package name
+        * check_ssl_cert.spec: standardized the RPM package name
 
-	* check_ssl_cert: added support for the TLS servername extension
+        * check_ssl_cert: added support for the TLS servername extension
                           (thanks to Matthias Fuhrmeister)
 
 2010-11-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* INSTALL: specifies that expect is needed for timeouts
+        * INSTALL: specifies that expect is needed for timeouts
 
 2010-10-29  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* README: specifies that expect is needed for timeouts
+        * README: specifies that expect is needed for timeouts
 
 2010-10-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: trap on more signals (thanks to Lawren Quigley-Jones)
+        * check_ssl_cert: trap on more signals (thanks to Lawren Quigley-Jones)
 
 2010-10-14  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a patch from Yannick Gravel putting the
+        * check_ssl_cert: added a patch from Yannick Gravel putting the
                           chain verification at the end of the tests
 
 2010-10-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a patch from Lawren Quigley-Jones which
+        * check_ssl_cert: added a patch from Lawren Quigley-Jones which
                           implements a new command line argument (-A) to disable the
                           certificate chain check
 
 2010-09-15  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: fixed option processing (bug #78)
+        * check_ssl_cert: fixed option processing (bug #78)
 
 2010-08-26  Dan Wallis
 
-	* check_ssl_cert: overloads --rootcert for use with directories as
+        * check_ssl_cert: overloads --rootcert for use with directories as
                           well as files (-CApath versus -CAfile)
 
 2010-07-21  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a patch from Marc Fournier to check the creation of the temporary files
-	* check_ssl_cert: added the --temp option to specify where to store the temporary files
+        * check_ssl_cert: added a patch from Marc Fournier to check the creation of the temporary files
+        * check_ssl_cert: added the --temp option to specify where to store the temporary files
 
 2010-07-10  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: improved the error messages
-	* check_ssl_cert: checks for certificates without email addresses (if -e is specified)
+        * check_ssl_cert: improved the error messages
+        * check_ssl_cert: checks for certificates without email addresses (if -e is specified)
 
 2010-07-09  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added a "long" version for all the command line options
-	* check_ssl_cert: added a critical and warning option for the certificate validity (in days)
-	* check_ssl_cert: the plugin always issues a critical warning if the certificate is expired
-	* check_ssl_cert: added a man page
+        * check_ssl_cert: added a "long" version for all the command line options
+        * check_ssl_cert: added a critical and warning option for the certificate validity (in days)
+        * check_ssl_cert: the plugin always issues a critical warning if the certificate is expired
+        * check_ssl_cert: added a man page
 
 2010-07-07  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: [Wolfgang Schricker patch] Add -f to check local files
+        * check_ssl_cert: [Wolfgang Schricker patch] Add -f to check local files
 
 2010-07-01  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: [Yannick Gravel patch] Restore displaying the CN in every messages:
-	                                         a previous patch changed something and only
-	                                         critical were adjusted.
-	* check_ssl_cert: [Yannick Gravel patch] Adjust what is displayed after the from in
-	                                         the OK message to display the matched ISSUER
-	                                         (CN or O).
+        * check_ssl_cert: [Yannick Gravel patch] Restore displaying the CN in every messages:
+                                                 a previous patch changed something and only
+                                                 critical were adjusted.
+        * check_ssl_cert: [Yannick Gravel patch] Adjust what is displayed after the from in
+                                                 the OK message to display the matched ISSUER
+                                                 (CN or O).
 
 2010-06-08  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: added the -s option to allow self signed certificates
+        * check_ssl_cert: added the -s option to allow self signed certificates
 
 2010-03-11  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: fixed the == bashism
+        * check_ssl_cert: fixed the == bashism
 
 2010-03-08  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: applied patch from Marcus Rejås with the -n and -N options
+        * check_ssl_cert: applied patch from Marcus Rejås with the -n and -N options
 
 2009-12-02  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: check if the issuer matches the O= or the CN= field of the Root Cert
+        * check_ssl_cert: check if the issuer matches the O= or the CN= field of the Root Cert
 
 2009-11-30  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: cleaned up error messages if the CN is not yet known
-	* check_ssl_cert: added certificate chain verification
-	* check_ssl_cert: allow backslashes escaped in the error messages (e.g., for \n used by Nagios 3)
-	* check_ssl_cert: -r can be used to specify a root certificate to be used for the verification
+        * check_ssl_cert: cleaned up error messages if the CN is not yet known
+        * check_ssl_cert: added certificate chain verification
+        * check_ssl_cert: allow backslashes escaped in the error messages (e.g., for \n used by Nagios 3)
+        * check_ssl_cert: -r can be used to specify a root certificate to be used for the verification
 
 2009-03-31  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: standard timeout of 15 seconds (can be set with the -t option)
+        * check_ssl_cert: standard timeout of 15 seconds (can be set with the -t option)
 
 2009-03-30  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: -P option to specify the protocol
+        * check_ssl_cert: -P option to specify the protocol
 
 2008-05-13  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: applied a patch from Dan Wallis to output the CN
+        * check_ssl_cert: applied a patch from Dan Wallis to output the CN
                           in all the messages
 
 2008-02-28  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: shortened the error message in case of no connection
-	                  (only the first line is reported)
+        * check_ssl_cert: shortened the error message in case of no connection
+                          (only the first line is reported)
 
 2008-02-25  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: [Dan Wallis patch] removed nmap dependency
-	* check_ssl_cert: [Dan Wallis patch] mktemp for the temporaries
-	* check_ssl_cert: [Dan Wallis patch] using trap to cleanup temporaries
-	* check_ssl_cert: [Dan Wallis patch] POSIX compliance and cleanup
-	* check_ssl_cert: [Dan Wallis patch] POSIX compliance and cleanup
-	* check_ssl_cert: [Dan Wallis patch] better handling of missing
-	                                     certificate and non resolvable host
-	* check_ssl_cert: [Dan Wallis patch] stricter check for "notAfter" in the
-	                                     certificate analysis
+        * check_ssl_cert: [Dan Wallis patch] removed nmap dependency
+        * check_ssl_cert: [Dan Wallis patch] mktemp for the temporaries
+        * check_ssl_cert: [Dan Wallis patch] using trap to cleanup temporaries
+        * check_ssl_cert: [Dan Wallis patch] POSIX compliance and cleanup
+        * check_ssl_cert: [Dan Wallis patch] POSIX compliance and cleanup
+        * check_ssl_cert: [Dan Wallis patch] better handling of missing
+                                             certificate and non resolvable host
+        * check_ssl_cert: [Dan Wallis patch] stricter check for "notAfter" in the
+                                             certificate analysis
 
 2007-09-04  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: better error messages (both the actual and the
-	expected values are displayed)
+        * check_ssl_cert: better error messages (both the actual and the
+        expected values are displayed)
 
 2007-08-31  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: new options to enforce email and
-	organization. Temporary files are now removed before termination
+        * check_ssl_cert: new options to enforce email and
+        organization. Temporary files are now removed before termination
 
 2007-08-15  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: openssl s_client closes the connection cleanly
+        * check_ssl_cert: openssl s_client closes the connection cleanly
 
 2007-08-10  Matteo Corti  <matteo.corti@id.ethz.ch>
 
-	* check_ssl_cert: initial release
+        * check_ssl_cert: initial release
