@@ -1871,7 +1871,7 @@ fetch_certificate() {
                         "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
                         if [ $? -eq 1 ]; then
-                            unknown "Error converting CRL ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                            unkown "Error converting CRL ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
                         fi
 
                     else
@@ -2918,7 +2918,7 @@ main() {
     # if the host name contains a / (e.g., a URL) the regex for COMMON_NAME substitution fails
     #   we check that only allowed characters are present
     #   we don't need a complete validation since a wrong host name will fail anyway
-    if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\-]*$'; then
+    if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
         unknown "Invalid host name: ${HOST_NAME}"
     fi
 
