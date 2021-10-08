@@ -121,3 +121,4 @@ Thanks:
 * Many thanks to Alexander Aleksandrovič Klimov (https://github.com/Al2Klimov) for the DANE 312 patch
 * Manu thanks to Jaime Hablutzel (https://github.com/hablutzel1) for the --element fix
 * Many thanks to Bernd Stroessenreuther for the CRL and IPv6 fixes and for the floating point patch
+* Many thanks to Kim Jahn for the conversion typo fix (https://github.com/mookie-)

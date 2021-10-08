@@ -1,3 +1,7 @@
+2021-10-08  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (fetch_certificate): Fixed a typo
+
 2021-10-06  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (check_ocsp): better handling of HTML pages instead of certificates
