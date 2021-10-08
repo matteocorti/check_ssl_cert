@@ -57,9 +57,6 @@ usage() {
         echo "Error: $1" 1>&2
     fi
 
-    #### The following line is 80 characters long (helps to fit the help text in a standard terminal)
-    ######--------------------------------------------------------------------------------
-
     echo
     echo "Usage: check_ssl_cert -H host [OPTIONS]"
     echo
