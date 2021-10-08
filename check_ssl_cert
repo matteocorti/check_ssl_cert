@@ -1871,7 +1871,7 @@ fetch_certificate() {
                         "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
                         if [ $? -eq 1 ]; then
-                            unkown "Error converting CRL ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                            unknown "Error converting CRL ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
                         fi
 
                     else
