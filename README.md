@@ -181,37 +181,32 @@ Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 
 ## Expect & timeout
 
-check\_ssl\_cert requires 'expect' or 'timeout' to enable timeouts. If 'expect' or 'timeout' is not
-present on your system timeouts will be disabled.
-
-See: [http://en.wikipedia.org/wiki/Expect](http://en.wikipedia.org/wiki/Expect) and [https://man7.org/linux/man-pages/man1/timeout.1.html](https://man7.org/linux/man-pages/man1/timeout.1.html)
-
+check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system timeouts will be disabled.
 
 ## Virtual servers
 
 check\_ssl\_cert supports the servername TLS extension in ClientHello
-if the installed openssl version provides it. This is needed if you
-are checking a machine with virtual hosts.
+if the installed OpenSSL version provides it. This is needed if you
+are checking a server with virtual hosts.
 
 ## SSL Labs
 
 If `-L` or `--check-ssl-labs` are specified the plugin will check the
-cached status using the SSL Labs Assessment API (see
-https://www.ssllabs.com/about/terms.html).
+cached status using the [SSL Labs Assessment API](https://www.ssllabs.com/about/terms.html).
 
 The plugin will ask for a cached result (maximum age 1 day) to avoid
-to many checks. The first time you issue the check you could therefore
+too many checks. The first time you issue the check you could therefore
 get an outdated result.
 
 ## Root Certificate
 
 The root certificate corresponding to the checked certificate must be
-available to openssl or specified with the `-r cabundle` or
-`--rootcert cabundle` option, where cabundle is either a file for `-CAfile`
+available to OpenSSL or specified with the `-r cabundle` or
+`--rootcert cabundle` option, where ```cabundle``` is either a file for `-CAfile`
 or a directory for `-CApath`.
 
 On macOS the root certificates bundle is stored in the Keychain and
-openssl will complain with:
+OpenSSL will complain with:
 
 ```
 verification error: unable to get local issuer certificate
@@ -232,7 +227,7 @@ and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
 ## Quoting in Nagios
 
-An asterisk ```*``` is automatically escaped by nagios. If you need to specify an option (e.g., ```--cn```) with an argument containing an asterisk you need to enclose it in double quotes (e.g., ```''*.ethz.ch''```)
+An asterisk ```*``` is automatically escaped by nagios. If you need to specify an option (e.g., ```--cn```) with an argument containing an asterisk you need to enclose it in double quotes (e.g., ```''*.github.com''```)
 
 ## Development
 
@@ -256,7 +251,5 @@ To run a single test:
  * execute the test suite with the tests to be run as argument after ```--```. For example ```./unit_tests.sh -- testName```
 
 ## Bugs
-
-The timeout is applied to each action involving a download.
 
 Report bugs to [https://github.com/matteocorti/check_ssl_cert/issues](https://github.com/matteocorti/check_ssl_cert/issues)
