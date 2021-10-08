@@ -1,5 +1,6 @@
 Does not accept certificates without SANs (use --allow-empty-san to ignore)
-Bug fix in the handling of errors while fetching certificates
+                            Bug fix in the handling of errors while fetching certificates
+                            Allows a check on invalid FQDNs containing an underscore
 2021-10-06 Version   2.9.1: Accepts certificates without subject alternative names
                             Added an option (--debug-time) to print the elapsed time in the debugging output
 2021-10-01 Version   2.9.0: The --skip-element option can now be specified multiple times and specifies to skip a single
