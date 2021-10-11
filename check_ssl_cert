@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.9.1
+VERSION=2.10.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -116,6 +116,7 @@ usage() {
     echo "      --ignore-connection-problems [state] in case of connection problems returns OK or the optional state"
     echo "      --ignore-exp                 ignore expiration date"
     echo "      --ignore-host-cn             do not complain if the CN does not match the host name"
+    echo "      --ignore-incomplete-chain    does not check chain integrity"
     echo "      --ignore-ocsp                do not check revocation with OCSP"
     echo "      --ignore-ocsp-errors         continue if the OCSP status cannot be checked"
     echo "      --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking"
@@ -2280,6 +2281,10 @@ parse_command_line_options() {
             # deprecated
             shift
             ;;
+        --ignore-incomplete-chain)
+            IGNORE_INCOMPLETE_CHAIN=1
+            shift
+            ;;
         --ignore-ocsp)
             OCSP=""
             shift
@@ -3922,6 +3927,9 @@ main() {
         NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
         debuglog "  Number of certificates in the chain: ${NUM_CERTIFICATES}"
 
+        CHAIN_ELEMENT_ISSUER=''
+        CHAIN_ELEMENT_SUBJECT=''
+
         # start with first certificate
         CERT_IN_CHAIN=1
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
@@ -3941,6 +3949,36 @@ main() {
             ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}")"
             debuglog "      ELEMENT_ISSUER=${ELEMENT_ISSUER}"
             ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
+
+            # Check the chain (https://docs.apigee.com/how-to-guides/validating-certificate-chain)
+            #
+            # get the issuer and subject of each element
+            # - from the second element the subject must be the same as the previous issuers
+            # - we skip the test if some elements are skipped
+
+            if [ -z "${SKIP_ELEMENT}" ] && [ -z "${IGNORE_INCOMPLETE_CHAIN}" ] ; then
+
+                debuglog "Checking the chain integrity of element (${CERT_IN_CHAIN})"
+                debuglog "  previous element issuer  = ${CHAIN_ELEMENT_ISSUER}"
+                debuglog "  previous element subject = ${CHAIN_ELEMENT_SUBJECT}"
+
+                CHAIN_ELEMENT_SUBJECT="$(extract_cert_attribute 'subject' "${CERT_ELEMENT}" | sed 's/^subject=//')"
+
+                debuglog "  element subject = ${CHAIN_ELEMENT_SUBJECT}"
+
+                if [ "${CHAIN_ELEMENT_SUBJECT}" = "${CHAIN_ELEMENT_ISSUER}" ] ; then
+                    debuglog "  the element's (${CERT_IN_CHAIN}) subject matches the previous issuer"
+                else
+                    debuglog "  the element's (${CERT_IN_CHAIN}) subject does not match the previous issuer"
+                    if [ "${CERT_IN_CHAIN}" -ne 1 ] ; then
+                        # we do not check the first element
+                        prepend_critical_message "Incomplete certificate chain (subject of element ${CERT_IN_CHAIN} '${CHAIN_ELEMENT_SUBJECT}' does not match the issuer of the previous element '${CHAIN_ELEMENT_ISSUER}'"
+                    fi
+                fi
+
+                CHAIN_ELEMENT_ISSUER="$(echo "${ELEMENT_ISSUER}" | sed 's/^issuer=//')"
+
+            fi
 
             CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
             if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then

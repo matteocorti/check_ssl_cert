@@ -70,6 +70,7 @@ Options:
       --ignore-connection-problems [state] in case of connection problems returns OK or the optional state
       --ignore-exp                 ignore expiration date
       --ignore-host-cn             do not complain if the CN does not match the host name
+      --ignore-incomplete-chain    does not check chain integrity
       --ignore-ocsp                do not check revocation with OCSP
       --ignore-ocsp-errors         continue if the OCSP status cannot be checked
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs while checking

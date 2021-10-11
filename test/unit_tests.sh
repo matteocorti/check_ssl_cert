@@ -1126,7 +1126,7 @@ testIgnoreConnectionStateError() {
 
 testSubdomainWithUnderscore() {
     TEST_HOST=_test.github.com
-    OUTPUT=$("${OPENSSL}" s_client -connect "${TEST_HOST}":443 2>&1)
+    OUTPUT=$(echo Q | "${OPENSSL}" s_client -connect "${TEST_HOST}":443 2>&1)
     if [ $? -eq 1 ]; then
         # there was an error: check if it's due to the _
         if echo "${OUTPUT}" | grep -q -F 'gethostbyname failure' ||
@@ -1141,6 +1141,18 @@ testSubdomainWithUnderscore() {
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
+}
+
+testChainOK() {
+    ${SCRIPT} -f ./fullchain.pem
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testChainFail() {
+    ${SCRIPT} -f ./incomplete_chain.pem
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 # the script will exit without executing main

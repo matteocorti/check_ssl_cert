@@ -1,3 +1,7 @@
+2021-10-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Checks the certificate chain
+
 2021-10-08  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh (testSubdomainWithUnderscore): does not test with older OpenSSL versions not supporting _

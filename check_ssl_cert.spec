@@ -1,4 +1,4 @@
-%define version          2.9.1
+%define version          2.10.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Mon Oct  11 2021 Matteo Corti <matteo@corti.li> - 2.10.0-0
+- Updated to 2.10.0
+
 * Wed Oct   6 2021 Matteo Corti <matteo@corti.li> - 2.9.1-0
 - Updated to 2.9.1
 
@@ -671,4 +674,3 @@ w
 
 * Mon Sep 24 2007 Matteo Corti <matteo.corti@id.ethz.ch> - 1.1.0-0
 - first RPM package
-

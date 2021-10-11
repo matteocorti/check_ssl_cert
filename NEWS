@@ -1,4 +1,5 @@
-Does not accept certificates without SANs (use --allow-empty-san to ignore)
+2021-10-11 Version  2.10.0: Checks the certificate chain integrity
+                            Does not accept certificates without SANs (use --allow-empty-san to ignore)
                             Bug fix in the handling of errors while fetching certificates
                             Allows a check on invalid FQDNs containing an underscore
 2021-10-06 Version   2.9.1: Accepts certificates without subject alternative names
