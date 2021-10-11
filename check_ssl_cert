@@ -3961,7 +3961,7 @@ main() {
             # - from the second element the subject must be the same as the previous issuers
             # - we skip the test if some elements are skipped
 
-            if [ -z "${SKIP_ELEMENT}" ] && [ -z "${IGNORE_INCOMPLETE_CHAIN}" ] ; then
+            if [ -z "${SKIP_ELEMENT}" ] && [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
 
                 debuglog "Checking the chain integrity of element (${CERT_IN_CHAIN})"
                 debuglog "  previous element issuer  = ${CHAIN_ELEMENT_ISSUER}"
@@ -3973,11 +3973,11 @@ main() {
                 debuglog "  element subject = ${CHAIN_ELEMENT_SUBJECT} (${CHAIN_ELEMENT_SUBJECT_HASH})"
 
                 if [ "${CHAIN_ELEMENT_SUBJECT}" = "${CHAIN_ELEMENT_ISSUER}" ] &&
-                   [ "${CHAIN_ELEMENT_SUBJECT_HASH}" = "${CHAIN_ELEMENT_ISSUER_HASH}" ] ; then
+                    [ "${CHAIN_ELEMENT_SUBJECT_HASH}" = "${CHAIN_ELEMENT_ISSUER_HASH}" ]; then
                     debuglog "  the element's (${CERT_IN_CHAIN}) subject matches the previous issuer"
                 else
                     debuglog "  the element's (${CERT_IN_CHAIN}) subject does not match the previous issuer"
-                    if [ "${CERT_IN_CHAIN}" -ne 1 ] ; then
+                    if [ "${CERT_IN_CHAIN}" -ne 1 ]; then
                         # we do not check the first element
                         prepend_critical_message "Incomplete certificate chain (subject of element ${CERT_IN_CHAIN} '${CHAIN_ELEMENT_SUBJECT}' (${CHAIN_ELEMENT_SUBJECT_HASH}) does not match the issuer of the previous element '${CHAIN_ELEMENT_ISSUER}' (${CHAIN_ELEMENT_ISSUER_HASH})"
                     fi

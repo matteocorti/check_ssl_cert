@@ -1155,6 +1155,12 @@ testChainFail() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testChainFailIgnored() {
+    ${SCRIPT} -f ./incomplete_chain.pem --ignore-incomplete-chain
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
