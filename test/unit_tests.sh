@@ -257,12 +257,12 @@ testSCT() {
     ${OPENSSL} version
     if openssl_version '1.1.0'; then
         echo "OpenSSL >= 1.1.0: SCTs supported"
-        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2
+        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
         echo "OpenSSL < 1.1.0: SCTs not supported"
-        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2
+        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com -c 1 -w 2 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
