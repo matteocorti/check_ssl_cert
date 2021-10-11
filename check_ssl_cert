@@ -942,6 +942,9 @@ extract_cert_attribute() {
     oscp_uri_single)
         extract_cert_attribute 'oscp_uri' "${cert_content}" | head -n 1
         ;;
+    hash)
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -hash
+        ;;
     issuer)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -issuer
         ;;
@@ -3929,6 +3932,8 @@ main() {
 
         CHAIN_ELEMENT_ISSUER=''
         CHAIN_ELEMENT_SUBJECT=''
+        CHAIN_ELEMENT_ISSUER_HASH=''
+        CHAIN_ELEMENT_SUBJECT_HASH=''
 
         # start with first certificate
         CERT_IN_CHAIN=1
@@ -3963,20 +3968,24 @@ main() {
                 debuglog "  previous element subject = ${CHAIN_ELEMENT_SUBJECT}"
 
                 CHAIN_ELEMENT_SUBJECT="$(extract_cert_attribute 'subject' "${CERT_ELEMENT}" | sed 's/^subject=//')"
+                CHAIN_ELEMENT_SUBJECT_HASH="$(extract_cert_attribute 'hash' "${CERT_ELEMENT}")"
 
-                debuglog "  element subject = ${CHAIN_ELEMENT_SUBJECT}"
+                debuglog "  element subject = ${CHAIN_ELEMENT_SUBJECT} (${CHAIN_ELEMENT_SUBJECT_HASH})"
 
-                if [ "${CHAIN_ELEMENT_SUBJECT}" = "${CHAIN_ELEMENT_ISSUER}" ] ; then
+                if [ "${CHAIN_ELEMENT_SUBJECT}" = "${CHAIN_ELEMENT_ISSUER}" ] &&
+                   [ "${CHAIN_ELEMENT_SUBJECT_HASH}" = "${CHAIN_ELEMENT_ISSUER_HASH}" ] ; then
                     debuglog "  the element's (${CERT_IN_CHAIN}) subject matches the previous issuer"
                 else
                     debuglog "  the element's (${CERT_IN_CHAIN}) subject does not match the previous issuer"
                     if [ "${CERT_IN_CHAIN}" -ne 1 ] ; then
                         # we do not check the first element
-                        prepend_critical_message "Incomplete certificate chain (subject of element ${CERT_IN_CHAIN} '${CHAIN_ELEMENT_SUBJECT}' does not match the issuer of the previous element '${CHAIN_ELEMENT_ISSUER}'"
+                        prepend_critical_message "Incomplete certificate chain (subject of element ${CERT_IN_CHAIN} '${CHAIN_ELEMENT_SUBJECT}' (${CHAIN_ELEMENT_SUBJECT_HASH}) does not match the issuer of the previous element '${CHAIN_ELEMENT_ISSUER}' (${CHAIN_ELEMENT_ISSUER_HASH})"
                     fi
                 fi
 
                 CHAIN_ELEMENT_ISSUER="$(echo "${ELEMENT_ISSUER}" | sed 's/^issuer=//')"
+                CHAIN_ELEMENT_ISSUER_HASH="$(extract_cert_attribute 'issuer_hash' "${CERT_ELEMENT}")"
+                debuglog "  element issuer = ${CHAIN_ELEMENT_ISSUER} (${CHAIN_ELEMENT_ISSUER_HASH})"
 
             fi
 
