@@ -1,3 +1,7 @@
+2021-10-12  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (fetch_certificate): using OpenSSL verify to verify a local chain
+
 2021-10-11  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Checks the certificate chain

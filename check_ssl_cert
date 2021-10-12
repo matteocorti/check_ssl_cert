@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.10.0
+VERSION=2.10.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1883,7 +1883,7 @@ fetch_certificate() {
 
             else
 
-                debuglog "Copying the certificate to ${CERT}"
+                 debuglog "Copying the certificate to ${CERT}"
                 /bin/cat "${FILE}" >"${CERT}"
                 RET=$?
 
@@ -1891,6 +1891,15 @@ fetch_certificate() {
 
             debuglog "storing the certificate to ${CERT}"
             debuglog "certificate type (2): $(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
+
+            # verify the local certificate
+            debuglog "verifying the certificate"
+            debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR}"
+
+            # the quotes with an empty "${ROOT_CA}" will make verify fail with a file not found
+            # shellcheck disable=SC2086
+            ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2> "${ERROR}" 1> /dev/null
+            RET=$?
 
         else
             unknown "Error: option 'file' works with -H localhost only"
@@ -1949,6 +1958,12 @@ fetch_certificate() {
             ERROR='OpenSSL connection timed out'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+
+        elif ascii_grep 'lookup: unable to get local issuer certificate' "${ERROR}"; then
+
+            if [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
+                prepend_critical_message 'Error verifying the certificate chain'
+            fi
 
         elif ascii_grep 'dh\ key\ too\ small' "${ERROR}"; then
 
@@ -3930,10 +3945,7 @@ main() {
         NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
         debuglog "  Number of certificates in the chain: ${NUM_CERTIFICATES}"
 
-        CHAIN_ELEMENT_ISSUER=''
-        CHAIN_ELEMENT_SUBJECT=''
-        CHAIN_ELEMENT_ISSUER_HASH=''
-        CHAIN_ELEMENT_SUBJECT_HASH=''
+        debuglog "Checking certificate chain"
 
         # start with first certificate
         CERT_IN_CHAIN=1
@@ -3955,45 +3967,14 @@ main() {
             debuglog "      ELEMENT_ISSUER=${ELEMENT_ISSUER}"
             ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
 
-            # Check the chain (https://docs.apigee.com/how-to-guides/validating-certificate-chain)
-            #
-            # get the issuer and subject of each element
-            # - from the second element the subject must be the same as the previous issuers
-            # - we skip the test if some elements are skipped
-
-            if [ -z "${SKIP_ELEMENT}" ] && [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
-
-                debuglog "Checking the chain integrity of element (${CERT_IN_CHAIN})"
-                debuglog "  previous element issuer  = ${CHAIN_ELEMENT_ISSUER}"
-                debuglog "  previous element subject = ${CHAIN_ELEMENT_SUBJECT}"
-
-                CHAIN_ELEMENT_SUBJECT="$(extract_cert_attribute 'subject' "${CERT_ELEMENT}" | sed 's/^subject=//')"
-                CHAIN_ELEMENT_SUBJECT_HASH="$(extract_cert_attribute 'hash' "${CERT_ELEMENT}")"
-
-                debuglog "  element subject = ${CHAIN_ELEMENT_SUBJECT} (${CHAIN_ELEMENT_SUBJECT_HASH})"
-
-                if [ "${CHAIN_ELEMENT_SUBJECT}" = "${CHAIN_ELEMENT_ISSUER}" ] &&
-                    [ "${CHAIN_ELEMENT_SUBJECT_HASH}" = "${CHAIN_ELEMENT_ISSUER_HASH}" ]; then
-                    debuglog "  the element's (${CERT_IN_CHAIN}) subject matches the previous issuer"
-                else
-                    debuglog "  the element's (${CERT_IN_CHAIN}) subject does not match the previous issuer"
-                    if [ "${CERT_IN_CHAIN}" -ne 1 ]; then
-                        # we do not check the first element
-                        prepend_critical_message "Incomplete certificate chain (subject of element ${CERT_IN_CHAIN} '${CHAIN_ELEMENT_SUBJECT}' (${CHAIN_ELEMENT_SUBJECT_HASH}) does not match the issuer of the previous element '${CHAIN_ELEMENT_ISSUER}' (${CHAIN_ELEMENT_ISSUER_HASH})"
-                    fi
-                fi
-
-                CHAIN_ELEMENT_ISSUER="$(echo "${ELEMENT_ISSUER}" | sed 's/^issuer=//')"
-                CHAIN_ELEMENT_ISSUER_HASH="$(extract_cert_attribute 'issuer_hash' "${CERT_ELEMENT}")"
-                debuglog "  element issuer = ${CHAIN_ELEMENT_ISSUER} (${CHAIN_ELEMENT_ISSUER_HASH})"
-
-            fi
-
             CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
             if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
                 break
             fi
         done
+
+        debuglog "Certificate chain check finished"
+
     fi
 
     debuglog 'ISSUERS = '

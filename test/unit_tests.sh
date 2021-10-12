@@ -1144,19 +1144,19 @@ testSubdomainWithUnderscore() {
 }
 
 testChainOK() {
-    ${SCRIPT} -f ./fullchain.pem
+    ${SCRIPT} -f ./fullchain.pem --allow-empty-san --ignore-sct
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testChainFail() {
-    ${SCRIPT} -f ./incomplete_chain.pem
+    ${SCRIPT} -f ./incomplete_chain.pem --allow-empty-san --ignore-sct
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testChainFailIgnored() {
-    ${SCRIPT} -f ./incomplete_chain.pem --ignore-incomplete-chain
+    ${SCRIPT} -f ./incomplete_chain.pem --ignore-incomplete-chain --allow-empty-san --ignore-sct
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
