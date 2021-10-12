@@ -853,20 +853,20 @@ testNotLongerValidThan() {
 }
 
 testDERCert() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./der.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san
+    ${SCRIPT} --rootcert-file cabundle.crt -f ./der.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testDERCertSymbolicLink() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./derlink.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san
+    ${SCRIPT} --rootcert-file cabundle.crt -f ./derlink.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPKCS12Cert() {
     export PASS=
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2 --allow-empty-san
+    ${SCRIPT} --rootcert-file cabundle.crt -f ./client.p12 --ignore-sct --password env:PASS --critical 1 --warning 2 --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -878,7 +878,7 @@ testCertificsteWithoutCN() {
 }
 
 testCertificsteWithEmptySubject() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2 --ignore-incomplete-chain
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
