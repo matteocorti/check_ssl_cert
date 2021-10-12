@@ -872,7 +872,7 @@ testPKCS12Cert() {
 }
 
 testCertificsteWithoutCN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H localhost -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2 --ignore-incomplete-chain
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1004,7 +1004,9 @@ testGithubComCRL() {
     create_temporary_test_file '.crl'
     TEMPFILE_CRL=${TEMPFILE}
 
+    echo "${GITHUB_CRL_URI}"
     curl --silent "${GITHUB_CRL_URI}" >"${TEMPFILE_CRL}"
+    cp "${TEMPFILE_CRL}" crl
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
     EXIT_CODE=$?

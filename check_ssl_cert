@@ -1892,14 +1892,22 @@ fetch_certificate() {
             debuglog "storing the certificate to ${CERT}"
             debuglog "certificate type (2): $(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
 
-            # verify the local certificate
-            debuglog "verifying the certificate"
-            debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR}"
+            if ! grep -q -F 'CRL' "${CERT}"; then
 
-            # the quotes with an empty "${ROOT_CA}" will make verify fail with a file not found
-            # shellcheck disable=SC2086
-            ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2> "${ERROR}" 1> /dev/null
-            RET=$?
+                # verify the local certificate
+                debuglog "verifying the certificate"
+                debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR}"
+
+                # the quotes with an empty "${ROOT_CA}" will make verify fail with a file not found
+                # shellcheck disable=SC2086
+                ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2> "${ERROR}" 1> /dev/null
+                RET=$?
+
+            else
+
+                debuglog "skipping verification on CRL"
+
+            fi
 
         else
             unknown "Error: option 'file' works with -H localhost only"
