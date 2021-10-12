@@ -1965,6 +1965,12 @@ fetch_certificate() {
                 prepend_critical_message 'Error verifying the certificate chain'
             fi
 
+        elif ascii_grep 'self signed certificate' "${ERROR}"; then
+
+            if [ -z "${SELFSIGNED}" ]; then
+                prepend_critical_message 'Self signed certificate'
+            fi
+
         elif ascii_grep 'dh\ key\ too\ small' "${ERROR}"; then
 
             prepend_critical_message 'DH with a key too small'
