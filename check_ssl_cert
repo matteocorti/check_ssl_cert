@@ -1883,7 +1883,7 @@ fetch_certificate() {
 
             else
 
-                 debuglog "Copying the certificate to ${CERT}"
+                debuglog "Copying the certificate to ${CERT}"
                 /bin/cat "${FILE}" >"${CERT}"
                 RET=$?
 
@@ -1896,11 +1896,12 @@ fetch_certificate() {
 
                 # verify the local certificate
                 debuglog "verifying the certificate"
-                debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR}"
+                debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR} 1>&2"
 
                 # the quotes with an empty "${ROOT_CA}" will make verify fail with a file not found
+		# onlder versions of OpenSSL write the error on standard input
                 # shellcheck disable=SC2086
-                ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2> "${ERROR}" 1> /dev/null
+                ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2>"${ERROR}" 1>&2
                 RET=$?
 
             else
@@ -1967,7 +1968,7 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
-        elif ascii_grep 'lookup: unable to get local issuer certificate' "${ERROR}"; then
+        elif ascii_grep 'unable to get local issuer certificate' "${ERROR}"; then
 
             if [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
                 prepend_critical_message 'Error verifying the certificate chain'
