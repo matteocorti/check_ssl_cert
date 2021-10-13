@@ -1,1 +1,1 @@
-Fixed the local certificate chain check
+Fixed the certificate chain check
