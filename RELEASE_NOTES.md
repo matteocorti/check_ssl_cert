@@ -1,1 +1,1 @@
-Fixed the certificate chain check
+Improved the certificate chain check of local bundles
