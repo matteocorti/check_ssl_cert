@@ -1894,14 +1894,33 @@ fetch_certificate() {
 
             if ! grep -q -F 'CRL' "${CERT}"; then
 
+                NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+
+                if [ "${NUM_CERTIFICATES}" -gt 1 ]; then
+                    debuglog "Certificate seems to be ca ca-bundle, splitting it"
+
+                    create_temporary_file
+                    USER_CERTIFICATE=${TEMPFILE}
+                    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
+                        awk -v n="1" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' > "${USER_CERTIFICATE}"
+
+                    create_temporary_file
+                    INTERMEDIATE_CERTIFICATES=${TEMPFILE}
+                    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
+                        awk -v n="2" '/-BEGIN CERTIFICATE-/{l++} (l>=n) {print}' > "${INTERMEDIATE_CERTIFICATES}"
+                    VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} -untrusted ${INTERMEDIATE_CERTIFICATES} ${USER_CERTIFICATE}"
+                else
+                    debuglog "Certificate does not contain any intermediates, checking the chain will probably fail."
+                    VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} ${CERT}"
+                fi
+
                 # verify the local certificate
                 debuglog "verifying the certificate"
-                debuglog "  ${OPENSSL} verify ${ROOT_CA}  ${CERT} 2> ${ERROR} 1>&2"
+                debuglog "  ${VERIFY_COMMAND} 2> ${ERROR} 1>&2"
 
-                # the quotes with an empty "${ROOT_CA}" will make verify fail with a file not found
-		# onlder versions of OpenSSL write the error on standard input
+                # on older versions of OpenSSL write the error on standard input
                 # shellcheck disable=SC2086
-                ${OPENSSL} verify ${ROOT_CA} "${CERT}" 2>"${ERROR}" 1>&2
+                ${VERIFY_COMMAND} 2>"${ERROR}" 1>&2
                 RET=$?
 
             else
