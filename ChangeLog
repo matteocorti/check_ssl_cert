@@ -1,3 +1,7 @@
+2021-10-15  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (create_temporary_file): AIX compatible temporary file creation
+
 2021-10-12  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (fetch_certificate): using OpenSSL verify to verify a local chain

@@ -353,7 +353,9 @@ cleanup() {
 create_temporary_file() {
 
     # create a temporary file
-    TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
+    #   mktemp is not always available (e.g., on AIX)
+    #   https://stackoverflow.com/questions/10224921/how-to-create-a-temporary-file-with-portable-shell-in-a-secure-way
+    TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | od -N4 -tu /dev/random | head -n 1 | sed 's/\ *$//' | sed 's/.*\ //')
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ]; then
         unknown 'temporary file creation failure.'
     fi
