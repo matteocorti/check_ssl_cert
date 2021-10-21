@@ -3193,16 +3193,16 @@ main() {
 
     if [ -n "${RSA}" ]; then
 
-	# check if ciphers with PSS are available
-	if ! "${OPENSSL}" ciphers | grep -q -F 'PSS' ; then
-	    NO_PSS=1
-	fi
+        # check if ciphers with PSS are available
+        if ! "${OPENSSL}" ciphers | grep -q -F 'PSS'; then
+            NO_PSS=1
+        fi
 
         if echo "${SSL_VERSION_DISABLED}" | grep -F -q -- '-no_tls1_3' ||
             [ "${SSL_VERSION}" = '-tls1' ] ||
             [ "${SSL_VERSION}" = '-tls1_1' ] ||
             [ "${SSL_VERSION}" = '-tls1_2' ] ||
-	    [ -n "${NO_PSS}" ]; then
+            [ -n "${NO_PSS}" ]; then
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
             # see https://github.com/matteocorti/check_ssl_cert/issues/167
             SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"
