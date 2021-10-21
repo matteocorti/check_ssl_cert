@@ -1,3 +1,8 @@
+2021-10-21  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixes --rsa on systems not supporting PSS
+        * check_ssl_cert (create_temporary_file): Uses mktemp if available (the workaround is only used if not available for speed reasons)
+
 2021-10-15  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (create_temporary_file): AIX compatible temporary file creation
