@@ -354,9 +354,16 @@ create_temporary_file() {
 
     # create a temporary file
     #   mktemp is not always available (e.g., on AIX)
-    #   https://stackoverflow.com/questions/10224921/how-to-create-a-temporary-file-with-portable-shell-in-a-secure-way
-    TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | od -N4 -tu /dev/random | head -n 1 | sed 's/\ *$//' | sed 's/.*\ //')
-    touch "${TEMPFILE}"
+    #   we could use https://stackoverflow.com/questions/10224921/how-to-create-a-temporary-file-with-portable-shell-in-a-secure-way
+    #   but on some systems od -N4 -tu /dev/random takes seconds (?) to execute
+
+    if [ -n "${MKTEMP}" ] ; then
+	TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
+    else
+	TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | head -n 1 | sed 's/\ *$//' | sed 's/.*\ //')
+	touch "${TEMPFILE}"
+    fi
+
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ]; then
         unknown 'temporary file creation failure.'
     fi
@@ -3226,6 +3233,14 @@ main() {
     check_required_prog "${FILE_BIN}"
     FILE_BIN=${PROG}
 
+    # mktemp
+    MKTEMP=$(command -v mktemp 2>/dev/null)
+    if [ -z "${MKTEMP}" ] ; then
+	debuglog "mktemp not available"
+    else
+	debuglog "mktemp available: ${MKTEMP}"
+    fi
+
     # date
     if [ -z "${DATEBIN}" ]; then
         check_required_prog 'date'
@@ -3617,6 +3632,7 @@ main() {
     else
         HOST_HEADER="${HOST_NAME}"
     fi
+    debuglog "HOST_HEADER = ${HOST_HEADER}"
 
     # add newline if custom HTTP header is defined
     if [ -n "${CUSTOM_HTTP_HEADER}" ]; then
@@ -3756,6 +3772,8 @@ main() {
 
     fi
 
+    debuglog "Sanity checks: OK"
+
     ################################################################################
     # Fetch the X.509 certificate
 
@@ -3785,6 +3803,8 @@ main() {
         create_temporary_file
         OCSP_RESPONSE_TMP=${TEMPFILE}
     fi
+
+    debuglog "Temporary files created"
 
     if [ -z "${FILE}" ]; then
         verboselog "downloading certificate to ${TMPDIR}"
