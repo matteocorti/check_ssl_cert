@@ -5,7 +5,7 @@ DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(P
 YEAR=`date +"%Y"`
 MONTH_YEAR=`date +"%B, %Y"`
 FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* utils/*.sh
-SCRIPTS=check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh utils/format_files.sh
+SCRIPTS=check_ssl_cert test/unit_tests.sh utils/prepare_rpm.sh utils/publish_release.sh utils/format_files.sh utils/stats.sh
 
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
