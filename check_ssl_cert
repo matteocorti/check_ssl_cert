@@ -3182,6 +3182,22 @@ main() {
 
     debuglog "ROOT_CA = ${ROOT_CA}"
 
+    if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
+        if ! echo "${IGNORE_CONNECTION_STATE}" | grep -q '^[0-3]$'; then
+            unknown "The specified state (${IGNORE_CONNECTION_STATE}) is not valid (must be 0,1,2 or 3)"
+        fi
+    fi
+
+    #######################
+    # Check needed programs
+
+    # OpenSSL
+    if [ -z "${OPENSSL}" ]; then
+        OPENSSL='openssl'
+    fi
+    check_required_prog "${OPENSSL}"
+    OPENSSL=${PROG}
+
     # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ]; then
         unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'
@@ -3212,27 +3228,11 @@ main() {
         fi
     fi
     if [ -n "${SSL_AU}" ]; then
-        if "${OPENSSL}" ciphers "${SSL_AU}" >/dev/null 2>&1; then
-            unknown "OpenSSL does not support cipher ${SSL_AU}"
+        if ! "${OPENSSL}" ciphers "${SSL_AU}" >/dev/null 2>&1; then
+            unknown "OpenSSL does not support cipher '${SSL_AU}'"
         fi
         SSL_AU="-sigalgs '${SSL_AU}'"
     fi
-
-    if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
-        if ! echo "${IGNORE_CONNECTION_STATE}" | grep -q '^[0-3]$'; then
-            unknown "The specified state (${IGNORE_CONNECTION_STATE}) is not valid (must be 0,1,2 or 3)"
-        fi
-    fi
-
-    #######################
-    # Check needed programs
-
-    # OpenSSL
-    if [ -z "${OPENSSL}" ]; then
-        OPENSSL='openssl'
-    fi
-    check_required_prog "${OPENSSL}"
-    OPENSSL=${PROG}
 
     # file
     if [ -z "${FILE_BIN}" ]; then
