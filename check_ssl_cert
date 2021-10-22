@@ -972,15 +972,22 @@ extract_cert_attribute() {
 
         # on older systems the fields where separated by /, e.g.,
         #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
-        # on newwer systems the fielda are separated by , and are quoted, e.g.,
+        # on newwer systems the fielda are separated by , and are sometimes quoted (if they contain a comma), e.g.,
         #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
+        #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
 
         if echo "${cert_subject}" | grep -q '^subject=\ \/' ; then
             # old format
             echo "${cert_subject}" | sed -e 's/.*\/O=//' -e 's/\/.*//'
         else
             # new format
-            echo "${cert_subject}" | sed -e 's/.*O\ =\ "//' -e 's/".*//'
+            if echo "${cert_subject}" | grep -q 'O\ =\ "' ; then
+                # quotes
+                echo "${cert_subject}" | sed -e 's/.*O\ =\ "//' -e 's/".*//'
+            else
+                # no quotes
+                echo "${cert_subject}" | sed -e 's/.*O\ =\ //' -e 's/\,\ .*//'
+            fi
         fi
         ;;
     email)
