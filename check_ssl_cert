@@ -4471,7 +4471,7 @@ main() {
     fi
 
     ################################################################################
-    # Check SSL Labs
+    # Check nmap
     if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
 
         verboselog "checking offered ciphers with nmap"
@@ -4510,6 +4510,10 @@ main() {
         fi
 
         if [ -n "${CHECK_CIPHERS}" ]; then
+
+            if ! grep -F 'least strength' ; then
+                unknown 'nmap does not deliver cipher strength'
+            fi
 
             NMAP_GRADE=$(grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
             convert_grade "${NMAP_GRADE}"

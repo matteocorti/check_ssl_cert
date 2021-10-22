@@ -928,6 +928,8 @@ testCiphersOK() {
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
+    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+        echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
 
         # check if nmap is installed
@@ -957,6 +959,8 @@ testCiphersError() {
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
+    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+        echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
 
         # check if nmap is installed
@@ -1034,7 +1038,7 @@ testCertExpiringInLessThanOneDay() {
 
     CERT=$(createSelfSignedCertificate 1)
 
-    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned --allow-empty-san
+    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned --allow-empty-san --ignore-sig-alg
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
