@@ -1164,9 +1164,13 @@ testChainFailIgnored() {
 }
 
 testRSA() {
-    ${SCRIPT} -H github.com --rsa --tls1_2
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -sigalgs; then
+        ${SCRIPT} -H github.com --rsa --tls1_2
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Skipping forcing RSA: no OpenSSL support"
+    fi
 }
 
 testOrganizationFail() {
