@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.10.3
+VERSION=2.10.4
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4436,6 +4436,8 @@ main() {
 
             done
 
+            debuglog '------------------------------------------------------------------------------'
+
         fi
 
     fi
@@ -4662,7 +4664,10 @@ main() {
 
         ORG="$(extract_cert_attribute 'org' "${CERT}")"
 
-        if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}"; then
+        debuglog "  ORG          = ${ORG}"
+        debuglog "  ORGANIZATION = ${ORGANIZATION}"
+
+        if ! echo "${ORG}" | grep -q -E "${ORGANIZATION}"; then
             prepend_critical_message "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
         fi
 

@@ -1,3 +1,4 @@
+2021-10-22 Version  2.10.4: Fixes the organisation check
 2021-10-21 Version  2.10.3: Fixes --rsa on systems not supporting PSS
                             Uses mktemp if available (the workaround is only used if not available for speed reasons)
 2021-10-14 Version  2.10.2: Improved the certificate chain check of local bundles

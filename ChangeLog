@@ -1,3 +1,7 @@
+2021-10-22  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Fixed the organization check
+
 2021-10-21  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh (testRSA): Added a test for RSA ciphers

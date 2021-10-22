@@ -1169,6 +1169,18 @@ testRSA() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testOrganizationFail() {
+    ${SCRIPT} -H github.com -o 'California.*Los\ Angeles'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testOrganizationOK() {
+    ${SCRIPT} -H github.com -o 'California.*San Francisco.*GitHub,\ Inc.'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
