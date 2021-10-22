@@ -15,3 +15,11 @@ printf "Authors:\\t%s\\n" "${authors}"
 printf "Versions:\\t%s\\n" "${versions}"
 
 echo
+
+tests=$( grep -c '^test' test/unit_tests.sh )
+loc=$( grep -c '.' check_ssl_cert )
+
+printf "LoC:\\t\\t%s\\n" "${loc}"
+printf "Tests:\\t\\t%s\\n" "${tests}"
+
+echo
