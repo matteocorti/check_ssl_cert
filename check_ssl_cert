@@ -4511,7 +4511,7 @@ main() {
 
         if [ -n "${CHECK_CIPHERS}" ]; then
 
-            if ! grep -F 'least strength' ; then
+            if ! grep -q -F 'least strength' "${NMAP_OUT}" ; then
                 unknown 'nmap does not deliver cipher strength'
             fi
 
