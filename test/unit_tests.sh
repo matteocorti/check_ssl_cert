@@ -1170,13 +1170,13 @@ testRSA() {
 }
 
 testOrganizationFail() {
-    ${SCRIPT} -H github.com -o 'California.*Los\ Angeles'
+    ${SCRIPT} -H github.com -o 'SomeOrg'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testOrganizationOK() {
-    ${SCRIPT} -H github.com -o 'California.*San Francisco.*GitHub,\ Inc.'
+    ${SCRIPT} -H github.com -o 'GitHub,\ Inc.'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

@@ -968,7 +968,20 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
         ;;
     org)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject | sed -e 's/.*\/O=//' -e 's/\/.*//'
+        cert_subject=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject )
+
+        # on older systems the fields where separated by /, e.g.,
+        #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
+        # on newwer systems the fielda are separated by , and are quoted, e.g.,
+        #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
+
+        if echo "${cert_subject}" | grep -q '^subject=\ \/' ; then
+            # old format
+            echo "${cert_subject}" | sed -e 's/.*\/O=//' -e 's/\/.*//'
+        else
+            # new format
+            echo "${cert_subject}" | sed -e 's/.*O\ =\ "//' -e 's/".*//'
+        fi
         ;;
     email)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
@@ -4667,7 +4680,7 @@ main() {
         debuglog "  ORG          = ${ORG}"
         debuglog "  ORGANIZATION = ${ORGANIZATION}"
 
-        if ! echo "${ORG}" | grep -q -E "${ORGANIZATION}"; then
+        if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}"; then
             prepend_critical_message "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
         fi
 
