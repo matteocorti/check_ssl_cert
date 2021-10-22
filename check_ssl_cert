@@ -2908,6 +2908,7 @@ main() {
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
+    debuglog "  TMPDIR = ${TMPDIR}"
 
     if [ -n "${ALL}" ]; then
 
