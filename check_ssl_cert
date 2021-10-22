@@ -3223,6 +3223,14 @@ main() {
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ]; then
         unknown 'both --rsa and --ecdsa specified: cannot force both ciphers at the same time'
     fi
+
+    # check if -sigalgs is available
+    if  [ -n "${RSA}" ] || [ -n "${ECDSA}" ] ; then
+        if ! "${OPENSSL}" s_client -help 2>&1 | grep -- -sigalgs ; then
+            unkown '--rsa or --ecdsa specified but OpenSSL does not support the -sigalgs option'
+        fi
+    fi
+
     if [ -n "${ECDSA}" ]; then
         # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
         SSL_AU="ECDSA+SHA1:ECDSA+SHA224:ECDSA+SHA384:ECDSA+SHA256:ECDSA+SHA512"

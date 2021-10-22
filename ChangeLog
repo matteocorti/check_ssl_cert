@@ -1,6 +1,7 @@
 2021-10-22  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed the organization check
+        * check_ssl_cert (main): Check if -sigalgs is available
 
 2021-10-21  Matteo Corti  <matteo@corti.li>
 
