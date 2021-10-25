@@ -59,7 +59,7 @@ Options:
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --first-element-only         verify just the first cert element, not the whole chain
-      --force-dcovn-date           force the usage of dconf for date computations
+      --force-dconv-date           force the usage of dconf for date computations
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
@@ -171,6 +171,12 @@ Deprecated options:
       --days days                  minimum number of days a certificate has to be valid
                                    (see --critical and --warning)
    -N,--host-cn                    match CN with the host name (enabled by default)
+      --no_ssl2                    disable SSLv2 (deprecated use --no-ssl2)
+      --no_ssl3                    disable SSLv3 (deprecated use --no-ssl3)
+      --no_tls1                    disable TLSv1 (deprecated use --no-tls1)
+      --no_tls1_1                  disable TLSv1.1 (deprecated use --no-tls1_1)
+      --no_tls1_2                  disable TLSv1.1 (deprecated use --no-tls1_2)
+      --no_tls1_3                  disable TLSv1.1 (deprecated use --no-tls1_3)
       --ocsp                       check revocation via OCSP (enabled by default)
       --require-san                require the presence of a Subject Alternative Name
                                    extension
