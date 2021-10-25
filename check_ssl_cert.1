@@ -30,9 +30,6 @@ enables all the possible optional checks at the maximum level (without SSL-Labs)
 .BR "    --allow-empty-san"
 allow certificates without Subject Alternative Names (SANs)
 .TP
-.BR "   --altnames"
-matches the pattern specified in -n with alternate names too
-.TP
 .BR "   --check-ciphers" " grade"
 checks the offered ciphers
 .TP
@@ -230,9 +227,6 @@ check that the issuer of the certificate does not match the given pattern
 .BR "   --not-valid-longer-than" " days"
 critical if the certificate validity is longer than the specified period
 .TP
-.BR "-N,--host-cn"
-match CN with the host name
-.TP
 .BR "   --ocsp-critical" " hours"
 minimum number of hours an OCSP response has to be valid to issue a critical status
 .TP
@@ -358,8 +352,17 @@ forces IPv4
 forces IPv6
 .SH DEPRECATED OPTIONS
 .TP
+.BR "   --altnames"
+matches the pattern specified in -n with alternate names too
+.TP
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
+.TP
+.BR "-N,--host-cn"
+match CN with the host name
+.TP
+.BR "--no_ssl2"
+disable SSLv2 (deprecated use --no-ssl2)
 .TP
 .BR "   --ocsp"
 check revocation via OCSP
