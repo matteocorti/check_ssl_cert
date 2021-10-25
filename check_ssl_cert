@@ -243,7 +243,7 @@ debuglog() {
     if [ -n "${DEBUG_TIME}" ]; then
         NOW=$(date +%s)
         ELAPSED=$((NOW - DEBUG_TIME))
-        ELAPSED=": ${ELAPSED}"
+        ELAPSED=$( printf "%04d" "${ELAPSED}" )
     fi
 
     if [ -z "${LEVEL}" ]; then
@@ -252,13 +252,53 @@ debuglog() {
     fi
 
     if [ "${LEVEL}" -le "${DEBUG}" ]; then
-        echo "${1}" | sed "s/^/[DBG${ELAPSED}] /" >&2
+        if [ -n "${ELAPSED}" ]; then
+            echo "${1}" | sed "s/^/[DBG ${ELAPSED}s] /" >&2
+        else
+            echo "${1}" | sed "s/^/[DBG] /" >&2
+        fi
     fi
 
     # debuglog is also called during the --debug-file sanity checks: we have
     # to check if the file exists
     if [ -n "${DEBUG_FILE}" ] && [ -e "${DEBUG_FILE}" ] && ! [ -d "${DEBUG_FILE}" ] && [ -w "${DEBUG_FILE}" ]; then
-        echo "${1}${ELAPSED}" >>"${DEBUG_FILE}"
+        if [ -n "${ELAPSED}" ]; then
+            echo "+${ELAPSED}s ${1}" >>"${DEBUG_FILE}"
+        else
+            echo "${1}" >>"${DEBUG_FILE}"
+        fi
+    fi
+
+}
+
+################################################################################
+# Checks if the given file can be created and written
+# $1: file name
+open_for_appending() {
+
+    FILE_TO_OPEN=$1
+
+    if [ -d "${FILE_TO_OPEN}" ]; then
+
+        unknown "${FILE_TO_OPEN} is a directory"
+
+    elif [ -e "${FILE_TO_OPEN}" ]; then
+
+        # file already exists
+        if [ ! -w "${FILE_TO_OPEN}" ]; then
+            unknown "Cannot write to ${FILE_TO_OPEN}"
+        fi
+
+    else
+
+        FILE_TO_OPEN_DIRECTORY=$(dirname "${FILE_TO_OPEN}")
+        if [ ! -w "${FILE_TO_OPEN_DIRECTORY}" ]; then
+            unknown "Cannot write to ${FILE_TO_OPEN}"
+        fi
+
+        # clear / create the file
+        true >"${FILE_TO_OPEN}"
+
     fi
 
 }
@@ -2924,7 +2964,8 @@ main() {
     fi
 
     if [ -n "${DEBUG_FILE}" ]; then
-        open_for_writing "${DEBUG_FILE}"
+        open_for_appending "${DEBUG_FILE}"
+        date >> "${DEBUG_FILE}"
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"

@@ -1,7 +1,12 @@
+2021-10-25  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (debuglog): Better formatting of the elapsed time in the log output
+
 2021-10-22  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed the organization check
         * check_ssl_cert (main): Check if -sigalgs is available
+        * check_ssl_cert (check_attr): check if nmap delivers cipher strenghts
 
 2021-10-21  Matteo Corti  <matteo@corti.li>
 
