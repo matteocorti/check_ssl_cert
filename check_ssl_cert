@@ -48,6 +48,18 @@ DEBUG_FILE=""
 # Functions
 
 ################################################################################
+# To set a variable with an HEREDOC in a POSIX compliant way
+# see: https://unix.stackexchange.com/questions/340718/how-do-i-bring-heredoc-text-into-a-shell-script-variable
+# Usage:
+#   set_variable variablename<<'HEREDOC'
+#   ...
+#  HEREDOC
+set_variable() {
+    # shellcheck disable=SC2016
+    eval "$1"'=$(cat)'
+}
+
+################################################################################
 # Prints usage information
 # Params
 #   $1 error message (optional)
@@ -105,7 +117,7 @@ usage() {
     echo "      --file-bin path              path of the file binary to be used"
     echo "      --fingerprint SHA1           pattern to match the SHA1-Fingerprint"
     echo "      --first-element-only         verify just the first cert element, not the whole chain"
-    echo "      --force-dcovn-date           force the usage of dconf for date computations"
+    echo "      --force-dconv-date           force the usage of dconf for date computations"
     echo "      --force-perl-date            force the usage of Perl for date computations"
     echo "      --format FORMAT              format output template on success, for example"
     echo "                                   \"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'\""
@@ -217,6 +229,12 @@ usage() {
     echo "      --days days                  minimum number of days a certificate has to be valid"
     echo "                                   (see --critical and --warning)"
     echo "   -N,--host-cn                    match CN with the host name (enabled by default)"
+    echo "      --no_ssl2                    disable SSLv2 (deprecated use --no-ssl2)"
+    echo "      --no_ssl3                    disable SSLv3 (deprecated use --no-ssl3)"
+    echo "      --no_tls1                    disable TLSv1 (deprecated use --no-tls1)"
+    echo "      --no_tls1_1                  disable TLSv1.1 (deprecated use --no-tls1_1)"
+    echo "      --no_tls1_2                  disable TLSv1.1 (deprecated use --no-tls1_2)"
+    echo "      --no_tls1_3                  disable TLSv1.1 (deprecated use --no-tls1_3)"
     echo "      --ocsp                       check revocation via OCSP (enabled by default)"
     echo "      --require-san                require the presence of a Subject Alternative Name"
     echo "                                   extension"
@@ -938,18 +956,6 @@ require_s_client_option() {
     if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "$1"; then
         unknown "s_client does not support the $1 option"
     fi
-}
-
-################################################################################
-# To set a variable with an HEREDOC in a POSIX compliant way
-# see: https://unix.stackexchange.com/questions/340718/how-do-i-bring-heredoc-text-into-a-shell-script-variable
-# Usage:
-#   set_variable variablename<<'HEREDOC'
-#   ...
-#  HEREDOC
-set_variable() {
-    # shellcheck disable=SC2016
-    eval "$1"'=$(cat)'
 }
 
 ################################################################################
@@ -2307,27 +2313,33 @@ parse_command_line_options() {
             NO_PROXY_CURL=1
             shift
             ;;
-        --no-ssl2 | --no_ssl2) # we keep the old variant for compatibility
+        --no-ssl2 | --no_ssl2)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2"
             shift
             ;;
-        --no-ssl3 | --no_ssl3) # we keep the old variant for compatibility
+        --no-ssl3 | --no_ssl3)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
             shift
             ;;
-        --no-tls1 | --no_tls1) # we keep the old variant for compatibility
+        --no-tls1 | --no_tls1)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1"
             shift
             ;;
-        --no-tls1_1 | --no_tls1_1) # we keep the old variant for compatibility
+        --no-tls1_1 | --no_tls1_1)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_1"
             shift
             ;;
-        --no-tls1_2 | --no_tls1_2) # we keep the old variant for compatibility
+        --no-tls1_2 | --no_tls1_2)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_2"
             shift
             ;;
-        --no-tls1_3 | --no_tls1_3) # we keep the old variant for compatibility
+        --no-tls1_3 | --no_tls1_3)
+            # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
             shift
             ;;
