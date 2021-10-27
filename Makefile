@@ -74,6 +74,7 @@ SHUNIT := $(shell command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/
 distcheck: disttest
 disttest: dist formatting_check copyright_check shellcheck
 	./utils/check_documentation.sh
+	man ./check_ssl_cert.1 > /dev/null
 
 test: disttest
 ifndef SHUNIT
