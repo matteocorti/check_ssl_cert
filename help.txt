@@ -40,7 +40,7 @@
 --file-bin path;path of the file binary to be used
 --fingerprint SHA1;pattern to match the SHA1-Fingerprint
 --first-element-only;verify just the first cert element, not the whole chain
---force-dconv-date;force the usage of dconf for date computations
+--force-dconv-date;force the usage of dconv for date computations
 --force-perl-date;force the usage of Perl for date computations
 --format FORMAT;format output template on success, for example
 --format FORMAT;%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'
@@ -66,7 +66,7 @@
 -K,--clientkey path;use client certificate key to authenticate
 -L,--check-ssl-labs grade;SSL Labs assessment
 -L,--check-ssl-labs grade;(please check https://www.ssllabs.com/about/terms.html)
---check-ssl-labs-warn grade;SSL-Labs grade on which to warn
+--check-ssl-labs-warn grade;SSL Labs grade on which to warn
 --long-output list;append the specified comma separated (no spaces) list
 --long-output list;of attributes to the plugin output on additional lines
 --long-output list;Valid attributes are:
@@ -100,16 +100,13 @@
 --password source;openssl(1)
 -p,--port port;TCP port
 --prometheus;generates Prometheus/OpenMetrics output
--P,--protocol protocol;use the specific protocol
--P,--protocol protocol;{ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
--P,--protocol protocol;postgres|sieve|smtp|smtps|xmpp|xmpp-server}
--P,--protocol protocol;https:                             default
--P,--protocol protocol;h2:                                forces HTTP/2
--P,--protocol protocol;ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
--P,--protocol protocol;TLS using StartTLS
+-P,--protocol protocol;use the specific protocol:
+-P,--protocol protocol;ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap
+-P,--protocol protocol;ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server
+-P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS
 --proxy proxy;sets http_proxy and the s_client -proxy option
 --require-client-cert [list];the server must accept a client certificate
---require-client-cert [list];list is an optional comma separated list expected client certificate CAs
+--require-client-cert [list];is an optional comma separated list of expected client certificate CAs
 --require-no-ssl2;critical if SSL version 2 is offered
 --require-no-ssl3;critical if SSL version 3 is offered
 --require-no-tls1;critical if TLS 1 is offered
@@ -120,8 +117,8 @@
 --skip-element number;skips checks on the Nth cert element (can be specified multiple times)
 --sni name;sets the TLS SNI (Server Name Indication) extension
 --sni name;in the ClientHello message to 'name'
---ssl2;forces SSL version 2
---ssl3;forces SSL version 3
+--ssl2;force SSL version 2
+--ssl3;force SSL version 3
 --require-ocsp-stapling;require OCSP stapling
 -r,--rootcert path;root certificate or directory to be used for
 -r,--rootcert path;certificate validation

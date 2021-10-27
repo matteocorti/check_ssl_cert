@@ -61,10 +61,13 @@ while read line; do
         ERROR=1
     fi
 
-    # if ! grep -q "${line}" check_ssl_cert.1 ; then
-    #     echo "Error: the description of option ${option} '${description}' is not the same in check_ssl_cert.1"
-    #     ERROR=1
-    # fi
+    if ! grep -q "${description}" check_ssl_cert.1 ; then
+        # check for automatically generated options
+        if ! echo "${description}" | grep -q '${' ; then
+            echo "Error: the description of option '${option}' '${description}' is not present in check_ssl_cert.1"
+            ERROR=1
+        fi
+    fi
 
     # if ! grep -q "${line}" README.md ; then
     #     echo "Error: the description of option ${option} '${description}' is not the same in README.md"

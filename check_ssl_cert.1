@@ -57,9 +57,10 @@ user agent that curl shall use to obtain the issuer cert
 .TP
 .BR "   --custom-http-header" " string"
 custom HTTP header sent when getting the cert
+example: 'X-Check-Ssl-Cert: Foobar=1'
 .TP
 .BR "   --dane"
-verifies there are valid TLSA records for the returned certificate, requires OpenSSL 1.1.0 or later
+verify that valid DANE records exist (since OpenSSL 1.1.0)
 .TP
 .BR "   --dane 211"
 verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
@@ -73,6 +74,9 @@ verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
 .BR "   --dane 311"
 verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
 .TP
+.BR "   --dane 312"
+'verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record exists
+.TP
 .BR "   --date" " path"
 path of the date binary to be used
 .TP
@@ -83,7 +87,7 @@ produces debugging output (can be specified more than once)
 stores the retrieved certificates in the current directory
 .TP
 .BR "   --debug-file" " file"
-writes the debue messages to file
+writes the debug messages to file
 .TP
 .BR "   --debug-time"
 writes timing information in the debugging output
@@ -119,7 +123,7 @@ force the usage of dconv for date computations
 force the usage of Perl for date computations
 .TP
 .BR "   --format" " FORMAT"
-custom output format (e.g. "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'")
+format output template on success, for example "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
 .TP
 .BR "-h,--help,-?"
 this help message
@@ -176,7 +180,7 @@ pattern to match the issuer of the certificate
 use client certificate key to authenticate
 .TP
 .BR "-L,--check-ssl-labs grade"
-SSL Labs assestment (please check https://www.ssllabs.com/about/terms.html). Critical if the grade is lower than specified.
+SSL Labs assessment (please check https://www.ssllabs.com/about/terms.html). Critical if the grade is lower than specified.
 .TP
 .BR "   --check-ssl-labs-warn grade"
 SSL Labs grade on which to warn
@@ -249,15 +253,16 @@ TCP port
 generates Prometheus/OpenMetrics output
 .TP
 .BR "-P,--protocol" " protocol"
-use the specific protocol: ftp, ftps, http, https (default), h2 (http/2), imap, imaps, irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server.
+use the specific protocol: ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server.
+ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS.
 .br
 These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, mysql, pop3, smtp.
 .TP
 .BR "   --proxy" " proxy"
-sets http_proxy
+sets http_proxy and the s_client -proxy option
 .TP
 .BR "   --require-client-cert" " [list]"
-the server must accept a client certificate. [list] is an optional comma separated list expected client certificate CAs
+the server must accept a client certificate. [list] is an optional comma separated list of expected client certificate CAs
 .TP
 .BR "   --require-no-ssl2"
 critical if SSL version 2 is offered
@@ -343,29 +348,29 @@ version
 minimum number of days a certificate has to be valid to issue a warning status. Might be a floating point number, e.g., 0.5. Default: 20
 .TP
 .BR "   --xmpphost" " name"
-specifies the host for the "to" attribute of the stream element
+specifies the host for the 'to' attribute of the stream element
 .TP
 .BR "-4"
-forces IPv4
+force IPv4
 .TP
 .BR "-6"
-forces IPv6
+force IPv6
 .SH DEPRECATED OPTIONS
 .TP
 .BR "   --altnames"
-matches the pattern specified in -n with alternate names too
+matches the pattern specified in -n with alternate names too (enabled by default)
 .TP
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
 .TP
 .BR "-N,--host-cn"
-match CN with the host name
+match CN with the host name (enabled by default)
 .TP
 .BR "--no_ssl2"
 disable SSLv2 (deprecated use --no-ssl2)
 .TP
 .BR "--no_ssl3"
-disable SSLv2 (deprecated use --no-ssl3)
+disable SSLv3 (deprecated use --no-ssl3)
 .TP
 .BR "--no_tls1"
 disable TLSv1 (deprecated use --no-tls1)
@@ -380,7 +385,7 @@ disable TLSv1.1 (deprecated use --no-tls1_2)
 disable TLSv1.1 (deprecated use --no-tls1_3)
 .TP
 .BR "   --ocsp"
-check revocation via OCSP
+check revocation via OCSP (enabled by default)
 .TP
 .BR "   --require-san"
 require the presence of a Subject Alternative Name extension
