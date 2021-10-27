@@ -69,10 +69,13 @@ while read line; do
         fi
     fi
 
-    # if ! grep -q "${line}" README.md ; then
-    #     echo "Error: the description of option ${option} '${description}' is not the same in README.md"
-    #     ERROR=1
-    # fi
+    if ! grep -q "${description}" README.md ; then
+        # check for automatically generated options
+        if ! echo "${description}" | grep -q '${' ; then
+            echo "Error: the description of option '${option}' '${description}' is not present in README.md"
+            ERROR=1
+        fi
+    fi
 
 done < help.txt
 

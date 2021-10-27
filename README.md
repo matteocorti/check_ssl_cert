@@ -59,7 +59,7 @@ Options:
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --first-element-only         verify just the first cert element, not the whole chain
-      --force-dconv-date           force the usage of dconf for date computations
+      --force-dconv-date           force the usage of dconv for date computations
       --force-perl-date            force the usage of Perl for date computations
       --format FORMAT              format output template on success, for example
                                    "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
@@ -85,7 +85,7 @@ Options:
    -K,--clientkey path             use client certificate key to authenticate
    -L,--check-ssl-labs grade       SSL Labs assessment
                                    (please check https://www.ssllabs.com/about/terms.html)
-      --check-ssl-labs-warn grade  SSL-Labs grade on which to warn
+      --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --long-output list           append the specified comma separated (no spaces) list
                                    of attributes to the plugin output on additional lines
                                    Valid attributes are:
@@ -119,16 +119,13 @@ Options:
                                    openssl(1)
    -p,--port port                  TCP port
       --prometheus                 generates Prometheus/OpenMetrics output
-   -P,--protocol protocol          use the specific protocol
-                                   {ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
-                                    postgres|sieve|smtp|smtps|xmpp|xmpp-server}
-                                   https:                             default
-                                   h2:                                forces HTTP/2
-                                   ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
-                                   TLS using StartTLS
+   -P,--protocol protocol          use the specific protocol:
+                                   ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap
+                                   ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server
+                                   ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS
       --proxy proxy                sets http_proxy and the s_client -proxy option
       --require-client-cert [list] the server must accept a client certificate
-                                   list is an optional comma separated list expected client certificate CAs
+                                   list is an optional comma separated list of expected client certificate CAs
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
@@ -139,8 +136,8 @@ Options:
       --skip-element number        skips checks on the Nth cert element (can be specified multiple times)
       --sni name                   sets the TLS SNI (Server Name Indication) extension
                                    in the ClientHello message to 'name'
-      --ssl2                       forces SSL version 2
-      --ssl3                       forces SSL version 3
+      --ssl2                       force SSL version 2
+      --ssl3                       force SSL version 3
       --require-ocsp-stapling      require OCSP stapling
    -r,--rootcert path              root certificate or directory to be used for
                                    certificate validation
@@ -184,6 +181,7 @@ Deprecated options:
                                    (see: --ssl2 or --ssl3)
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
+
 ```
 
 ## Expect & timeout
