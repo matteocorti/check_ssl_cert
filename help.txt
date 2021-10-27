@@ -9,7 +9,7 @@
 --clientpass phrase;set passphrase for client certificate.
 -c,--critical days;minimum number of days a certificate has to be valid to issue a
 -c,--critical days;critical status. Might be a floating point number, e.g., 0.5
--c,--critical days;Default: 15
+-c,--critical days;Default: ${CRITICAL_DAYS}
 --crl;checks revokation via CRL (requires --rootcert-file)
 --curl-bin path;path of the curl binary to be used
 --curl-user-agent string;user agent that curl shall use to obtain the
@@ -43,7 +43,7 @@
 --force-dconv-date;force the usage of dconf for date computations
 --force-perl-date;force the usage of Perl for date computations
 --format FORMAT;format output template on success, for example
---format FORMAT;"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
+--format FORMAT;%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'
 -h,--help,-?;this help message
 --http-use-get;use GET instead of HEAD (default) for the HTTP
 --http-use-get;related checks
@@ -103,8 +103,8 @@
 -P,--protocol protocol;use the specific protocol
 -P,--protocol protocol;{ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
 -P,--protocol protocol;postgres|sieve|smtp|smtps|xmpp|xmpp-server}
--P,--protocol protocol;https:;default
--P,--protocol protocol;h2:;forces HTTP/2
+-P,--protocol protocol;https:                             default
+-P,--protocol protocol;h2:                                forces HTTP/2
 -P,--protocol protocol;ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
 -P,--protocol protocol;TLS using StartTLS
 --proxy proxy;sets http_proxy and the s_client -proxy option
@@ -131,7 +131,7 @@
 --temp dir;directory where to store the temporary files
 --terse;terse output
 -t,--timeout;seconds timeout after the specified time
--t,--timeout;(defaults to 120 seconds)
+-t,--timeout;(defaults to ${TIMEOUT} seconds)
 --tls1;force TLS version 1
 --tls1_1;force TLS version 1.1
 --tls1_2;force TLS version 1.2
@@ -141,7 +141,7 @@
 -V,--version;version
 -w,--warning days;minimum number of days a certificate has to be valid to issue a
 -w,--warning days;warning status. Might be a floating point number, e.g., 0.5
--w,--warning days;Default: 20
+-w,--warning days;Default: ${WARNING_DAYS}"
 --xmpphost name;specifies the host for the 'to' attribute of the stream element
 -4;force IPv4
 -6;force IPv6
