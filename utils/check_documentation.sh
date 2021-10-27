@@ -15,6 +15,12 @@ for option in $( grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//
             ;;
         *)
 
+            # 0) check if the option is documented in the help.txt file
+            if ! grep -q -- "${option}" help.txt ; then
+                echo "Error ${option} is not documented in help.txt"
+                ERROR=1
+            fi
+
             # 1) check if the option is documented in check_ssl_cert
 
             if ! echo "${HELP}" | grep -q -- "${option}" ; then

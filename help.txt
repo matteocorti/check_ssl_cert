@@ -13,9 +13,9 @@
 --crl;checks revokation via CRL (requires --rootcert-file)
 --curl-bin path;path of the curl binary to be used
 --curl-user-agent string;user agent that curl shall use to obtain the
---curl-user-agent stringissuer cert
+--curl-user-agent string;issuer cert
 --custom-http-header string;custom HTTP header sent when getting the cert
---custom-http-header stringexample: 'X-Check-Ssl-Cert: Foobar=1'
+--custom-http-header string;example: 'X-Check-Ssl-Cert: Foobar=1'
 --dane;verify that valid DANE records exist (since OpenSSL 1.1.0)
 --dane 211;verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
 --dane 301;verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
@@ -31,24 +31,24 @@
 --ecdsa;signature algorithm selection: force ECDSA certificate
 --element number;checks up to the N cert element from the beginning of the chain
 -e,--email address;pattern to match the email address contained
--e,--email addressin the certificate
+-e,--email address;in the certificate
 -f,--file file;local file path (works with -H localhost only)
--f,--file filewith -f you can not only pass a x509
--f,--file filecertificate file but also a certificate
--f,--file filerevocation list (CRL) to check the validity
--f,--file fileperiod
+-f,--file file;with -f you can not only pass a x509
+-f,--file file;certificate file but also a certificate
+-f,--file file;revocation list (CRL) to check the validity
+-f,--file file;period
 --file-bin path;path of the file binary to be used
 --fingerprint SHA1;pattern to match the SHA1-Fingerprint
 --first-element-only;verify just the first cert element, not the whole chain
 --force-dconv-date;force the usage of dconf for date computations
 --force-perl-date;force the usage of Perl for date computations
 --format FORMAT;format output template on success, for example
-"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
+--format FORMAT;"%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
 -h,--help,-?;this help message
 --http-use-get;use GET instead of HEAD (default) for the HTTP
-related checks
+--http-use-get;related checks
 --ignore-altnames;ignores alternative names when matching pattern specified in -n (or the host name)
---ignore-connection-problems [state] in case of connection problems returns OK or the optional state
+--ignore-connection-problems [state];in case of connection problems returns OK or the optional state
 --ignore-exp;ignore expiration date
 --ignore-host-cn;do not complain if the CN does not match the host name
 --ignore-incomplete-chain;does not check chain integrity
@@ -56,25 +56,25 @@ related checks
 --ignore-ocsp-errors;continue if the OCSP status cannot be checked
 --ignore-ocsp-timeout;ignore OCSP result when timeout occurs while checking
 --ignore-sig-alg;do not check if the certificate was signed with SHA1
-or MD5
+--ignore-sig-alg;or MD5
 --ignore-sct;do not check for signed certificate timestamps (SCT)
 --ignore-ssl-labs-cache;Forces a new check by SSL Labs (see -L)
---ignore-tls-renegotiation   Ignores the TLS renegotiation check
+--ignore-tls-renegotiation;Ignores the TLS renegotiation check
 --inetproto protocol;Force IP version 4 or 6
 -i,--issuer issuer;pattern to match the issuer of the certificate
 --issuer-cert-cache dir;directory where to store issuer certificates cache
 -K,--clientkey path;use client certificate key to authenticate
 -L,--check-ssl-labs grade;SSL Labs assessment
-(please check https://www.ssllabs.com/about/terms.html)
---check-ssl-labs-warn grade  SSL-Labs grade on which to warn
+-L,--check-ssl-labs grade;(please check https://www.ssllabs.com/about/terms.html)
+--check-ssl-labs-warn grade;SSL-Labs grade on which to warn
 --long-output list;append the specified comma separated (no spaces) list
-of attributes to the plugin output on additional lines
-Valid attributes are:
-enddate, startdate, subject, issuer, modulus,
-serial, hash, email, ocsp_uri and fingerprint.
-'all' will include all the available attributes.
+--long-output list;of attributes to the plugin output on additional lines
+--long-output list;Valid attributes are:
+--long-output list;enddate, startdate, subject, issuer, modulus,
+--long-output list;serial, hash, email, ocsp_uri and fingerprint.
+--long-output list;'all' will include all the available attributes.
 -n,--cn name;pattern to match the CN of the certificate (can be
-specified multiple times)
+-n,--cn name;specified multiple times)
 --nmap-bin path;path of the nmap binary to be used
 --no-perf;do not show performance data
 --no-proxy;ignores the http_proxy and https_proxy environment variables
@@ -87,29 +87,29 @@ specified multiple times)
 --no-tls1_2;disable TLS version 1.2
 --no-tls1_3;disable TLS version 1.3
 --not-issued-by issuer;check that the issuer of the certificate does not match
-the given pattern
---not-valid-longer-than days critical if the certificate validity is longer than
-the specified period
+--not-issued-by issuer;the given pattern
+--not-valid-longer-than days;critical if the certificate validity is longer than
+--not-valid-longer-than days;the specified period
 --ocsp-critical hours;minimum number of hours an OCSP response has to be valid to
-issue a critical status
+--ocsp-critical hours;issue a critical status
 --ocsp-warning hours;minimum number of hours an OCSP response has to be valid to
-issue a warning status
+--ocsp-warning hours;issue a warning status
 -o,--org org;pattern to match the organization of the certificate
 --openssl path;path of the openssl binary to be used
 --password source;password source for a local certificate, see the PASS PHRASE ARGUMENTS section
-openssl(1)
+--password source;openssl(1)
 -p,--port port;TCP port
 --prometheus;generates Prometheus/OpenMetrics output
 -P,--protocol protocol;use the specific protocol
-{ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
-postgres|sieve|smtp|smtps|xmpp|xmpp-server}
-https:;default
-h2:;forces HTTP/2
-ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
-TLS using StartTLS
+-P,--protocol protocol;{ftp|ftps|http|https|h2|imap|imaps|irc|ircs|ldap|ldaps|mysql|pop3|pop3s|
+-P,--protocol protocol;postgres|sieve|smtp|smtps|xmpp|xmpp-server}
+-P,--protocol protocol;https:;default
+-P,--protocol protocol;h2:;forces HTTP/2
+-P,--protocol protocol;ftp,imap,irc,ldap,pop3,postgres,sieve,smtp: switch to
+-P,--protocol protocol;TLS using StartTLS
 --proxy proxy;sets http_proxy and the s_client -proxy option
---require-client-cert [list] the server must accept a client certificate
-list is an optional comma separated list expected client certificate CAs
+--require-client-cert [list];the server must accept a client certificate
+--require-client-cert [list];list is an optional comma separated list expected client certificate CAs
 --require-no-ssl2;critical if SSL version 2 is offered
 --require-no-ssl3;critical if SSL version 3 is offered
 --require-no-tls1;critical if TLS 1 is offered
@@ -119,19 +119,19 @@ list is an optional comma separated list expected client certificate CAs
 --serial serialnum;pattern to match the serial number
 --skip-element number;skips checks on the Nth cert element (can be specified multiple times)
 --sni name;sets the TLS SNI (Server Name Indication) extension
-in the ClientHello message to 'name'
+--sni name;in the ClientHello message to 'name'
 --ssl2;forces SSL version 2
 --ssl3;forces SSL version 3
 --require-ocsp-stapling;require OCSP stapling
 -r,--rootcert path;root certificate or directory to be used for
-certificate validation
+-r,--rootcert path;certificate validation
 --rootcert-dir path;root directory to be used for certificate validation
 --rootcert-file path;root certificate to be used for certificate validation
 --rsa;signature algorithm selection: force RSA certificate
 --temp dir;directory where to store the temporary files
 --terse;terse output
 -t,--timeout;seconds timeout after the specified time
-(defaults to 120 seconds)
+-t,--timeout;(defaults to 120 seconds)
 --tls1;force TLS version 1
 --tls1_1;force TLS version 1.1
 --tls1_2;force TLS version 1.2
@@ -140,15 +140,15 @@ certificate validation
 -v,--verbose;verbose output (can be specified more than once)
 -V,--version;version
 -w,--warning days;minimum number of days a certificate has to be valid to issue a
-warning status. Might be a floating point number, e.g., 0.5
-Default: 20
+-w,--warning days;warning status. Might be a floating point number, e.g., 0.5
+-w,--warning days;Default: 20
 --xmpphost name;specifies the host for the 'to' attribute of the stream element
 -4;force IPv4
 -6;force IPv6
 --altnames;matches the pattern specified in -n with
-alternate names too (enabled by default)
+--altnames;alternate names too (enabled by default)
 --days days;minimum number of days a certificate has to be valid
-(see --critical and --warning)
+--days days;(see --critical and --warning)
 -N,--host-cn;match CN with the host name (enabled by default)
 --no_ssl2;disable SSLv2 (deprecated use --no-ssl2)
 --no_ssl3;disable SSLv3 (deprecated use --no-ssl3)
@@ -158,6 +158,6 @@ alternate names too (enabled by default)
 --no_tls1_3;disable TLSv1.1 (deprecated use --no-tls1_3)
 --ocsp;check revocation via OCSP (enabled by default)
 --require-san;require the presence of a Subject Alternative Name
-extension
+--require-san;extension
 -S,--ssl version;force SSL version (2,3)
-(see: --ssl2 or --ssl3)
+-S,--ssl version;(see: --ssl2 or --ssl3)
