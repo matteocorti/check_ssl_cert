@@ -3,7 +3,6 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 DIST_FILES=AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1
 YEAR=`date +"%Y"`
-MONTH_YEAR=`date +"%B, %Y"`
 FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL Makefile NEWS README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* utils/*.sh
 SCRIPTS=check_ssl_cert test/*.sh
 
@@ -33,7 +32,6 @@ version_check:
 	grep -q -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q "${VERSION}" NEWS
-	grep -q "$(MONTH_YEAR)" $(PLUGIN).1
 	echo "Version check: OK"
 
 # we check for tabs

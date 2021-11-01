@@ -4,6 +4,16 @@ VERSION=$(head -n 1 VERSION)
 
 echo "Publishing release ${VERSION}"
 
+echo
+
+echo 'Checking release date'
+MONTH_YEAR=$( date +"%B, %Y" )
+if ! grep -q "${MONTH_YEAR}" check_ssl_cert.1 ; then
+    echo "Please update the date in check_ssl_cert.1"
+    exit 1
+fi
+
+echo
 echo 'RELEASE_NOTES.md:'
 echo '------------------------------------------------------------------------------'
 
