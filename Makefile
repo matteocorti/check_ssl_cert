@@ -70,7 +70,7 @@ SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
 SHUNIT := $(shell command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi )
 
 distcheck: disttest
-disttest: dist formatting_check copyright_check shellcheck
+disttest: dist formatting_check shellcheck
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
@@ -89,12 +89,6 @@ ifndef SHELLCHECK
 else
 	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
-
-copyright_check:
-	grep -q "&copy; Matteo Corti, 2007-$(YEAR)" README.md
-	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti" COPYRIGHT
-	grep -q "Copyright (c) 2007-$(YEAR) Matteo Corti <matteo@corti.li>" $(PLUGIN)
-	echo "Copyright year check: OK"
 
 rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
