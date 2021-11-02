@@ -63,7 +63,8 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
-        include:
+          - 'fedora:35'
+       include:
 
 
           - distro: 'debian:testing'
@@ -106,6 +107,11 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc
 
 
+          - distro: 'fedora:35'
+            pre: >-
+              dnf upgrade -y &&
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man
           - distro: 'fedora:34'
             pre: >-
               dnf upgrade -y &&
@@ -154,7 +160,12 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
+          - 'fedora:35'
         include:
+          - distro: 'fedora:35'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
