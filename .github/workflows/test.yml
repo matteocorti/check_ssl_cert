@@ -63,7 +63,6 @@ jobs:
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
-          - 'fedora:35'
         include:
 
 
@@ -109,12 +108,6 @@ jobs:
 
           - distro: 'fedora:34'
             pre: >-
-              dnf upgrade -y &&
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man
-          - distro: 'fedora:35'
-            pre: >-
-              echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man
