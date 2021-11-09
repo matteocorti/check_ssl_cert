@@ -22,8 +22,9 @@ A clear and concise description of what you expected to happen.
 **System (please complete the following information):**
 
  - OS: [e.g. iOS]
- - OS Version: [e.g. 22]
- - check_ssl_cert Version: [e.g. 1.19.0]
+ - OS version: [e.g. 22]
+ - check_ssl_cert version: [e.g. 1.19.0]
+ - OpenSSL version (```openssl version```): [e.g., 3.0.0]
 
 **Additional context/output**
 
