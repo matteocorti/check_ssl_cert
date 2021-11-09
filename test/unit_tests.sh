@@ -3,14 +3,24 @@
 # $SHUNIT2 should be defined as an environment variable before running the tests
 # shellcheck disable=SC2154
 if [ -z "${SHUNIT2}" ]; then
-    cat <<EOF
+
+    SHUNIT2=$( command -v shunit2 )
+
+    if [ -z "${SHUNIT2}" ]; then
+
+        cat <<EOF
 To be able to run the unit test you need a copy of shUnit2
 You can download it from https://github.com/kward/shunit2
 
 Once downloaded please set the SHUNIT2 variable with the location
 of the 'shunit2' script
 EOF
-    exit 1
+        exit 1
+
+    else
+        echo "shunit2 detected: ${SHUNIT2}"
+    fi
+
 fi
 
 if [ ! -x "${SHUNIT2}" ]; then
