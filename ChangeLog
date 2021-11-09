@@ -1,3 +1,8 @@
+2021-11-09  Matteo Corti  <matteo@corti.li>
+
+	* check_ssl_cert (fetch_certificate): Parsing of OpenSSL 3 messages
+	* check_ssl_cert (fetch_certificate): Ignoring legacy renegotiation if --ignore-tls-renegotiation was specified
+
 2021-10-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (debuglog): Better formatting of the elapsed time in the log output
