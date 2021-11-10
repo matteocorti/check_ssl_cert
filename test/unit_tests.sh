@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2312
 
 # $SHUNIT2 should be defined as an environment variable before running the tests
 # shellcheck disable=SC2154
@@ -309,16 +310,16 @@ testGroupedVariablesError() {
 }
 
 testPrometheus() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --prometheus --critical 1000 --warning 1100)
+    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --prometheus --critical 1000 --warning 1100)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     assertContains "wrong output" "${OUTPUT}" '# HELP cert_valid '
-    assertContains "wrong output" "${OUTPUT}" 'cert_valid_chain_elem{cn="ethz.ch", element=1} 2'
-    assertContains "wrong output" "${OUTPUT}" 'cert_days_chain_elem{cn="ethz.ch", element=1}'
+    assertContains "wrong output" "${OUTPUT}" 'cert_valid_chain_elem{cn="github.com", element=1} 2'
+    assertContains "wrong output" "${OUTPUT}" 'cert_days_chain_elem{cn="github.com", element=1}'
 }
 
-testETHZ() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --critical 1 --warning 2
+testGitHub() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -336,7 +337,7 @@ testGoDaddy() {
 }
 
 testETHZCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ETHZ.CH --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn GITHUB.COM --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -388,26 +389,26 @@ testETHZWildCardSubCaseInsensitive() {
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --issuer 'QuoVadis Limited' --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --issuer 'QuoVadis Limited' --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testValidity() {
     # Tests bug #8
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -w 1000
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testValidityWithPerl() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -w 1000 --force-perl-date
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --force-perl-date
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testAltNames() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn www.inf.ethz.ch --altnames --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn www.github.com --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -433,7 +434,7 @@ testWildcardAltNames2() {
 }
 
 testAltNamesCaseInsensitve() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.inf.ethz.ch --cn WWW.INF.ETHZ.CH --altnames --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn WWW.GITHUB.COM --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -447,14 +448,14 @@ testMultipleAltNamesOK() {
 
 testMultipleAltNamesFailOne() {
     # Test with wiltiple CN's but last one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n www.ethz.ch -n wrong.ch --altnames --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n www.github.com -n wrong.com --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H inf.ethz.ch -n wrong.ch -n www.ethz.ch --altnames --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n wrong.ch -n www.github.com --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -732,14 +733,14 @@ testIPv6() {
 }
 
 testFormatShort() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --critical 1 --warning 2 --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
+    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --critical 1 --warning 2 --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK ethz.ch from 'QuoVadis Europe SSL CA G2'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK github.com from 'QuoVadis Europe SSL CA G2'" "${OUTPUT}"
 }
 
 testMoreErrors() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g')
+    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -747,7 +748,7 @@ testMoreErrors() {
 }
 
 testMoreErrors2() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g')
+    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -848,7 +849,7 @@ testHTTP2() {
 
 testForceHTTP2() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -F alpn; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --protocol h2 --critical 1 --warning 2
+        ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --protocol h2 --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -857,7 +858,7 @@ testForceHTTP2() {
 }
 
 testNotLongerValidThan() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --not-valid-longer-than 2 --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --not-valid-longer-than 2 --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -894,7 +895,7 @@ testCertificsteWithEmptySubject() {
 }
 
 testResolveSameName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.ethz.ch --resolve www.ethz.ch --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --resolve www.github.com --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -906,7 +907,7 @@ testResolveDifferentName() {
 }
 
 #testNewQuoVadis() {
-#    ${SCRIPT} --rootcert-file cabundle.crt -H matteo.ethz.ch
+#    ${SCRIPT} --rootcert-file cabundle.crt -H matteo.github.com
 #    EXIT_CODE=$?
 #    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #}
@@ -914,7 +915,7 @@ testResolveDifferentName() {
 testResolveCorrectIP() {
     # dig is needed to resolve the IP address
     if command -v dig >/dev/null; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --resolve "$(dig +short ethz.ch)" --critical 1 --warning 2
+        ${SCRIPT} --rootcert-file cabundle.crt -H github.com --resolve "$(dig +short github.com)" --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -996,9 +997,9 @@ testCiphersError() {
 
 # SSL Labs (last one as it usually takes a lot of time
 
-testETHZWithSSLLabs() {
-    # we assume www.ethz.ch gets at least a B
-    ${SCRIPT} --rootcert-file cabundle.crt -H ethz.ch --cn ethz.ch --check-ssl-labs B --critical 1 --warning 2
+testGitHubWithSSLLabs() {
+    # we assume www.github.com gets at least a B
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --check-ssl-labs B --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1057,7 +1058,7 @@ testCertExpiringInLessThanOneDay() {
 
 testAcceptableClientCertCAMissing() {
 
-    ${SCRIPT} -H www.ethz.ch --require-client-cert
+    ${SCRIPT} -H www.github.com --require-client-cert
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"

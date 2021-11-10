@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2312
 #
 # check_ssl_cert
 #
@@ -258,7 +259,7 @@ debuglog() {
     if [ -n "${DEBUG_TIME}" ]; then
         NOW=$(date +%s)
         ELAPSED=$((NOW - DEBUG_TIME))
-        ELAPSED=$( printf "%04d" "${ELAPSED}" )
+        ELAPSED=$(printf "%04d" "${ELAPSED}")
     fi
 
     if [ -z "${LEVEL}" ]; then
@@ -1011,7 +1012,7 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
         ;;
     org)
-        cert_subject=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject )
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
 
         # on older systems the fields where separated by /, e.g.,
         #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
@@ -1019,12 +1020,12 @@ extract_cert_attribute() {
         #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
         #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
 
-        if echo "${cert_subject}" | grep -q '^subject=\ \/' ; then
+        if echo "${cert_subject}" | grep -q '^subject=\ \/'; then
             # old format
             echo "${cert_subject}" | sed -e 's/.*\/O=//' -e 's/\/.*//'
         else
             # new format
-            if echo "${cert_subject}" | grep -q 'O\ =\ "' ; then
+            if echo "${cert_subject}" | grep -q 'O\ =\ "'; then
                 # quotes
                 echo "${cert_subject}" | sed -e 's/.*O\ =\ "//' -e 's/".*//'
             else
@@ -2112,11 +2113,11 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
-	elif ascii_grep "unsafe legacy renegotiation disabled" "${ERROR}"; then
+        elif ascii_grep "unsafe legacy renegotiation disabled" "${ERROR}"; then
 
-	    ERROR="The server does not support the Renegotiation Indication Extension"
+            ERROR="The server does not support the Renegotiation Indication Extension"
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"    
+            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
         else
 
@@ -2189,6 +2190,7 @@ ascii_grep() {
 #  $2 next command line parameter
 check_option_argument() {
 
+    # shellcheck disable=SC2295
     if [ -z "$2" ] || [ "${2%${2#?}}"x = '-x' ]; then
         unknown "'${1}' requires an argument"
     fi
@@ -2751,6 +2753,7 @@ parse_command_line_options() {
             # check the second parameter if it exist
             if [ $# -gt 1 ]; then
 
+                # shellcheck disable=SC2295
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     DANE=1
                     shift
@@ -2774,6 +2777,7 @@ parse_command_line_options() {
 
             # check the second optional parameter if it exist
             if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     shift
                 else
@@ -2793,6 +2797,7 @@ parse_command_line_options() {
 
             # check the second optional parameter if it exist
             if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     shift
                 else
@@ -2980,7 +2985,7 @@ main() {
 
     if [ -n "${DEBUG_FILE}" ]; then
         open_for_appending "${DEBUG_FILE}"
-        date >> "${DEBUG_FILE}"
+        date >>"${DEBUG_FILE}"
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
@@ -3281,8 +3286,8 @@ main() {
     fi
 
     # check if -sigalgs is available
-    if  [ -n "${RSA}" ] || [ -n "${ECDSA}" ] ; then
-        if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- -sigalgs ; then
+    if [ -n "${RSA}" ] || [ -n "${ECDSA}" ]; then
+        if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- -sigalgs; then
             unkown '--rsa or --ecdsa specified but OpenSSL does not support the -sigalgs option'
         fi
     fi
@@ -3818,13 +3823,12 @@ main() {
 
     # OpenSSL 3.0.0 gives an error for legacy renegotiation: ignore the error if --ignore-tls-renegotiation was specified
     if [ -n "${IGNORE_TLS_RENEGOTIATION}" ]; then
-	debuglog "--ignore-tls-renegotiation specified: checking OpenSSL version and -legacy_renegotiation support"
-	if "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- "-legacy_renegotiation"; then
-	    debuglog "OpenSSL s_client supports the -legacy_renegotiation option"
-	    RENEGOTIATION="-legacy_renegotiation"
-	fi
+        debuglog "--ignore-tls-renegotiation specified: checking OpenSSL version and -legacy_renegotiation support"
+        if "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- "-legacy_renegotiation"; then
+            debuglog "OpenSSL s_client supports the -legacy_renegotiation option"
+            RENEGOTIATION="-legacy_renegotiation"
+        fi
     fi
-
 
     ################################################################################
     # Connection check
@@ -4577,7 +4581,7 @@ main() {
 
         if [ -n "${CHECK_CIPHERS}" ]; then
 
-            if ! grep -q -F 'least strength' "${NMAP_OUT}" ; then
+            if ! grep -q -F 'least strength' "${NMAP_OUT}"; then
                 unknown 'nmap does not deliver cipher strength'
             fi
 
