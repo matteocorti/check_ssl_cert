@@ -389,7 +389,7 @@ testETHZWildCardSubCaseInsensitive() {
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --issuer 'QuoVadis Limited' --critical 1 --warning 2
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --issuer 'DigiCert Inc' --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
