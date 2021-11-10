@@ -2018,6 +2018,8 @@ fetch_certificate() {
 
     fi
 
+    debuglog "Return value of the command = ${RET}"
+
     if [ -n "${DEBUG_CERT}" ]; then
 
         debuglog "storing a copy of the retrieved certificate in ${HOST_NAME}.crt for debugging purposes"
@@ -2029,8 +2031,6 @@ fetch_certificate() {
         cp "${ERROR}" "${HOST_NAME}.error"
 
     fi
-
-    debuglog "Return value of the command = ${RET}"
 
     if [ "${RET}" -ne 0 ]; then
 
@@ -2067,7 +2067,7 @@ fetch_certificate() {
                 prepend_critical_message 'Error verifying the certificate chain'
             fi
 
-        elif ascii_grep 'self signed certificate' "${ERROR}"; then
+        elif ascii_grep 'self[ -]signed certificate' "${ERROR}"; then
 
             if [ -z "${SELFSIGNED}" ]; then
                 prepend_critical_message 'Self signed certificate'
