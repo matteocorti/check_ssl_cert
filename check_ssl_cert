@@ -1,5 +1,4 @@
 #!/bin/sh
-# shellcheck disable=SC2312
 #
 # check_ssl_cert
 #
@@ -390,7 +389,8 @@ remove_temporary_files() {
     debuglog "cleaning up temporary files"
     # shellcheck disable=SC2086
     if [ -n "${TEMPORARY_FILES}" ]; then
-        debuglog "$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
+        TEMPORARY_FILES_TMP="$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
+        debuglog "${TEMPORARY_FILES_TMP}"
         rm -f ${TEMPORARY_FILES}
     fi
 }
@@ -445,7 +445,8 @@ hours_until() {
     # we check if we are on a 32 bit system and if the date is beyond the max date
     # we simplify and consider a date invalid after 1.1.2038 instead of 19.1.2038
     # since date is not able to parse the date we do it manually with a little bit of heuristics ...
-    if [ "$(getconf LONG_BIT)" -eq 32 ]; then
+    LONG_BIT_TMP="$(getconf LONG_BIT)"
+    if [ "${LONG_BIT_TMP}" -eq 32 ]; then
         debuglog "32 bit system"
         CERT_YEAR=$(echo "${DATE}" | sed 's/.*\ \(2[0-9][0-9][0-9]\).*/\1/')
         debuglog "Checking if the year ${CERT_YEAR} is beyond the max date for the system 2038-01-19"
@@ -1355,7 +1356,8 @@ check_ocsp() {
             debuglog "checking issuer URIs: ${ELEMENT_ISSUER_URI}"
 
             # shellcheck disable=SC2021
-            if [ "${ELEMENT_ISSUER_URI}" != "$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')" ]; then
+            ELEMENT_ISSUER_URI_WO_SPACES_TMP="$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')"
+            if [ "${ELEMENT_ISSUER_URI}" != "${ELEMENT_ISSUER_URI_WO_SPACES_TMP}" ]; then
                 verboselog "unable to fetch the CA issuer certificate (spaces in URI): skipping"
                 continue
             elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http'; then
@@ -1373,7 +1375,8 @@ check_ocsp() {
                     exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
 
-                debuglog "OCSP: issuer certificate type (1): $(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                debuglog "OCSP: issuer certificate type (1): ${TYPE_TMP}"
 
                 if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c'; then
                     debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
@@ -1385,7 +1388,8 @@ check_ocsp() {
 
                 fi
 
-                debuglog "OCSP: issuer certificate type (2): $(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                debuglog "OCSP: issuer certificate type (2): ${TYPE_TMP}"
 
                 # check for errors
                 if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q HTML; then
@@ -1413,7 +1417,8 @@ check_ocsp() {
 
                     else
 
-                        debuglog "OCSP: complete issuer certificate type $(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}")"
+                        TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}")"
+                        debuglog "OCSP: complete issuer certificate type ${TYPE_TMP}"
 
                         unknown "Unable to fetch a valid certificate issuer certificate."
 
@@ -1421,7 +1426,8 @@ check_ocsp() {
 
                 fi
 
-                debuglog "OCSP: issuer certificate type (3): $(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+                debuglog "OCSP: issuer certificate type (3): ${TYPE_TMP}"
 
                 if [ -n "${DEBUG_CERT}" ]; then
 
@@ -1476,7 +1482,8 @@ check_ocsp() {
 
                 # ocsp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
                 # so we check if the major version is greater than 0
-                if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "$(${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g')" -gt 0 ]; then
+                OPENSSL_VERSION_TMP="$(${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g')"
+                if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "${OPENSSL_VERSION_TMP}" -gt 0 ]; then
 
                     debuglog "openssl ocsp supports the -header option"
 
@@ -1518,7 +1525,8 @@ check_ocsp() {
 
                     fi
 
-                    debuglog "$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
+                    MESSAGE_TMP="$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
+                    debuglog "${MESSAGE_TMP}"
 
                     if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -F -q -i "timeout on connect"; then
 
@@ -1908,7 +1916,8 @@ fetch_certificate() {
         if [ "${HOST_NAME}" = "localhost" ]; then
 
             debuglog "check if we have to convert the file ${FILE} to PEM"
-            debuglog "certificate type (1): $(${FILE_BIN} -L -b "${FILE}" | sed 's/.*://')"
+            TYPE_TMP="$(${FILE_BIN} -L -b "${FILE}" | sed 's/.*://')"
+            debuglog "certificate type (1): ${TYPE_TMP}"
             create_temporary_file
             CONVERSION_ERROR=${TEMPFILE}
 
@@ -1925,7 +1934,8 @@ fetch_certificate() {
                 fi
 
                 if [ $? -eq 1 ]; then
-                    unknown "Error converting ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                    CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                    unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                 fi
 
             elif "${FILE_BIN}" -L -b "${FILE}" | grep -q -E '(data|Certificate)'; then
@@ -1935,7 +1945,8 @@ fetch_certificate() {
 
                 if [ $? -eq 1 ]; then
 
-                    debuglog "Error converting ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                    CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                    debuglog "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                     debuglog "Checking if ${FILE} is DER encoded CRL"
 
                     if "${OPENSSL}" crl -in "${FILE}" -inform DER 2>/dev/null | grep -F -q "BEGIN X509 CRL"; then
@@ -1946,11 +1957,13 @@ fetch_certificate() {
                         "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
                         if [ $? -eq 1 ]; then
-                            unknown "Error converting CRL ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                            CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                            unknown "Error converting CRL ${FILE}: ${CONVERSION_ERROR_TMP}"
                         fi
 
                     else
-                        unknown "Error converting ${FILE}: $(head -n 1 "${CONVERSION_ERROR}") "
+                        CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                        unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                     fi
 
                 fi
@@ -1964,7 +1977,8 @@ fetch_certificate() {
             fi
 
             debuglog "storing the certificate to ${CERT}"
-            debuglog "certificate type (2): $(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
+            TYPE_TMP="$(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
+            debuglog "certificate type (2): ${TYPE_TMP}"
 
             if ! grep -q -F 'CRL' "${CERT}"; then
 
@@ -2034,7 +2048,8 @@ fetch_certificate() {
 
     if [ "${RET}" -ne 0 ]; then
 
-        debuglog "$(sed 's/^/SSL error: /' "${ERROR}")"
+        MESSAGE_TMP="$(sed 's/^/SSL error: /' "${ERROR}")"
+        debuglog "${MESSAGE_TMP}"
 
         # s_client could verify the server certificate because the server requires a client certificate
         if ascii_grep '^Client Certificate Types' "${CERT}"; then
@@ -2165,7 +2180,8 @@ add_performance_data() {
 #   $1 variable name (e.g. SHORTNAME)
 #   $2 variable value (e.g. SSL_CERT)
 var_for_sed() {
-    echo "s|%$1%|$(echo "$2" | sed -e 's#|#\\\\|#g')|g"
+    VALUE_TMP="$(echo "$2" | sed -e 's#|#\\\\|#g')"
+    echo "s|%$1%|${VALUE_TMP}|g"
 }
 
 ################################################################################
@@ -2820,8 +2836,9 @@ parse_command_line_options() {
             # we try to check for grouped variables
             OPTION="${1}"
             # if the option begins with a single dash and it's longer than one character
+            OPTION_TMP="$(echo "${OPTION}" | wc -c | sed 's/\ //g')"
             if ! echo "${OPTION}" | grep -q -- '^--' &&
-                [ "$(echo "${OPTION}" | wc -c | sed 's/\ //g')" -gt 3 ]; then
+                [ "${OPTION_TMP}" -gt 3 ]; then
                 if [ "${DEBUG}" -gt 0 ]; then
                     echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group"
                 fi
@@ -3109,7 +3126,8 @@ main() {
         elif [ -f "${ROOT_CA}" ]; then
             ROOT_CA="-CAfile ${ROOT_CA}"
         else
-            unknown "Root certificate of unknown type $(file "${ROOT_CA}" 2>/dev/null)"
+            FILE_TMP="$(file "${ROOT_CA}" 2>/dev/null)"
+            unknown "Root certificate of unknown type ${FILE_TMP}"
         fi
 
     fi
@@ -3345,7 +3363,8 @@ main() {
         DATEBIN=${PROG}
     fi
 
-    debuglog "file version: $("${FILE_BIN}" --version 2>&1)"
+    FILE_BIN_VERSION="$("${FILE_BIN}" --version 2>&1)"
+    debuglog "file version: ${FILE_BIN_VERSION}"
 
     # cURL
     if [ -z "${CURL_BIN}" ]; then
@@ -3360,7 +3379,8 @@ main() {
             CURL_BIN=${PROG}
 
             debuglog "cURL available: ${CURL_BIN}"
-            debuglog "$(${CURL_BIN} --version)"
+            CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
+            debuglog "${CURL_BIN_VERSION_TMP}"
 
         else
             debuglog "cURL binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
@@ -3517,7 +3537,8 @@ main() {
         fi
         debuglog "${DEFAULT_CA} root certificates installed by default"
 
-        debuglog " System info: $(uname -a)"
+        UNAME_TMP="$(uname -a)"
+        debuglog " System info: ${UNAME_TMP}"
         debuglog "Date computation: ${DATETYPE}"
 
     fi
@@ -4276,15 +4297,17 @@ main() {
         debuglog "ALTNAMES                 = ${ALTNAMES}"
         debuglog "SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
 
-        if [ "$(is_ip "${COMMON_NAME}")" -eq 0 ]; then
+        IS_IP_TMP="$(is_ip "${COMMON_NAME}")"
+        if [ "${IS_IP_TMP}" -eq 0 ]; then
 
             # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
             if echo "${CN}" | grep -q -i '^\*\.'; then
 
                 # Or the literal with the wildcard
-                debuglog "checking if the common name matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"
-                if echo "${COMMON_NAME}" | grep -q -i "^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"; then
-                    debuglog "the common name ${COMMON_NAME} matches ^$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"
+                CN_TMP="$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
+                debuglog "checking if the common name matches ^${CN_TMP}\$"
+                if echo "${COMMON_NAME}" | grep -q -i "^${CN_TMP}\$"; then
+                    debuglog "the common name ${COMMON_NAME} matches ^${CN_TMP}\$"
                     ok="true"
                 fi
 
@@ -4328,7 +4351,8 @@ main() {
 
                     for cn in ${COMMON_NAME}; do
 
-                        if [ "$(is_ip "${cn}")" -eq 1 ]; then
+                        IS_IP_TMP="$(is_ip "${cn}")"
+                        if [ "${IS_IP_TMP}" -eq 1 ]; then
                             verboselog "Skipping the matching of ${cn} as it is an IP address"
                             continue
                         fi
@@ -4347,19 +4371,21 @@ main() {
 
                                 # Match the domain
                                 debuglog "the altname ${alt_name} begins with a '*'"
-                                debuglog "checking if the common name matches ^$(echo "${alt_name}" | cut -c 3-)\$"
+                                ALT_NAME_TMP="$(echo "${alt_name}" | cut -c 3-)"
+                                debuglog "checking if the common name matches ^${ALT_NAME_TMP}\$"
 
-                                if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | cut -c 3-)\$"; then
-                                    debuglog "the common name ${cn} matches ^$(echo "${alt_name}" | cut -c 3-)\$"
+                                if echo "${cn}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                                    debuglog "the common name ${cn} matches ^${ALT_NAME_TMP}\$"
                                     ok="true"
 
                                 fi
 
                                 # Or the literal with the wildcard
-                                debuglog "checking if the common name matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"
+                                ALT_NAME_TMP="$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
+                                debuglog "checking if the common name matches ^${ALT_NAME_TMP}\$"
 
-                                if echo "${cn}" | grep -q -i "^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"; then
-                                    debuglog "the common name ${cn} matches ^$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')\$"
+                                if echo "${cn}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                                    debuglog "the common name ${cn} matches ^${ALT_NAME_TMP}\$"
                                     ok="true"
                                 fi
 
@@ -4394,11 +4420,12 @@ main() {
 
                 fi
 
+                CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
                 if [ -n "${fail}" ]; then
-                    prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${fail}')"
+                    prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${fail}')"
                 else
                     if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
-                        prepend_critical_message "invalid CN ('$(echo "${CN}" | sed "s/|/ PIPE /g")' does not match '${COMMON_NAME}')"
+                        prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
                     fi
                 fi
 
@@ -4425,7 +4452,9 @@ main() {
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
-            prepend_critical_message "invalid CA ('$(echo "${ISSUER}" | sed "s/|/ PIPE /g")' does not match '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")')"
+            ISSUER_TMP="$(echo "${ISSUER}" | sed "s/|/ PIPE /g")"
+            ISSUERS_TMP="$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")"
+            prepend_critical_message "invalid CA ('${ISSUER_TMP}' does not match '${ISSUERS_TMP}')"
         fi
 
     fi
@@ -4445,7 +4474,9 @@ main() {
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
             # this looks ugly but preserves spaces in CA name
-            prepend_critical_message "invalid CA ('$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")' matches '$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")')"
+            NOT_ISSUED_BY_TMP="$(echo "${NOT_ISSUED_BY}" | sed "s/|/ PIPE /g")"
+            ISSUERS_TMP="$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")"
+            prepend_critical_message "invalid CA ('${NOT_ISSUED_BY_TMP}' matches '${ISSUERS_TMP}')"
         else
             ok="true"
             CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | grep -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
@@ -4468,7 +4499,8 @@ main() {
         fi
 
         if [ -z "${ok}" ]; then
-            prepend_critical_message "invalid serial number ('$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")' does not match '${SERIAL}')"
+            SERIAL_LOCK_TMP="$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")"
+            prepend_critical_message "invalid serial number ('${SERIAL_LOCK_TMP}' does not match '${SERIAL}')"
         fi
 
     fi
@@ -4483,7 +4515,8 @@ main() {
         fi
 
         if [ -z "${ok}" ]; then
-            prepend_critical_message "invalid SHA1 Fingerprint ('$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")' does not match '${FINGERPRINT}')"
+            FINGERPRINT_LOCK_TMP="$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")"
+            prepend_critical_message "invalid SHA1 Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
         fi
 
     fi
@@ -4495,7 +4528,8 @@ main() {
         debuglog "Checking expiration date"
         if [ -n "${FIRST_ELEMENT_ONLY}" ] || [ "${OPENSSL_COMMAND}" = "crl" ]; then
             debuglog "Only one element or CRL"
-            check_cert_end_date "$(cat "${CERT}")"
+            DATE_TMP="$(cat "${CERT}")"
+            check_cert_end_date "${DATE_TMP}"
         else
             # count the certificates in the chain
             NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
@@ -4770,7 +4804,8 @@ main() {
         debuglog "  ORGANIZATION = ${ORGANIZATION}"
 
         if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}"; then
-            prepend_critical_message "invalid organization ('$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")' does not match '${ORG}')"
+            ORGANIZATION_TMP="$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")"
+            prepend_critical_message "invalid organization ('${ORGANIZATION_TMP}' does not match '${ORG}')"
         fi
 
     fi
@@ -4792,7 +4827,8 @@ main() {
         else
 
             if ! echo "${EMAIL}" | grep -q -E "^${ADDR}"; then
-                prepend_critical_message "invalid email ('$(echo "${ADDR}" | sed "s/|/ PIPE /g")' does not match ${EMAIL})"
+                EMAIL_TMP="$(echo "${ADDR}" | sed "s/|/ PIPE /g")"
+                prepend_critical_message "invalid email ('${EMAIL_TMP}' does not match ${EMAIL})"
             fi
 
         fi
@@ -4821,7 +4857,8 @@ main() {
 
         else
 
-            debuglog "$(sed 's/^/Error: /' "${ERROR}")"
+            DEBUG_MESSAGE="$(sed 's/^/Error: /' "${ERROR}")"
+            debuglog "${DEBUG_MESSAGE}"
 
             # Process errors
             details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
@@ -4941,18 +4978,30 @@ main() {
 
     if [ -z "${PROMETHEUS}" ]; then
 
+        CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
+        CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
+        CN_TMP="$(var_for_sed CN "${CN}")"
+        DATE_TMP="$(var_for_sed DATE "${DATE}")"
+        DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
+        DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
+        OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
+        SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
+        SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
+        OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
+        SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+
         echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-            -e "$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")" \
-            -e "$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")" \
-            -e "$(var_for_sed CN "${CN}")" \
-            -e "$(var_for_sed DATE "${DATE}")" \
-            -e "$(var_for_sed DAYS_VALID "${DAYS_VALID}")" \
-            -e "$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")" \
-            -e "$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")" \
-            -e "$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")" \
-            -e "$(var_for_sed SHORTNAME "${SHORTNAME}")" \
-            -e "$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")" \
-            -e "$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+            -e "${CA_ISSUER_MATCHED_TMP}" \
+            -e "${CHECKEDNAMES_TMP}" \
+            -e "${CN_TMP}" \
+            -e "${DATE_TMP}" \
+            -e "${DAYS_VALID_TMP}" \
+            -e "${DISPLAY_CN_TMP}" \
+            -e "${OPENSSL_COMMAND_TMP}" \
+            -e "${SELFSIGNEDCERT_TMP}" \
+            -e "${SHORTNAME_TMP}" \
+            -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
+            -e "${SSL_LABS_HOST_GRADE_TMP}"
 
     else
 
