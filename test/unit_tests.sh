@@ -1,5 +1,4 @@
 #!/bin/sh
-# shellcheck disable=SC2312
 
 # $SHUNIT2 should be defined as an environment variable before running the tests
 # shellcheck disable=SC2154
@@ -176,21 +175,24 @@ oneTimeTearDown() {
 testHoursUntilNow() {
     # testing with perl
     export DATETYPE='PERL'
-    hours_until "$(date)"
+    DATE_TMP="$(date)"
+    hours_until "${DATE_TMP}"
     assertEquals "error computing the missing hours until now" 0 "${HOURS_UNTIL}"
 }
 
 testHoursUntil5Hours() {
     # testing with perl
     export DATETYPE='PERL'
-    hours_until "$(perl -e '$x=localtime(time+(5*3600));print $x')"
+    DATE_TMP="$(perl -e '$x=localtime(time+(5*3600));print $x')"
+    hours_until "${DATE_TMP}"
     assertEquals "error computing the missing hours until now" 5 "${HOURS_UNTIL}"
 }
 
 testHoursUntil42Hours() {
     # testing with perl
     export DATETYPE='PERL'
-    hours_until "$(perl -e '$x=localtime(time+(42*3600));print $x')"
+    DATE_TMP="$(perl -e '$x=localtime(time+(42*3600));print $x')"
+    hours_until "${DATE_TMP}"
     assertEquals "error computing the missing hours until now" 42 "${HOURS_UNTIL}"
 }
 
@@ -915,7 +917,8 @@ testResolveDifferentName() {
 testResolveCorrectIP() {
     # dig is needed to resolve the IP address
     if command -v dig >/dev/null; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H github.com --resolve "$(dig +short github.com)" --critical 1 --warning 2
+        RESOLVED_IP="$(dig +short github.com)"
+        ${SCRIPT} --rootcert-file cabundle.crt -H github.com --resolve "${RESOLVED_IP}" --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -926,7 +929,8 @@ testResolveCorrectIP() {
 testResolveWrongIP() {
     # dig is needed to resolve the IP address
     if command -v dig >/dev/null; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "$(dig +short www.google.com)" --critical 1 --warning 2
+        RESOLVED_IP="$(dig +short www.google.com)"
+        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "${RESOLVED_IP}" --critical 1 --warning 2
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
