@@ -1,6 +1,6 @@
-Several fixes in the documentation
-Works with OpenSSL 3.0.0
-Fixes a bug in the processing of certificate issuers containing commas
+2021-11-11 Version  2.11.0: Several fixes in the documentation
+                            Works with OpenSSL 3.0.0
+                            Fixes a bug in the processing of certificate issuers containing commas
 2021-10-22 Version  2.10.4: Fixes the organisation check
 2021-10-21 Version  2.10.3: Fixes --rsa on systems not supporting PSS
                             Uses mktemp if available (the workaround is only used if not available for speed reasons)

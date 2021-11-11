@@ -29,9 +29,9 @@ endif
 version_check:
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%define\ version\ *$(VERSION)" $(PLUGIN).spec
-	grep -q -- "- $(VERSION)-" $(PLUGIN).spec
+	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
-	grep -q "${VERSION}" NEWS
+	grep -q -F "${VERSION}" NEWS
 	echo "Version check: OK"
 
 # we check for tabs
