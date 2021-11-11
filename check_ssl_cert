@@ -1001,7 +1001,10 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -hash
         ;;
     issuer)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -issuer
+        # see https://unix.stackexchange.com/questions/676776/parse-comma-separated-string-ignoring-commas-between-quotes
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout -nameopt sep_multiline,utf8,esc_ctrl -issuer |
+            tail -n +2 |
+            sed 's/^\ *//'
         ;;
     issuer_uri)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
@@ -1353,6 +1356,7 @@ check_ocsp() {
         debuglog "Chain element issuer URIs: ${ELEMENT_ISSUER_URIS}"
 
         for ELEMENT_ISSUER_URI in ${ELEMENT_ISSUER_URIS}; do
+
             debuglog "checking issuer URIs: ${ELEMENT_ISSUER_URI}"
 
             # shellcheck disable=SC2021
@@ -4148,8 +4152,16 @@ main() {
             fi
             CERT_ELEMENT="$(sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
                 awk -v n="${CERT_IN_CHAIN}" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}')"
-            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}")"
-            debuglog "      ELEMENT_ISSUER=${ELEMENT_ISSUER}"
+
+            # get the organization and common name
+
+            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | grep -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//' )"
+
+            # echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/'
+
+            MESSAGE="$( echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/' )"
+            debuglog "${MESSAGE}"
+
             ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
 
             CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
@@ -4161,14 +4173,6 @@ main() {
         debuglog "Certificate chain check finished"
 
     fi
-
-    debuglog 'ISSUERS = '
-    debuglog "${ISSUERS}"
-
-    # Handle properly openssl x509 -issuer -noout output format differences:
-    # OpenSSL 1.1.0: issuer=C = XY, ST = Alpha, L = Bravo, O = Charlie, CN = Charlie SSL CA
-    # OpenSSL 1.0.2: issuer= /C=XY/ST=Alpha/L=Bravo/O=Charlie/CN=Charlie SSL CA 3
-    ISSUERS=$(echo "${ISSUERS}" | sed 's/\\n/\n/g' | sed -E -e 's/^issuer=( \/)?//' | awk '{gsub(", ","\n")};1' | grep -E "^(O|CN) ?= ?")
 
     debuglog 'ISSUERS = '
     debuglog "${ISSUERS}"
@@ -4444,7 +4448,7 @@ main() {
         debuglog "check ISSUER: ${ISSUER}"
 
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^(O|CN) ?= ?${ISSUER}\$" | sed -E -e "s/^(O|CN) ?= ?//" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${ISSUER}\$" | head -n1)
 
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
@@ -4453,7 +4457,7 @@ main() {
         else
             # this looks ugly but preserves spaces in CA name
             ISSUER_TMP="$(echo "${ISSUER}" | sed "s/|/ PIPE /g")"
-            ISSUERS_TMP="$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")"
+            ISSUERS_TMP="$(echo "${ISSUERS}" | tr '\n' '|' | sed 's/|$//g' | sed "s/|/\\' or \\'/g")"
             prepend_critical_message "invalid CA ('${ISSUER_TMP}' does not match '${ISSUERS_TMP}')"
         fi
 
@@ -4484,7 +4488,7 @@ main() {
 
     else
 
-        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | grep -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
+        CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | head -n1)"
 
     fi
 

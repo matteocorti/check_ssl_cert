@@ -1,3 +1,7 @@
+2021-11-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Better extraction of the certificate issuers
+
 2021-11-09  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (fetch_certificate): Parsing of OpenSSL 3 messages
