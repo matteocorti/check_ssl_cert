@@ -1851,11 +1851,6 @@ fetch_certificate() {
         STATUS='-status'
     fi
 
-    if [ "${DEBUG}" -ge 1 ]; then
-        debuglog "Adding -ign_eof to the options"
-        IGN_EOF='-ign_eof'
-    fi
-
     debuglog "fetch_certificate: PROTICOL = ${PROTOCOL}"
 
     # Check if a protocol was specified (if not HTTP switch to TLS)
