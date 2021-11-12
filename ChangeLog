@@ -1,3 +1,7 @@
+2021-11-12  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Skipping the manual renegotiation test with OpenSSL > 3.0.0
+
 2021-11-11  Matteo Corti  <matteo@corti.li>
 
 	* check_ssl_cert (main): Fixed a problem with newlines in variable on some systems (e.g., Fedora)

@@ -3977,28 +3977,35 @@ main() {
     fi
 
     # check for TLS renegotiation
-    if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] && [ -z "${FILE}" ]; then
+    if openssl_version '3.0.0' ; then
+        debuglog 'Skipping TLS renegotiation check as OpenSSL 3.0.0 enforces it by default'
 
-        verboselog "checking TLS renegotiation"
-        debuglog "checking TLS renegotiation"
+    else
 
-        # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
+        if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] && [ -z "${FILE}" ]; then
 
-        case "${PROTOCOL}" in
-        pop3 | ftp | smtp | irc | ldap | imap | postgres | sieve | xmpp | xmpp-server | mysql)
-            exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
-            RET=$?
-            ;;
-        *)
-            exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
-            RET=$?
-            ;;
-        esac
+            verboselog "checking TLS renegotiation"
+            debuglog "checking TLS renegotiation"
 
-        if [ "${RET}" -eq 1 ]; then
+            # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
-            if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}"; then
-                prepend_critical_message 'TLS renegotiation is supported but not secure'
+            case "${PROTOCOL}" in
+                pop3 | ftp | smtp | irc | ldap | imap | postgres | sieve | xmpp | xmpp-server | mysql)
+                    exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
+                    RET=$?
+                    ;;
+                *)
+                    exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
+                    RET=$?
+                    ;;
+            esac
+
+            if [ "${RET}" -eq 1 ]; then
+
+                if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}"; then
+                    prepend_critical_message 'TLS renegotiation is supported but not secure'
+                fi
+
             fi
 
         fi
