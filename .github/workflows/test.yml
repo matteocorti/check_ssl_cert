@@ -40,6 +40,7 @@ jobs:
         run:  |
           uname -a \
           && make test
+          && make dist
 
   ##############################################################################
   # Linuxes
@@ -145,6 +146,7 @@ jobs:
               && cpanm --sudo install Date::Parse \
               && uname -a \
               && make test \
+              && make dist \
               && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi'
 
   rpm:
