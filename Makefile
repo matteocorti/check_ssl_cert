@@ -12,8 +12,8 @@ dist: version_check
 	cp -r $(DIST_FILES) $(DIST_DIR)
 # avoid to include extended attribute data files
 # see https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives
-	env COPYFILE_DISABLE=1 tar --no-xattrs cfz $(DIST_DIR).tar.gz  $(DIST_DIR)
-	env COPYFILE_DISABLE=1 tar --no-xattrs cfj $(DIST_DIR).tar.bz2 $(DIST_DIR)
+	env COPYFILE_DISABLE=1 tar -c --no-xattrs -z -f $(DIST_DIR).tar.gz  $(DIST_DIR)
+	env COPYFILE_DISABLE=1 tar -c --no-xattrs -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
 install:
 ifndef DESTDIR
