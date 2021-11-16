@@ -39,7 +39,7 @@ jobs:
       - name: Run the tests
         run:  |
           uname -a \
-          && make test
+          && make test \
           && make dist
 
   ##############################################################################
