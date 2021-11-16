@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.11.0
+VERSION=2.12.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1590,6 +1590,8 @@ check_ocsp() {
 
         done
 
+        verboselog "OCSP check for element ${el_number} OK"
+
     fi
 
 }
@@ -1736,6 +1738,7 @@ check_cert_end_date() {
     if [ -z "${CN}" ]; then
         CN='unavailable'
     fi
+    verboselog "Certificate element ${el_number} (${element_cn}) is valid for ${ELEM_DAYS_VALID} days."
     add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
 
 }
@@ -4170,8 +4173,6 @@ main() {
 
             ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | grep -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//' )"
 
-            # echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/'
-
             MESSAGE="$( echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/' )"
             debuglog "${MESSAGE}"
 
@@ -4199,8 +4200,6 @@ main() {
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ]; then
 
-        verboselog "checking OCSP stapling"
-
         grep -F -A 17 'OCSP response:' "${CERT}" >"${OCSP_RESPONSE_TMP}"
 
         debuglog "${OCSP_RESPONSE_TMP}"
@@ -4208,11 +4207,9 @@ main() {
         if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}"; then
             prepend_critical_message "OCSP stapling not enabled"
         else
-            verboselog "  OCSP stapling enabled"
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
-
             OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
-            verboselog "  OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
+            verboselog "OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ]; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
             elif [ -n "${OCSP_WARNING}" ] && [ "${OCSP_WARNING}" -ge "${OCSP_EXPIRES_IN_HOURS}" ]; then
@@ -4304,6 +4301,8 @@ main() {
     debuglog "subjectAlternativeName = ${SUBJECT_ALTERNATIVE_NAME}"
     if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ "${OPENSSL_COMMAND}" != "crl" ]; then
         prepend_critical_message "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
+    else
+        verboselog "The certificate for this site contains a Subject Alternative Name extension."
     fi
 
     ################################################################################
@@ -4469,6 +4468,7 @@ main() {
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
+            verboselog "The certificare issuer matches ${ISSUER}"
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
