@@ -505,7 +505,7 @@ hours_until() {
     "BUSYBOX")
         BUSYBOX_DATE=$(echo "${DATE}" | sed 's/[ ][^ ]*$//')
         debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
-        verboselog "warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
+        verboselog "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
         HOURS_UNTIL=$((($(${DATEBIN} -d "${BUSYBOX_DATE}" +%s) - $(${DATEBIN} +%s)) / 3600))
         ;;
     "GNU")
@@ -842,7 +842,7 @@ critical() {
 #   $2 replace current warning message
 append_warning_message() {
 
-    verboselog "WARNING: $1"
+    verboselog "Warning: $1"
 
     debuglog "WARNING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     debuglog "append_warning_message: HOST_NAME    = ${HOST_NAME}"
@@ -1349,7 +1349,7 @@ check_ocsp() {
         ELEMENT_ISSUER_URIS="$(extract_cert_attribute 'issuer_uri' "${CERT_ELEMENT}")"
 
         if [ -z "${ELEMENT_ISSUER_URIS}" ]; then
-            verboselog "cannot find the CA Issuers in the certificate: disabling OCSP checks on element ${el_number}"
+            verboselog "Warning cannot find the CA Issuers in the certificate chain element ${el_number}: disabling OCSP checks on chain element ${el_number}"
             return
         fi
 
@@ -1362,10 +1362,10 @@ check_ocsp() {
             # shellcheck disable=SC2021
             ELEMENT_ISSUER_URI_WO_SPACES_TMP="$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')"
             if [ "${ELEMENT_ISSUER_URI}" != "${ELEMENT_ISSUER_URI_WO_SPACES_TMP}" ]; then
-                verboselog "unable to fetch the CA issuer certificate (spaces in URI): skipping"
+                verboselog "Warning: unable to fetch the CA issuer certificate (spaces in URI): skipping"
                 continue
             elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http'; then
-                verboselog "unable to fetch the CA issuer certificate (unsupported protocol): skipping"
+                verboselog "Warning: unable to fetch the CA issuer certificate (unsupported protocol): skipping"
                 continue
             fi
 
@@ -1544,7 +1544,7 @@ check_ocsp() {
 
                     elif echo "${OCSP_RESP}" | grep -F -q -i "internalerror" && [ -n "${OCSP_IGNORE_ERRORS}" ]; then
 
-                        verbose 'the OCSP server returned an internal error'
+                        verbose 'warning: the OCSP server returned an internal error'
 
                     elif ! echo "${OCSP_RESP}" | grep -F -q -i "good"; then
 
@@ -1572,21 +1572,19 @@ check_ocsp() {
 
                         fi
 
-                        verboselog "OCSP Error: ${OCSP_RESP}"
-
                         prepend_critical_message "OCSP error (-v for details)"
 
                     fi
 
                 else
 
-                    verboselog "openssl ocsp does not support the -header option: disabling OCSP checks"
+                    verboselog "Warning: openssl ocsp does not support the -header option: disabling OCSP checks"
 
                 fi
 
             else
 
-                verboselog "no OCSP host found: disabling OCSP checks"
+                verboselog "Warning: no OCSP host found: disabling OCSP checks"
 
             fi
 
@@ -2053,7 +2051,7 @@ fetch_certificate() {
         # s_client could verify the server certificate because the server requires a client certificate
         if ascii_grep '^Client Certificate Types' "${CERT}"; then
 
-            verboselog "the server requires a client certificate"
+            verboselog "Warning: the server requires a client certificate"
 
         elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
             ascii_grep 'Name or service not known' "${ERROR}" ||
@@ -3093,7 +3091,7 @@ main() {
     # we accept unterscrores since some hosts with an underscore exist but these names
     # are invalid: we issue a small warning
     if echo "${HOST_NAME}" | grep -q '[\_]' && [ -n "${VERBOSE}" ]; then
-        verboselog "${HOST_NAME} contains an underscore (invalid)"
+        verboselog "Warning: ${HOST_NAME} contains an underscore (invalid)"
     fi
 
     ################################################################################
@@ -3432,7 +3430,7 @@ main() {
     fi
 
     if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ]; then
-        verboselog "disabling timeouts"
+        verboselog "disabling timeouts" 2
     fi
 
     PERL="$(command -v perl 2>/dev/null)"
@@ -3454,7 +3452,7 @@ main() {
         # Perl with Date::Parse (optional)
         test -x "${PERL}" || PERL=""
         if [ -z "${PERL}" ]; then
-            verboselog "Perl not found: disabling date computations"
+            verboselog "Warning: Perl not found: disabling date computations"
         fi
 
         if ! ${PERL} -e "use Date::Parse;" >/dev/null 2>&1; then
@@ -3495,7 +3493,7 @@ main() {
         fi
 
         debuglog "date computation type: ${DATETYPE}"
-        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations"
+        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations" 2
 
     fi
 
@@ -3777,14 +3775,19 @@ main() {
         debuglog "offered cyphers and protocols:"
         debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
 
+        DISALLOWED_PROTOCOLS_FAIL=
         for protocol in ${DISALLOWED_PROTOCOLS}; do
             debuglog "Checking if '${protocol}' is offered"
             if echo "${OFFERED_PROTOCOLS}" | grep -F -v 'No supported ciphers found' | grep -q "${protocol}"; then
                 debuglog "'${protocol}' is offered"
+                DISALLOWED_PROTOCOLS_FAIL=1
                 prepend_critical_message "${protocol} is offered"
             fi
-
         done
+
+        if [ -z "${DISALLOWED_PROTOCOLS_FAIL}" ] ; then
+            verboselog "no disallowed protocols offered"
+        fi
 
     fi
 
@@ -3833,6 +3836,8 @@ main() {
             if [ ${#DANE} -lt 5 ]; then
                 prepend_critical_message "No matching TLSA records found at _${PORT}._tcp.${HOST_ADDR}"
                 critical "${SHORTNAME} CRITICAL: No matching TLSA records found at _${PORT}._tcp.${HOST_ADDR}"
+            else
+                verboselog "DANE OK"
             fi
             DANE="${DANE} -dane_tlsa_domain ${HOST_ADDR} "
             debuglog "DBG] DANE = ${DANE}"
@@ -3934,7 +3939,7 @@ main() {
     debuglog "Temporary files created"
 
     if [ -z "${FILE}" ]; then
-        verboselog "downloading certificate to ${TMPDIR}"
+        verboselog "downloading certificate to ${TMPDIR}" 2
     fi
 
     CLIENT=""
@@ -3984,7 +3989,6 @@ main() {
 
         if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] && [ -z "${FILE}" ]; then
 
-            verboselog "checking TLS renegotiation"
             debuglog "checking TLS renegotiation"
 
             # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
@@ -4004,7 +4008,12 @@ main() {
 
                 if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}"; then
                     prepend_critical_message 'TLS renegotiation is supported but not secure'
+                else
+                    verboselog "TLS renegotiation OK"
                 fi
+
+            else
+                verboselog "TLS renegotiation OK"
 
             fi
 
@@ -4089,7 +4098,7 @@ main() {
 
     fi
 
-    verboselog "parsing the ${OPENSSL_COMMAND} certificate file"
+    verboselog "parsing the ${OPENSSL_COMMAND} certificate file" 2
 
     ################################################################################
     # Parse the X.509 certificate or crl
@@ -4167,7 +4176,7 @@ main() {
             debuglog "${MESSAGE}"
 
             ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
-	    MESSAGE="$( echo "${ISSUERS}" | sed 's/^/ISSUERS=/' )"
+	        MESSAGE="$( echo "${ISSUERS}" | sed 's/^/ISSUERS=/' )"
             debuglog "${MESSAGE}"
 
 
@@ -4512,6 +4521,8 @@ main() {
         if [ -z "${ok}" ]; then
             SERIAL_LOCK_TMP="$(echo "${SERIAL_LOCK}" | sed "s/|/ PIPE /g")"
             prepend_critical_message "invalid serial number ('${SERIAL_LOCK_TMP}' does not match '${SERIAL}')"
+        else
+            verboselog "Valid serial number (${SERIAL})"
         fi
 
     fi
@@ -4528,6 +4539,8 @@ main() {
         if [ -z "${ok}" ]; then
             FINGERPRINT_LOCK_TMP="$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")"
             prepend_critical_message "invalid SHA1 Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
+        else
+            verboselog "Valid SHA1 fingerprint (${FINGERPRINT})"
         fi
 
     fi
@@ -4589,8 +4602,6 @@ main() {
     # Check nmap
     if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
 
-        verboselog "checking offered ciphers with nmap"
-
         if [ -n "${CHECK_CIPHERS}" ]; then
             debuglog "Checking offered ciphers (minimum level ${CHECK_CIPHERS}: ${CHECK_CIPHERS_NUMERIC})"
         fi
@@ -4634,7 +4645,7 @@ main() {
             convert_grade "${NMAP_GRADE}"
             NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
-            verboselog "  nmap cipher grade ${NMAP_GRADE}: ${NMAP_GRADE_NUMERIC}"
+            verboselog "Cipher grade ${NMAP_GRADE_NUMERIC}: ${NMAP_GRADE}"
 
             # Check the grade
             if [ "${NMAP_GRADE_NUMERIC}" -lt "${CHECK_CIPHERS_NUMERIC}" ]; then
@@ -4669,6 +4680,10 @@ main() {
 
                 WARNINGS=$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed 's/,/,\ /g' | sed 's/,\ $//')
                 prepend_critical_message "${HOST_ADDR} offers ciphers with warning: ${WARNINGS}"
+
+            else
+
+                verboselog "No ciphers with warnings are offered"
 
             fi
 
@@ -4827,8 +4842,6 @@ main() {
 
         EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
 
-        verboselog "checking email (${ADDR}): ${EMAIL}"
-
         if [ -z "${EMAIL}" ]; then
 
             debuglog "no email in certificate"
@@ -4840,6 +4853,8 @@ main() {
             if ! echo "${EMAIL}" | grep -q -E "^${ADDR}"; then
                 EMAIL_TMP="$(echo "${ADDR}" | sed "s/|/ PIPE /g")"
                 prepend_critical_message "invalid email ('${EMAIL_TMP}' does not match ${EMAIL})"
+            else
+                verboselog "email ${ADDR} is OK"
             fi
 
         fi
@@ -4877,6 +4892,10 @@ main() {
 
         fi
 
+    else
+
+        verboselog "The certificate was succesfully verified"
+
     fi
 
     ##############################################################################
@@ -4890,10 +4909,12 @@ main() {
 
             if [ -n "${SCT}" ] && ! extract_cert_attribute 'sct' "${CERT}"; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
+            else
+                verboselog "The certificate contains signed certificate timestamps (SCT)"
             fi
 
         else
-            verboselog 'Skipping SCTs check as not supported by OpenSSL'
+            verboselog 'warning: Skipping SCTs check as not supported by OpenSSL'
         fi
     fi
 
