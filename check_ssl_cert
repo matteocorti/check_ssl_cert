@@ -1738,7 +1738,7 @@ check_cert_end_date() {
     if [ -z "${CN}" ]; then
         CN='unavailable'
     fi
-    verboselog "Certificate element ${el_number} (${element_cn}) is valid for ${ELEM_DAYS_VALID} days."
+    verboselog "Certificate element ${el_number} (${element_cn}) is valid for ${ELEM_DAYS_VALID} days"
     add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
 
 }
@@ -3418,19 +3418,19 @@ main() {
     EXPECT="$(command -v expect 2>/dev/null)"
     test -x "${EXPECT}" || EXPECT=""
     if [ -z "${EXPECT}" ]; then
-        verboselog "expect not available." 2
+        verboselog "expect not available" 2
     else
-        verboselog "expect available (${EXPECT})." 2
+        verboselog "expect available (${EXPECT})" 2
     fi
 
     # Timeout (optional)
     TIMEOUT_BIN="$(command -v timeout 2>/dev/null)"
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
     if [ -z "${TIMEOUT_BIN}" ]; then
-        verboselog "timeout not available." 2
+        verboselog "timeout not available" 2
     else
 
-        verboselog "timeout available (${TIMEOUT_BIN})." 2
+        verboselog "timeout available (${TIMEOUT_BIN})" 2
     fi
 
     if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ]; then
@@ -4102,7 +4102,7 @@ main() {
 
     fi
 
-    verboselog "Parsing the ${OPENSSL_COMMAND} certificate file." 2
+    verboselog "Parsing the ${OPENSSL_COMMAND} certificate file" 2
 
     ################################################################################
     # Parse the X.509 certificate or crl
@@ -4303,7 +4303,7 @@ main() {
     if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ] && [ "${OPENSSL_COMMAND}" != "crl" ]; then
         prepend_critical_message "The certificate for this site does not contain a Subject Alternative Name extension containing a domain name or IP address."
     else
-        verboselog "The certificate for this site contains a Subject Alternative Name extension."
+        verboselog "The certificate for this site contains a Subject Alternative Name extension"
     fi
 
     ################################################################################
@@ -4696,8 +4696,6 @@ main() {
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ]; then
 
-        verboselog "checking SSL Labs assessment"
-
         while true; do
 
             debuglog "http_proxy  = ${http_proxy}"
@@ -4760,7 +4758,7 @@ main() {
 
                         debuglog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
-                        verboselog "  SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+                        verboselog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
                         convert_grade "${SSL_LABS_HOST_GRADE}"
                         SSL_LABS_HOST_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
@@ -4811,7 +4809,7 @@ main() {
             fi
 
             WAIT_TIME=60
-            verboselog "  waiting ${WAIT_TIME} seconds"
+            verboselog "  waiting ${WAIT_TIME} seconds" 2
 
             sleep "${WAIT_TIME}"
 
