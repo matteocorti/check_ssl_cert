@@ -1252,7 +1252,7 @@ check_crl() {
     CRL_URI="$(extract_cert_attribute 'crl_uri' "${CERT_ELEMENT}")"
     if [ -n "${CRL_URI}" ]; then
 
-        debuglog "Certificate revokation list available (${CRL_URI})"
+        debuglog "Certificate revokation list available (${CRL_URI})."
 
         debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
 
@@ -3418,18 +3418,19 @@ main() {
     EXPECT="$(command -v expect 2>/dev/null)"
     test -x "${EXPECT}" || EXPECT=""
     if [ -z "${EXPECT}" ]; then
-        verboselog "expect not available" 2
+        verboselog "expect not available." 2
     else
-        verboselog "expect available (${EXPECT})" 2
+        verboselog "expect available (${EXPECT})." 2
     fi
 
     # Timeout (optional)
     TIMEOUT_BIN="$(command -v timeout 2>/dev/null)"
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
     if [ -z "${TIMEOUT_BIN}" ]; then
-        verboselog "timeout not available" 2
+        verboselog "timeout not available." 2
     else
-        verboselog "timeout available (${TIMEOUT_BIN})" 2
+
+        verboselog "timeout available (${TIMEOUT_BIN})." 2
     fi
 
     if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ]; then
@@ -3496,7 +3497,7 @@ main() {
         fi
 
         debuglog "date computation type: ${DATETYPE}"
-        verboselog "found ${DATETYPE} date with timestamp support: enabling date computations" 2
+        verboselog "Found ${DATETYPE} date with timestamp support: enabling date computations" 2
 
     fi
 
@@ -3942,7 +3943,7 @@ main() {
     debuglog "Temporary files created"
 
     if [ -z "${FILE}" ]; then
-        verboselog "downloading certificate to ${TMPDIR}" 2
+        verboselog "Downloading certificate to ${TMPDIR}" 2
     fi
 
     CLIENT=""
@@ -4101,7 +4102,7 @@ main() {
 
     fi
 
-    verboselog "parsing the ${OPENSSL_COMMAND} certificate file" 2
+    verboselog "Parsing the ${OPENSSL_COMMAND} certificate file." 2
 
     ################################################################################
     # Parse the X.509 certificate or crl
