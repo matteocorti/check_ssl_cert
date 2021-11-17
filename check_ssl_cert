@@ -4671,7 +4671,8 @@ main() {
                         WARNING=$(echo "${line}" | sed 's/|\ *//')
                         if [ -n "${WARNINGS}" ]; then
                             debuglog "Cipher warning '${WARNING}'"
-                            WARNINGS="${WARNINGS}\\n${WARNING}"
+                            WARNINGS="${WARNINGS}
+${WARNING}"
                         else
                             WARNINGS="${WARNING}"
                         fi
@@ -4679,8 +4680,8 @@ main() {
 
                 done <"${NMAP_OUT}"
 
-                WARNINGS=$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed 's/,/,\ /g' | sed 's/,\ $//')
-                prepend_critical_message "${HOST_ADDR} offers ciphers with warning: ${WARNINGS}"
+                WARNINGS="$( echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//' )"
+                prepend_critical_message "${HOST_ADDR} offers ciphers with warnings: ${WARNINGS}"
 
             else
 
