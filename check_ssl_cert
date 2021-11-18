@@ -3366,24 +3366,24 @@ main() {
     FILE_BIN_VERSION="$("${FILE_BIN}" --version 2>&1)"
     debuglog "file version: ${FILE_BIN_VERSION}"
 
-    # cURL
+    # curl
     if [ -z "${CURL_BIN}" ]; then
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
             [ -n "${OCSP}" ] ||
             [ -n "${CRL}" ] ||
             [ -n "${IGNORE_CONNECTION_STATE}" ]; then
-            debuglog "cURL binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}"
-            debuglog "cURL binary not specified"
+            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}"
+            debuglog "curl binary not specified"
 
             check_required_prog curl
             CURL_BIN=${PROG}
 
-            debuglog "cURL available: ${CURL_BIN}"
+            debuglog "curl available: ${CURL_BIN}"
             CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
             debuglog "${CURL_BIN_VERSION_TMP}"
 
         else
-            debuglog "cURL binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+            debuglog "curl binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
         fi
     else
         # we check if the provided binary actually works
@@ -3626,7 +3626,7 @@ main() {
         fi
 
         if ${CURL_BIN} --manual | grep -F -q -- --proxy; then
-            debuglog "Adding --proxy ${HTTP_PROXY} to the cURL options"
+            debuglog "Adding --proxy ${HTTP_PROXY} to the curl options"
             CURL_PROXY="--proxy"
             CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
         fi
@@ -3661,7 +3661,7 @@ main() {
     debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
     debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
     debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
-    debuglog "  cURL        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
+    debuglog "  curl        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
 
     ################################################################################
     # Check if openssl s_client supports the -name option
@@ -3717,11 +3717,11 @@ main() {
             unknown "OpenSSL does not support the ${INETPROTO} option"
         fi
 
-        # Check if cURL is needed and if it supports the -4 and -6 options
+        # Check if curl is needed and if it supports the -4 and -6 options
         if [ -z "${CURL_BIN}" ]; then
             if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ]; then
                 if ! "${CURL_BIN}" --manual | grep -F -q -- -6 && [ -n "${INETPROTO}" ]; then
-                    unknown "cURL does not support the ${INETPROTO} option"
+                    unknown "curl does not support the ${INETPROTO} option"
                 fi
             fi
         fi
@@ -3865,15 +3865,15 @@ main() {
 
         debuglog "Testing connection with ${HOST}:${PORT} with timeout ${TIMEOUT}"
 
-        # we check with cURL if a connection is possible
+        # we check with curl if a connection is possible
         debuglog "Executing: ${CURL_BIN} --silent --connect-timeout ${TIMEOUT} ${HOST}:${PORT}"
 
         "${CURL_BIN}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" >/dev/null
         CURL_EXIT_STATUS=$?
 
-        debuglog "  cURL exited with status ${CURL_EXIT_STATUS}"
+        debuglog "  curl exited with status ${CURL_EXIT_STATUS}"
 
-        # cURL exit codes
+        # curl exit codes
         # -  7 Failed to connect to host
         # - 28 Timeout
         if [ "${CURL_EXIT_STATUS}" -eq 28 ] ||

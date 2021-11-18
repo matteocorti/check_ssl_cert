@@ -18,7 +18,7 @@
 2021-09-29 Version   2.8.0: Adds a check for acceptable client certificate CAs (--require-client-cert [list])
                             Supporting certificate expiration after 2038-01-19 on 32 bit systems
                             Adds an option (--ignore-connection-problem)  to set a custom state in case of connection failures
-                            Adds two options to selectively disable proxy setting for cURL and s_client
+                            Adds two options to selectively disable proxy setting for curl and s_client
                             (--no-proxy-curl and --no-proxy-s_client)
 2021-09-24 Version   2.7.0: Critical and warning can now be floating point numbers
 2021-09-21 Version   2.6.1: Fixed the output of several messages
@@ -136,7 +136,7 @@
 2019-08-08 Version 1.87.0: LDAPS support
 2019-07-21 Version 1.86.0: Fixed a bug and enabled extended regex search
 2019-06-02 Version 1.85.0: Improved the warnings when using the --file option
-2019-03-28 Version 1.84.0: Added an option to specify the cURL user agent
+2019-03-28 Version 1.84.0: Added an option to specify the curl user agent
 2019-03-01 Version 1.83.0: Spelling corrections
 2019-02-08 Version 1.82.0: Added a check on the readability of the certificate file
 2019-02-01 Version 1.81.0: Added an option to specify a warning level with SSL Labs
@@ -162,7 +162,7 @@
 2018-04-17 Version 1.67.0: Terse output, warning if the specified server name is not found in the certificate and --format option
 2018-04-06 Version 1.66.0: UTF-8 output
 2018-03-29 Version 1.65.0: Bug fix release
-2018-03-28 Version 1.64.0: Remove cURL dependency
+2018-03-28 Version 1.64.0: Remove curl dependency
 2018-03-17 Version 1.63.0: Support for TLS 1.3
 2018-03-06 Version 1.62.0: Support for LibreSSL
 2018-01-19 Version 1.61.0: Fixed a bug handling more than one OCSP host
