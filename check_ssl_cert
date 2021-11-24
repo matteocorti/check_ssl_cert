@@ -4661,16 +4661,17 @@ main() {
             fi
         fi
 
-       if [ -s "${NMAP_ERR}" ]; then
+	if [ -s "${NMAP_ERR}" ]; then
 
             NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
 	    # check for -Pn warning
-	    if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower."; then
+	    if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
 		unknown "nmap exited with error: ${NMAP_ERROR}"
 	    fi
 
         fi
+
 
         if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
             unknown "empty nmap result while checking ciphers"
