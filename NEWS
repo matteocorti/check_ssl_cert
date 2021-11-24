@@ -1,3 +1,5 @@
+2021-11-24 Version  2.13.0: Fixed a bug in the processing of error messages
+                            Handling of root certificates in DER format
 2021-11-16 Version  2.12.0: Improved verbose messages
 2021-11-11 Version  2.11.0: Several fixes in the documentation
                             Works with OpenSSL 3.0.0

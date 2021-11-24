@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.12.0
+VERSION=2.13.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2134,6 +2134,12 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
+        elif ascii_grep "no certificate or crl found" "${ERROR}"; then
+
+            ERROR="Cannot read or parse the supplied certificate (e.g., root certificate)"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT_CRITICAL ${HOST_NAME}: ${ERROR}"
+
         else
 
             # Try to clean up the error message
@@ -3115,6 +3121,28 @@ main() {
         unknown "--altnames requires a common name to match (--cn or --host-cn)"
     fi
 
+    ##############################################################################
+    # file
+    if [ -z "${FILE_BIN}" ]; then
+        FILE_BIN='file'
+    fi
+    check_required_prog "${FILE_BIN}"
+    FILE_BIN=${PROG}
+
+    ##############################################################################
+    # OpenSSL
+    if [ -n "${OPENSSL}" ]; then
+        if [ ! -x "${OPENSSL}" ]; then
+            unknown "${OPENSSL} is not an executable"
+        fi
+    else
+        OPENSSL='openssl'
+    fi
+    check_required_prog "${OPENSSL}"
+    OPENSSL=${PROG}
+
+    ##############################################################################
+    # Root certificate
     if [ -n "${ROOT_CA}" ]; then
 
         if [ ! -r "${ROOT_CA}" ]; then
@@ -3124,11 +3152,38 @@ main() {
         if [ -d "${ROOT_CA}" ]; then
             ROOT_CA="-CApath ${ROOT_CA}"
         elif [ -f "${ROOT_CA}" ]; then
-            ROOT_CA="-CAfile ${ROOT_CA}"
+
+            # check if the file is in DER format and has to be converted
+            if "${FILE_BIN}" -L -b "${ROOT_CA}" | grep -E -q '(data|Certificate)'; then
+
+                create_temporary_file
+                ROOT_CA_PEM=${TEMPFILE}
+                debuglog "Converting ${ROOT_CA} (DER) to PEM: ${ROOT_CA_PEM}"
+
+                create_temporary_file
+                CONVERT_ERROR=${TEMPFILE}
+                if ! ${OPENSSL} x509 -inform DER -outform PEM -in "${ROOT_CA}" -out "${ROOT_CA_PEM}" 2> "${CONVERT_ERROR}"; then
+
+                    CONVERT_ERROR=$( head -n 1 "${CONVERT_ERROR}" )
+                    prepend_critical_message "Error converting ${ROOT_CA} to PEM: ${CONVERT_ERROR}"
+                    critical "${SHORTNAME} CRITICAL: Error converting ${ROOT_CA} to PEM: ${CONVERT_ERROR}"
+
+                fi
+
+                ROOT_CA="-CAfile ${ROOT_CA_PEM}"
+
+            else
+
+                ROOT_CA="-CAfile ${ROOT_CA}"
+
+            fi
+
         else
             FILE_TMP="$(file "${ROOT_CA}" 2>/dev/null)"
             unknown "Root certificate of unknown type ${FILE_TMP}"
         fi
+
+        debuglog "Root CA option = ${ROOT_CA}"
 
     fi
 
@@ -3252,14 +3307,6 @@ main() {
 
     fi
 
-    if [ -n "${OPENSSL}" ]; then
-
-        if [ ! -x "${OPENSSL}" ]; then
-            unknown "${OPENSSL} is not an executable"
-        fi
-
-    fi
-
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ]; then
         convert_grade "${SSL_LAB_CRIT_ASSESSMENT}"
         SSL_LAB_CRIT_ASSESSMENT_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
@@ -3290,13 +3337,6 @@ main() {
 
     #######################
     # Check needed programs
-
-    # OpenSSL
-    if [ -z "${OPENSSL}" ]; then
-        OPENSSL='openssl'
-    fi
-    check_required_prog "${OPENSSL}"
-    OPENSSL=${PROG}
 
     # Signature algorithms
     if [ -n "${RSA}" ] && [ -n "${ECDSA}" ]; then
@@ -3341,13 +3381,6 @@ main() {
         fi
         SSL_AU="-sigalgs '${SSL_AU}'"
     fi
-
-    # file
-    if [ -z "${FILE_BIN}" ]; then
-        FILE_BIN='file'
-    fi
-    check_required_prog "${FILE_BIN}"
-    FILE_BIN=${PROG}
 
     # mktemp
     MKTEMP=$(command -v mktemp 2>/dev/null)
@@ -4612,7 +4645,8 @@ main() {
         create_temporary_file
         NMAP_ERR=${TEMPFILE}
 
-        exec_with_timeout "nmap --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+        # -Pn is needed even if we specify a port
+        exec_with_timeout "nmap -Pn --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
         if [ "${DEBUG}" -ge 1 ]; then
             debuglog 'nmap output:'
@@ -4887,7 +4921,8 @@ ${WARNING}"
             debuglog "${DEBUG_MESSAGE}"
 
             # Process errors
-            details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
+            # details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
+            details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' )
             prepend_critical_message "Cannot verify certificate: ${details}"
 
         fi

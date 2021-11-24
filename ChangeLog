@@ -1,3 +1,9 @@
+2021-11-24  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Fixed a bug in the processing of error messages
+        * check_ssl_cert (main): Handle root certificates in DER format
+        * check_ssl_cert (check_attr): Fixed the nmap cipher check for hosts which are not discoverable
+
 2021-11-12  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Skipping the manual renegotiation test with OpenSSL > 3.0.0
