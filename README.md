@@ -80,6 +80,7 @@ Options:
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
       --ignore-tls-renegotiation   Ignores the TLS renegotiation check
       --inetproto protocol         Force IP version 4 or 6
+      --info                       Prints certificate information
    -i,--issuer issuer              pattern to match the issuer of the certificate
       --issuer-cert-cache dir      directory where to store issuer certificates cache
    -K,--clientkey path             use client certificate key to authenticate

@@ -263,6 +263,10 @@ testDependencies() {
     assertNotNull 'openssl not found' "${PROG}"
 }
 
+testInfo() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --info
+}
+
 testSCT() {
     if [ -z "${OPENSSL}" ]; then
         OPENSSL=$(command -v openssl) # needed by openssl_version

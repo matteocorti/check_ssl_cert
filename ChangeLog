@@ -1,3 +1,7 @@
+2021-11-26  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (info): --info to print certificate information
+
 2021-11-24  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed a bug in the processing of error messages

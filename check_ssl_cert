@@ -138,6 +138,7 @@ usage() {
     echo "      --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)"
     echo "      --ignore-tls-renegotiation   Ignores the TLS renegotiation check"
     echo "      --inetproto protocol         Force IP version 4 or 6"
+    echo "      --info                       Prints certificate information"
     echo "   -i,--issuer issuer              pattern to match the issuer of the certificate"
     echo "      --issuer-cert-cache dir      directory where to store issuer certificates cache"
     echo "   -K,--clientkey path             use client certificate key to authenticate"
@@ -282,6 +283,19 @@ debuglog() {
         else
             echo "${1}" >>"${DEBUG_FILE}"
         fi
+    fi
+
+}
+
+##############################################################################
+# Prints nicely certificate infos
+info() {
+
+    LABEL=$1
+    VALUE=$2
+
+    if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
+        printf "%s\t%s\n" "${LABEL}" "${VALUE}" | expand -t 32
     fi
 
 }
@@ -1000,6 +1014,9 @@ extract_cert_attribute() {
     hash)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -hash
         ;;
+    modulus)
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -modulus
+        ;;
     issuer)
         # see https://unix.stackexchange.com/questions/676776/parse-comma-separated-string-ignoring-commas-between-quotes
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout -nameopt sep_multiline,utf8,esc_ctrl -issuer |
@@ -1049,6 +1066,9 @@ extract_cert_attribute() {
         ;;
     sig_algo)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Signature Algorithm'
+        ;;
+    startdate)
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -startdate | sed -e "s/^notBefore=//"
         ;;
     enddate)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
@@ -2322,6 +2342,10 @@ parse_command_line_options() {
             ;;
         --ignore-tls-renegotiation)
             IGNORE_TLS_RENEGOTIATION='1'
+            shift
+            ;;
+        --info)
+            INFO='1'
             shift
             ;;
         --no-perf)
@@ -4140,6 +4164,10 @@ main() {
     ################################################################################
     # Parse the X.509 certificate or crl
     DATE="$(extract_cert_attribute 'enddate' "${CERT}")"
+    info "Valid until" "${DATE}"
+
+    START_DATE="$(extract_cert_attribute 'startdate' "${CERT}")"
+    info "Valid from" "${START_DATE}"
 
     if [ "${OPENSSL_COMMAND}" = "crl" ]; then
         CN=""
@@ -4164,16 +4192,25 @@ main() {
         SUBJECT="$(extract_cert_attribute 'subject' "${CERT}")"
         debuglog "SUBJECT = ${SUBJECT}"
 
+        info "Subject" "${CN}"
+
         SERIAL="$(extract_cert_attribute 'serial' "${CERT}")"
         debuglog "SERIAL = ${SERIAL}"
 
+        info "Serial Number" "${SERIAL}"
+
         FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
         debuglog "FINGEPRINT = ${FINGERPRINT}"
+
+        FINGERPRINT_INFO="$( echo "${FINGERPRINT}" | sed 's/Fingerprint=//' )"
+        info "Fingerprint" "${FINGERPRINT_INFO}"
 
         # TO DO: we just take the first result: a loop over all the hosts should
         # be implemented
         OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
         debuglog "OCSP_URI = ${OCSP_URI}"
+
+        info "Revocation information" "OCSP: ${OCSP_URI}"
 
         # Extract the issuers
         debuglog "Extracting issuers"
@@ -4253,7 +4290,8 @@ main() {
 
     fi
 
-    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}")"
+    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*:\ //' )"
+    info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
     if [ "${DEBUG}" -ge 1 ]; then
         debuglog "${SUBJECT}"
@@ -4268,6 +4306,11 @@ main() {
         debuglog "ISSUER_URI = ${ISSUER_URI}"
         debuglog "${SIGNATURE_ALGORITHM}"
     fi
+
+    info "Issuer URI" "${ISSUER_URI}"
+    # shellcheck disable=SC2116,SC2086
+    ISSUER_INFO="$( echo ${ISSUERS} )"
+    info "Issuers" "${ISSUER_INFO}"
 
     if echo "${SIGNATURE_ALGORITHM}" | grep -F -q "sha1"; then
 
@@ -4338,6 +4381,10 @@ main() {
     else
         verboselog "The certificate for this site contains a Subject Alternative Name extension"
     fi
+
+    for san in ${SUBJECT_ALTERNATIVE_NAME}; do
+        info "Subject Alternative Name" "${san}"
+    done
 
     ################################################################################
     # Check the CN
@@ -4866,7 +4913,6 @@ ${WARNING}"
         debuglog "Checking organization ${ORGANIZATION}"
 
         ORG="$(extract_cert_attribute 'org' "${CERT}")"
-
         debuglog "  ORG          = ${ORG}"
         debuglog "  ORGANIZATION = ${ORGANIZATION}"
 
@@ -4877,11 +4923,13 @@ ${WARNING}"
 
     fi
 
-    ################################################################################
-    # Check the organization
-    if [ -n "${ADDR}" ]; then
+    EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
+    debuglog "EMAIL = ${EMAIL}"
+    info "Email" "${EMAIL}"
 
-        EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
+    ################################################################################
+    # Check the email
+    if [ -n "${ADDR}" ]; then
 
         if [ -z "${EMAIL}" ]; then
 
@@ -4952,6 +5000,7 @@ ${WARNING}"
             if [ -n "${SCT}" ] && ! extract_cert_attribute 'sct' "${CERT}"; then
                 prepend_critical_message "Cannot find Signed Certificate Timestamps (SCT)"
             else
+                info "SCT" "yes"
                 verboselog "The certificate contains signed certificate timestamps (SCT)"
             fi
 

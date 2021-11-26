@@ -39,7 +39,6 @@ version_check:
 # we check for tabs
 # and remove trailing blanks
 formatting_check:
-	! grep -q '\\t' check_ssl_cert test/unit_tests.sh
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
 
 remove_blanks:
