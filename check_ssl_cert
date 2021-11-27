@@ -295,7 +295,7 @@ info() {
     VALUE=$2
 
     if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
-        printf "%s\t%s\n" "${LABEL}" "${VALUE}" | expand -t 32
+        printf "%s\\t%s\\n" "${LABEL}" "${VALUE}" | expand -t 32
     fi
 
 }
