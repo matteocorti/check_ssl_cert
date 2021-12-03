@@ -13,6 +13,7 @@
 * ```dig``` for DANE checks
 * [nmap](https://nmap.org) for the disallowed protocols and cyphers checks
 * ```expand`` for ```--info```
+* ```tar``` and ```bzip2``` to build release packages
 
 ## Development
 

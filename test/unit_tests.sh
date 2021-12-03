@@ -174,26 +174,38 @@ oneTimeTearDown() {
 
 testHoursUntilNow() {
     # testing with perl
-    export DATETYPE='PERL'
-    DATE_TMP="$(date)"
-    hours_until "${DATE_TMP}"
-    assertEquals "error computing the missing hours until now" 0 "${HOURS_UNTIL}"
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+        export DATETYPE='PERL'
+        DATE_TMP="$(date)"
+        hours_until "${DATE_TMP}"
+        assertEquals "error computing the missing hours until now" 0 "${HOURS_UNTIL}"
+    else
+        echo "Date::Parse not installed: skipping Perl date computation tests"
+    fi
 }
 
 testHoursUntil5Hours() {
     # testing with perl
-    export DATETYPE='PERL'
-    DATE_TMP="$(perl -e '$x=localtime(time+(5*3600));print $x')"
-    hours_until "${DATE_TMP}"
-    assertEquals "error computing the missing hours until now" 5 "${HOURS_UNTIL}"
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+        export DATETYPE='PERL'
+        DATE_TMP="$(perl -e '$x=localtime(time+(5*3600));print $x')"
+        hours_until "${DATE_TMP}"
+        assertEquals "error computing the missing hours until now" 5 "${HOURS_UNTIL}"
+    else
+        echo "Date::Parse not installed: skipping Perl date computation tests"
+    fi
 }
 
 testHoursUntil42Hours() {
     # testing with perl
-    export DATETYPE='PERL'
-    DATE_TMP="$(perl -e '$x=localtime(time+(42*3600));print $x')"
-    hours_until "${DATE_TMP}"
-    assertEquals "error computing the missing hours until now" 42 "${HOURS_UNTIL}"
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+        export DATETYPE='PERL'
+        DATE_TMP="$(perl -e '$x=localtime(time+(42*3600));print $x')"
+        hours_until "${DATE_TMP}"
+        assertEquals "error computing the missing hours until now" 42 "${HOURS_UNTIL}"
+    else
+        echo "Date::Parse not installed: skipping Perl date computation tests"
+    fi
 }
 
 testOpenSSLVersion1() {
