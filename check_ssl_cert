@@ -4874,13 +4874,13 @@ ${WARNING}"
                     # Data not yet available: warn and continue
                     PROGRESS=$(echo "${JSON}" | sed 's/.*progress"://' | sed 's/,.*//')
                     if [ "${PROGRESS}" -eq -1 ]; then
-                        verboselog "  warning: no cached data by SSL Labs, check in progress"
+                        verboselog "  warning: no cached data by SSL Labs, check in progress" 2
                     else
-                        verboselog "  warning: no cached data by SSL Labs, check in progress ${PROGRESS}%"
+                        verboselog "  warning: no cached data by SSL Labs, check in progress ${PROGRESS}%" 2
                     fi
                     ;;
                 'DNS')
-                    verboselog "  SSL Labs resolving the domain name"
+                    verboselog "  SSL Labs resolving the domain name" 2
                     ;;
                 *)
                     # Try to extract a message
