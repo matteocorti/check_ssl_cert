@@ -3784,8 +3784,19 @@ main() {
         fi
 
         # check if IPv6 is available locally
-        if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && ! ifconfig -a | grep -F -q inet6; then
-            unknown "cannot connect using IPv6 as no local interface has  IPv6 configured"
+	if command -v ifconfig > /dev/null; then
+	    ifconfig -a | grep -F -q inet6
+	    IPV6_INTERFACE=$?
+	elif command -v ip > /dev/null; then
+	    ip addr | grep -F -q inet6
+	    IPV6_INTERFACE=$?
+	else
+	    unknown "cannot determine if a network interface has IPv6 configured"
+	fi
+
+
+        if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && [ "${IPV6_INTERFACE}" -ne 0 ]; then
+            unknown "cannot connect using IPv6 as no local interface has IPv6 configured"
         fi
 
         # nmap does not have a -4 switch

@@ -1,3 +1,7 @@
+2021-12-03  Matteo Corti  <corti@ubuntu-2110>
+
+	* check_ssl_cert (main): IPv6 checks fixed if ipconfig is not available
+
 2021-11-26  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (info): --info to print certificate information
