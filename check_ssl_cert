@@ -3784,15 +3784,15 @@ main() {
         fi
 
         # check if IPv6 is available locally
-	if command -v ifconfig > /dev/null; then
-	    ifconfig -a | grep -F -q inet6
-	    IPV6_INTERFACE=$?
-	elif command -v ip > /dev/null; then
-	    ip addr | grep -F -q inet6
-	    IPV6_INTERFACE=$?
-	else
-	    unknown "cannot determine if a network interface has IPv6 configured"
-	fi
+	    if command -v ifconfig > /dev/null; then
+	        ifconfig -a | grep -F -q inet6
+	        IPV6_INTERFACE=$?
+	    elif command -v ip > /dev/null; then
+	        ip addr | grep -F -q inet6
+	        IPV6_INTERFACE=$?
+	    else
+	        unknown "cannot determine if a network interface has IPv6 configured"
+	    fi
 
 
         if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && [ "${IPV6_INTERFACE}" -ne 0 ]; then
