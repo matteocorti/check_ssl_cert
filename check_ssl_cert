@@ -4166,8 +4166,10 @@ main() {
     DATE="$(extract_cert_attribute 'enddate' "${CERT}")"
     info "Valid until" "${DATE}"
 
-    START_DATE="$(extract_cert_attribute 'startdate' "${CERT}")"
-    info "Valid from" "${START_DATE}"
+    if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
+	START_DATE="$(extract_cert_attribute 'startdate' "${CERT}")"
+	info "Valid from" "${START_DATE}"
+    fi
 
     if [ "${OPENSSL_COMMAND}" = "crl" ]; then
         CN=""
@@ -4923,9 +4925,11 @@ ${WARNING}"
 
     fi
 
-    EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
-    debuglog "EMAIL = ${EMAIL}"
-    info "Email" "${EMAIL}"
+    if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
+	EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
+	debuglog "EMAIL = ${EMAIL}"
+	info "Email" "${EMAIL}"
+    fi
 
     ################################################################################
     # Check the email
