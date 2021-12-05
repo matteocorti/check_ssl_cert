@@ -20,7 +20,8 @@ Arguments:
 Options:
    -A,--noauth                     ignore authority warnings (expiration only)
       --all                        enables all the possible optional checks at the maximum level
-      --all-local                  enables all the possible optional checks at the maximum level (without SSL-Labs)
+      --all-local                  enables all the possible optional checks at the maximum level
+                                   (without SSL-Labs)
       --allow-empty-san            allow certificates without Subject Alternative Names (SANs)
       --check-ciphers grade        checks the offered ciphers
       --check-ciphers-warnings     critical if nmap reports a warning for an offered cipher
@@ -36,11 +37,16 @@ Options:
       --custom-http-header string  custom HTTP header sent when getting the cert
                                    example: 'X-Check-Ssl-Cert: Foobar=1'
       --dane                       verify that valid DANE records exist (since OpenSSL 1.1.0)
-      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record exists
-      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record exists
-      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record exists
-      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record exists
-      --dane 312                   verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record exists
+      --dane 211                   verify that a valid DANE-TA(2) SPKI(1) SHA2-256(1) TLSA record
+                                   exists
+      --dane 301                   verify that a valid DANE-EE(3) Cert(0) SHA2-256(1) TLSA record
+                                   exists
+      --dane 302                   verify that a valid DANE-EE(3) Cert(0) SHA2-512(2) TLSA record
+                                   exists
+      --dane 311                   verify that a valid DANE-EE(3) SPKI(1) SHA2-256(1) TLSA record
+                                   exists
+      --dane 312                   verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record
+                                   exists
       --date path                  path of the date binary to be used
    -d,--debug                      produces debugging output (can be specified more than once)
       --debug-cert                 stores the retrieved certificates in the current directory
@@ -66,8 +72,10 @@ Options:
    -h,--help,-?                    this help message
       --http-use-get               use GET instead of HEAD (default) for the HTTP
                                    related checks
-      --ignore-altnames            ignores alternative names when matching pattern specified in -n (or the host name)
-      --ignore-connection-problems [state] in case of connection problems returns OK or the optional state
+      --ignore-altnames            ignores alternative names when matching pattern specified
+                                   in -n (or the host name)
+      --ignore-connection-problems [state] in case of connection problems returns OK or the
+                                   optional state
       --ignore-exp                 ignore expiration date
       --ignore-host-cn             do not complain if the CN does not match the host name
       --ignore-incomplete-chain    does not check chain integrity
@@ -98,8 +106,10 @@ Options:
       --nmap-bin path              path of the nmap binary to be used
       --no-perf                    do not show performance data
       --no-proxy                   ignores the http_proxy and https_proxy environment variables
-      --no-proxy-curl              ignores the http_proxy and https_proxy environment variables for curl
-      --no-proxy-s_client          ignores the http_proxy and https_proxy environment variables for openssl s_client
+      --no-proxy-curl              ignores the http_proxy and https_proxy environment variables
+                                   for curl
+      --no-proxy-s_client          ignores the http_proxy and https_proxy environment variables
+                                   for openssl s_client
       --no-ssl2                    disable SSL version 2
       --no-ssl3                    disable SSL version 3
       --no-tls1                    disable TLS version 1
@@ -116,17 +126,20 @@ Options:
                                    issue a warning status
    -o,--org org                    pattern to match the organization of the certificate
       --openssl path               path of the openssl binary to be used
-      --password source            password source for a local certificate, see the PASS PHRASE ARGUMENTS section
-                                   openssl(1)
+      --password source            password source for a local certificate, see the PASS PHRASE
+                                   ARGUMENTS section openssl(1)
    -p,--port port                  TCP port
       --prometheus                 generates Prometheus/OpenMetrics output
    -P,--protocol protocol          use the specific protocol:
-                                   ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap
-                                   ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server
-                                   ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS
+                                   ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps,
+                                   irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve,
+                                   smtp, smtps, xmpp, xmpp-server
+                                   ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to
+                                   TLS using StartTLS
       --proxy proxy                sets http_proxy and the s_client -proxy option
       --require-client-cert [list] the server must accept a client certificate
-                                   list is an optional comma separated list of expected client certificate CAs
+                                   list is an optional comma separated list of expected client
+                                   certificate CAs
       --require-no-ssl2            critical if SSL version 2 is offered
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
@@ -134,7 +147,8 @@ Options:
       --resolve ip                 provides a custom IP address for the specified host
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
-      --skip-element number        skips checks on the Nth cert element (can be specified multiple times)
+      --skip-element number        skips checks on the Nth cert element (can be specified multiple
+                                   times)
       --sni name                   sets the TLS SNI (Server Name Indication) extension
                                    in the ClientHello message to 'name'
       --ssl2                       force SSL version 2
