@@ -123,3 +123,4 @@ Thanks:
 * Manu thanks to Jaime Hablutzel (https://github.com/hablutzel1) for the --element fix
 * Many thanks to Bernd Stroessenreuther for the CRL and IPv6 fixes and for the floating point patch
 * Many thanks to Kim Jahn for the conversion typo and underscore fixes (https://github.com/mookie-)
+* Many thanks to Bernd Strößenreuther (https://github.com/booboo-at-gluga-de) for the --help patch

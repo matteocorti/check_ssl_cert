@@ -43,7 +43,7 @@ use client certificate to authenticate
 set passphrase for client certificate.
 .TP
 .BR "-c,--critical" " days"
-minimum number of days a certificate has to be valid to issue a critical status. Might be a floating point number, e.g., 0.5.
+minimum number of days a certificate has to be valid to issue a critical status. Can be a floating point number, e.g., 0.5.
 Default: 15
 .TP
 .BR "   --crl"
@@ -56,8 +56,7 @@ path of the curl binary to be used
 user agent that curl shall use to obtain the issuer cert
 .TP
 .BR "   --custom-http-header" " string"
-custom HTTP header sent when getting the cert
-example: 'X-Check-Ssl-Cert: Foobar=1'
+custom HTTP header sent when getting the cert example: 'X-Check-Ssl-Cert: Foobar=1'
 .TP
 .BR "   --dane"
 verify that valid DANE records exist (since OpenSSL 1.1.0)
@@ -123,7 +122,7 @@ force the usage of dconv for date computations
 force the usage of Perl for date computations
 .TP
 .BR "   --format" " FORMAT"
-format output template on success, for example "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'"
+format output template on success, for example: %SHORTNAME% OK %CN% from %CA_ISSUER_MATCHED%
 .TP
 .BR "-h,--help,-?"
 this help message
@@ -256,8 +255,7 @@ TCP port
 generates Prometheus/OpenMetrics output
 .TP
 .BR "-P,--protocol" " protocol"
-use the specific protocol: ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server.
-ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS.
+use the specific protocol: ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, xmpp, xmpp-server, ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS.
 .br
 These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, mysql, pop3, smtp.
 .TP
@@ -265,7 +263,7 @@ These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, mysql, pop3,
 sets http_proxy and the s_client -proxy option
 .TP
 .BR "   --require-client-cert" " [list]"
-the server must accept a client certificate. [list] is an optional comma separated list of expected client certificate CAs
+the server must accept a client certificate. 'list' is an optional comma separated list of expected client certificate CAs
 .TP
 .BR "   --require-no-ssl2"
 critical if SSL version 2 is offered
