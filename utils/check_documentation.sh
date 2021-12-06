@@ -33,7 +33,7 @@ for option in $( grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//
             # check if the option is documented in check_ssl_cert
 
             if ! echo "${HELP}" | grep -q -- "${option}" ; then
-                echo "Error: ${option} is not documented in the help (--help_)"
+                echo "Error: ${option} is not documented in the help (--help)"
                 ERROR=1
             fi
 

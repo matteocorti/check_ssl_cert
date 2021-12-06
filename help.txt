@@ -147,7 +147,7 @@
 -P,--protocol protocol;ftp, ftps, http, https (default),
 -P,--protocol protocol;h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
 -P,--protocol protocol;ldaps, mysql, pop3, pop3s, postgres,
--P,--protocol protocol;sieve, smtp, smtps, xmpp, xmpp-server,
+-P,--protocol protocol;sieve, smtp, smtps, xmpp, xmpp-server.
 -P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
 -P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
 --proxy proxy;sets http_proxy and the s_client -proxy

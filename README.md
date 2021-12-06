@@ -11,10 +11,15 @@ A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS 
 ## Usage
 
 ```
-
 Usage: check_ssl_cert -H host [OPTIONS]
+       check_ssl_cert -f file [OPTIONS]
 
 Arguments:
+   -f,--file file                  local file path (works with -H localhost
+                                   only) with -f you can not only pass a x509
+                                   certificate file but also a certificate
+                                   revocation list (CRL) to check the
+                                   validity period
    -H,--host host                  server
 
 Options:
@@ -26,15 +31,16 @@ Options:
                                    at the maximum level (without SSL-Labs)
       --allow-empty-san            allow certificates without Subject
                                    Alternative Names (SANs)
-      --check-ciphers grade        checks the offered ciphers
-      --check-ciphers-warnings     critical if nmap reports a warning for an
-                                   offered cipher
    -C,--clientcert path            use client certificate to authenticate
-      --clientpass phrase          set passphrase for client certificate.
    -c,--critical days              minimum number of days a certificate has
                                    to be valid to issue a critical status.
                                    Can be a floating point number, e.g., 0.5
                                    Default: 15
+      --check-ciphers grade        checks the offered ciphers
+      --check-ciphers-warnings     critical if nmap reports a warning for an
+                                   offered cipher
+      --check-ssl-labs-warn grade  SSL Labs grade on which to warn
+      --clientpass phrase          set passphrase for client certificate.
       --crl                        checks revokation via CRL (requires
                                    --rootcert-file)
       --curl-bin path              path of the curl binary to be used
@@ -42,6 +48,8 @@ Options:
                                    the issuer cert
       --custom-http-header string  custom HTTP header sent when getting the
                                    cert example: 'X-Check-Ssl-Cert: Foobar=1'
+   -d,--debug                      produces debugging output (can be
+                                   specified more than once)
       --dane                       verify that valid DANE records exist
                                    (since OpenSSL 1.1.0)
       --dane 211                   verify that a valid DANE-TA(2) SPKI(1)
@@ -55,25 +63,18 @@ Options:
       --dane 312                   verify that a valid DANE-EE(3)
                                    SPKI(1) SHA2-512(1) TLSA record exists
       --date path                  path of the date binary to be used
-   -d,--debug                      produces debugging output (can be
-                                   specified more than once)
       --debug-cert                 stores the retrieved certificates in the
                                    current directory
       --debug-file file            writes the debug messages to file
       --debug-time                 writes timing information in the
                                    debugging output
       --dig-bin path               path of the dig binary to be used
+   -e,--email address              pattern to match the email address
+                                   contained in the certificate
       --ecdsa                      signature algorithm selection: force ECDSA
                                    certificate
       --element number             checks up to the N cert element from the
                                    beginning of the chain
-   -e,--email address              pattern to match the email address
-                                   contained in the certificate
-   -f,--file file                  local file path (works with -H localhost
-                                   only) with -f you can not only pass a x509
-                                   certificate file but also a certificate
-                                   revocation list (CRL) to check the
-                                   validity period
       --file-bin path              path of the file binary to be used
       --fingerprint SHA1           pattern to match the SHA1-Fingerprint
       --first-element-only         verify just the first cert element, not
@@ -88,6 +89,8 @@ Options:
    -h,--help,-?                    this help message
       --http-use-get               use GET instead of HEAD (default) for the
                                    HTTP related checks
+   -i,--issuer issuer              pattern to match the issuer of the
+                                   certificate
       --ignore-altnames            ignores alternative names when matching
                                    pattern specified in -n (or the host name)
       --ignore-connection-problems [state] in case of connection problems
@@ -101,22 +104,19 @@ Options:
                                    checked
       --ignore-ocsp-timeout        ignore OCSP result when timeout occurs
                                    while checking
-      --ignore-sig-alg             do not check if the certificate was signed
-                                   with SHA1 or MD5
       --ignore-sct                 do not check for signed certificate
                                    timestamps (SCT)
+      --ignore-sig-alg             do not check if the certificate was signed
+                                   with SHA1 or MD5
       --ignore-ssl-labs-cache      Forces a new check by SSL Labs (see -L)
       --ignore-tls-renegotiation   Ignores the TLS renegotiation check
       --inetproto protocol         Force IP version 4 or 6
       --info                       Prints certificate information
-   -i,--issuer issuer              pattern to match the issuer of the
-                                   certificate
       --issuer-cert-cache dir      directory where to store issuer
                                    certificates cache
    -K,--clientkey path             use client certificate key to authenticate
    -L,--check-ssl-labs grade       SSL Labs assessment (please check
                                    https://www.ssllabs.com/about/terms.html)
-      --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --long-output list           append the specified comma separated (no
                                    spaces) list of attributes to the plugin
                                    output on additional lines
@@ -146,27 +146,28 @@ Options:
                                    does not match the given pattern
       --not-valid-longer-than days critical if the certificate validity is
                                    longer than the specified period
+   -o,--org org                    pattern to match the organization of the
+                                   certificate
       --ocsp-critical hours        minimum number of hours an OCSP response
                                    has to be valid to issue a critical status
       --ocsp-warning hours         minimum number of hours an OCSP response
                                    has to be valid to issue a warning status
-   -o,--org org                    pattern to match the organization of the
-                                   certificate
       --openssl path               path of the openssl binary to be used
-      --password source            password source for a local certificate,
-                                   see the PASS PHRASE ARGUMENTS section
-                                   openssl(1)
    -p,--port port                  TCP port
-      --prometheus                 generates Prometheus/OpenMetrics output
    -P,--protocol protocol          use the specific protocol:
                                    ftp, ftps, http, https (default),
                                    h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
                                    ldaps, mysql, pop3, pop3s, postgres,
-                                   sieve, smtp, smtps, xmpp, xmpp-server,
+                                   sieve, smtp, smtps, xmpp, xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS
-      --proxy proxy                sets http_proxy and the s_client -proxy
-                                   option
+      --password source            password source for a local certificate,
+                                   see the PASS PHRASE ARGUMENTS section
+                                   openssl(1)
+      --prometheus                 generates Prometheus/OpenMetrics output
+      --proxy                      sets http_proxy and the s_client -proxy
+   -r,--rootcert path              root certificate or directory to be used
+                                   for certificate validation
       --require-client-cert [list] the server must accept a client
                                    certificate. 'list' is an optional comma
                                    separated list of expected client
@@ -175,8 +176,15 @@ Options:
       --require-no-ssl3            critical if SSL version 3 is offered
       --require-no-tls1            critical if TLS 1 is offered
       --require-no-tls1_1          critical if TLS 1.1 is offered
+      --require-ocsp-stapling      require OCSP stapling
       --resolve ip                 provides a custom IP address for the
                                    specified host
+      --rootcert-dir path          root directory to be used for certificate
+                                   validation
+      --rootcert-file path         root certificate to be used for
+                                   certificate validation
+      --rsa                        signature algorithm selection: force RSA
+                                   certificate
    -s,--selfsigned                 allows self-signed certificates
       --serial serialnum           pattern to match the serial number
       --skip-element number        skips checks on the Nth cert element (can
@@ -186,20 +194,11 @@ Options:
                                    'name'
       --ssl2                       force SSL version 2
       --ssl3                       force SSL version 3
-      --require-ocsp-stapling      require OCSP stapling
-   -r,--rootcert path              root certificate or directory to be used
-                                   for certificate validation
-      --rootcert-dir path          root directory to be used for certificate
-                                   validation
-      --rootcert-file path         root certificate to be used for
-                                   certificate validation
-      --rsa                        signature algorithm selection: force RSA
-                                   certificate
+   -t,--timeout                    seconds timeout after the specified time
+                                   (defaults to 120 seconds)
       --temp dir                   directory where to store the temporary
                                    files
       --terse                      terse output
-   -t,--timeout                    seconds timeout after the specified time
-                                   (defaults to 120 seconds)
       --tls1                       force TLS version 1
       --tls1_1                     force TLS version 1.1
       --tls1_2                     force TLS version 1.2
@@ -243,7 +242,6 @@ Deprecated options:
                                    (see: --ssl2 or --ssl3)
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
-
 ```
 
 ## Expect & timeout
