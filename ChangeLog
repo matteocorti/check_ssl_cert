@@ -1,3 +1,7 @@
+2021-12-05 Bernd Stroessenreuther <booboo@gluga.de>
+
+	* check_ssl_cert: improve readability of --help by wrapping some very long lines
+
 2021-12-03  Matteo Corti  <corti@ubuntu-2110>
 
 	* check_ssl_cert (main): IPv6 checks fixed if ipconfig is not available
