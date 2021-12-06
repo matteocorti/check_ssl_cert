@@ -16,8 +16,8 @@ echo "--------------------------------------------------------------------------
 echo "-- Version History and Authors"
 echo
 
-printf "Authors:\\t%'10d\\n" "${authors}"
-printf "Versions:\\t%'10d\\n" "${versions}"
+printf "Authors:\\t\\t%'10d\\n" "${authors}"
+printf "Versions:\\t\\t%'10d\\n" "${versions}"
 echo
 
 echo "------------------------------------------------------------------------------"
@@ -27,8 +27,8 @@ echo
 tests=$( grep -c '^test' test/unit_tests.sh )
 loc=$( grep -c '.' check_ssl_cert )
 
-printf "LoC:\\t\\t%'10d\\n" "${loc}"
-printf "Tests:\\t\\t%'10d\\n" "${tests}"
+printf "LoC:\\t\\t\\t%'10d\\n" "${loc}"
+printf "Tests:\\t\\t\\t%'10d\\n" "${tests}"
 echo
 
 echo "------------------------------------------------------------------------------"
@@ -37,7 +37,16 @@ echo
 
 commits=$( git log --oneline | wc -l )
 
-printf "Commits:\\t%'10d\\n" "${commits}"
-git log --numstat --format="" | awk '{files += 1}{ins += $1}{del += $2} END{printf "File changes:\t%10'"'"'d\nInsertions:\t%10'"'"'d\nDeletions:\t%10'"'"'d\n", files, ins, del}'
+printf "Commits:\\t\\t%'10d\\n" "${commits}"
+git log --numstat --format="" | awk '{files += 1}{ins += $1}{del += $2} END{printf "File changes:\t\t%10'"'"'d\nInsertions:\t\t%10'"'"'d\nDeletions:\t\t%10'"'"'d\n", files, ins, del}'
+
+echo
+
+echo "------------------------------------------------------------------------------"
+echo "-- Features"
+echo
+
+command_line_options=$( sed 's/;.*//' help.txt  | sort  | uniq | wc -l )
+printf "Command line options:\\t%'10d\\n" "${command_line_options}"
 
 echo
