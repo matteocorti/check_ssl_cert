@@ -354,7 +354,7 @@ testGoDaddy() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testETHZCaseInsensitive() {
+testGITHUBCaseInsensitive() {
     ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn GITHUB.COM --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -465,7 +465,7 @@ testMultipleAltNamesOK() {
 }
 
 testMultipleAltNamesFailOne() {
-    # Test with wiltiple CN's but last one is wrong
+    # Test with multiple CN's but last one is wrong
     ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n www.github.com -n wrong.com --altnames --critical 1 --warning 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -532,7 +532,7 @@ testSMTPS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-# Disabled as test.rebex.net is currently not workin. Should find another public FTP server with TLS
+# Disabled as test.rebex.net is currently not working. Should find another public FTP server with TLS
 #testFTP() {
 #    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
 #    EXIT_CODE=$?
@@ -872,7 +872,7 @@ testForceHTTP2() {
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
-        echo "Skupping forced HTTP2 test as -alpn is not supported"
+        echo "Skipping forced HTTP2 test as -alpn is not supported"
     fi
 }
 

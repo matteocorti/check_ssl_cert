@@ -369,7 +369,7 @@ debuglog() {
 }
 
 ##############################################################################
-# Prints nicely certificate infos
+# Prints nicely certificate information
 info() {
 
     LABEL=$1
@@ -446,7 +446,7 @@ open_for_writing() {
 }
 
 ################################################################################
-# Prints the given message to STDOUT if the verbose command line opttion was
+# Prints the given message to STDOUT if the verbose command line option was
 # specified
 # $1: string
 # $2: level (optional default 1)
@@ -592,7 +592,7 @@ hours_until() {
             HOURS_UNTIL=$((($(${DATEBIN} -j +%s "${CONVERTED_DATE}") - $(${DATEBIN} +%s)) / 3600))
 
         else
-            unknown "Unknown date(1) input fomat"
+            unknown "Unknown date(1) input format"
         fi
 
         ;;
@@ -664,7 +664,7 @@ days_to_seconds() {
 ################################################################################
 # checks if OpenSSL version is at least the given parameter
 # Params
-#   $1 minumum version
+#   $1 minimum version
 openssl_version() {
 
     # See https://wiki.openssl.org/index.php/Versioning
@@ -793,7 +793,7 @@ prepend_critical_message() {
 }
 
 ################################################################################
-# Adda a line to the prometheus status output
+# Adds a line to the prometheus status output
 # Params
 #   $1 line to be added
 add_prometheus_status_output_line() {
@@ -815,7 +815,7 @@ add_prometheus_status_output_line() {
 }
 
 ################################################################################
-# Adda a line to the prometheus validity output
+# Dada a line to the prometheus validity output
 # Params
 #   $1 line to be added
 add_prometheus_valid_output_line() {
@@ -837,7 +837,7 @@ add_prometheus_valid_output_line() {
 }
 
 ################################################################################
-# Adda a line to the prometheus days output
+# Dada a line to the prometheus days output
 # Params
 #   $1 line to be added
 add_prometheus_days_output_line() {
@@ -985,7 +985,7 @@ append_warning_message() {
 
 ################################################################################
 # Exits with a warning message
-# Param
+# Params
 #   $1 warning message
 warning() {
 
@@ -1022,7 +1022,7 @@ warning() {
 
 ################################################################################
 # Exits with an 'unknown' status
-# Param
+# Params
 #   $1 message
 unknown() {
     if [ -n "${HOST_NAME}" ]; then
@@ -1118,7 +1118,7 @@ extract_cert_attribute() {
 
         # on older systems the fields where separated by /, e.g.,
         #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
-        # on newwer systems the fielda are separated by , and are sometimes quoted (if they contain a comma), e.g.,
+        # on newer systems the fields are separated by , and are sometimes quoted (if they contain a comma), e.g.,
         #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
         #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
 
@@ -1205,7 +1205,7 @@ exec_with_timeout() {
 
         debuglog "$(printf '%s %s %s\n' "${TIMEOUT_BIN}" "${time}" "${command}")"
 
-        # We execute timeout in the backgroud so that it can be relay a signal to 'timeout'
+        # We execute timeout in the background so that it can be relay a signal to 'timeout'
         # https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
         eval "${TIMEOUT_BIN} ${time} ${command} &" >"${OUTFILE}" 2>"${ERRFILE}"
         TIMEOUT_PID=$!
@@ -1215,7 +1215,7 @@ exec_with_timeout() {
         # return codes
         # https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation
 
-        # because of the execution in the backgroud we get a 137 for a timeout
+        # because of the execution in the background we get a 137 for a timeout
         if [ "${RET}" -eq 137 ] || [ "${RET}" -eq 124 ]; then
             prepend_critical_message "Timeout after ${time} seconds"
             critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
@@ -1552,7 +1552,7 @@ check_ocsp() {
                 if [ -n "${ISSUER_CERT_CACHE}" ]; then
 
                     if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
-                        unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writeable!"
+                        unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writable!"
                     fi
 
                     debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
@@ -1953,7 +1953,7 @@ fetch_certificate() {
         STATUS='-status'
     fi
 
-    debuglog "fetch_certificate: PROTICOL = ${PROTOCOL}"
+    debuglog "fetch_certificate: PROTOCOL = ${PROTOCOL}"
 
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; then
@@ -2219,7 +2219,7 @@ fetch_certificate() {
 
         elif ascii_grep 'write:errno=54' "${ERROR}"; then
 
-            ERROR='No certificate returned (SNI reqired?)'
+            ERROR='No certificate returned (SNI required?)'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
 
@@ -2271,7 +2271,7 @@ fetch_certificate() {
 ################################################################################
 # Adds metric to performance data
 # Params
-#   $1 performance data in nagios plugin format,
+#   $1 performance data in Nagios plugin format,
 #      see https://nagios-plugins.org/doc/guidelines.html#AEN200
 add_performance_data() {
     if [ -z "${PERFORMANCE_DATA}" ]; then
@@ -2309,7 +2309,7 @@ ascii_grep() {
 # Checks if there is an option argument (should not begin with -)
 #
 # Params
-#  $1 name of the option (e.g., '-w,--waring') to be used in the error message
+#  $1 name of the option (e.g., '-w,--warning') to be used in the error message
 #  $2 next command line parameter
 check_option_argument() {
 
@@ -2672,7 +2672,7 @@ parse_command_line_options() {
             HOST="$2"
             # remove http[s] from the input
             if echo "${HOST}" | grep -F -q '://'; then
-                # try to remove the protocol (we do not consider URLs withour
+                # try to remove the protocol (we do not consider URLs without
                 # an authority (https://en.wikipedia.org/wiki/URL)
                 debuglog "Stripping protocol and path from URL"
                 HOST=$(echo "${HOST}" | sed 's/^[a-z]*:\/\///' | sed 's/\/.*//')
@@ -3164,7 +3164,7 @@ main() {
     fi
 
     ################################################################################
-    # Ususally SERVERADDR and SERVERNAME both contain the fully qualified domain name
+    # Usually SERVERADDR and SERVERNAME both contain the fully qualified domain name
     # (FQDN) or IP address of the host to check
     #
     # If --resolve is specified (defining an alternative IP address for the HOST
@@ -3202,7 +3202,7 @@ main() {
         unknown "Invalid host name: ${HOST_NAME}"
     fi
 
-    # we accept unterscrores since some hosts with an underscore exist but these names
+    # we accept underscores since some hosts with an underscore exist but these names
     # are invalid: we issue a small warning
     if echo "${HOST_NAME}" | grep -q '[\_]' && [ -n "${VERBOSE}" ]; then
         verboselog "Warning: ${HOST_NAME} contains an underscore (invalid)"
@@ -3293,7 +3293,7 @@ main() {
     fi
 
     if [ -n "${REQUIRE_CLIENT_CERT}" ]; then
-        debuglog "Ceck if at at least one client certificate is accepted"
+        debuglog "Check if at at least one client certificate is accepted"
         if [ -n "${REQUIRE_CLIENT_CERT_CAS}" ]; then
             debuglog "  from the following CAs: ${REQUIRE_CLIENT_CERT_CAS}"
         fi
@@ -3451,7 +3451,7 @@ main() {
     # check if -sigalgs is available
     if [ -n "${RSA}" ] || [ -n "${ECDSA}" ]; then
         if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- -sigalgs; then
-            unkown '--rsa or --ecdsa specified but OpenSSL does not support the -sigalgs option'
+            unknown '--rsa or --ecdsa specified but OpenSSL does not support the -sigalgs option'
         fi
     fi
 
@@ -3626,7 +3626,7 @@ main() {
 
                 DCONV_BIN=$(command -v dconv)
                 if [ -z "${DCONV_BIN}" ]; then
-                    uknown "Old version of date without the -f option detected and no dconv installed"
+                    unknown "Old version of date without the -f option detected and no dconv installed"
                 else
                     debuglog "dconv detected: ${DCONV_BIN}"
                     DATETYPE='DCONV'
@@ -3721,7 +3721,7 @@ main() {
                 [ -n "${NO_PROXY_CURL}" ] ||
                 [ -n "${NO_PROXY_S_CLIENT}" ]
         }; then
-        unknown "Only one of --proxy or --no_proxy can be specfied"
+        unknown "Only one of --proxy or --no_proxy can be specified"
     fi
 
     debuglog "Proxy settings (before):"
@@ -3925,7 +3925,7 @@ main() {
 
         OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script ssl-enum-ciphers "${HOST_ADDR}" 2>&1 | grep '^|')
 
-        debuglog "offered cyphers and protocols:"
+        debuglog "offered ciphers and protocols:"
         debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
 
         DISALLOWED_PROTOCOLS_FAIL=
@@ -4047,7 +4047,7 @@ main() {
                 unknown "Cannot connect to ${HOST}:${PORT}"
                 ;;
             *)
-                uknown "Wrong exit code () specified for --ignore-connection-problem"
+                unknown "Wrong exit code () specified for --ignore-connection-problem"
                 ;;
             esac
 
@@ -4174,7 +4174,7 @@ main() {
 
     fi
 
-    # check client certficates
+    # check client certificates
     if [ -n "${REQUIRE_CLIENT_CERT}" ]; then
 
         debuglog "Checking required client cert CAs"
@@ -4294,7 +4294,7 @@ main() {
         info "Serial Number" "${SERIAL}"
 
         FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
-        debuglog "FINGEPRINT = ${FINGERPRINT}"
+        debuglog "FINGERPRINT = ${FINGERPRINT}"
 
         FINGERPRINT_INFO="$( echo "${FINGERPRINT}" | sed 's/Fingerprint=//' )"
         info "Fingerprint" "${FINGERPRINT_INFO}"
@@ -4523,7 +4523,7 @@ main() {
 
         else
 
-            verboselog "Skipping the matching of the host name (${COMMON_NAME}) as it is an IP adress"
+            verboselog "Skipping the matching of the host name (${COMMON_NAME}) as it is an IP address"
             COMMON_NAME_IS_AN_IP=1
 
         fi
@@ -4643,7 +4643,7 @@ main() {
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
         if [ -n "${CA_ISSUER_MATCHED}" ]; then
-            verboselog "The certificare issuer matches ${ISSUER}"
+            verboselog "The certificate issuer matches ${ISSUER}"
             ok="true"
         else
             # this looks ugly but preserves spaces in CA name
@@ -5080,7 +5080,7 @@ ${WARNING}"
 
     else
 
-        verboselog "The certificate was succesfully verified"
+        verboselog "The certificate was successfully verified"
 
     fi
 
@@ -5088,7 +5088,7 @@ ${WARNING}"
     # Check for Signed Certificate Timestamps (SCT)
     if [ -z "${SELFSIGNED}" ] && [ "${OPENSSL_COMMAND}" != "crl" ]; then
 
-        # check if OpenSSL supoort SCTs
+        # check if OpenSSL supports SCTs
         if openssl_version '1.1.0'; then
 
             debuglog 'Checking Signed Certificate Timestamps (SCTs)'
