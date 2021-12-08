@@ -1042,7 +1042,6 @@ testGithubComCRL() {
 
     echo "${GITHUB_CRL_URI}"
     curl --silent "${GITHUB_CRL_URI}" >"${TEMPFILE_CRL}"
-    cp "${TEMPFILE_CRL}" crl
 
     ${SCRIPT} --file "${TEMPFILE_CRL}" --warning 2 --critical 1
     EXIT_CODE=$?
