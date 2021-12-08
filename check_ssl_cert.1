@@ -51,7 +51,7 @@ SSL Labs grade on which to warn
 set passphrase for client certificate.
 .TP
 .BR "   --crl"
-checks revokation via CRL (requires --rootcert-file)
+checks revocation via CRL (requires --rootcert-file)
 .TP
 .BR "   --curl-bin" " path"
 path of the curl binary to be used
@@ -393,7 +393,7 @@ require the presence of a Subject Alternative Name extension
 force SSL version (2,3) (see: --ssl2 or --ssl3)
 
 .SH NOTES
-If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Idetificator) with the -N (or --host-cn) option.
+If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Identificator) with the -N (or --host-cn) option.
 
 .SH "EXIT STATUS"
 check_ssl_cert returns a zero exist status if it finds no errors, 1 for warnings, 2 for a critical errors and 3 for unknown problems

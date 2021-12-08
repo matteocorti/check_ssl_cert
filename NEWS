@@ -6,7 +6,7 @@ Fixed the IPv6 checks when ipconfig is not available
 2021-11-11 Version  2.11.0: Several fixes in the documentation
                             Works with OpenSSL 3.0.0
                             Fixes a bug in the processing of certificate issuers containing commas
-2021-10-22 Version  2.10.4: Fixes the organisation check
+2021-10-22 Version  2.10.4: Fixes the organization check
 2021-10-21 Version  2.10.3: Fixes --rsa on systems not supporting PSS
                             Uses mktemp if available (the workaround is only used if not available for speed reasons)
 2021-10-14 Version  2.10.2: Improved the certificate chain check of local bundles
@@ -66,14 +66,14 @@ Fixed the IPv6 checks when ipconfig is not available
                             Short options can be grouped (e.g., -vs -c 10 -w 15)
                             Different verbosity levels can now be specified (-v can be used more than once)
                             Added the --resolve option to specify a custom IP for the checked host
-2021-03-25 Version 1.146.0: Added --all to enable oll the optional checks
+2021-03-25 Version 1.146.0: Added --all to enable all the optional checks
                             Fixed a bug in the processing of client certificate requirements
                             Improved the error handling in case a TLS connection is not possible
 2021-03-15 Version 1.145-0: Fix in the parsing of OpenSSL version
 2021-03-14 Version 1.144.0: Getting rid of the man dependency
 2021-03-12 Version 1.143.0: Better handling of the timeout
                             Checks ciphers with nmap (--check-ciphers and --check-ciphers-warnings)
-                            Checks oll the supplied OCSP URIs
+                            Checks all the supplied OCSP URIs
 2021-03-10 Version 1.142.0: Improved the TLS renegotiation check
                             Added --password to specify a password source for PCKS12 certificates
 2021-03-09 Version 1.141.0: Do not check SCTs if the certificate is self signed
@@ -88,8 +88,8 @@ Fixed the IPv6 checks when ipconfig is not available
 2021-01-27 Version 1.134.0: Complete support for Alpine Linux and BusyBox
 2021-01-26 Version 1.133.0: Added the --date option to specify the date binary
                             support for BusyBox date
-2021-01-18 Version 1.132.0: Timeouted subprocesses can now be interrupted
-                            Revokation via CRL can be checked with the --crl option
+2021-01-18 Version 1.132.0: Time-outed sub-processes can now be interrupted
+                            Revocation via CRL can be checked with the --crl option
 			    Better error messages for DH with small keys and handshake failures
 2021-01-15 Version 1.131.0: OCSP check on all the chain elements
 2021-01-14 Version 1.130.0: Retries when SSL Labs has no available slot
@@ -247,17 +247,17 @@ Fixed the IPv6 checks when ipconfig is not available
                           the certificate download
 2012-07-13 Version 1.14.2 Added the name since or to expiration in the plugin
                           output.
-2012-07-11 Version 1.14.1 FIxed a bug with Perl date computation on some systems
+2012-07-11 Version 1.14.1 Fixed a bug with Perl date computation on some systems
 2012-07-06 Version 1.14.0 The status now includes performance data in days until
-                          expiration (requires perl with Date::Parse).
+                          expiration (requires Perl with Date::Parse).
                           It is now possible to print additional information in
-                          the plugins long output (multiline, Nagios 3 only)
+                          the plugins long output (multi-line, Nagios 3 only)
 2012-04-05 Version 1.13.0 The plugin will now try to fetch the certificate without
                           without TLS extensions in case of error
 2012-04-04 Version 1.12.0 Fixed a bug in the chain verification (hard coded
                           error number)
 2011-10-22 Version 1.11.0 --altname option
-2011-09-01 Version 1.10.0 Applied a patch from Sven Nierlein to authenicate
+2011-09-01 Version 1.10.0 Applied a patch from Sven Nierlein to authenticate
                           using a client certificate
 2011-03-10 Version  1.9.1 Allows HTTP as protocol and fixes -N with wildcards
 2011-01-24 Version  1.9.0 Added an option to specify the openssl executable

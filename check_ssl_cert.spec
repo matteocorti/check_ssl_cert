@@ -578,7 +578,7 @@ w
 - Updated to 1.16.1 (rpm make target)
 
 * Mon Dec 23 2013 Matteo Corti <matteo.corti@id.ethz.ch> - 1.16.0-0
-- Udated to 1.16.0 (force TLS)
+- Updated to 1.16.0 (force TLS)
 
 * Mon Jul 29 2013 Matteo Corti <matteo.corti@id.ethz.ch> - 1.15.0-0
 - Updated to 1.15.0 (force SSL version)
@@ -611,7 +611,7 @@ w
 - updated to 1.12.0 (bug fix release)
 
 * Sat Oct 22 2011 Matteo Corti <matteo.corti@id.ethz.ch> - 1.11.0-0
-- ipdated to 1.10.1 (--altnames option)
+- updated to 1.10.1 (--altnames option)
 
 * Thu Sep  1 2011 Matteo Corti <matteo.corti@id.ethz.ch> - 1.10.0-0
 - applied patch from Sven Nierlein for client certificate authentication

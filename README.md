@@ -296,7 +296,7 @@ An asterisk ```*``` is automatically escaped by nagios. If you need to specify a
 
 ## Development
 
-### Tesing
+### Testing
 
 To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
 
