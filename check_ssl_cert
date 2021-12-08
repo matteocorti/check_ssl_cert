@@ -102,7 +102,7 @@ usage() {
     echo "                                   offered cipher"
     echo "      --check-ssl-labs-warn grade  SSL Labs grade on which to warn"
     echo "      --clientpass phrase          set passphrase for client certificate."
-    echo "      --crl                        checks revokation via CRL (requires"
+    echo "      --crl                        checks revocation via CRL (requires"
     echo "                                   --rootcert-file)"
     echo "      --curl-bin path              path of the curl binary to be used"
     echo "      --curl-user-agent string     user agent that curl shall use to obtain"
@@ -1327,7 +1327,7 @@ check_required_prog() {
 }
 
 ################################################################################
-# Checks cert revokation via CRL
+# Checks cert revocation via CRL
 # Params
 #   $1 cert
 #   $2 element number
@@ -1353,7 +1353,7 @@ check_crl() {
     CRL_URI="$(extract_cert_attribute 'crl_uri' "${CERT_ELEMENT}")"
     if [ -n "${CRL_URI}" ]; then
 
-        debuglog "Certificate revokation list available (${CRL_URI})."
+        debuglog "Certificate revocation list available (${CRL_URI})."
 
         debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
 
@@ -1388,14 +1388,14 @@ check_crl() {
 
     else
 
-        debuglog "Certificate revokation list not available"
+        debuglog "Certificate revocation list not available"
 
     fi
 
 }
 
 ################################################################################
-# Checks cert revokation via OCSP
+# Checks cert revocation via OCSP
 # Params
 #   $1 cert
 #   $2 element number
@@ -1421,7 +1421,7 @@ check_ocsp() {
     # Check revocation via OCSP
     if [ -n "${OCSP}" ]; then
 
-        debuglog "Checking revokation via OCSP"
+        debuglog "Checking revocation via OCSP"
 
         ISSUER_HASH="$(extract_cert_attribute 'issuer_hash' "${CERT_ELEMENT}")"
         debuglog "Issuer hash: ${ISSUER_HASH}"

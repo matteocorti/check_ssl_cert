@@ -42,7 +42,7 @@
 
         * check_ssl_cert (check_attr): Fixed the organization check
         * check_ssl_cert (main): Check if -sigalgs is available
-        * check_ssl_cert (check_attr): check if nmap delivers cipher strenghts
+        * check_ssl_cert (check_attr): check if nmap delivers cipher strengths
 
 2021-10-21  Matteo Corti  <matteo@corti.li>
 
@@ -80,7 +80,7 @@
 
 2021-10-01  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert (check_attr): --skip-elemnt now skips a single element and can be specified multiple times
+        * check_ssl_cert (check_attr): --skip-element now skips a single element and can be specified multiple times
 
 2021-09-29  Matteo Corti  <matteo@corti.li>
 
@@ -181,7 +181,7 @@
 2021-08-13  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh (testMultipleAltNamesOK): Added a test for multiple --cn and OK status
-        * check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was ovewritten each time)
+        * check_ssl_cert (parse_command_line_options): Fixed the -n option (the old value was overwritten each time)
         * check_ssl_cert (main): Better validation of the host command line argument
 
 2021-07-09  Matteo Corti  <matteo@corti.li>
@@ -298,7 +298,7 @@
 2021-03-12  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (exec_with_timeout): reducing the total timeout by each execution
-        * check_ssl_cert (check_attr): check chiphers with nmap
+        * check_ssl_cert (check_attr): check ciphers with nmap
 
         * check_ssl_cert (check_ocsp): looping over all the supplied URIs
 
@@ -338,7 +338,7 @@
 
 2021-02-17  Robin Pronk  <robin.pronk@nedap.com>
 
-        * check_ssl_cert: Make HTTP request url configurable (default stays /)
+        * check_ssl_cert: Make HTTP request URL configurable (default stays /)
 
 2021-02-05  Matteo Corti  <matteo@corti.li>
 
@@ -366,7 +366,7 @@
 
         * check_ssl_cert (exec_with_timeout): Execute timeout in the background so that it can handle signals
         * check_ssl_cert (fetch_certificate): Better error message for DH with a too small key and handshake failure
-        * check_ssl_cert (check_crl): Checks revokation via CRL
+        * check_ssl_cert (check_crl): Checks revocation via CRL
 
 2021-01-15  Matteo Corti  <matteo@corti.li>
 
@@ -515,7 +515,7 @@
 2019-10-14  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Remove RSA-PSS if not TLS 1.3 requested
-        * check_ssl_cert (check_attr): Write the OPSP issuer cert to the temporary directory
+        * check_ssl_cert (check_attr): Write the OCSP issuer cert to the temporary directory
 
 2019-10-10  Matteo Corti  <corti@Matteo-Cortis-Mac-mini.local>
 
@@ -536,7 +536,7 @@
 
 2019-09-26  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: stops if needed programs are not foud
+        * check_ssl_cert: stops if needed programs are not found
 
 2019-09-24  Matteo Corti  <matteo@corti.li>
 
@@ -554,12 +554,12 @@
 2019-09-18  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: Consolidated the error messages in case of more than one error
-        * check_ssl_cert: Fixed a bug where the cypher was not forced by the OCSP checks
+        * check_ssl_cert: Fixed a bug where the cipher was not forced by the OCSP checks
 
 2019-08-09  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (ascii_grep): Removed NULL characters before 'grepping' a file
-        * check_ssl_cert (critical): Display the CN in a crical or warning message (if present)
+        * check_ssl_cert (critical): Display the CN in a critical or warning message (if present)
         * check_ssl_cert: merged patch to choose the IP protocol version
 
 2019-08-08  Matteo Corti <matteo@corti.li>
@@ -661,7 +661,7 @@
 
 2018-04-29  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: Remooved the SNI name check patch (see #78)
+        * check_ssl_cert: Removed the SNI name check patch (see #78)
 
 2018-04-19  Matteo Corti  <matteo@corti.li>
 
@@ -685,7 +685,7 @@
 
 2018-03-29  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: Fixed a bug introduced in the last verstion
+        * check_ssl_cert: Fixed a bug introduced in the last version
 
 2018-03-28  Matteo Corti  <matteo@corti.li>
 
@@ -772,7 +772,7 @@
 
 2017-04-28  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: Fixed a bug occurring when more than one issuNer URI is present
+        * check_ssl_cert: Fixed a bug occurring when more than one issuer URI is present
 
 2017-03-07  Matteo Corti  <matteo@corti.li>
 
@@ -814,7 +814,7 @@
 
 2016-12-06  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: fixed a problem when specifying a CN beginnging with *
+        * check_ssl_cert: fixed a problem when specifying a CN beginning with *
 
 2016-12-04  Matteo Corti  <matteo@corti.li>
 
@@ -842,7 +842,7 @@
 
 2016-06-25  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: fixed OSCP header on old OpenSSL versions
+        * check_ssl_cert: fixed OCSP header on old OpenSSL versions
 
 2016-06-24  Matteo Corti  <matteo@corti.li>
 
@@ -864,7 +864,7 @@
 
 2016-05-17  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: added more debugging info (-v is automatic if -d is spefied, system info and cert written to a file)
+        * check_ssl_cert: added more debugging info (-v is automatic if -d is specified, system info and cert written to a file)
 
 2016-04-27  Matteo Corti  <matteo@corti.li>
 
@@ -881,7 +881,7 @@
 2016-03-21  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (exec_with_timeout): issues a critical status
-        when using the 'timout' utility
+        when using the 'timeout' utility
 
 2016-03-19  Matteo Corti  <matteo@corti.li>
 
@@ -928,7 +928,7 @@
 
 2015-10-20  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: fixex a problem with OCSP paths w/o URLs
+        * check_ssl_cert: fixed a problem with OCSP paths w/o URLs
 
 2015-04-07  Matteo Corti  <matteo@corti.li>
 

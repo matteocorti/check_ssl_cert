@@ -17,7 +17,7 @@
 -c,--critical days;to be valid to issue a critical status.
 -c,--critical days;Can be a floating point number, e.g., 0.5
 -c,--critical days;Default: ${CRITICAL_DAYS}
---crl;checks revokation via CRL (requires
+--crl;checks revocation via CRL (requires
 --crl;--rootcert-file)
 --curl-bin path;path of the curl binary to be used
 --curl-user-agent string;user agent that curl shall use to obtain

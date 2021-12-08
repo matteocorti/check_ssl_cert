@@ -41,7 +41,7 @@ Options:
                                    offered cipher
       --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --clientpass phrase          set passphrase for client certificate.
-      --crl                        checks revokation via CRL (requires
+      --crl                        checks revocation via CRL (requires
                                    --rootcert-file)
       --curl-bin path              path of the curl binary to be used
       --curl-user-agent string     user agent that curl shall use to obtain
