@@ -10,10 +10,7 @@ check_ssl_cert \- checks the validity of X.509 certificates
 .BR "check_ssl_cert " "-f file [OPTIONS]"
 .SH DESCRIPTION
 .B check_ssl_cert
-A Nagios plugin to check an X.509 certificate:
- - checks if the server is running and delivers a valid certificate
- - checks if the CA matches a given pattern
- - checks the validity
+A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection
 .SH ARGUMENTS
 .TP
 .BR "-f,--file" " file"
@@ -395,17 +392,17 @@ require the presence of a Subject Alternative Name extension
 .BR "-S,--ssl" " version"
 force SSL version (2,3) (see: --ssl2 or --ssl3)
 
-.SH MULTIPLE CERTIFICATES
+.SH NOTES
 If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Idetificator) with the -N (or --host-cn) option.
 
-.SH "SEE ALSO"
-openssl(1), openssl-x509(1)
 .SH "EXIT STATUS"
 check_ssl_cert returns a zero exist status if it finds no errors, 1 for warnings, 2 for a critical errors and 3 for unknown problems
 .SH BUGS
 Please report bugs to:
-
 https://github.com/matteocorti/check_ssl_cert/issues
-.SH AUTHOR
-Matteo Corti (matteo (at) corti.li )
-See the AUTHORS file for the complete list of contributors
+
+.SH "EXAMPLE"
+check_ssl_cert --host github.com --all-local
+
+.SH "SEE ALSO"
+openssl(1), openssl-x509(1)
