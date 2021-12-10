@@ -3122,23 +3122,26 @@ main() {
     if [ -n "${ALL}" ]; then
 
         # enable ciphers checks (level A)
-        CHECK_CIPHERS='A'
-
-        # enable ciphers warnings
-        CHECK_CIPHERS_WARNINGS=1
-
-        # enable ciphers checks (level A)
         SSL_LAB_CRIT_ASSESSMENT='A'
 
     fi
 
-    if [ -n "${ALL_LOCAL}" ]; then
+    if [ -n "${ALL_LOCAL}" ] || [ -n "${ALL}" ]; then
 
         # enable ciphers checks (level A)
         CHECK_CIPHERS='A'
 
         # enable ciphers warnings
         CHECK_CIPHERS_WARNINGS=1
+
+        if "${OPENSSL}" s_client -help 2>&1 | grep -q -- '-no_ssl2'; then
+            debuglog "s_client supports -no_ssl2: disabling"
+            # disable SSL 2.0 and SSL 3.0
+            SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2 -no_ssl3"
+        else
+            # disable SSL 3.0 (SSL 2.0 is not supported anymore)
+            SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
+        fi
 
     fi
 

@@ -2,6 +2,7 @@
 
         * check_ssl_cert (check_attr): using NMAP_BIN instead of nmap
         * check_ssl_cert (main): fixed a bug causing an unnecessary scan when checking for disallowed protocols
+        * check_ssl_cert (main): (main): SSL 2.0 and SSL 3.0 disabled by --all and --all-local
 
 2021-12-08  Matteo Corti  <matteo@corti.li>
 
