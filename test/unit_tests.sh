@@ -901,8 +901,8 @@ testPKCS12Cert() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testCertificsteWithoutCN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2 --ignore-incomplete-chain
+testCertificateWithoutCN() {
+    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --critical 1 --warning 2 --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
