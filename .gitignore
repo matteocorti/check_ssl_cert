@@ -1,6 +1,7 @@
 check_ssl_cert-**
 **~
 **.crt
+**.bak
 **.error
 \#**
 .#**

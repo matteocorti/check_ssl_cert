@@ -1,3 +1,8 @@
+2021-12-10  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): using NMAP_BIN instead of nmap
+        * check_ssl_cert (main): fixed a bug causing an unnecessary scan when checking for disallowed protocols
+
 2021-12-08  Matteo Corti  <matteo@corti.li>
 
         * Fixed several spelling mistakes

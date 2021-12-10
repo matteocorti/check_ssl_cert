@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.13.0
+VERSION=2.14.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -3914,10 +3914,9 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ]; then
 
-        # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch
-        if ${NMAP_BIN} "${HOST_ADDR}" 2>&1 | grep -F -q 'Failed to resolve'; then
-            debuglog "nmap is not able to resolve the host name (${HOST_ADDR}). Trying with -6 to force IPv6 for an IPv6-only host"
-
+        # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
+        if ! host "${HOST_ADDR}" | grep -F -q ' has address ' ; then
+            debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
             NMAP_INETPROTO='-6'
         fi
 
@@ -4787,7 +4786,7 @@ main() {
         NMAP_ERR=${TEMPFILE}
 
         # -Pn is needed even if we specify a port
-        exec_with_timeout "nmap -Pn --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+        exec_with_timeout "${NMAP_BIN} -Pn --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
         if [ "${DEBUG}" -ge 1 ]; then
             debuglog 'nmap output:'
@@ -4802,14 +4801,14 @@ main() {
             fi
         fi
 
-	if [ -s "${NMAP_ERR}" ]; then
+	    if [ -s "${NMAP_ERR}" ]; then
 
             NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
-	    # check for -Pn warning
-	    if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
-		unknown "nmap exited with error: ${NMAP_ERROR}"
-	    fi
+	        # check for -Pn warning
+	        if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
+		        unknown "nmap exited with error: ${NMAP_ERROR}"
+	        fi
 
         fi
 

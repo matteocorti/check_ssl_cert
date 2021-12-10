@@ -1,5 +1,6 @@
-Added an option --info to print certificate information
-Fixed the IPv6 checks when ipconfig is not available
+2021-12-10 Version  2.14.0: Added an option --info to print certificate information
+                            Fixed the IPv6 checks when ipconfig is not available
+                            Fixed a bug causing an unnecessary scan when checking for disallowed protocols
 2021-11-24 Version  2.13.0: Fixed a bug in the processing of error messages
                             Handling of root certificates in DER format
 2021-11-16 Version  2.12.0: Improved verbose messages

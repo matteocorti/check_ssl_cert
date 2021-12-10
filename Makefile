@@ -58,6 +58,7 @@ endif
 
 clean:
 	rm -f *~
+	rm -f *.bak
 	rm -rf rpmroot
 
 distclean: clean
