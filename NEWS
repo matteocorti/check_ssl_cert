@@ -1,4 +1,5 @@
-SSL 2.0 and SSL 3.0 disabled by --all and --all-local
+2021-12-15 Version  2.15.0: Error if HTTP/2 is requested but not offered by the server
+                            SSL 2.0 and SSL 3.0 disabled by --all and --all-local
 2021-12-10 Version  2.14.0: Added an option --info to print certificate information
                             Fixed the IPv6 checks when ipconfig is not available
                             Fixed a bug causing an unnecessary scan when checking for disallowed protocols

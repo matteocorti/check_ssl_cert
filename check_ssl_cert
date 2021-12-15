@@ -19,7 +19,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.14.0
+VERSION=2.15.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2125,7 +2125,7 @@ fetch_certificate() {
     else
 
         if [ "${PROTOCOL}" = 'h2' ]; then
-            ALPN='-alpn h2'
+            ALPN="-alpn h2"
         fi
 
         exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
@@ -2262,6 +2262,16 @@ fetch_certificate() {
 
         if ascii_grep usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ]; then
             unknown "it seems that OpenSSL -starttls does not support yet LDAP"
+        fi
+
+        NEGOTIATED_PROTOCOL=$( grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //' )
+        debuglog "Negotiated protocol: ${NEGOTIATED_PROTOCOL}"
+
+        # check if the protocol was really HTTP/2
+        if [ "${PROTOCOL}" = 'h2' ]; then
+            if ! grep -q -F 'ALPN protocol: h2' "${CERT}"; then
+                prepend_critical_message 'The server does not support HTTP/2'
+            fi
         fi
 
     fi
@@ -3911,7 +3921,14 @@ main() {
         CUSTOM_HTTP_HEADER="${CUSTOM_HTTP_HEADER}\\n"
     fi
 
-    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/1.1\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
+    # HTTP version
+    if [ "${PROTOCOL}" = 'h2' ]; then
+        HTTP_VERSION="2"
+    else
+        HTTP_VERSION="1.1"
+    fi
+
+    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
     ##############################################################################
     # Check for disallowed protocols
