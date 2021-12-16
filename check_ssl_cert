@@ -2680,6 +2680,7 @@ parse_command_line_options() {
         -H | --host)
             check_option_argument '-H|--host' "$2"
             HOST="$2"
+
             # remove http[s] from the input
             if echo "${HOST}" | grep -F -q '://'; then
                 # try to remove the protocol (we do not consider URLs without
@@ -2687,6 +2688,10 @@ parse_command_line_options() {
                 debuglog "Stripping protocol and path from URL"
                 HOST=$(echo "${HOST}" | sed 's/^[a-z]*:\/\///' | sed 's/\/.*//')
             fi
+
+            # remove the trailing . from FQDN (otherwise the CN will not match)
+            HOST=$( echo "${HOST}" | sed 's/[.]$//' )
+
             shift 2
             ;;
         -i | --issuer)

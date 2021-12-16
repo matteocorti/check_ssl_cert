@@ -279,6 +279,12 @@ testInfo() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --info
 }
 
+testFQDN() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com.
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testSCT() {
     if [ -z "${OPENSSL}" ]; then
         OPENSSL=$(command -v openssl) # needed by openssl_version
