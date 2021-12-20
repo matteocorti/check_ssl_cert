@@ -1,3 +1,7 @@
+2021-12-20  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Fixed a problem with self signed certificates
+
 2021-12-16  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (parse_command_line_options): Remove the trailing . from FQDNs
