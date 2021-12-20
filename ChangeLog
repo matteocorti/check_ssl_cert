@@ -1,6 +1,7 @@
 2021-12-20  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed a problem with self signed certificates
+        * check_ssl_cert (main): Better --info output by missing fields
 
 2021-12-16  Matteo Corti  <matteo@corti.li>
 

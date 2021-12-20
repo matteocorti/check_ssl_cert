@@ -377,6 +377,8 @@ info() {
 
     if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
         printf "%s\\t%s\\n" "${LABEL}" "${VALUE}" | expand -t 32
+    elif [ -n "${INFO}" ]; then
+        printf "%s\\n" "${LABEL}"
     fi
 
 }
@@ -4330,7 +4332,11 @@ main() {
         OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
         debuglog "OCSP_URI = ${OCSP_URI}"
 
-        info "Revocation information" "OCSP: ${OCSP_URI}"
+        if [ -n "${OCSP_URI}" ] ; then
+            info "Revocation information" "OCSP: ${OCSP_URI}"
+        else
+            info "No revocation information"
+        fi
 
         # Extract the issuers
         debuglog "Extracting issuers"
@@ -4427,7 +4433,13 @@ main() {
         debuglog "${SIGNATURE_ALGORITHM}"
     fi
 
-    info "Issuer URI" "${ISSUER_URI}"
+    if [ -n "${ISSUER_URI}" ]; then
+        info "Issuer URI" "${ISSUER_URI}"
+    else
+        info "No issuer URI"
+    fi
+
+
     # shellcheck disable=SC2116,SC2086
     ISSUER_INFO="$( echo ${ISSUERS} )"
     info "Issuers" "${ISSUER_INFO}"
@@ -5046,7 +5058,13 @@ ${WARNING}"
     if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
 	    EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
 	    debuglog "EMAIL = ${EMAIL}"
-	    info "Email" "${EMAIL}"
+
+        if [ -n "${EMAIL}" ]; then
+	        info "Email" "${EMAIL}"
+        else
+            info "No email"
+        fi
+
     fi
 
     ################################################################################
