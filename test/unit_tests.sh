@@ -4,7 +4,7 @@
 # shellcheck disable=SC2154
 if [ -z "${SHUNIT2}" ]; then
 
-    SHUNIT2=$( command -v shunit2 )
+    SHUNIT2=$(command -v shunit2)
 
     if [ -z "${SHUNIT2}" ]; then
 
@@ -174,7 +174,7 @@ oneTimeTearDown() {
 
 testHoursUntilNow() {
     # testing with perl
-    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1; then
         export DATETYPE='PERL'
         DATE_TMP="$(date)"
         hours_until "${DATE_TMP}"
@@ -186,7 +186,7 @@ testHoursUntilNow() {
 
 testHoursUntil5Hours() {
     # testing with perl
-    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1; then
         export DATETYPE='PERL'
         DATE_TMP="$(perl -e '$x=localtime(time+(5*3600));print $x')"
         hours_until "${DATE_TMP}"
@@ -198,7 +198,7 @@ testHoursUntil5Hours() {
 
 testHoursUntil42Hours() {
     # testing with perl
-    if perl -e 'use Date::Parse;' >/dev/null 2>&1 ; then
+    if perl -e 'use Date::Parse;' >/dev/null 2>&1; then
         export DATETYPE='PERL'
         DATE_TMP="$(perl -e '$x=localtime(time+(42*3600));print $x')"
         hours_until "${DATE_TMP}"
@@ -765,9 +765,9 @@ testIPv6Numeric() {
 
             echo "IPv6 is configured"
 
-            if ping -c 3 -6 corti.li >/dev/null 2>&1; then
+            if ping -c 3 -6 ipv6.google.com >/dev/null 2>&1; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H 2a01:4f8:c17:cbd8::2 --critical 1 --warning 2
+                ${SCRIPT} --rootcert-file cabundle.crt -H 2a00:1450:4001:803::200e --critical 1 --warning 2
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
