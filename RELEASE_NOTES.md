@@ -1,2 +1,2 @@
- * Remove the trailing . from FQDNs
- * Fixed a problem with self signed certificates
+ * Fixed several issues when specifying a numeric IPv6 address
+ * Checking the whole chain with STARTTLS

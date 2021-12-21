@@ -110,7 +110,7 @@ Thanks:
 * Many thanks to Robin Pronk (https://github.com/rfpronk) for the -u patch
 * Many thanks to tunnelpr0 (https://github.com/tunnelpr0) for the --inetproto patch
 * Many thanks to Christoph Moench-Tegeder (https://github.com/moench-tegeder) for the OpenSSL version patch
-* Many thanks to waja (https://github.com/waja) for the GitHub workflows
+* Many thanks to waja (https://github.com/waja) for the GitHub workflows and the chain checks with STARTTLS
 * Many thanks to Tobias Grünewald (https://github.com/tobias-gruenewald) for the client certificate
 * Many thanks to chornberger-c2c (https://github.com/chornberger-c2c) for the critical and warning output fix
 * Many thanks to Claus-Theodor Riegg (https://github.com/ctriegg-mak) for the domain with
