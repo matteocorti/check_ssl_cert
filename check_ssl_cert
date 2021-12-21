@@ -1962,51 +1962,51 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
         pop3 | ftp)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         pop3s | ftps)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         smtp)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         smtps)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         irc | ldap)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         ircs | ldaps)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         imap)
-            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         imaps)
-            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         postgres)
-            exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         sieve)
-            exec_with_timeout "echo 'LOGOUT' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'LOGOUT' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         xmpp | xmpp-server)
-            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         mysql)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         *)
@@ -3174,7 +3174,12 @@ main() {
     fi
 
     # we need the FQDN of an host to check the CN
-    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ]; then
+    debuglog "Adding the domain if missing"
+    # - the domain does not contain a .
+    # - we are not checking a file
+    # - we are not checking localhost
+    # - we are not checking an IPv6 address (which does not have dots
+    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | grep -q -F ':' ; then
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
@@ -3220,8 +3225,14 @@ main() {
     # if the host name contains a / (e.g., a URL) the regex for COMMON_NAME substitution fails
     #   we check that only allowed characters are present
     #   we don't need a complete validation since a wrong host name will fail anyway
-    if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
-        unknown "Invalid host name: ${HOST_NAME}"
+
+    IS_IP_TMP="$(is_ip "${HOST_NAME}")"
+    if [ "${IS_IP_TMP}" -eq 0 ]; then
+
+        if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
+            unknown "Invalid host name: ${HOST_NAME}"
+        fi
+
     fi
 
     # we accept underscores since some hosts with an underscore exist but these names
