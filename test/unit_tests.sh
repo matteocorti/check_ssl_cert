@@ -751,6 +751,39 @@ testIPv6() {
     fi
 }
 
+testIPv6Numeric() {
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6; then
+
+        IPV6=
+        if command -v ifconfig >/dev/null && ifconfig -a | grep -q -F inet6; then
+            IPV6=1
+        elif command -v ip >/dev/null && ip addr | grep -q -F inet6; then
+            IPV6=1
+        fi
+
+        if [ -n "${IPV6}" ]; then
+
+            echo "IPv6 is configured"
+
+            if ping -c 3 -6 corti.li >/dev/null 2>&1; then
+
+                ${SCRIPT} --rootcert-file cabundle.crt -H 2a01:4f8:c17:cbd8::2 --critical 1 --warning 2
+                EXIT_CODE=$?
+                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+            else
+                echo "IPv6 is configured but not working: skipping test"
+            fi
+
+        else
+            echo "Skipping forcing IPv6: not IPv6 configured locally"
+        fi
+
+    else
+        echo "Skipping forcing IPv6: no OpenSSL support"
+    fi
+}
+
 testFormatShort() {
     OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --critical 1 --warning 2 --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?

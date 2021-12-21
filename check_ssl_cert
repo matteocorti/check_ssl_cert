@@ -3174,7 +3174,12 @@ main() {
     fi
 
     # we need the FQDN of an host to check the CN
-    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ]; then
+    debuglog "Adding the domain if missing"
+    # - the domain does not contain a .
+    # - we are not checking a file
+    # - we are not checking localhost
+    # - we are not checking an IPv6 address (which does not have dots
+    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | grep -q -F ':' ; then
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
@@ -3220,8 +3225,14 @@ main() {
     # if the host name contains a / (e.g., a URL) the regex for COMMON_NAME substitution fails
     #   we check that only allowed characters are present
     #   we don't need a complete validation since a wrong host name will fail anyway
-    if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
-        unknown "Invalid host name: ${HOST_NAME}"
+
+    IS_IP_TMP="$(is_ip "${HOST_NAME}")"
+    if [ "${IS_IP_TMP}" -eq 0 ]; then
+
+        if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
+            unknown "Invalid host name: ${HOST_NAME}"
+        fi
+
     fi
 
     # we accept underscores since some hosts with an underscore exist but these names
