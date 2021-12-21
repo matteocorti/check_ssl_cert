@@ -376,9 +376,9 @@ info() {
     VALUE=$2
 
     if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
-        printf "%s\\t%s\\n" "${LABEL}" "${VALUE}" | expand -t 32
+        printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32
     elif [ -n "${INFO}" ]; then
-        printf "%s\\n" "${LABEL}"
+        printf '%s\n' "${LABEL}"
     fi
 
 }
@@ -2268,7 +2268,7 @@ fetch_certificate() {
             unknown "it seems that OpenSSL -starttls does not support yet LDAP"
         fi
 
-        NEGOTIATED_PROTOCOL=$( grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //' )
+        NEGOTIATED_PROTOCOL=$(grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
         debuglog "Negotiated protocol: ${NEGOTIATED_PROTOCOL}"
 
         # check if the protocol was really HTTP/2
@@ -2694,7 +2694,7 @@ parse_command_line_options() {
             fi
 
             # remove the trailing . from FQDN (otherwise the CN will not match)
-            HOST=$( echo "${HOST}" | sed 's/[.]$//' )
+            HOST=$(echo "${HOST}" | sed 's/[.]$//')
 
             shift 2
             ;;
@@ -3179,7 +3179,7 @@ main() {
     # - we are not checking a file
     # - we are not checking localhost
     # - we are not checking an IPv6 address (which does not have dots
-    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | grep -q -F ':' ; then
+    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | grep -q -F ':'; then
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
@@ -3189,6 +3189,14 @@ main() {
         HOST="${HOST}.${DOMAIN}"
         debuglog "New host: ${HOST}"
     fi
+
+    # we do quick check if the argument seems an IPv6 address (no validity check)
+    if echo "${HOST}" | grep -q "^[0-9a-fA-F:]*$"; then
+        debuglog "${HOST} seems an IPv6 address without []"
+        HOST="[${HOST}]"
+    fi
+
+    debuglog "HOST = ${HOST}"
 
     ################################################################################
     # Usually SERVERADDR and SERVERNAME both contain the fully qualified domain name
@@ -3300,9 +3308,9 @@ main() {
 
                 create_temporary_file
                 CONVERT_ERROR=${TEMPFILE}
-                if ! ${OPENSSL} x509 -inform DER -outform PEM -in "${ROOT_CA}" -out "${ROOT_CA_PEM}" 2> "${CONVERT_ERROR}"; then
+                if ! ${OPENSSL} x509 -inform DER -outform PEM -in "${ROOT_CA}" -out "${ROOT_CA_PEM}" 2>"${CONVERT_ERROR}"; then
 
-                    CONVERT_ERROR=$( head -n 1 "${CONVERT_ERROR}" )
+                    CONVERT_ERROR=$(head -n 1 "${CONVERT_ERROR}")
                     prepend_critical_message "Error converting ${ROOT_CA} to PEM: ${CONVERT_ERROR}"
                     critical "${SHORTNAME} CRITICAL: Error converting ${ROOT_CA} to PEM: ${CONVERT_ERROR}"
 
@@ -3898,16 +3906,15 @@ main() {
         fi
 
         # check if IPv6 is available locally
-	    if command -v ifconfig > /dev/null; then
-	        ifconfig -a | grep -F -q inet6
-	        IPV6_INTERFACE=$?
-	    elif command -v ip > /dev/null; then
-	        ip addr | grep -F -q inet6
-	        IPV6_INTERFACE=$?
-	    else
-	        unknown "cannot determine if a network interface has IPv6 configured"
-	    fi
-
+        if command -v ifconfig >/dev/null; then
+            ifconfig -a | grep -F -q inet6
+            IPV6_INTERFACE=$?
+        elif command -v ip >/dev/null; then
+            ip addr | grep -F -q inet6
+            IPV6_INTERFACE=$?
+        else
+            unknown "cannot determine if a network interface has IPv6 configured"
+        fi
 
         if [ -n "${INETPROTO}" ] && [ "${INETPROTO}" -eq "-6" ] && [ "${IPV6_INTERFACE}" -ne 0 ]; then
             unknown "cannot connect using IPv6 as no local interface has IPv6 configured"
@@ -3955,7 +3962,7 @@ main() {
     if [ -n "${DISALLOWED_PROTOCOLS}" ]; then
 
         # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
-        if ! host "${HOST_ADDR}" | grep -F -q ' has address ' ; then
+        if ! host "${HOST_ADDR}" | grep -F -q ' has address '; then
             debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
             NMAP_INETPROTO='-6'
         fi
@@ -3977,7 +3984,7 @@ main() {
             fi
         done
 
-        if [ -z "${DISALLOWED_PROTOCOLS_FAIL}" ] ; then
+        if [ -z "${DISALLOWED_PROTOCOLS_FAIL}" ]; then
             verboselog "no disallowed protocols offered"
         fi
 
@@ -4174,7 +4181,7 @@ main() {
     fi
 
     # check for TLS renegotiation
-    if openssl_version '3.0.0' ; then
+    if openssl_version '3.0.0'; then
         debuglog 'Skipping TLS renegotiation check as OpenSSL 3.0.0 enforces it by default'
 
     else
@@ -4186,14 +4193,14 @@ main() {
             # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
             case "${PROTOCOL}" in
-                pop3 | ftp | smtp | irc | ldap | imap | postgres | sieve | xmpp | xmpp-server | mysql)
-                    exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
-                    RET=$?
-                    ;;
-                *)
-                    exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
-                    RET=$?
-                    ;;
+            pop3 | ftp | smtp | irc | ldap | imap | postgres | sieve | xmpp | xmpp-server | mysql)
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
+                RET=$?
+                ;;
+            *)
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} 2>&1 | grep -F -q err"
+                RET=$?
+                ;;
             esac
 
             if [ "${RET}" -eq 1 ]; then
@@ -4298,8 +4305,8 @@ main() {
     info "Valid until" "${DATE}"
 
     if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
-	START_DATE="$(extract_cert_attribute 'startdate' "${CERT}")"
-	info "Valid from" "${START_DATE}"
+        START_DATE="$(extract_cert_attribute 'startdate' "${CERT}")"
+        info "Valid from" "${START_DATE}"
     fi
 
     if [ "${OPENSSL_COMMAND}" = "crl" ]; then
@@ -4335,7 +4342,7 @@ main() {
         FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
         debuglog "FINGERPRINT = ${FINGERPRINT}"
 
-        FINGERPRINT_INFO="$( echo "${FINGERPRINT}" | sed 's/Fingerprint=//' )"
+        FINGERPRINT_INFO="$(echo "${FINGERPRINT}" | sed 's/Fingerprint=//')"
         info "Fingerprint" "${FINGERPRINT_INFO}"
 
         # TO DO: we just take the first result: a loop over all the hosts should
@@ -4343,7 +4350,7 @@ main() {
         OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
         debuglog "OCSP_URI = ${OCSP_URI}"
 
-        if [ -n "${OCSP_URI}" ] ; then
+        if [ -n "${OCSP_URI}" ]; then
             info "Revocation information" "OCSP: ${OCSP_URI}"
         else
             info "No revocation information"
@@ -4370,7 +4377,7 @@ main() {
             fi
 
             if [ -n "${ISSUERS}" ]; then
-		# add a newline
+                # add a newline
                 ISSUERS="${ISSUERS}
 "
             fi
@@ -4379,15 +4386,14 @@ main() {
 
             # get the organization and common name
 
-            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | grep -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//' )"
+            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | grep -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//')"
 
-            MESSAGE="$( echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/' )"
+            MESSAGE="$(echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/')"
             debuglog "${MESSAGE}"
 
             ISSUERS="${ISSUERS}${ELEMENT_ISSUER}"
-	        MESSAGE="$( echo "${ISSUERS}" | sed 's/^/ISSUERS=/' )"
+            MESSAGE="$(echo "${ISSUERS}" | sed 's/^/ISSUERS=/')"
             debuglog "${MESSAGE}"
-
 
             CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
             if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
@@ -4427,7 +4433,7 @@ main() {
 
     fi
 
-    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*:\ //' )"
+    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*:\ //')"
     info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
     if [ "${DEBUG}" -ge 1 ]; then
@@ -4450,9 +4456,8 @@ main() {
         info "No issuer URI"
     fi
 
-
     # shellcheck disable=SC2116,SC2086
-    ISSUER_INFO="$( echo ${ISSUERS} )"
+    ISSUER_INFO="$(echo ${ISSUERS})"
     info "Issuers" "${ISSUER_INFO}"
 
     if echo "${SIGNATURE_ALGORITHM}" | grep -F -q "sha1"; then
@@ -4851,17 +4856,16 @@ main() {
             fi
         fi
 
-	    if [ -s "${NMAP_ERR}" ]; then
+        if [ -s "${NMAP_ERR}" ]; then
 
             NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
-	        # check for -Pn warning
-	        if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
-		        unknown "nmap exited with error: ${NMAP_ERROR}"
-	        fi
+            # check for -Pn warning
+            if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
+                unknown "nmap exited with error: ${NMAP_ERROR}"
+            fi
 
         fi
-
 
         if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
             unknown "empty nmap result while checking ciphers"
@@ -4911,7 +4915,7 @@ ${WARNING}"
 
                 done <"${NMAP_OUT}"
 
-                WARNINGS="$( echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//' )"
+                WARNINGS="$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//')"
                 prepend_critical_message "${HOST_ADDR} offers ciphers with warnings: ${WARNINGS}"
 
             else
@@ -5067,11 +5071,11 @@ ${WARNING}"
     fi
 
     if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
-	    EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
-	    debuglog "EMAIL = ${EMAIL}"
+        EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
+        debuglog "EMAIL = ${EMAIL}"
 
         if [ -n "${EMAIL}" ]; then
-	        info "Email" "${EMAIL}"
+            info "Email" "${EMAIL}"
         else
             info "No email"
         fi
@@ -5128,7 +5132,7 @@ ${WARNING}"
 
             # Process errors
             # details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
-            details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' )
+            details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://')
             prepend_critical_message "Cannot verify certificate: ${details}"
 
         fi
