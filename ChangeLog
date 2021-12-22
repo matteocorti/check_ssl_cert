@@ -1,3 +1,7 @@
+2021-12-21  Matteo Corti  <matteo@corti.li>
+
+        * Converted several documents to Markdown
+
 2021-12-20  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed a problem with self signed certificates

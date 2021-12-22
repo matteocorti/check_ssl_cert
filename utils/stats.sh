@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # authors
-authors=$( grep -c 'Many thanks' AUTHORS )
+authors=$( grep -c 'Many thanks' AUTHORS.md )
 
 # versions
-versions=$( grep -c Version NEWS )
+versions=$( grep -c Version NEWS.md )
 
 version=$( head -n 1 VERSION )
 
