@@ -19,8 +19,8 @@ if ! grep -q "&copy; Matteo Corti, 2007-${YEAR}" README.md ; then
     echo "Please update the copyright year in README.md"
     exit 1
 fi
-if ! grep -q "Copyright (c) 2007-${YEAR} Matteo Corti" COPYRIGHT ; then
-    echo "Please update the copyright year in COPYRIGHT"
+if ! grep -q "Copyright &copy; 2007-${YEAR} Matteo Corti" COPYRIGHT.md ; then
+    echo "Please update the copyright year in COPYRIGHT.md"
     exit 1
 fi
 if ! grep -q "Copyright (c) 2007-${YEAR} Matteo Corti <matteo@corti.li>" check_ssl_cert ; then

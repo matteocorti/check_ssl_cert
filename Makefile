@@ -1,11 +1,20 @@
 PLUGIN=check_ssl_cert
 VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
+
+# files to be included in the distribution
 DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1
+
+# this year
 YEAR=`date +"%Y"`
-FORMATTED_FILES=test/unit_tests.sh AUTHORS COPYING ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT ${PLUGIN}.1 .github/workflows/* utils/*.sh
+
+# file to be checked for formatting
+FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh
+
+# shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh
 
+# builds the relase files
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
@@ -28,6 +37,7 @@ else
 	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
 endif
 
+# checks if the verison is updated in all the files
 version_check:
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%define\ version\ *$(VERSION)" $(PLUGIN).spec
@@ -40,9 +50,6 @@ version_check:
 # and remove trailing blanks
 formatting_check:
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
-
-remove_blanks:
-	./utils/format_files.sh $(FORMATTED_FILES)
 
 SHFMT= := $(shell command -v shfmt 2> /dev/null)
 format:
@@ -96,7 +103,5 @@ rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
 	cp $(DIST_DIR).tar.gz rpmroot/SOURCES
 	rpmbuild --define "_topdir `pwd`/rpmroot" -ba check_ssl_cert.spec
-
-
 
 .PHONY: install clean test rpm distclean check

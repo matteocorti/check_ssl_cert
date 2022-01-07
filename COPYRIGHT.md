@@ -1,6 +1,6 @@
 
 * Copyright &copy; 2007-2013 ETH Zurich
-* Copyright &copy; 2007-2021 Matteo Corti
+* Copyright &copy; 2007-2022 Matteo Corti
 
 with the following individuals added to the list of contributing authors
 

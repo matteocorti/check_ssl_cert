@@ -1,8 +1,8 @@
 
  &copy; Matteo Corti, ETH Zurich, 2007-2012
 
- &copy; Matteo Corti, 2007-2021
-  see AUTHORS for the complete list of contributors
+ &copy; Matteo Corti, 2007-2022
+  see AUTHORS.md for the complete list of contributors
 
 # check\_ssl\_cert
 
