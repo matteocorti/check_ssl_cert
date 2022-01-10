@@ -21,10 +21,10 @@ dist: version_check
 	cp -r $(DIST_FILES) $(DIST_DIR)
 # avoid to include extended attribute data files
 # see https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives
-	export COPY_EXTENDED_ATTRIBUTES_DISABLE=1; \
-	export COPYFILE_DISABLE=1; \
-	tar -c -z -f $(DIST_DIR).tar.gz  $(DIST_DIR) && \
-	tar -c -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
+	export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; \
+	export COPYFILE_DISABLE=true; \
+	tar --no-xattrs -c -z -f $(DIST_DIR).tar.gz  $(DIST_DIR) && \
+	tar --no-xattrs -c -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
 install:
 ifndef DESTDIR
