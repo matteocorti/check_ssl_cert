@@ -1,6 +1,7 @@
 2022-01-10  Matteo Corti  <matteo@corti.li>
 
-        * Makefile (dist): Disable extended attributes support
+        * .github/workflows/test.yml (jobs): Removed Ubuntu 20.10
+        * Makefile (dist): Disable extended attributes support with bsdtar
 
 2021-12-21  Matteo Corti  <matteo@corti.li>
 

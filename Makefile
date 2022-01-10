@@ -14,6 +14,8 @@ FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Ma
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh
 
+XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
+
 # builds the relase files
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -23,8 +25,8 @@ dist: version_check
 # see https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives
 	export COPY_EXTENDED_ATTRIBUTES_DISABLE=true; \
 	export COPYFILE_DISABLE=true; \
-	tar --no-xattrs -c -z -f $(DIST_DIR).tar.gz  $(DIST_DIR) && \
-	tar --no-xattrs -c -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
+	tar $(XATTRS_OPTION) -c -z -f $(DIST_DIR).tar.gz  $(DIST_DIR) && \
+	tar $(XATTRS_OPTION) -c -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
 install:
 ifndef DESTDIR
@@ -51,7 +53,7 @@ version_check:
 formatting_check:
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
 
-SHFMT= := $(shell command -v shfmt 2> /dev/null)
+SHFMT := $(shell command -v shfmt 2> /dev/null)
 format:
 ifndef SHFMT
 	echo "No shfmt installed"

@@ -59,7 +59,6 @@ jobs:
           - 'ubuntu:16.04'
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
-          - 'ubuntu:20.10'
           - 'alpine:3.13'
           - 'fedora:32'
           - 'fedora:33'
@@ -82,10 +81,6 @@ jobs:
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man
 
 
-          - distro: 'ubuntu:20.10'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools
           - distro: 'ubuntu:16.04'
             pre: >-
               apt-get update &&
