@@ -19,7 +19,7 @@ BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://github.com/matteocorti/check_ssl_cert
 Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v%{version}/check_ssl_cert-%{version}.tar.gz
 
-Requires:  nagios-plugins expect perl(Date::Parse)
+Requires:  nagios-plugins expect perl(Date::Parse) bc
 
 %description
 A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection

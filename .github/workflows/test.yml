@@ -70,29 +70,29 @@ jobs:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools bc
           - distro: 'debian:10'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc
           - distro: 'debian:9'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc
 
 
           - distro: 'ubuntu:16.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools
           - distro: 'ubuntu:18.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools
           - distro: 'ubuntu:20.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools
 
 
           - distro: 'alpine:3.13'
@@ -100,29 +100,29 @@ jobs:
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 man bcdoc
 
 
           - distro: 'fedora:32'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man net-tools
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools
           - distro: 'fedora:33'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man net-tools
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools
           - distro: 'fedora:34'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man net-tools
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools
           - distro: 'fedora:35'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man net-tools
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools
 
 
     steps:
