@@ -100,7 +100,7 @@ jobs:
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 man bc doc
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc
 
 
           - distro: 'fedora:32'
