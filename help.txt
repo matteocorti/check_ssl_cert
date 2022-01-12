@@ -142,6 +142,9 @@
 --password source;see the PASS PHRASE ARGUMENTS section
 --password source;openssl(1)
 -p,--port port;TCP port
+--precision digits;number of decimal places for durations:
+--precision digits;defaults to 0 if critical or warning are
+--precision digits;integers, 2 otherwise
 --prometheus;generates Prometheus/OpenMetrics output
 -P,--protocol protocol;use the specific protocol:
 -P,--protocol protocol;ftp, ftps, http, https (default),

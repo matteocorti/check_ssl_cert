@@ -134,6 +134,9 @@ oneTimeSetUp() {
     NAGIOS_CRITICAL=2
     NAGIOS_UNKNOWN=3
 
+    OK=0
+    NOT_OK=1
+
     if [ -z "${TMPDIR}" ]; then
         TMPDIR=/tmp
     fi
@@ -273,6 +276,34 @@ testDependencies() {
     # $PROG is defined in the script
     # shellcheck disable=SC2154
     assertNotNull 'openssl not found' "${PROG}"
+}
+
+testPrecision() {
+    # if nothing is specified integers should be used
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com | grep -q -E 'in\ [0-9]*[.]'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
+}
+
+testPrecisionCW() {
+    # if critical or warning is not an integer we should switch to floating point
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 | grep -q -E 'in\ [0-9]*[.][0-9]{2}'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
+}
+
+testPrecision4() {
+    # we force a precision of 4
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 4 | grep -q -E 'in\ [0-9]*[.][0-9]{4}'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
+}
+
+testPrecision0() {
+    # we force integers even if critical is a floting point
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in\ [0-9]*[.]'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
 
 testInfo() {

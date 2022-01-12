@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.17.0
+VERSION=2.18.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -52,6 +52,11 @@ ALL_MSG=""
 EARLIEST_VALIDITY_HOURS=""
 DEBUG=0
 DEBUG_FILE=""
+
+# if --critical or --warning are floating point then switch to floating point output, otherwise integer
+
+# Floating point precision: default integer
+SCALE=""
 
 ################################################################################
 # Functions
@@ -234,6 +239,9 @@ usage() {
     echo "      --openssl path               path of the openssl binary to be used"
     # Delimiter at 78 chars ############################################################
     echo "   -p,--port port                  TCP port"
+    echo "      --precision digits           number of decimal places for durations:"
+    echo "                                   defaults to 0 if critical or warning are"
+    echo "                                   integers, 2 otherwise"
     echo "   -P,--protocol protocol          use the specific protocol:"
     echo "                                   ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
@@ -562,13 +570,16 @@ hours_until() {
         fi
     fi
 
-    debuglog "Computing number of hours until '${DATE}'"
+    debuglog "Computing number of hours until '${DATE}' with ${DATETYPE}"
 
     case "${DATETYPE}" in
     "BSD")
 
         # new BSD date
-        HOURS_UNTIL=$((($(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s) - $(${DATEBIN} +%s)) / 3600))
+
+        target_date=$(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s)
+        now=$(${DATEBIN} +%s)
+        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
 
         ;;
 
@@ -587,7 +598,9 @@ hours_until() {
             CONVERTED_DATE=$(echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z")
             debuglog "date converted with dconv: ${CONVERTED_DATE}"
 
-            HOURS_UNTIL=$((($(${DATEBIN} -j "${CONVERTED_DATE}" +%s) - $(${DATEBIN} +%s)) / 3600))
+            target_date=$(${DATEBIN} -j "${CONVERTED_DATE}" +%s)
+            now=$(${DATEBIN} +%s)
+            HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
 
             debuglog "hours computed with ${DCONV_BIN}: ${HOURS_UNTIL}"
 
@@ -600,7 +613,9 @@ hours_until() {
             CONVERTED_DATE=$(echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z")
             debuglog "date converted with ${DCONV_BIN}: ${CONVERTED_DATE}"
 
-            HOURS_UNTIL=$((($(${DATEBIN} -j +%s "${CONVERTED_DATE}") - $(${DATEBIN} +%s)) / 3600))
+            target_date=$(${DATEBIN} -j +%s "${CONVERTED_DATE}")
+            now=$(${DATEBIN} +%s)
+            HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
 
         else
             unknown "Unknown date(1) input format"
@@ -612,10 +627,14 @@ hours_until() {
         BUSYBOX_DATE=$(echo "${DATE}" | sed 's/[ ][^ ]*$//')
         debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
         verboselog "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
-        HOURS_UNTIL=$((($(${DATEBIN} -d "${BUSYBOX_DATE}" +%s) - $(${DATEBIN} +%s)) / 3600))
+        target_date=$(${DATEBIN} -d "${BUSYBOX_DATE}" +%s)
+        now=$(${DATEBIN} +%s)
+        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
         ;;
     "GNU")
-        HOURS_UNTIL=$((($(${DATEBIN} -d "${DATE}" +%s) - $(${DATEBIN} +%s)) / 3600))
+        target_date=$(${DATEBIN} -d "${DATE}" +%s)
+        now=$(${DATEBIN} +%s)
+        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
         ;;
     "PERL")
         # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
@@ -1048,6 +1067,45 @@ unknown() {
     remove_temporary_files
     printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     exit "${STATUS_UNKNOWN}"
+}
+
+##############################################################################
+# Compares two (floating point) numbers using bc
+# Params
+#  $1 the left hand value
+#  $2 the comparison operator
+#  $3 the right hand value
+# Returns the boolean result of the comparison
+compare() {
+
+    lhv=$1;
+    op=$2;
+    rhv=$3
+
+    debuglog "Executing comparison '${lhv} ${op} ${rhv}'"
+
+    comparison="$(echo "${lhv} ${op} ${rhv}" | bc)"
+    debuglog "  bc result = ${comparison}"
+
+    [ 1 -eq "${comparison}" ]
+    ret=$?
+    debuglog "  returning ${ret}"
+    return "${ret}"
+
+}
+
+##############################################################################
+# Computes an arithmetic expression with bc (floating point)
+#   SCALE has to be set (precision)
+# Params
+#  $1 the expression
+# Returns the result
+compute() {
+    expression="$1"
+    debuglog "Computing '${expression}'"
+    result=$( echo "scale=${SCALE};${expression}"|bc 2>&1 )
+    echo "${result}"
+
 }
 
 ################################################################################
@@ -1733,19 +1791,21 @@ check_cert_end_date() {
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
 
-    ELEM_DAYS_VALID=$((HOURS_UNTIL / 24))
-    ELEM_SECONDS_VALID=$((HOURS_UNTIL * 3600))
+    # TO DO: flaoting point
+
+    ELEM_DAYS_VALID=$( compute "${HOURS_UNTIL}/24" )
+    ELEM_SECONDS_VALID=$( compute "${HOURS_UNTIL} * 3600" )
 
     add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
 
     debuglog "  valid for ${ELEM_DAYS_VALID} days"
 
-    if [ -z "${EARLIEST_VALIDITY_HOURS}" ] || [ "${HOURS_UNTIL}" -lt "${EARLIEST_VALIDITY_HOURS}" ]; then
+    if [ -z "${EARLIEST_VALIDITY_HOURS}" ] || compare "${HOURS_UNTIL}" "<" "${EARLIEST_VALIDITY_HOURS}"; then
         EARLIEST_VALIDITY_HOURS="${HOURS_UNTIL}"
         replace_current_message='yes'
     fi
 
-    if [ -z "${DAYS_VALID}" ] || [ "${ELEM_DAYS_VALID}" -lt "${DAYS_VALID}" ]; then
+    if [ -z "${DAYS_VALID}" ] || compare "${ELEM_DAYS_VALID}" "<" "${DAYS_VALID}"; then
         DAYS_VALID="${ELEM_DAYS_VALID}"
     fi
 
@@ -1756,9 +1816,9 @@ check_cert_end_date() {
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number} (${element_cn})"
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 >/dev/null; then
-            if [ "${ELEM_DAYS_VALID}" -eq 0 ]; then
+            if compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='today'
-            elif [ "${ELEM_DAYS_VALID}" -eq -1 ]; then
+            elif compare "${ELEM_DAYS_VALID}" "<" 2; then
                 DAYS_AGO='yesterday'
             else
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
@@ -1803,7 +1863,7 @@ check_cert_end_date() {
         if [ -n "${NOT_VALID_LONGER_THAN}" ]; then
             debuglog "checking if the certificate is valid longer than ${NOT_VALID_LONGER_THAN} days"
             debuglog "  valid for ${DAYS_VALID} days"
-            if [ "${DAYS_VALID}" -gt "${NOT_VALID_LONGER_THAN}" ]; then
+            if compare "${DAYS_VALID}" '>' "${NOT_VALID_LONGER_THAN}"; then
                 debuglog "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
                 prepend_critical_message "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days" "${replace_current_message}"
                 add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
@@ -1814,7 +1874,7 @@ check_cert_end_date() {
         # CRL certificates
 
         # We always check expired certificates
-        if [ "${ELEM_SECONDS_VALID}" -lt 1 ]; then
+        if compare "${ELEM_SECONDS_VALID}" '<' 1; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE})" "${replace_current_message}"
             add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
             return 2
@@ -1822,7 +1882,7 @@ check_cert_end_date() {
 
         if [ -n "${CRITICAL_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ]; then
             # When comparing, always use values in seconds, because values in days might be floating point numbers
-            if [ "${ELEM_SECONDS_VALID}" -lt "${CRITICAL_SECONDS}" ]; then
+            if compare "${ELEM_SECONDS_VALID}" '<' "${CRITICAL_SECONDS}"; then
                 prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
@@ -1835,7 +1895,7 @@ check_cert_end_date() {
 
         if [ -n "${WARNING_DAYS}" ] && [ -n "${WARNING_SECONDS}" ]; then
             # When comparing, always use values in seconds, because values in days might be floating point numbers
-            if [ "${ELEM_SECONDS_VALID}" -lt "${WARNING_SECONDS}" ]; then
+            if compare "${ELEM_SECONDS_VALID}" '<' "${WARNING_SECONDS}"; then
                 append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
@@ -2807,6 +2867,11 @@ parse_command_line_options() {
             XMPPPORT="$2"
             shift 2
             ;;
+        --precision)
+            check_option_argument '--precision' "$2"
+            SCALE="$2"
+            shift 2
+            ;;
         -P | --protocol)
             check_option_argument '-P|--protocol' "$2"
             PROTOCOL="$2"
@@ -3413,6 +3478,11 @@ main() {
             unknown "invalid number of days '${CRITICAL_DAYS}'"
         fi
 
+        if echo "${CRITICAL_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ]; then
+            # floating point critical and no precision set
+            SCALE=2
+        fi
+
     fi
 
     if [ -n "${WARNING_DAYS}" ]; then
@@ -3423,12 +3493,28 @@ main() {
             unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
+        if echo "${WARNING_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ] ; then
+            SCALE=2
+        fi
+
+    fi
+
+    if [ -z "${SCALE}" ] ; then
+        # --precision not specified and no floating point critical or warnings --> integer computations
+        SCALE=0
+    fi
+
+    if [ -n "${FLOATING_POINT}" ]; then
+        debuglog "Enabling floating point output"
+        check_required_prog 'bc'
+        BCBIN=${PROG}
+        debuglog "  bc binary: ${BCBIN}"
     fi
 
     if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] && [ -n "${WARNING_SECONDS}" ]; then
 
         # When comparing, always use values in seconds, because values in days might be floating point numbers
-        if [ "${WARNING_SECONDS}" -le "${CRITICAL_SECONDS}" ]; then
+        if compare "${WARNING_SECONDS}" '<=' "${CRITICAL_SECONDS}"; then
             unknown "--warning (${WARNING_DAYS}) is less than or equal to --critical (${CRITICAL_DAYS})"
         fi
 
@@ -4433,9 +4519,9 @@ main() {
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
             OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
             verboselog "OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
-            if [ -n "${OCSP_CRITICAL}" ] && [ "${OCSP_CRITICAL}" -ge "${OCSP_EXPIRES_IN_HOURS}" ]; then
+            if [ -n "${OCSP_CRITICAL}" ] && compare "${OCSP_CRITICAL}" '>=' "${OCSP_EXPIRES_IN_HOURS}"; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
-            elif [ -n "${OCSP_WARNING}" ] && [ "${OCSP_WARNING}" -ge "${OCSP_EXPIRES_IN_HOURS}" ]; then
+            elif [ -n "${OCSP_WARNING}" ] && compare "${OCSP_WARNING}" '>=' "${OCSP_EXPIRES_IN_HOURS}"; then
                 append_warning_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
             fi
         fi
@@ -5196,13 +5282,13 @@ ${WARNING}"
 
     if [ -n "${DAYS_VALID}" ]; then
         # nicer formatting
-        if [ "${DAYS_VALID}" -gt 1 ]; then
+        if compare "${DAYS_VALID}" '>=' 2; then
             DAYS_VALID=" (expires in ${DAYS_VALID} days)"
-        elif [ "${DAYS_VALID}" -eq 1 ]; then
+        elif compare "${DAYS_VALID}" '>=' 1; then
             DAYS_VALID=" (expires tomorrow)"
-        elif [ "${DAYS_VALID}" -eq 0 ]; then
+        elif compare "${DAYS_VALID}" '>=' 0; then
             DAYS_VALID=" (expires today)"
-        elif [ "${DAYS_VALID}" -eq -1 ]; then
+        elif compare  "${DAYS_VALID}" '>=' '-1'; then
             DAYS_VALID=" (expired yesterday)"
         else
             DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
@@ -5211,13 +5297,13 @@ ${WARNING}"
 
     if [ -n "${OCSP_EXPIRES_IN_HOURS}" ]; then
         # nicer formatting
-        if [ "${OCSP_EXPIRES_IN_HOURS}" -gt 1 ]; then
+        if compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 2; then
             OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours)"
-        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq 1 ]; then
+        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 1; then
             OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in one hour)"
-        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq 0 ]; then
+        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 0; then
             OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires now)"
-        elif [ "${OCSP_EXPIRES_IN_HOURS}" -eq -1 ]; then
+        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' '-1'; then
             OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired one hour ago)"
         else
             OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired ${OCSP_EXPIRES_IN_HOURS} hours ago)"

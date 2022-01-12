@@ -6,6 +6,7 @@
 * [curl](https://curl.se)
 * ```date```
 * ```file```
+* ```bc```
 
 ## Optional dependencies
 

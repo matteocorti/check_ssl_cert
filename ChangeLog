@@ -1,3 +1,7 @@
+2022-01-12  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: enable floating point computations
+
 2022-01-10  Matteo Corti  <matteo@corti.li>
 
         * .github/workflows/test.yml (jobs): Removed Ubuntu 20.10

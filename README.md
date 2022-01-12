@@ -154,6 +154,9 @@ Options:
                                    has to be valid to issue a warning status
       --openssl path               path of the openssl binary to be used
    -p,--port port                  TCP port
+      --precision digits           number of decimal places for durations:
+                                   defaults to 0 if critical or warning are
+                                   integers, 2 otherwise
    -P,--protocol protocol          use the specific protocol:
                                    ftp, ftps, http, https (default),
                                    h2 (HTTP/2), imap, imaps, irc, ircs, ldap,

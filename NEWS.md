@@ -1,4 +1,6 @@
- * 2021-12-21 Version 2.17.0
+* 2022-01-12 Version 2.18.0
+  * Using floating point computations
+* 2021-12-21 Version 2.17.0
   * Fixed several issues when specifying a numeric IPv6 address
   * Checking the whole chain with STARTTLS
  * 2021-12-20 Version 2.16.0
