@@ -1084,7 +1084,7 @@ compare() {
 
     debuglog "Executing comparison '${lhv} ${op} ${rhv}'"
 
-    comparison="$(echo "${lhv} ${op} ${rhv}" | bc)"
+    comparison="$(echo "${lhv} ${op} ${rhv}" | "${BCBIN}")"
     debuglog "  bc result = ${comparison}"
 
     [ 1 -eq "${comparison}" ]
@@ -1103,7 +1103,7 @@ compare() {
 compute() {
     expression="$1"
     debuglog "Computing '${expression}'"
-    result=$( echo "scale=${SCALE};${expression}"|bc 2>&1 )
+    result=$( echo "scale=${SCALE};${expression}"|"${BCBIN}" 2>&1 )
     echo "${result}"
 
 }
@@ -3504,12 +3504,8 @@ main() {
         SCALE=0
     fi
 
-    if [ -n "${FLOATING_POINT}" ]; then
-        debuglog "Enabling floating point output"
-        check_required_prog 'bc'
-        BCBIN=${PROG}
-        debuglog "  bc binary: ${BCBIN}"
-    fi
+    check_required_prog 'bc'
+    BCBIN=${PROG}
 
     if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] && [ -n "${WARNING_SECONDS}" ]; then
 
