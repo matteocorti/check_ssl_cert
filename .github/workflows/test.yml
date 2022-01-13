@@ -60,7 +60,6 @@ jobs:
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
           - 'alpine:3.13'
-          - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
           - 'fedora:35'
@@ -103,11 +102,6 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc
 
 
-          - distro: 'fedora:32'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools
           - distro: 'fedora:33'
             pre: >-
               dnf upgrade -y &&
