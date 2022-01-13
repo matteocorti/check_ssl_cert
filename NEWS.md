@@ -1,3 +1,5 @@
+* 2022-01-13 Version 2.19.0
+  * ```--file``` now accepts URIs (e.g., http://, https://, ftp://, file://, ...)
   * Added input validation for integers and floats
 * 2022-01-12 Version 2.18.0
   * Using floating point computations

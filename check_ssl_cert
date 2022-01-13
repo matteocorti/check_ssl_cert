@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.18.0
+VERSION=2.19.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -88,8 +88,8 @@ usage() {
     echo "       check_ssl_cert -f file [OPTIONS]"
     echo
     echo "Arguments:"
-    echo "   -f,--file file                  local file path (works with -H localhost"
-    echo "                                   only) with -f you can not only pass a x509"
+    echo "   -f,--file file                  local file path or URI."
+    echo "                                   With -f you can not only pass a x509"
     echo "                                   certificate file but also a certificate"
     echo "                                   revocation list (CRL) to check the"
     echo "                                   validity period"
@@ -799,6 +799,8 @@ prepend_critical_message() {
         if [ -n "${HOST_NAME}" ]; then
             if [ -n "${SNI}" ]; then
                 tmp=" ${SNI}"
+            elif [ -n "${FILE_URI}" ]; then
+                tmp=" ${FILE_URI}"
             elif [ -n "${FILE}" ]; then
                 tmp=" ${FILE}"
             else
@@ -990,6 +992,8 @@ append_warning_message() {
         if [ -n "${HOST_NAME}" ]; then
             if [ -n "${SNI}" ]; then
                 tmp=" ${SNI}"
+            elif [ -n "${FILE_URI}" ]; then
+                tmp=" ${FILE_URI}"
             elif [ -n "${FILE}" ]; then
                 tmp=" ${FILE}"
             else
@@ -3491,9 +3495,61 @@ main() {
     fi
 
     if [ -n "${FILE}" ]; then
-        if [ ! -r "${FILE}" ]; then
+        # is $FILE a URI? We detect URIs with an "authority" part, since locat paths are specified directly
+        # see https://en.wikipedia.org/wiki/Uniform_Resource_Identifier for the syntax
+        FILE_URI=$( echo "${FILE}" | grep '^[a-z][a-z+.-]*://' )
+        debuglog "${FILE} is an URI with an authority"
+    fi
+
+    # curl
+    if [ -z "${CURL_BIN}" ]; then
+        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
+            [ -n "${OCSP}" ] ||
+            [ -n "${CRL}" ] ||
+            [ -n "${IGNORE_CONNECTION_STATE}" ] ||
+            [ -n "${FILE_URI}" ] ; then
+            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}"
+            debuglog "curl binary not specified"
+
+            check_required_prog curl
+            CURL_BIN=${PROG}
+
+            debuglog "curl available: ${CURL_BIN}"
+            CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
+            debuglog "${CURL_BIN_VERSION_TMP}"
+
+        else
+            debuglog "curl binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+        fi
+    else
+        # we check if the provided binary actually works
+        check_required_prog "${CURL_BIN}"
+    fi
+
+    if [ -n "${FILE}" ]; then
+
+        if [ -n "${FILE_URI}" ]; then
+
+            # we try to fetch it with curl
+            create_temporary_file
+            FILE=${TEMPFILE}
+
+            debuglog "Fetching ${FILE_URI} to ${FILE}"
+
+            if [ -n "${CURL_USER_AGENT}" ]; then
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
+            else
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
+            fi
+
+            if [ ! -r "${FILE}" ]; then
+                unknown "Cannot fetch ${FILE_URI}"
+            fi
+
+        elif [ ! -r "${FILE}" ]; then
             unknown "Cannot read file ${FILE}"
         fi
+
     fi
 
     # check if grep is in the path (see #244)
@@ -3666,30 +3722,6 @@ main() {
 
     FILE_BIN_VERSION="$("${FILE_BIN}" --version 2>&1)"
     debuglog "file version: ${FILE_BIN_VERSION}"
-
-    # curl
-    if [ -z "${CURL_BIN}" ]; then
-        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
-            [ -n "${OCSP}" ] ||
-            [ -n "${CRL}" ] ||
-            [ -n "${IGNORE_CONNECTION_STATE}" ]; then
-            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}"
-            debuglog "curl binary not specified"
-
-            check_required_prog curl
-            CURL_BIN=${PROG}
-
-            debuglog "curl available: ${CURL_BIN}"
-            CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
-            debuglog "${CURL_BIN_VERSION_TMP}"
-
-        else
-            debuglog "curl binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
-        fi
-    else
-        # we check if the provided binary actually works
-        check_required_prog "${CURL_BIN}"
-    fi
 
     # nmap
     if [ -z "${NMAP_BIN}" ]; then

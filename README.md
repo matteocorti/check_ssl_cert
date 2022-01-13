@@ -15,8 +15,8 @@ Usage: check_ssl_cert -H host [OPTIONS]
        check_ssl_cert -f file [OPTIONS]
 
 Arguments:
-   -f,--file file                  local file path (works with -H localhost
-                                   only) with -f you can not only pass a x509
+   -f,--file file                  local file path or URI.
+                                   With -f you can not only pass a x509
                                    certificate file but also a certificate
                                    revocation list (CRL) to check the
                                    validity period

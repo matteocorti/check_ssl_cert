@@ -1,4 +1,4 @@
-%define version          2.18.0
+%define version          2.19.0
 %define release          0
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{sourcename}.1*
 
 %changelog
+* Wed Jan  13 2022 Matteo Corti <matteo@corti.li> - 2.19.0-0
+- Updated to 2.19.0
+
 * Wed Jan  12 2022 Matteo Corti <matteo@corti.li> - 2.18.0-0
 - Updated to 2.18.0
 

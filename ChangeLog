@@ -1,6 +1,7 @@
 2022-01-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_integer): Added input validation for integers and floats
+        * check_ssl_cert (main): If --file is an URI fetch it with curl
 
 2022-01-12  Matteo Corti  <matteo@corti.li>
 

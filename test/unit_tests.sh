@@ -982,6 +982,12 @@ testDERCert() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testDERCertURI() {
+    ${SCRIPT} --rootcert-file cabundle.crt -f "file://${PWD}/der.cer" --ignore-sct --critical 1 --warning 2 --allow-empty-san -s
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testDERCertSymbolicLink() {
     ${SCRIPT} --rootcert-file cabundle.crt -f ./derlink.cer --ignore-sct --critical 1 --warning 2 --allow-empty-san -s
     EXIT_CODE=$?

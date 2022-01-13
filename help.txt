@@ -51,8 +51,8 @@
 --element number;beginning of the chain
 -e,--email address;pattern to match the email address
 -e,--email address;contained in the certificate
--f,--file file;local file path (works with -H localhost
--f,--file file; only) with -f you can not only pass a x509
+-f,--file file;local file path or URI.
+-f,--file file;With -f you can not only pass a x509
 -f,--file file;certificate file but also a certificate
 -f,--file file;revocation list (CRL) to check the
 -f,--file file;validity period
