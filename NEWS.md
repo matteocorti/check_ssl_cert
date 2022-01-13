@@ -1,3 +1,4 @@
+  * Added input validation for integers and floats
 * 2022-01-12 Version 2.18.0
   * Using floating point computations
 * 2021-12-21 Version 2.17.0

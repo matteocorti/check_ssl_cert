@@ -1108,6 +1108,32 @@ compute() {
 
 }
 
+##############################################################################
+# Check if the parameter is an integer
+# Params
+#  $1 the value to check
+#  $2 error message
+check_integer() {
+    value=$1
+    message=$2
+    if ! echo "$1" | grep -q '^[0-9][0-9]*$' ; then
+        unknown "${message}"
+    fi
+}
+
+##############################################################################
+# Check if the parameter is a float
+# Params
+#  $1 the value to check
+#  $2 error message
+check_float() {
+    value=$1
+    message=$2
+    if ! echo "$1" | grep -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$' ; then
+        unknown "${message}"
+    fi
+}
+
 ################################################################################
 # Exits with unknown if s_client does not support the given option
 #
@@ -2672,6 +2698,7 @@ parse_command_line_options() {
 
         -c | --critical)
             check_option_argument '-c,--critical' "$2"
+            check_float "$2" "--critical: the number of days should be an integer or a float"
             CRITICAL_DAYS="$2"
             CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
             shift 2
@@ -2704,6 +2731,7 @@ parse_command_line_options() {
         # Deprecated option: used to be as --warning
         --days)
             check_option_argument '--days' "$2"
+            check_integer "$2" "--days: the number of days should be an integer"
             WARNING_DAYS="$2"
             WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
             shift 2
@@ -2869,6 +2897,7 @@ parse_command_line_options() {
             ;;
         --precision)
             check_option_argument '--precision' "$2"
+            check_integer "$2" "--precision: the precision should be an integer"
             SCALE="$2"
             shift 2
             ;;
@@ -2937,6 +2966,7 @@ parse_command_line_options() {
             ;;
         -t | --timeout)
             check_option_argument '-t|--timeout' "$2"
+            check_integer "$2" "--timeout: the timeout should be an integer"
             TIMEOUT="$2"
             shift 2
             ;;
@@ -2952,6 +2982,7 @@ parse_command_line_options() {
             ;;
         -w | --warning)
             check_option_argument '-w|--warning' "$2"
+            check_float "$2" "--warning: the number of days should be an integer or a float"
             WARNING_DAYS="$2"
             WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
             shift 2

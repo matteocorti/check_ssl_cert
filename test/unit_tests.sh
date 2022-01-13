@@ -278,6 +278,36 @@ testDependencies() {
     assertNotNull 'openssl not found' "${PROG}"
 }
 
+testIntegerOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testIntegerNotOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2.2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2.a
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
+testFloatOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 2.2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testFloatNotOK() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 2.2a
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical .2
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
 testPrecision() {
     # if nothing is specified integers should be used
     ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com | grep -q -E 'in\ [0-9]*[.]'
