@@ -48,8 +48,8 @@ authors:
   given-names: "Raphael"
 - family-names: "Yamry"
   given-names: "Rob"
- - name: Robin H. Johnson
- - name: Rolf Eike Beer
+- name: Robin H. Johnson
+- name: Rolf Eike Beer
 - family-names: "Nowakowski"
   given-names: "Ryan"
 - family-names: "Richards"
@@ -70,7 +70,7 @@ authors:
   given-names: "Wolfgang"
 - family-names: "Gravel"
   given-names: "Yannick"
- - name: Alexander Aleksandrovič Klimov
+- name: Alexander Aleksandrovič Klimov
   website: https://github.com/Al2Klimov
 - family-names: "Klärner"
   given-names: "Andre"
@@ -179,7 +179,7 @@ authors:
 - family-names: "Horky"
   given-names: "Vojtech"
   website: https://github.com/vhotspur
- - name: Wim van Ravesteijn
+- name: Wim van Ravesteijn
   website: https://github.com/wimvr
 - name: Zadkiel
   website: https://github.com/aslafy-z

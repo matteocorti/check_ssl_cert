@@ -42,13 +42,14 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to Rolf Eike Beer for the IRC and SMTP check patch
 * Many thanks to Viktor Szépe for the formatting and style patches
 * Many thanks to Philippe Kueck for the CN patch
-* Many thanks to [Ricardo](https://github.com/bb-Ricardo) and [xert](https://github.com/xert) for the date timestamp patch
+* Many thanks to [Ricardo](https://github.com/bb-Ricardo) for the date timestamp patch
+* Many thanks to [xert](https://github.com/xert) for the date timestamp patch
 * Many thanks to [xert](https://github.com/xert) for the [Qualys, SSL Labs](https://www.ssllabs.com/ssltest/) patch
 * Many thanks to [Leynos](https://github.com/leynos) for the OCSP proxy patch
 * Many thanks to Philippe Kueck for the selection of the cipher authentication
 * Many thanks to [Jalonet](https://github.com/jalonet) for the file/PEM patch
 * Many thanks to [Sander Cornelissen](https://github.com/scornelissen85)for the multiple CNs patch
-* Many thanks to Pavel Rochnyak (https://github.com/rpv-tomsk) for the issuer certificate cache patch and the wildcard support in alternative names
+* Many thanks to [Pavel Rochnyak](https://github.com/rpv-tomsk) for the issuer certificate cache patch and the wildcard support in alternative names
 * Many thanks to [Vamp898](https://github.com/Vamp898) for the LDAP patch
 * Many thanks to Emilian Ertel for the [curl](https://curl.se) and ```date``` patches
 * Many thanks to Kosta Velikov for the ```grep``` patch
@@ -75,8 +76,8 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Jonas Meurer](https://github.com/mejo-) for the IMAP / IMAPS fix
 * Many thanks to [Mathieu Simon](https://github.com/matsimon) for the IMAPS, POP3S and LDAP patches
 * Many thanks to [Nico](https://github.com/nicox) for the [Qualys, SSL Labs](https://www.ssllabs.com/ssltest/) patch
-* Many thanks to barakAtSoluto (https://github.com/barakAtSoluto) for the [Qualys, SSL Labs](https://www.ssllabs.com/ssltest/) warning patch
-* Many thanks to Valentin Heidelberger (https://github.com/va1entin) for the [curl](https://curl.se) user agent patch
+* Many thanks to [barakAtSoluto](https://github.com/barakAtSoluto) for the [Qualys, SSL Labs](https://www.ssllabs.com/ssltest/) warning patch
+* Many thanks to [Valentin Heidelberger](https://github.com/va1entin) for the [curl](https://curl.se) user agent patch
 * Many thanks to [Tone](https://github.com/anthonyhaussman) for the warning message improvement patch
 * Many thanks to [Michael Niewiara](https://github.com/mobitux)for the HTTPS/```echo``` fix
 * Many thanks to [Zadkiel](https://github.com/aslafy-z) for the extended regex patch and for the n-elementh check
@@ -100,7 +101,7 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Zadkiel](https://github.com/aslafy-z) for
   * the ```--version``` patch and
   *  the ```--skip-element``` patch
-* Many thanks to [Marcel Burkhalter](https://github.com/explorer69) () the custom HTTP header patch.
+* Many thanks to [Marcel Burkhalter](https://github.com/explorer69) for the custom HTTP header patch.
 * Many thanks to [Peter Newmann](https://github.com/peternewman) for
   * the timeout documentation patch and
   * the issuers patch
