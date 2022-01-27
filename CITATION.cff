@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Corti"
+  given-names: "Matteo"
+  orcid: "https://orcid.org/0000-0002-1746-1108"
+- name: "see the AUTHORS.md file"
+title: "check_ssl_cert"
+version: 2.19.0
+date-released: 2022-01-13
+url: "https://github.com/matteocorti/check_ssl_cert"
