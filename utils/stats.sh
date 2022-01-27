@@ -9,7 +9,7 @@ versions=$( grep -c Version NEWS.md )
 version=$( head -n 1 VERSION )
 
 echo
-printf "\\tcheck_ssl_cert version %s\n" "${version}"
+printf "\\tcheck_ssl_cert version %s\\n" "${version}"
 echo
 
 echo "------------------------------------------------------------------------------"
