@@ -16,7 +16,8 @@ fi
 
 # list all the command line options
 
-for option in $( grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//' ) ; do
+# shellcheck disable=SC2013
+for option in $( grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//' ); do
 
     case "${option}" in
         '|'|'--'|'-*')
@@ -60,7 +61,7 @@ done
 
 # check if the option descriptions are present in all the files
 
-while read line; do
+while read -r line; do
 
     option=$( echo "${line}" | sed 's/;.*//' )
     description=$( echo "${line}" | sed 's/[^;]*;//' )
@@ -72,6 +73,7 @@ while read line; do
 
     if ! grep -q -- "${description}" check_ssl_cert.1 ; then
         # check for automatically generated options
+        # shellcheck disable=SC2016
         if ! echo "${description}" | grep -q '${' ; then
             echo "Error: the description of option '${option}' '${description}' is not present in check_ssl_cert.1"
             ERROR=1
@@ -80,6 +82,7 @@ while read line; do
 
     if ! grep -q -- "${description}" README.md ; then
         # check for automatically generated options
+        # shellcheck disable=SC2016
         if ! echo "${description}" | grep -q '${' ; then
             echo "Error: the description of option '${option}' '${description}' is not present in README.md"
             ERROR=1

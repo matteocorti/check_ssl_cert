@@ -3,7 +3,7 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 
 # files to be included in the distribution
-DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1
+DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff
 
 # this year
 YEAR=`date +"%Y"`
@@ -12,7 +12,7 @@ YEAR=`date +"%Y"`
 FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh
 
 # shell scripts (to be checked with ShellCheck)
-SCRIPTS=check_ssl_cert test/*.sh
+SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
 
 XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
 
@@ -46,6 +46,7 @@ version_check:
 	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q -F "${VERSION}" NEWS.md
+	grep -q  "^version:\ ${VERSION}" CITATION.cff
 	echo "Version check: OK"
 
 # we check for tabs

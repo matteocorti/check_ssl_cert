@@ -9,7 +9,7 @@ versions=$( grep -c Version NEWS.md )
 version=$( head -n 1 VERSION )
 
 echo
-printf "\tcheck_ssl_cert version ${version}\n"
+printf "\tcheck_ssl_cert version %s\n" "${version}"
 echo
 
 echo "------------------------------------------------------------------------------"
@@ -44,7 +44,7 @@ git log --numstat --format="" | awk '{files += 1}{ins += $1}{del += $2} END{prin
 
 open_issues=$( gh issue list -L 1000 | wc -l )
 closed_issues=$( gh issue list -s closed -L 1000 | wc -l )
-open_bugs=$( gh issue list -L 1000 -l bug | grep -v 'No issue match' | wc -l )
+open_bugs=$( gh issue list -L 1000 -l bug | grep -v -c 'No issue match' )
 
 echo
 printf "Open issues:\\t\\t%'10d\\n" "${open_issues}"
