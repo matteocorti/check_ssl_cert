@@ -69,8 +69,20 @@ title: "check_ssl_cert"
 version: ${version}
 date-released: ${date}
 url: "https://github.com/matteocorti/check_ssl_cert"
+repository-code: "https://github.com/matteocorti/check_ssl_cert"
+keywords:
+  - "certificate"
+  - "openssl"
+  - "shell-script"
+  - " nagios-plugin"
+abstract: A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection.
 contact:
   - email: matteo@corti.li
     family-names: Corti
     given-names: Matteo
+type: software
+references:
+  - copyright: "© 2022 Matteo Corti"
+    type: generic
+license: GPL-3.0
 EOT
