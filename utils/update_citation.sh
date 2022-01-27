@@ -82,7 +82,7 @@ contact:
     given-names: Matteo
 type: software
 references:
-  - copyright: "© 2022 Matteo Corti"
+  - copyright: "(c) 2022 Matteo Corti"
     type: generic
 license: GPL-3.0
 EOT
