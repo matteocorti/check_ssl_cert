@@ -11,11 +11,11 @@ parse_name() {
     blanks=$( echo "${name}" | sed 's/[^ ]//g' | wc -m )
 
     if [ "${blanks}" -gt 2 ]; then
-        echo "- name: ${name}" >> CITATION.cff
+        printf -- "- name: %s\\n" "${name}" >> CITATION.cff
     else
         first=$( echo "${name}" | sed -e 's/\ .*//' )
         last=$( echo "${name}" | sed -e 's/[^ ]*\ //' )
-        echo "- family-names: \"${last}\"" >> CITATION.cff
+        printf -- "- family-names: \"%s\"\\n" "${last}" >> CITATION.cff
         echo "  given-names: \"${first}\"" >> CITATION.cff
     fi
 }
@@ -50,7 +50,7 @@ grep '[*] Many thanks to' AUTHORS.md |
             parse_name "${user}"
 
         else
-            echo "- name: ${user}" >> CITATION.cff
+            printf -- "- name: %s\\n" "${user}" >> CITATION.cff
         fi
 
         echo "  website: ${url}" >> CITATION.cff
