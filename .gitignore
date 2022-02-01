@@ -5,3 +5,4 @@ check_ssl_cert-**
 **.error
 \#**
 .#**
+.DS_Store
