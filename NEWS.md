@@ -1,3 +1,4 @@
+  * adding the reason of the timeout to the error message
 * 2022-01-13 Version 2.19.0
   * ```--file``` now accepts URIs (e.g., http://, https://, ftp://, file://, ...)
   * Added input validation for integers and floats

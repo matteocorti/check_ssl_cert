@@ -1,2 +1,1 @@
- * ```--file``` now accepts URIs (e.g., http://, https://, ftp://, file://, ...)
- * Added input validation for integers and floats
+ * adding the reason of the timeout to the error message

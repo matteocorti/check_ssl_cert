@@ -1,3 +1,7 @@
+2022-02-01  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (exec_with_timeout): adding the reason of the timeout to the error message
+
 2022-01-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_integer): Added input validation for integers and floats

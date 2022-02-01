@@ -1277,6 +1277,7 @@ extract_cert_attribute() {
 #   $1 command
 #   $2 where to put the stdout
 #   $3 where to put the stderr
+# if ${TIMEOUT_REASON} is set, it is added to the error message
 # Returns 1 if timed out 0 otherwise
 exec_with_timeout() {
 
@@ -1293,6 +1294,11 @@ exec_with_timeout() {
     ERRFILE=/dev/null
     if [ -n "$3" ]; then
         ERRFILE=$3
+    fi
+
+    if [ -n "${TIMEOUT_REASON}" ]; then
+        # add a blank before the reason in parenthesis
+        TIMEOUT_REASON=" (${TIMEOUT_REASON})"
     fi
 
     start_time=$(date +%s)
@@ -1317,7 +1323,7 @@ exec_with_timeout() {
         # because of the execution in the background we get a 137 for a timeout
         if [ "${RET}" -eq 137 ] || [ "${RET}" -eq 124 ]; then
             prepend_critical_message "Timeout after ${time} seconds"
-            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
+            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds${TIMEOUT_REASON}"
         elif [ "${RET}" -eq 125 ]; then
             prepend_critical_message "execution of ${command} failed"
         elif [ "${RET}" -eq 126 ]; then
@@ -1374,7 +1380,7 @@ EOT
 
         if [ "${RET}" -eq "${TIMEOUT_ERROR_CODE}" ]; then
             prepend_critical_message "Timeout after ${time} seconds"
-            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds"
+            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds${TIMEOUT_REASON}"
         fi
 
         end_time=$(date +%s)
@@ -1456,6 +1462,7 @@ check_crl() {
 
         debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
 
+        TIMEOUT_REASON="fetching CRL"
         if [ -n "${CURL_USER_AGENT}" ]; then
             exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
         else
@@ -1573,6 +1580,7 @@ check_ocsp() {
 
                 debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
 
+                TIMEOUT_REASON="OCSP: fetching issuer ${ELEMENT_ISSUER_URI}"
                 if [ -n "${CURL_USER_AGENT}" ]; then
                     exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 else
@@ -2055,6 +2063,8 @@ fetch_certificate() {
     fi
 
     debuglog "fetch_certificate: PROTOCOL = ${PROTOCOL}"
+
+    TIMEOUT_REASON="fetching certificate"
 
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; then
@@ -3536,6 +3546,7 @@ main() {
 
             debuglog "Fetching ${FILE_URI} to ${FILE}"
 
+            TIMEOUT_REASON="fetching certificate file"
             if [ -n "${CURL_USER_AGENT}" ]; then
                 exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
             else
@@ -4346,6 +4357,7 @@ main() {
 
             # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
+            TIMEOUT_REASON="checking TLS renegotiation"
             case "${PROTOCOL}" in
             pop3 | ftp | smtp | irc | ldap | imap | postgres | sieve | xmpp | xmpp-server | mysql)
                 exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
@@ -4995,6 +5007,7 @@ main() {
         NMAP_ERR=${TEMPFILE}
 
         # -Pn is needed even if we specify a port
+        TIMEOUT_REASON="checking ciphers"
         exec_with_timeout "${NMAP_BIN} -Pn --script ssl-enum-ciphers ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
         if [ "${DEBUG}" -ge 1 ]; then
