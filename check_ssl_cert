@@ -3158,12 +3158,15 @@ main() {
     SCT="1" # enabled by default
     SKIP_ELEMENT=""
     SNI=""
-    TIMEOUT="120"
     VERBOSE="0"
     WARNING_DAYS=20
     WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
     XMPPHOST=""
     XMPPPORT="5222"
+
+    if [ -z "${TIMEOUT}" ]; then
+        TIMEOUT="120"
+    fi
 
     # after 2020-09-01 we could set the default to 398 days because of Apple
     # https://support.apple.com/en-us/HT211025

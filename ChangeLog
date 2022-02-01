@@ -1,6 +1,7 @@
 2022-02-01  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (exec_with_timeout): adding the reason of the timeout to the error message
+        * check_ssl_cert (main): do not set the default timeout if ${TIMEOUT} is already set
 
 2022-01-13  Matteo Corti  <matteo@corti.li>
 
