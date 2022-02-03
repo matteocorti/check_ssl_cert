@@ -22,24 +22,24 @@ jobs:
           - distro: 'fedora:33'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
           - distro: 'fedora:34'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
           - distro: 'fedora:35'
             pre: >-
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
           - distro: 'centos:7'
             pre: >-
-              yum install -y nmap curl sudo perl make bzip2 file openssl perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build openssh-clients bc &&
+              yum install -y nmap curl sudo perl make bzip2 file openssl perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build openssh-clients b bash-completionc &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
           - distro: 'centos:8'
             pre: >-
               sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&
               sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&
-              dnf install -y nmap curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion &&
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
