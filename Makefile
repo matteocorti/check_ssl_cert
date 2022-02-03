@@ -3,7 +3,7 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 
 # files to be included in the distribution
-DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff
+DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff check_ssl_cert.completion
 
 # this year
 YEAR=`date +"%Y"`
@@ -38,12 +38,14 @@ else
 	mkdir -p ${MANDIR}/man1
 	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
 endif
+ifdef COMPLETIONDIR
+	mkdir -p $(COMPLETIONDIR)
+	install -m 644 check_ssl_cert.completion $(COMPLETIONDIR)/check_ssl_cert
+endif
 
 COMPLETIONS_DIR := $(shell pkg-config --variable=completionsdir bash-completion)
 install_bash_completion:
-ifndef COMPLETIONS_DIR
-	echo "Cannot detect the bash-completion completions dir"
-else
+ifdef COMPLETIONS_DIR
 	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
 endif
 

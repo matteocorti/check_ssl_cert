@@ -1,5 +1,5 @@
 %define version          2.20.0
-%define release          0
+%define release          1
 %define sourcename       check_ssl_cert
 %define packagename      nagios-plugins-check_ssl_cert
 %define nagiospluginsdir %{_libdir}/nagios/plugins
@@ -7,10 +7,13 @@
 # No binaries in this package
 %define debug_package %{nil}
 
+%define completions_dir "%( pkg-config --variable=completionsdir bash-completion )"
+
 Summary:   A Nagios plugin to check X.509 certificates
 Name:      %{packagename}
 Version:   %{version}
-Obsoletes: check_ssl_cert
+# any version
+Obsoletes: check_ssl_cert <= 100
 Release:   %{release}%{?dist}
 License:   GPLv3+
 Packager:  Matteo Corti <matteo@corti.li>
@@ -29,8 +32,9 @@ A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connect
 
 %build
 
+
 %install
-make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} install
+make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} COMPLETIONDIR=${RPM_BUILD_ROOT}%{completions_dir} install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -40,12 +44,18 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.md ChangeLog NEWS.md README.md COPYING.md VERSION COPYRIGHT.md
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 %{_mandir}/man1/%{sourcename}.1*
+%if %{completions_dir}
+%{completions_dir}
+%endif
 
 %changelog
+* Thu Feb   3 2022 Matteo Corti <matteo@corti.li> - 2.20.0-1
+- Packaged the bash completion script
+
 * Thu Feb   3 2022 Matteo Corti <matteo@corti.li> - 2.20.0-0
 - Updated to 2.20.0
 
-* Wed Jan  13 2022 Matteo Corti <matteo@corti.li> - 2.19.0-0
+* Thu Jan  13 2022 Matteo Corti <matteo@corti.li> - 2.19.0-0
 - Updated to 2.19.0
 
 * Wed Jan  12 2022 Matteo Corti <matteo@corti.li> - 2.18.0-0
@@ -117,7 +127,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Sep   1 2021 Matteo Corti <matteo@corti.li> - 2.4.3-0
 - Updated to 2.4.3
 
-* Thu Aug  27 2021 Matteo Corti <matteo@corti.li> - 2.4.2-0
+* Fri Aug  27 2021 Matteo Corti <matteo@corti.li> - 2.4.2-0
 - Updated to 2.4.2
 
 * Thu Aug  19 2021 Matteo Corti <matteo@corti.li> - 2.4.1-0
@@ -174,7 +184,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Apr   7 2021 Matteo Corti <matteo@corti.li> - 2.0.1-0
 - Updated to 2.0.1
 
-* Mon Apr   1 2021 Matteo Corti <matteo@corti.li> - 2.0.0-0
+* Thu Apr   1 2021 Matteo Corti <matteo@corti.li> - 2.0.0-0
 - Updated to 2.0.0
 
 * Mon Mar  29 2021 Matteo Corti <matteo@corti.li> - 1.147.0-0
