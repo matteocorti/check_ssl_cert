@@ -39,6 +39,14 @@ else
 	install -m 644 ${PLUGIN}.1 ${MANDIR}/man1/
 endif
 
+COMPLETIONS_DIR := $(shell pkg-config --variable=completionsdir bash-completion)
+install_bash_completion:
+ifndef COMPLETIONS_DIR
+	echo "Cannot detect the bash-completion completions dir"
+else
+	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
+endif
+
 # checks if the verison is updated in all the files
 version_check:
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
