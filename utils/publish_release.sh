@@ -8,8 +8,8 @@ echo
 
 echo 'Checking release date'
 
-MONTH_YEAR=$( date +"%B, %Y" )
-YEAR=$( date +"%Y" )
+MONTH_YEAR=$(date +"%B, %Y")
+YEAR=$(date +"%Y")
 
 if ! grep -q "${MONTH_YEAR}" check_ssl_cert.1; then
     echo "Please update the date in check_ssl_cert.1"

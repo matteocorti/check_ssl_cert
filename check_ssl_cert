@@ -579,7 +579,7 @@ hours_until() {
 
         target_date=$(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s)
         now=$(${DATEBIN} +%s)
-        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
+        HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
 
         ;;
 
@@ -600,7 +600,7 @@ hours_until() {
 
             target_date=$(${DATEBIN} -j "${CONVERTED_DATE}" +%s)
             now=$(${DATEBIN} +%s)
-            HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
+            HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
 
             debuglog "hours computed with ${DCONV_BIN}: ${HOURS_UNTIL}"
 
@@ -615,7 +615,7 @@ hours_until() {
 
             target_date=$(${DATEBIN} -j +%s "${CONVERTED_DATE}")
             now=$(${DATEBIN} +%s)
-            HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
+            HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
 
         else
             unknown "Unknown date(1) input format"
@@ -629,12 +629,12 @@ hours_until() {
         verboselog "Warning: BusyBox date does not support time zones. Using ${BUSYBOX_DATE} in the current zone instead of ${DATE}"
         target_date=$(${DATEBIN} -d "${BUSYBOX_DATE}" +%s)
         now=$(${DATEBIN} +%s)
-        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
+        HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
         ;;
     "GNU")
         target_date=$(${DATEBIN} -d "${DATE}" +%s)
         now=$(${DATEBIN} +%s)
-        HOURS_UNTIL=$( compute "(${target_date}-${now})/3600" )
+        HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
         ;;
     "PERL")
         # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
@@ -1082,8 +1082,8 @@ unknown() {
 # Returns the boolean result of the comparison
 compare() {
 
-    lhv=$1;
-    op=$2;
+    lhv=$1
+    op=$2
     rhv=$3
 
     debuglog "Executing comparison '${lhv} ${op} ${rhv}'"
@@ -1107,7 +1107,7 @@ compare() {
 compute() {
     expression="$1"
     debuglog "Computing '${expression}'"
-    result=$( echo "scale=${SCALE};${expression}"|"${BCBIN}" 2>&1 )
+    result=$(echo "scale=${SCALE};${expression}" | "${BCBIN}" 2>&1)
     echo "${result}"
 
 }
@@ -1120,7 +1120,7 @@ compute() {
 check_integer() {
     value=$1
     message=$2
-    if ! echo "$1" | grep -q '^[0-9][0-9]*$' ; then
+    if ! echo "$1" | grep -q '^[0-9][0-9]*$'; then
         unknown "${message}"
     fi
 }
@@ -1133,7 +1133,7 @@ check_integer() {
 check_float() {
     value=$1
     message=$2
-    if ! echo "$1" | grep -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$' ; then
+    if ! echo "$1" | grep -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$'; then
         unknown "${message}"
     fi
 }
@@ -1831,8 +1831,8 @@ check_cert_end_date() {
 
     # TO DO: flaoting point
 
-    ELEM_DAYS_VALID=$( compute "${HOURS_UNTIL}/24" )
-    ELEM_SECONDS_VALID=$( compute "${HOURS_UNTIL} * 3600" )
+    ELEM_DAYS_VALID=$(compute "${HOURS_UNTIL}/24")
+    ELEM_SECONDS_VALID=$(compute "${HOURS_UNTIL} * 3600")
 
     add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
 
@@ -3510,7 +3510,7 @@ main() {
     if [ -n "${FILE}" ]; then
         # is $FILE a URI? We detect URIs with an "authority" part, since locat paths are specified directly
         # see https://en.wikipedia.org/wiki/Uniform_Resource_Identifier for the syntax
-        FILE_URI=$( echo "${FILE}" | grep '^[a-z][a-z+.-]*://' )
+        FILE_URI=$(echo "${FILE}" | grep '^[a-z][a-z+.-]*://')
         debuglog "${FILE} is an URI with an authority"
     fi
 
@@ -3520,7 +3520,7 @@ main() {
             [ -n "${OCSP}" ] ||
             [ -n "${CRL}" ] ||
             [ -n "${IGNORE_CONNECTION_STATE}" ] ||
-            [ -n "${FILE_URI}" ] ; then
+            [ -n "${FILE_URI}" ]; then
             debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}"
             debuglog "curl binary not specified"
 
@@ -3594,13 +3594,13 @@ main() {
             unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
-        if echo "${WARNING_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ] ; then
+        if echo "${WARNING_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ]; then
             SCALE=2
         fi
 
     fi
 
-    if [ -z "${SCALE}" ] ; then
+    if [ -z "${SCALE}" ]; then
         # --precision not specified and no floating point critical or warnings --> integer computations
         SCALE=0
     fi
@@ -5363,7 +5363,7 @@ ${WARNING}"
             DAYS_VALID=" (expires tomorrow)"
         elif compare "${DAYS_VALID}" '>=' 0; then
             DAYS_VALID=" (expires today)"
-        elif compare  "${DAYS_VALID}" '>=' '-1'; then
+        elif compare "${DAYS_VALID}" '>=' '-1'; then
             DAYS_VALID=" (expired yesterday)"
         else
             DAYS_VALID=" (expired ${DAYS_VALID} days ago)"

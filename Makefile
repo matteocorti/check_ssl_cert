@@ -9,7 +9,7 @@ DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md
 YEAR=`date +"%Y"`
 
 # file to be checked for formatting
-FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh
+FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
 
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
@@ -74,6 +74,7 @@ else
 # -s simplify
 # -i 4 indent with 4 spaces
 	shfmt -p -w -s -i 4 $(SCRIPTS)
+	shfmt -ln bash -w -s -i 4 check_ssl_cert.completion
 endif
 
 clean:
