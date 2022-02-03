@@ -34,7 +34,12 @@ A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connect
 
 
 %install
+
+%if %{completions_dir}
 make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} COMPLETIONDIR=${RPM_BUILD_ROOT}%{completions_dir} install
+%else
+make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} install
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
