@@ -27,10 +27,6 @@ if ! grep -q "Copyright (c) 2007-${YEAR} Matteo Corti <matteo@corti.li>" check_s
     echo "Please update the copyright year in check_ssl_cert"
     exit 1
 fi
-if ! grep -q "(c) 2022 Matteo Corti" CITATION.cff; then
-    echo "Please update the copyright year in CITATION.cff"
-    exit 1
-fi
 echo "Copyright year check: OK"
 
 echo
