@@ -418,7 +418,7 @@ w
 * Mon Jul 30 2018 Matteo Corti <matteo@corti.li> - 1.71.0-0
 - Updated to 1.71.0
 
-* Sat Jun 28 2018 Matteo Corti <matteo@corti.li> - 1.70.0-0
+* Thu Jun 28 2018 Matteo Corti <matteo@corti.li> - 1.70.0-0
 - Updated to 1.70.0
 
 * Mon Jun 25 2018 Matteo Corti <matteo@corti.li> - 1.69.0-0
