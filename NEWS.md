@@ -1,3 +1,4 @@
+* 2022-02-03 Version 2.20.0
   * bash completion
   * adding the reason of the timeout to the error message
 * 2022-01-13 Version 2.19.0
