@@ -195,7 +195,7 @@ jobs:
   rpm-nocompletion:
     # The host should always be linux
     runs-on: ubuntu-latest
-    name: Running RPM tests on ${{ matrix.distro }}
+    name: Running RPM tests without bash completion on ${{ matrix.distro }}
     strategy:
       fail-fast: false
       matrix:
