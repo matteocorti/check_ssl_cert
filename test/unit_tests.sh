@@ -721,7 +721,7 @@ testBadSSLSHA256() {
 }
 
 testBadSSLEcc256() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --ingore-exp
+    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
