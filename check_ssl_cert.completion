@@ -20,23 +20,23 @@ _check_ssl_cert() {
 
     # options with arguments
     case "${prev}" in
-    # to do short versions
-    # options with files as argument
-    -f | --file | -C | --clientcert | --curl-bin | --date | --debug-file | --dig-bin | --file-bin | --issuer-cert-cache | --nmap-bin | --openssl | --rootcert-dir | --rootcert-file | --temp | -K | --clientkey | -r | --rootcert)
-        _filedir
-        ;;
-    # grades
-    --check-ciphers | --check-ssl-labs-warn)
-        COMPREPLY=($(compgen -W "A B C D E F" -- ${cur}))
-        ;;
-    --dane)
-        COMPREPLY=($(compgen -W "211 301 302 311 312" -- ${cur}))
-        ;;
-    --protocol | -P)
-        COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp imap irc ldap pop3 postgres sieve smtp:" -- ${cur}))
-        ;;
-    *) ;;
-
+        # to do short versions
+        # options with files as argument
+        -f|--file|-C|--clientcert|--curl-bin|--date|--debug-file|--dig-bin|--file-bin|--issuer-cert-cache|--nmap-bin|--openssl|--rootcert-dir|--rootcert-file|--temp|-K|--clientkey|-r|--rootcert)
+            _filedir
+            ;;
+        # grades
+        --check-ciphers|--check-ssl-labs-warn)
+            COMPREPLY=($(compgen -W "A B C D E F" -- ${cur}))
+            ;;
+        --dane)
+            COMPREPLY=($(compgen -W "211 301 302 311 312" -- ${cur}))
+            ;;
+        --protocol|-P)
+            COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp imap irc ldap pop3 postgres sieve smtp:" -- ${cur}))
+            ;;
+        *)
+            ;;
     esac
 
 }
