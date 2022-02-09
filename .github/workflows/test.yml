@@ -191,3 +191,57 @@ jobs:
               /bin/sh -c 'sh ./prep-cmd.sh \
               && uname -a \
               && make rpm'
+
+  rpm-nocompletion:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Running RPM tests on ${{ matrix.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - 'centos:7'
+          - 'centos:8'
+          - 'fedora:32'
+          - 'fedora:33'
+          - 'fedora:34'
+          - 'fedora:35'
+        include:
+          - distro: 'fedora:32'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:33'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:34'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:35'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'centos:7'
+            pre: >-
+              yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build
+          - distro: 'centos:8'
+            pre: >-
+              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&
+              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&
+              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+    steps:
+
+      - name: Git clone repository
+        uses: actions/checkout@v2
+
+      - name: Build the RPM on ${{ matrix.distro }}
+        env:
+          PRE: ${{ matrix.pre }}
+        run: |
+          echo $PRE > ./prep-cmd.sh
+          docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
+              /bin/sh -c 'sh ./prep-cmd.sh \
+              && uname -a \
+              && make rpm'
