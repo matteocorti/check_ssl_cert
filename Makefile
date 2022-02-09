@@ -52,7 +52,7 @@ endif
 # checks if the verison is updated in all the files
 version_check:
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
-	grep -q "^%define\ version\ *$(VERSION)" $(PLUGIN).spec
+	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec
 	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q -F "${VERSION}" NEWS.md

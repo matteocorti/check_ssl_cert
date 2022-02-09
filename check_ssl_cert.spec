@@ -1,13 +1,13 @@
-%define version          2.20.0
-%define release          1
-%define sourcename       check_ssl_cert
-%define packagename      nagios-plugins-check_ssl_cert
-%define nagiospluginsdir %{_libdir}/nagios/plugins
+%global version          2.20.0
+%global release          2
+%global sourcename       check_ssl_cert
+%global packagename      nagios-plugins-check_ssl_cert
+%global nagiospluginsdir %{_libdir}/nagios/plugins
 
 # No binaries in this package
-%define debug_package %{nil}
+%global debug_package %{nil}
 
-%define completions_dir "%( pkg-config --variable=completionsdir bash-completion )"
+%global completions_dir %( pkg-config --variable=completionsdir bash-completion )
 
 Summary:   A Nagios plugin to check X.509 certificates
 Name:      %{packagename}
@@ -35,7 +35,7 @@ A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connect
 
 %install
 
-%if %{completions_dir}
+%if "%{completions_dir}"
 make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} COMPLETIONDIR=${RPM_BUILD_ROOT}%{completions_dir} install
 %else
 make DESTDIR=${RPM_BUILD_ROOT}%{nagiospluginsdir} MANDIR=${RPM_BUILD_ROOT}%{_mandir} install
@@ -49,7 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.md ChangeLog NEWS.md README.md COPYING.md VERSION COPYRIGHT.md
 %attr(0755, root, root) %{nagiospluginsdir}/check_ssl_cert
 %{_mandir}/man1/%{sourcename}.1*
-%if %{completions_dir}
+%if "%{completions_dir}"
 %{completions_dir}
 %endif
 
