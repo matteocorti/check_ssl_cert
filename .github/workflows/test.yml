@@ -40,8 +40,9 @@ jobs:
         run:  |
           uname -a \
           && make test \
-          && bash -c "source ./check_ssl_cert.completion && complete | grep -q check_ssl_cert" \
+          && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && make dist \
+          && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi
 
 
@@ -138,8 +139,9 @@ jobs:
               && cpanm --sudo install Date::Parse \
               && uname -a \
               && make test \
-              && bash -c "source ./check_ssl_cert.completion && complete | grep -q check_ssl_cert" \
+              && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && make dist \
+              && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi'
 
   rpm:
