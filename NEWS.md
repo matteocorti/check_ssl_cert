@@ -1,3 +1,4 @@
+  * The checked host and port are displayed in the output
 * 2022-02-03 Version 2.20.0
   * bash completion
   * adding the reason of the timeout to the error message

@@ -5399,7 +5399,7 @@ ${WARNING}"
         if [ -n "${TERSE}" ]; then
             FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
         else
-            FORMAT="%SHORTNAME% OK - %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+            FORMAT="%SHORTNAME% OK - %HOST%:%PORT% %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
         fi
     fi
 
@@ -5426,6 +5426,8 @@ ${WARNING}"
 
     if [ -z "${PROMETHEUS}" ]; then
 
+        HOST_TMP="$(var_for_sed HOST "${HOST}")"
+        PORT_TMP="$(var_for_sed PORT "${PORT}")"
         CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
         CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
         CN_TMP="$(var_for_sed CN "${CN}")"
@@ -5439,6 +5441,8 @@ ${WARNING}"
         SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
 
         echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
+            -e "${PORT_TMP}" \
+            -e "${HOST_TMP}" \
             -e "${CA_ISSUER_MATCHED_TMP}" \
             -e "${CHECKEDNAMES_TMP}" \
             -e "${CN_TMP}" \

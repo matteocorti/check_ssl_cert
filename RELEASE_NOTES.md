@@ -1,2 +1,1 @@
- * adding the reason of the timeout to the error message
- * bash completion
+ * The checked host and port are displayed in the output
