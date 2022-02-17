@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install shellcheck
-        run: brew install shellcheck shunit2
+        run: brew install shellcheck shunit2 bash-completion
 
       - name: install cpanm and Date::Parse
         uses: perl-actions/install-with-cpanm@v1
@@ -40,7 +40,10 @@ jobs:
         run:  |
           uname -a \
           && make test \
-          && make dist
+          && bash -c "source ./check_ssl_cert.completion && complete | grep -q check_ssl_cert" \
+          && make dist \
+          && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi
+
 
   ##############################################################################
   # Linuxes
