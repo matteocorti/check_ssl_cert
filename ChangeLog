@@ -1,6 +1,7 @@
 2022-02-17  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): write the host and the port in the output
+        * check_ssl_cert (usage): list of possible variables for the --format option
 
 2022-02-03  Matteo Corti  <matteo@corti.li>
 

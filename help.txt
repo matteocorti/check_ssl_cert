@@ -65,8 +65,8 @@
 --force-perl-date;force the usage of Perl for date
 --force-perl-date;computations
 --format FORMAT;format output template on success, for
---format FORMAT;example: %SHORTNAME% OK %CN% from
---format FORMAT;%CA_ISSUER_MATCHED%
+--format FORMAT;example: '%SHORTNAME% OK %CN% from
+--format FORMAT;%CA_ISSUER_MATCHED%'
 -h,--help,-?;this help message
 --http-use-get;use GET instead of HEAD (default) for the
 --http-use-get;HTTP related checks

@@ -123,7 +123,35 @@ force the usage of dconv for date computations
 force the usage of Perl for date computations
 .TP
 .BR "   --format" " FORMAT"
-format output template on success, for example: %SHORTNAME% OK %CN% from %CA_ISSUER_MATCHED%
+format output template on success, for example: '%SHORTNAME% OK %CN% from %CA_ISSUER_MATCHED%'
+.br
+list of possible variables:
+.br
+- %HOST%
+.br
+- %PORT%
+.br
+- %CA_ISSUER_MATCHED%
+.br
+- %CHECKEDNAMES%
+.br
+- %CN%
+.br
+- %DATE%
+.br
+- %DAYS_VALID%
+.br
+- %DYSPLAY_CN%
+.br
+- %OPENSSL_COMMAND%
+.br
+- %SELFSIGNEDCERT%
+.br
+- %SHORTNAME%
+.br
+- %OCSP_EXPIRES_IN_HOURS%
+.br
+- %SSL_LABS_HOST_GRADE%
 .TP
 .BR "-h,--help,-?"
 this help message

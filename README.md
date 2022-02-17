@@ -84,8 +84,23 @@ Options:
       --force-perl-date            force the usage of Perl for date
                                    computations
       --format FORMAT              format output template on success, for
-                                   example: %SHORTNAME% OK %CN% from
-                                   %CA_ISSUER_MATCHED%
+                                   example: '%SHORTNAME% OK %CN% from
+                                   %CA_ISSUER_MATCHED%'
+                                   list of possible variables:
+                                   - %HOST%
+                                   - %PORT%
+                                   - %CA_ISSUER_MATCHED%
+                                   - %CHECKEDNAMES%
+                                   - %CN%
+                                   - %DATE%
+                                   - %DAYS_VALID%
+                                   - %DYSPLAY_CN%
+                                   - %OPENSSL_COMMAND%
+                                   - %SELFSIGNEDCERT%
+                                   - %SHORTNAME%
+                                   - %OCSP_EXPIRES_IN_HOURS%
+                                   - %SSL_LABS_HOST_GRADE%
+
    -h,--help,-?                    this help message
       --http-use-get               use GET instead of HEAD (default) for the
                                    HTTP related checks
