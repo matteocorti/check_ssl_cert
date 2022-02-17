@@ -153,7 +153,6 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'centos:8'
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
@@ -178,11 +177,6 @@ jobs:
           - distro: 'centos:7'
             pre: >-
               yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build bash-completion
-          - distro: 'centos:8'
-            pre: >-
-              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&
-              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&
-              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
     steps:
 
       - name: Git clone repository
@@ -207,7 +201,6 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'centos:8'
           - 'fedora:32'
           - 'fedora:33'
           - 'fedora:34'
@@ -232,11 +225,6 @@ jobs:
           - distro: 'centos:7'
             pre: >-
               yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build
-          - distro: 'centos:8'
-            pre: >-
-              sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&
-              sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&
-              dnf install -y nmap curl sudo perl make bzip2 file openssl bind-utils rpm-build git
     steps:
 
       - name: Git clone repository
