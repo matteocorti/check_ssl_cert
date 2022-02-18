@@ -1,3 +1,7 @@
+2022-02-18  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert.completion (_check_ssl_cert): host completion
+
 2022-02-17  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): write the host and the port in the output

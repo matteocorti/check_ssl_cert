@@ -21,10 +21,13 @@ _check_ssl_cert() {
 
     # options with arguments
     case "${prev}" in
-        # to do short versions
         # options with files as argument
         -f|--file|-C|--clientcert|--curl-bin|--date|--debug-file|--dig-bin|--file-bin|--issuer-cert-cache|--nmap-bin|--openssl|--rootcert-dir|--rootcert-file|--temp|-K|--clientkey|-r|--rootcert)
             _filedir
+            ;;
+        # optios with hosts as argument
+        -H|--host|--resolve)
+            _known_hosts_real "${cur}"
             ;;
         # grades
         --check-ciphers|--check-ssl-labs-warn)
