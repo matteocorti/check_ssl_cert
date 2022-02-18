@@ -100,7 +100,6 @@ Options:
                                    - %SHORTNAME%
                                    - %OCSP_EXPIRES_IN_HOURS%
                                    - %SSL_LABS_HOST_GRADE%
-
    -h,--help,-?                    this help message
       --http-use-get               use GET instead of HEAD (default) for the
                                    HTTP related checks
