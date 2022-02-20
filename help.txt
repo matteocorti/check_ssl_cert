@@ -155,6 +155,7 @@
 -P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
 --proxy proxy;sets http_proxy and the s_client -proxy
 --proxy proxy;option
+-q,--quiet;do not produce any output
 --require-client-cert [list];the server must accept a client
 --require-client-cert [list];certificate. 'list' is an optional comma
 --require-client-cert [list];separated list of expected client

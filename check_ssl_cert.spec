@@ -1,5 +1,5 @@
-%global version          2.20.0
-%global release          2
+%global version          2.21.0
+%global release          0
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
 %global nagiospluginsdir %{_libdir}/nagios/plugins
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Feb  20 2022 Matteo Corti <matteo@corti.li> - 2.21.0-0
+- Updated to 2.21.0
+
 * Thu Feb   3 2022 Matteo Corti <matteo@corti.li> - 2.20.0-1
 - Packaged the bash completion script
 

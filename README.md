@@ -183,6 +183,7 @@ Options:
                                    openssl(1)
       --prometheus                 generates Prometheus/OpenMetrics output
       --proxy                      sets http_proxy and the s_client -proxy
+   -q,--quiet                      do not produce any output
    -r,--rootcert path              root certificate or directory to be used
                                    for certificate validation
       --require-client-cert [list] the server must accept a client

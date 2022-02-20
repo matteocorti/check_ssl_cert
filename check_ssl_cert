@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.20.0
+VERSION=2.21.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -268,6 +268,8 @@ usage() {
     echo "                                   openssl(1)"
     echo "      --prometheus                 generates Prometheus/OpenMetrics output"
     echo "      --proxy                      sets http_proxy and the s_client -proxy"
+    # Delimiter at 78 chars ############################################################
+    echo "   -q,--quiet                      do not produce any output"
     # Delimiter at 78 chars ############################################################
     echo "   -r,--rootcert path              root certificate or directory to be used"
     echo "                                   for certificate validation"
@@ -945,31 +947,35 @@ critical() {
     debuglog 'exiting with CRITICAL'
     debuglog "ALL_MSG = ${ALL_MSG}"
 
-    NUMBER_OF_ERRORS=$(printf '%b' "${ALL_MSG}" | wc -l)
+    if [ -z "${QUIET}" ] ; then
 
-    debuglog "number of errors = ${NUMBER_OF_ERRORS}"
+        NUMBER_OF_ERRORS=$(printf '%b' "${ALL_MSG}" | wc -l)
 
-    if [ -n "${NO_PERF}" ]; then
-        PERFORMANCE_DATA=
-    fi
+        debuglog "number of errors = ${NUMBER_OF_ERRORS}"
 
-    if [ -z "${PROMETHEUS}" ]; then
-
-        if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
-            printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
-        else
-            printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
+        if [ -n "${NO_PERF}" ]; then
+            PERFORMANCE_DATA=
         fi
 
-    else
+        if [ -z "${PROMETHEUS}" ]; then
 
-        if [ -n "${CN}" ]; then
-            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 2"
+            if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
+                printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+            else
+                printf '%s%s \n' "$1" "${PERFORMANCE_DATA}"
+            fi
+
         else
-            add_prometheus_status_output_line "cert_valid 2"
-        fi
 
-        prometheus_output
+            if [ -n "${CN}" ]; then
+                add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 2"
+            else
+                add_prometheus_status_output_line "cert_valid 2"
+            fi
+
+            prometheus_output
+
+        fi
 
     fi
 
@@ -1039,29 +1045,33 @@ warning() {
 
     remove_temporary_files
 
-    NUMBER_OF_ERRORS=$(printf '%b' "${ALL_MSG}" | wc -l)
+    if [ -z "${QUIET}" ]; then
 
-    if [ -n "${NO_PERF}" ]; then
-        PERFORMANCE_DATA=
-    fi
+        NUMBER_OF_ERRORS=$(printf '%b' "${ALL_MSG}" | wc -l)
 
-    if [ -z "${PROMETHEUS}" ]; then
-
-        if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
-            printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
-        else
-            printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
+        if [ -n "${NO_PERF}" ]; then
+            PERFORMANCE_DATA=
         fi
 
-    else
+        if [ -z "${PROMETHEUS}" ]; then
 
-        if [ -n "${CN}" ]; then
-            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 1"
+            if [ "${NUMBER_OF_ERRORS}" -ge 2 ] && [ "${VERBOSE}" -gt 0 ]; then
+                printf '%s%s\nError(s):%b\n' "$1" "${PERFORMANCE_DATA}" "${ALL_MSG}"
+            else
+                printf '%s %s\n' "$1" "${PERFORMANCE_DATA}"
+            fi
+
         else
-            add_prometheus_status_output_line "cert_valid 1"
-        fi
 
-        prometheus_output
+            if [ -n "${CN}" ]; then
+                add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 1"
+            else
+                add_prometheus_status_output_line "cert_valid 1"
+            fi
+
+            prometheus_output
+
+        fi
 
     fi
 
@@ -1073,17 +1083,20 @@ warning() {
 # Params
 #   $1 message
 unknown() {
-    if [ -n "${HOST_NAME}" ]; then
-        if [ -n "${SNI}" ]; then
-            tmp=" ${SNI}"
-        elif [ -n "${FILE}" ]; then
-            tmp=" ${FILE}"
-        else
-            tmp=" ${HOST_NAME}"
+
+    if [ -z "${QUIET}" ] ; then
+        if [ -n "${HOST_NAME}" ]; then
+            if [ -n "${SNI}" ]; then
+                tmp=" ${SNI}"
+            elif [ -n "${FILE}" ]; then
+                tmp=" ${FILE}"
+            else
+                tmp=" ${HOST_NAME}"
+            fi
         fi
+        remove_temporary_files
+        printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     fi
-    remove_temporary_files
-    printf '%s UNKNOWN%s: %s\n' "${SHORTNAME}" "${tmp}" "$1"
     exit "${STATUS_UNKNOWN}"
 }
 
@@ -2618,6 +2631,10 @@ parse_command_line_options() {
             ;;
         --prometheus)
             PROMETHEUS=1
+            shift
+            ;;
+        -q | --quiet)
+            QUIET=1
             shift
             ;;
         --rsa)
@@ -5360,119 +5377,123 @@ ${WARNING}"
     ################################################################################
     # If we get this far, assume all is well. :)
 
-    # If --altnames was specified or if the certificate is wildcard,
-    # then we show the specified CN in addition to the certificate CN
-    CHECKEDNAMES=""
-    if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
-        CHECKEDNAMES="(${COMMON_NAME}) "
-    elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
-        CHECKEDNAMES="(${COMMON_NAME}) "
-    fi
+    if [ -z "${QUIET}" ] ; then
 
-    if [ -n "${DAYS_VALID}" ]; then
-        # nicer formatting
-        if compare "${DAYS_VALID}" '>=' 2; then
-            DAYS_VALID=" (expires in ${DAYS_VALID} days)"
-        elif compare "${DAYS_VALID}" '>=' 1; then
-            DAYS_VALID=" (expires tomorrow)"
-        elif compare "${DAYS_VALID}" '>=' 0; then
-            DAYS_VALID=" (expires today)"
-        elif compare "${DAYS_VALID}" '>=' '-1'; then
-            DAYS_VALID=" (expired yesterday)"
-        else
-            DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
+        # If --altnames was specified or if the certificate is wildcard,
+        # then we show the specified CN in addition to the certificate CN
+        CHECKEDNAMES=""
+        if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
+            CHECKEDNAMES="(${COMMON_NAME}) "
+        elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
+            CHECKEDNAMES="(${COMMON_NAME}) "
         fi
-    fi
 
-    if [ -n "${OCSP_EXPIRES_IN_HOURS}" ]; then
-        # nicer formatting
-        if compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 2; then
-            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours)"
-        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 1; then
-            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in one hour)"
-        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 0; then
-            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires now)"
-        elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' '-1'; then
-            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired one hour ago)"
-        else
-            OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired ${OCSP_EXPIRES_IN_HOURS} hours ago)"
+        if [ -n "${DAYS_VALID}" ]; then
+            # nicer formatting
+            if compare "${DAYS_VALID}" '>=' 2; then
+                DAYS_VALID=" (expires in ${DAYS_VALID} days)"
+            elif compare "${DAYS_VALID}" '>=' 1; then
+                DAYS_VALID=" (expires tomorrow)"
+            elif compare "${DAYS_VALID}" '>=' 0; then
+                DAYS_VALID=" (expires today)"
+            elif compare "${DAYS_VALID}" '>=' '-1'; then
+                DAYS_VALID=" (expired yesterday)"
+            else
+                DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
+            fi
         fi
-    fi
 
-    if [ -n "${SSL_LABS_HOST_GRADE}" ]; then
-        SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
-    fi
-
-    if [ -z "${CN}" ]; then
-        DISPLAY_CN=""
-    else
-        DISPLAY_CN="'${CN}' "
-    fi
-
-    if [ -z "${FORMAT}" ]; then
-        if [ -n "${TERSE}" ]; then
-            FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
-        else
-            FORMAT="%SHORTNAME% OK - %HOST%:%PORT% %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+        if [ -n "${OCSP_EXPIRES_IN_HOURS}" ]; then
+            # nicer formatting
+            if compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 2; then
+                OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours)"
+            elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 1; then
+                OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires in one hour)"
+            elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' 0; then
+                OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expires now)"
+            elif compare "${OCSP_EXPIRES_IN_HOURS}" '>=' '-1'; then
+                OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired one hour ago)"
+            else
+                OCSP_EXPIRES_IN_HOURS=" (OCSP stapling expired ${OCSP_EXPIRES_IN_HOURS} hours ago)"
+            fi
         fi
-    fi
 
-    # long output
-    if [ -z "${TERSE}" ]; then
-        EXTRA_OUTPUT="${LONG_OUTPUT}"
-    fi
-    # performance
-    if [ -z "${NO_PERF}" ]; then
-        EXTRA_OUTPUT="${EXTRA_OUTPUT}${PERFORMANCE_DATA}"
-    fi
+        if [ -n "${SSL_LABS_HOST_GRADE}" ]; then
+            SSL_LABS_HOST_GRADE=", SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
+        fi
 
-    debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
-    debuglog "output parameters: CHECKEDNAMES          = ${CHECKEDNAMES}"
-    debuglog "output parameters: CN                    = ${CN}"
-    debuglog "output parameters: DATE                  = ${DATE}"
-    debuglog "output parameters: DAYS_VALID            = ${DAYS_VALID}"
-    debuglog "output parameters: DYSPLAY_CN            = ${DISPLAY_CN}"
-    debuglog "output parameters: OPENSSL_COMMAND       = ${OPENSSL_COMMAND}"
-    debuglog "output parameters: SELFSIGNEDCERT        = ${SELFSIGNEDCERT}"
-    debuglog "output parameters: SHORTNAME             = ${SHORTNAME}"
-    debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
-    debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
+        if [ -z "${CN}" ]; then
+            DISPLAY_CN=""
+        else
+            DISPLAY_CN="'${CN}' "
+        fi
 
-    if [ -z "${PROMETHEUS}" ]; then
+        if [ -z "${FORMAT}" ]; then
+            if [ -n "${TERSE}" ]; then
+                FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
+            else
+                FORMAT="%SHORTNAME% OK - %HOST%:%PORT% %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+            fi
+        fi
 
-        HOST_TMP="$(var_for_sed HOST "${HOST}")"
-        PORT_TMP="$(var_for_sed PORT "${PORT}")"
-        CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
-        CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
-        CN_TMP="$(var_for_sed CN "${CN}")"
-        DATE_TMP="$(var_for_sed DATE "${DATE}")"
-        DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
-        DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
-        OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
-        SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
-        SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
-        OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
-        SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+        # long output
+        if [ -z "${TERSE}" ]; then
+            EXTRA_OUTPUT="${LONG_OUTPUT}"
+        fi
+        # performance
+        if [ -z "${NO_PERF}" ]; then
+            EXTRA_OUTPUT="${EXTRA_OUTPUT}${PERFORMANCE_DATA}"
+        fi
 
-        echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-            -e "${PORT_TMP}" \
-            -e "${HOST_TMP}" \
-            -e "${CA_ISSUER_MATCHED_TMP}" \
-            -e "${CHECKEDNAMES_TMP}" \
-            -e "${CN_TMP}" \
-            -e "${DATE_TMP}" \
-            -e "${DAYS_VALID_TMP}" \
-            -e "${DISPLAY_CN_TMP}" \
-            -e "${OPENSSL_COMMAND_TMP}" \
-            -e "${SELFSIGNEDCERT_TMP}" \
-            -e "${SHORTNAME_TMP}" \
-            -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
-            -e "${SSL_LABS_HOST_GRADE_TMP}"
+        debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
+        debuglog "output parameters: CHECKEDNAMES          = ${CHECKEDNAMES}"
+        debuglog "output parameters: CN                    = ${CN}"
+        debuglog "output parameters: DATE                  = ${DATE}"
+        debuglog "output parameters: DAYS_VALID            = ${DAYS_VALID}"
+        debuglog "output parameters: DYSPLAY_CN            = ${DISPLAY_CN}"
+        debuglog "output parameters: OPENSSL_COMMAND       = ${OPENSSL_COMMAND}"
+        debuglog "output parameters: SELFSIGNEDCERT        = ${SELFSIGNEDCERT}"
+        debuglog "output parameters: SHORTNAME             = ${SHORTNAME}"
+        debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
+        debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
 
-    else
+        if [ -z "${PROMETHEUS}" ]; then
 
-        add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 0"
-        prometheus_output
+            HOST_TMP="$(var_for_sed HOST "${HOST}")"
+            PORT_TMP="$(var_for_sed PORT "${PORT}")"
+            CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
+            CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
+            CN_TMP="$(var_for_sed CN "${CN}")"
+            DATE_TMP="$(var_for_sed DATE "${DATE}")"
+            DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
+            DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
+            OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
+            SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
+            SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
+            OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
+            SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+
+            echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
+                                                  -e "${PORT_TMP}" \
+                                                  -e "${HOST_TMP}" \
+                                                  -e "${CA_ISSUER_MATCHED_TMP}" \
+                                                  -e "${CHECKEDNAMES_TMP}" \
+                                                  -e "${CN_TMP}" \
+                                                  -e "${DATE_TMP}" \
+                                                  -e "${DAYS_VALID_TMP}" \
+                                                  -e "${DISPLAY_CN_TMP}" \
+                                                  -e "${OPENSSL_COMMAND_TMP}" \
+                                                  -e "${SELFSIGNEDCERT_TMP}" \
+                                                  -e "${SHORTNAME_TMP}" \
+                                                  -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
+                                                  -e "${SSL_LABS_HOST_GRADE_TMP}"
+
+        else
+
+            add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 0"
+            prometheus_output
+
+        fi
 
     fi
 
