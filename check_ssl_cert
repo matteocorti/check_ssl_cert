@@ -5432,7 +5432,7 @@ ${WARNING}"
             if [ -n "${TERSE}" ]; then
                 FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
             else
-                FORMAT="%SHORTNAME% OK - %HOST%:%PORT% %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+                FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
             fi
         fi
 
@@ -5443,6 +5443,11 @@ ${WARNING}"
         # performance
         if [ -z "${NO_PERF}" ]; then
             EXTRA_OUTPUT="${EXTRA_OUTPUT}${PERFORMANCE_DATA}"
+        fi
+
+        # default protocol
+        if [ -z "${PROTOCOL}" ]; then
+            PROTOCOL='https'
         fi
 
         debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
@@ -5456,6 +5461,7 @@ ${WARNING}"
         debuglog "output parameters: SHORTNAME             = ${SHORTNAME}"
         debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
         debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
+        debuglog "output parameters: PROTOCOL              = ${PROTOCOL}"
 
         if [ -z "${PROMETHEUS}" ]; then
 
@@ -5472,6 +5478,7 @@ ${WARNING}"
             SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
             OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
             SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+            PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
 
             echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
                                                   -e "${PORT_TMP}" \
@@ -5486,7 +5493,8 @@ ${WARNING}"
                                                   -e "${SELFSIGNEDCERT_TMP}" \
                                                   -e "${SHORTNAME_TMP}" \
                                                   -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
-                                                  -e "${SSL_LABS_HOST_GRADE_TMP}"
+                                                  -e "${SSL_LABS_HOST_GRADE_TMP}" \
+                                                  -e "${PROTOCOL_TMP}"
 
         else
 
