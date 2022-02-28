@@ -2160,7 +2160,7 @@ fetch_certificate() {
             create_temporary_file
             CONVERSION_ERROR=${TEMPFILE}
 
-            if echo "${FILE}" | grep -q -E '[.](p12|pfx)$'; then
+            if echo "${FILE}" | grep -q -E '[.](p12|pkcs12|pfx)$'; then
 
                 debuglog 'converting PKCS #12 to PEM'
 
