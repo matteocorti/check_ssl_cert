@@ -1,3 +1,7 @@
+2022-02-28  Peter Newmann  https://github.com/peternewman
+
+        * check_ssl_cert (fetch_certificate): Allow pkcs12 extension for PKCS #12 files
+
 2022-02-22  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): display the protocol in the output
