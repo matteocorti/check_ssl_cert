@@ -1,5 +1,7 @@
+* 2022-03-11 Version 2.22.0
   * The protocol is shown in the output
   * Processes files with .pkcs12 extension
+  * Display all the unmatched common names
 * 2022-02-20 Version 2.21.0
   * New option: --quiet
   * The checked host and port are displayed in the output

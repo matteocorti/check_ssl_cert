@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.21.0
+VERSION=2.22.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4791,11 +4791,13 @@ main() {
             # Check alternate names
             #   SUBJECT_ALTERNATIVE_NAME can also be empty
 
+            CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
+
             if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ]; then
 
                 if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
 
-                    debuglog "Checking alternate names"
+                    debuglog "Checking alternate names: ${COMMON_NAME}"
 
                     for cn in ${COMMON_NAME}; do
 
@@ -4860,15 +4862,17 @@ main() {
                         done
 
                         if [ -z "${ok}" ]; then
-                            fail="${cn}"
-                            break
+                            if [ -z "${fail}" ]; then
+                                fail="${cn}"
+                            else
+                                fail="${fail}, ${cn}"
+                            fi
                         fi
 
                     done
 
                 fi
 
-                CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
                 if [ -n "${fail}" ]; then
                     prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${fail}')"
                 else

@@ -1,4 +1,8 @@
-2022-02-28  Peter Newmann  https://github.com/peternewman
+2022-03-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Display all the unmatched common names
+
+2022-02-28  Peter Newmann (https://github.com/peternewman)
 
         * check_ssl_cert (fetch_certificate): Allow pkcs12 extension for PKCS #12 files
 
