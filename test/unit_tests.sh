@@ -610,7 +610,7 @@ testSMTPS() {
 # From https://badssl.com
 
 testBadSSLExpired() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com --ignore-exp
+    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
