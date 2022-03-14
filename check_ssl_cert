@@ -824,6 +824,9 @@ prepend_critical_message() {
             fi
         fi
     fi
+    if [ -n "${PROTOCOL}" ]; then
+        tmp="${tmp}:${PROTOCOL}"
+    fi
 
     MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${LONG_OUTPUT}"
 
@@ -2285,6 +2288,10 @@ fetch_certificate() {
 
     fi
 
+    if [ -n "${PROTOCOL}" ]; then
+        protocol_tmp=":${PROTOCOL}"
+    fi
+
     if [ "${RET}" -ne 0 ]; then
 
         MESSAGE_TMP="$(sed 's/^/SSL error: /' "${ERROR}")"
@@ -2301,19 +2308,19 @@ fetch_certificate() {
 
             ERROR="${HOST_ADDR} is not a valid hostname"
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep 'Connection\ refused' "${ERROR}"; then
 
             ERROR='Connection refused'
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep 'Connection timed out' "${ERROR}"; then
 
             ERROR='OpenSSL connection timed out'
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep 'unable to get local issuer certificate' "${ERROR}"; then
 
@@ -2349,37 +2356,37 @@ fetch_certificate() {
 
             ERROR='Invalid host name'
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep 'Operation\ timed\ out' "${ERROR}"; then
 
             ERROR='OpenSSL timed out'
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep 'write:errno=54' "${ERROR}"; then
 
             ERROR='No certificate returned (SNI required?)'
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep "Didn't find STARTTLS in server response, trying anyway..." "${ERROR}"; then
 
             ERROR="Didn't find STARTTLS in server response"
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep "unsafe legacy renegotiation disabled" "${ERROR}"; then
 
             ERROR="The server does not support the Renegotiation Indication Extension"
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         elif ascii_grep "no certificate or crl found" "${ERROR}"; then
 
             ERROR="Cannot read or parse the supplied certificate (e.g., root certificate)"
             prepend_critical_message "${ERROR}"
-            critical "SSL_CERT_CRITICAL ${HOST_NAME}: ${ERROR}"
+            critical "SSL_CERT_CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
         else
 
