@@ -102,7 +102,7 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
   * the ```--version``` patch and
   *  the ```--skip-element``` patch
 * Many thanks to [Marcel Burkhalter](https://github.com/explorer69) for the custom HTTP header patch.
-* Many thanks to [Peter Newmann](https://github.com/peternewman) for
+* Many thanks to [Peter Newman](https://github.com/peternewman) for
   * the timeout documentation patch and
   * the issuers patch
   * the PCKS12 extension patch
