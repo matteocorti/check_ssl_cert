@@ -4492,8 +4492,7 @@ main() {
                 #   the pattern space
                 ERROR_MESSAGE="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/; /g' "${ERROR}")"
                 verboselog "error: ${ERROR_MESSAGE}"
-                prepend_critical_message "No certificate returned"
-                critical "${CRITICAL_MSG}"
+                unknown "No certificate returned"
             fi
         else
             # parameters for regular x509 certificates
