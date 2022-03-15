@@ -1563,7 +1563,7 @@ check_ocsp() {
         debuglog "Issuer hash: ${ISSUER_HASH}"
 
         if [ -z "${ISSUER_HASH}" ]; then
-            unknown 'unable to find issuer certificate hash.'
+            critical 'unable to find issuer certificate hash.'
         fi
 
         ISSUER_CERT=
@@ -1636,7 +1636,7 @@ check_ocsp() {
                 # check for errors
                 if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q HTML; then
                     debuglog "OCSP: HTML page returned instead of a certificate"
-                    unknown "Unable to fetch a valid certificate issuer certificate (HTML page returned)."
+                    critical "Unable to fetch a valid certificate issuer certificate (HTML page returned)."
                 fi
 
                 # check the result
@@ -1662,7 +1662,7 @@ check_ocsp() {
                         TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}")"
                         debuglog "OCSP: complete issuer certificate type ${TYPE_TMP}"
 
-                        unknown "Unable to fetch a valid certificate issuer certificate."
+                        critical "Unable to fetch a valid certificate issuer certificate."
 
                     fi
 
@@ -2408,7 +2408,7 @@ fetch_certificate() {
     else
 
         if ascii_grep usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ]; then
-            unknown "it seems that OpenSSL -starttls does not support yet LDAP"
+            critical "it seems that OpenSSL -starttls does not support yet LDAP"
         fi
 
         NEGOTIATED_PROTOCOL=$(grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
@@ -3343,7 +3343,7 @@ main() {
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
-            unknown "Cannot resolve ${HOST}"
+            critical "Cannot resolve ${HOST}"
         fi
         debuglog "Adding domain ${DOMAIN} to ${HOST}"
         HOST="${HOST}.${DOMAIN}"
@@ -3452,7 +3452,7 @@ main() {
     if [ -n "${ROOT_CA}" ]; then
 
         if [ ! -r "${ROOT_CA}" ]; then
-            unknown "Cannot read root certificate ${ROOT_CA}"
+            critical "Cannot read root certificate ${ROOT_CA}"
         fi
 
         if [ -d "${ROOT_CA}" ]; then
@@ -3486,7 +3486,7 @@ main() {
 
         else
             FILE_TMP="$(file "${ROOT_CA}" 2>/dev/null)"
-            unknown "Root certificate of unknown type ${FILE_TMP}"
+            critical "Root certificate of unknown type ${FILE_TMP}"
         fi
 
         debuglog "Root CA option = ${ROOT_CA}"
@@ -3503,11 +3503,11 @@ main() {
     if [ -n "${ROOT_CA_DIR}" ]; then
 
         if [ ! -d "${ROOT_CA_DIR}" ]; then
-            unknown "${ROOT_CA_DIR} is not a directory"
+            critical "${ROOT_CA_DIR} is not a directory"
         fi
 
         if [ ! -r "${ROOT_CA_DIR}" ]; then
-            unknown "Cannot read root directory ${ROOT_CA_DIR}"
+            critical "Cannot read root directory ${ROOT_CA_DIR}"
         fi
 
         ROOT_CA_DIR="-CApath ${ROOT_CA_DIR}"
@@ -3516,7 +3516,7 @@ main() {
     if [ -n "${ROOT_CA_FILE}" ]; then
 
         if [ ! -r "${ROOT_CA_FILE}" ]; then
-            unknown "Cannot read root certificate ${ROOT_CA_FILE}"
+            critical "Cannot read root certificate ${ROOT_CA_FILE}"
         fi
 
     fi
@@ -3532,7 +3532,7 @@ main() {
     if [ -n "${CLIENT_CERT}" ]; then
 
         if [ ! -r "${CLIENT_CERT}" ]; then
-            unknown "Cannot read client certificate ${CLIENT_CERT}"
+            critical "Cannot read client certificate ${CLIENT_CERT}"
         fi
 
     fi
@@ -3540,7 +3540,7 @@ main() {
     if [ -n "${CLIENT_KEY}" ]; then
 
         if [ ! -r "${CLIENT_KEY}" ]; then
-            unknown "Cannot read client certificate key ${CLIENT_KEY}"
+            critical "Cannot read client certificate key ${CLIENT_KEY}"
         fi
 
     fi
@@ -3595,11 +3595,11 @@ main() {
             fi
 
             if [ ! -r "${FILE}" ]; then
-                unknown "Cannot fetch ${FILE_URI}"
+                critical "Cannot fetch ${FILE_URI}"
             fi
 
         elif [ ! -r "${FILE}" ]; then
-            unknown "Cannot read file ${FILE}"
+            critical "Cannot read file ${FILE}"
         fi
 
     fi
@@ -4296,7 +4296,7 @@ main() {
                 exit "${STATUS_CRITICAL}"
                 ;;
             "${STATUS_UNKNOWN}")
-                unknown "Cannot connect to ${HOST}:${PORT}"
+                critical "Cannot connect to ${HOST}:${PORT}"
                 ;;
             *)
                 unknown "Wrong exit code () specified for --ignore-connection-problem"
@@ -5074,19 +5074,19 @@ main() {
 
             # check for -Pn warning
             if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
-                unknown "nmap exited with error: ${NMAP_ERROR}"
+                critical "nmap exited with error: ${NMAP_ERROR}"
             fi
 
         fi
 
         if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
-            unknown "empty nmap result while checking ciphers"
+            critical "empty nmap result while checking ciphers"
         fi
 
         if [ -n "${CHECK_CIPHERS}" ]; then
 
             if ! grep -q -F 'least strength' "${NMAP_OUT}"; then
-                unknown 'nmap does not deliver cipher strength'
+                critical 'nmap does not deliver cipher strength'
             fi
 
             NMAP_GRADE=$(grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
@@ -5162,7 +5162,7 @@ ${WARNING}"
 
                 debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
-                unknown "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
+                critical "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
 
             fi
 

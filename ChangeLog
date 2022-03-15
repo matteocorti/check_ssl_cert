@@ -1,3 +1,7 @@
+2022-03-15  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: status UKNOWN only for plugin-internal problems (see https://nagios-plugins.org/doc/guidelines.html#AEN78)
+
 2022-03-14  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (fetch_certificate): Add the protocol (if defined) to the critical message

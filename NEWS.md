@@ -1,3 +1,4 @@
+  * An Unknown status is only returned for plugin-internal issues
 * 2022-03-11 Version 2.22.0
   * The protocol is shown in the output
   * Processes files with .pkcs12 extension
