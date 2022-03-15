@@ -79,7 +79,7 @@ with the following individuals added to the list of contributing authors
  * [skanx ](https://github.com/skanx)
  * [Zadkiel ](https://github.com/aslafy-z)
  * [Marcel Burkhalter ](https://github.com/explorer69)
- * [Peter Newmann ](https://github.com/peternewman)
+ * [Peter Newman ](https://github.com/peternewman)
  * [cbiedl ](https://github.com/cbiedl)
  * [Robin Schneider ](https://github.com/ypid-geberit)
  * [Robin Pronk ](https://github.com/rfpronk)
