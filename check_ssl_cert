@@ -2903,7 +2903,7 @@ parse_command_line_options() {
             else
                 COMMON_NAME="${COMMON_NAME} ${2}"
             fi
-            debuglog "--cn specified: COMMON_MANE = ${COMMON_NAME}"
+            debuglog "--cn specified: COMMON_NAME = ${COMMON_NAME}"
             shift 2
             ;;
         --not-issued-by)
