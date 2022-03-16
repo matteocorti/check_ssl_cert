@@ -4010,7 +4010,7 @@ main() {
             HTTPS_PROXY="${HTTP_PROXY}"
         fi
 
-        if ${CURL_BIN} --manual | grep -F -q -- --proxy; then
+        if [ ! -z "${CURL_BIN}" ] && [ ${CURL_BIN} --manual | grep -F -q -- --proxy ]; then
             debuglog "Adding --proxy ${HTTP_PROXY} to the curl options"
             CURL_PROXY="--proxy"
             CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
