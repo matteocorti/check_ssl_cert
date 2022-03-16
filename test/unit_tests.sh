@@ -475,13 +475,13 @@ testRootIssuer() {
 
 testValidity() {
     # Tests bug #8
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testValidityWithPerl() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --force-perl-date
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1 --force-perl-date
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
