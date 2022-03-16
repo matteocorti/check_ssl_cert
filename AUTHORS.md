@@ -106,6 +106,7 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
   * the timeout documentation patch and
   * the issuers patch
   * the PCKS12 extension patch
+  * and several other fixes
 * Many thanks to [cbiedl](https://github.com/cbiedl) for the proxy patch
 * Many thanks to [Robin Schneider](https://github.com/ypid-geberit) for the ```--long-output``` patch
 * Many thanks to [Robin Pronk](https://github.com/rfpronk) for the ```-u``` patch
