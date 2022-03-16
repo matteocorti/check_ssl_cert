@@ -182,7 +182,7 @@ Options:
                                    see the PASS PHRASE ARGUMENTS section
                                    openssl(1)
       --prometheus                 generates Prometheus/OpenMetrics output
-      --proxy                      sets http_proxy and the s_client -proxy
+      --proxy proxy                sets http_proxy and the s_client -proxy
    -q,--quiet                      do not produce any output
    -r,--rootcert path              root certificate or directory to be used
                                    for certificate validation
