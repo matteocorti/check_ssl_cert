@@ -267,7 +267,7 @@ usage() {
     echo "                                   see the PASS PHRASE ARGUMENTS section"
     echo "                                   openssl(1)"
     echo "      --prometheus                 generates Prometheus/OpenMetrics output"
-    echo "      --proxy                      sets http_proxy and the s_client -proxy"
+    echo "      --proxy proxy                sets http_proxy and the s_client -proxy"
     # Delimiter at 78 chars ############################################################
     echo "   -q,--quiet                      do not produce any output"
     # Delimiter at 78 chars ############################################################
