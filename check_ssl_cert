@@ -4858,6 +4858,7 @@ main() {
                             else
 
                                 if echo "${cn}" | grep -q -i "^${alt_name}$"; then
+                                    debuglog "the common name ${cn} matches ^${alt_name}\$"
                                     ok="true"
                                 fi
 
