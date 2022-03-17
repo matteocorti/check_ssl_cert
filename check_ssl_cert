@@ -1292,6 +1292,7 @@ extract_cert_attribute() {
             grep -F -A 1 "509v3 Subject Alternative Name:" |
             tail -n 1 |
             sed -e "s/DNS://g" |
+            sed -e "s/IP Address://g" |
             sed -e "s/,//g" |
             sed -e 's/^\ *//'
         ;;
