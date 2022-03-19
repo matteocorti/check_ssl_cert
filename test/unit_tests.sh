@@ -849,7 +849,7 @@ testFormatShort() {
     OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK github.com from 'DigiCert, Inc.'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK github.com from 'DigiCert Inc.'" "${OUTPUT}"
 }
 
 testMoreErrors() {
