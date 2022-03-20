@@ -1007,7 +1007,7 @@ testCertificateWithoutCN() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testCertificsteWithEmptySubject() {
+testCertificateWithEmptySubject() {
     ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
