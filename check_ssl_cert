@@ -4803,6 +4803,8 @@ main() {
             CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
 
             if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ]; then
+            
+                CN_TMP="$(echo "${SUBJECT_ALTERNATIVE_NAME}" | sed "s/|/ PIPE /g")"
 
                 if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
 
@@ -4884,7 +4886,7 @@ main() {
                 fi
 
                 if [ -n "${fail}" ]; then
-                    prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${fail}')"
+                    prepend_critical_message "invalid CN ('${fail}' not found in '${CN_TMP}')"
                 else
                     if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
                         prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
