@@ -4895,6 +4895,12 @@ main() {
                     fi
                 fi
 
+            else
+
+                if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
+                    prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
+                fi
+
             fi
 
         fi
