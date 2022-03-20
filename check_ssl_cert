@@ -951,7 +951,7 @@ critical() {
     debuglog 'exiting with CRITICAL'
     debuglog "ALL_MSG = ${ALL_MSG}"
 
-    if [ -z "${QUIET}" ] ; then
+    if [ -z "${QUIET}" ]; then
 
         NUMBER_OF_ERRORS=$(printf '%b' "${ALL_MSG}" | wc -l)
 
@@ -1088,7 +1088,7 @@ warning() {
 #   $1 message
 unknown() {
 
-    if [ -z "${QUIET}" ] ; then
+    if [ -z "${QUIET}" ]; then
         if [ -n "${HOST_NAME}" ]; then
             if [ -n "${SNI}" ]; then
                 tmp=" ${SNI}"
@@ -4803,7 +4803,7 @@ main() {
             CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
 
             if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ]; then
-            
+
                 CN_TMP="$(echo "${SUBJECT_ALTERNATIVE_NAME}" | sed "s/|/ PIPE /g")"
 
                 if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
@@ -5393,7 +5393,7 @@ ${WARNING}"
     ################################################################################
     # If we get this far, assume all is well. :)
 
-    if [ -z "${QUIET}" ] ; then
+    if [ -z "${QUIET}" ]; then
 
         # If --altnames was specified or if the certificate is wildcard,
         # then we show the specified CN in addition to the certificate CN
@@ -5497,20 +5497,20 @@ ${WARNING}"
             PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
 
             echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-                                                  -e "${PORT_TMP}" \
-                                                  -e "${HOST_TMP}" \
-                                                  -e "${CA_ISSUER_MATCHED_TMP}" \
-                                                  -e "${CHECKEDNAMES_TMP}" \
-                                                  -e "${CN_TMP}" \
-                                                  -e "${DATE_TMP}" \
-                                                  -e "${DAYS_VALID_TMP}" \
-                                                  -e "${DISPLAY_CN_TMP}" \
-                                                  -e "${OPENSSL_COMMAND_TMP}" \
-                                                  -e "${SELFSIGNEDCERT_TMP}" \
-                                                  -e "${SHORTNAME_TMP}" \
-                                                  -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
-                                                  -e "${SSL_LABS_HOST_GRADE_TMP}" \
-                                                  -e "${PROTOCOL_TMP}"
+                -e "${PORT_TMP}" \
+                -e "${HOST_TMP}" \
+                -e "${CA_ISSUER_MATCHED_TMP}" \
+                -e "${CHECKEDNAMES_TMP}" \
+                -e "${CN_TMP}" \
+                -e "${DATE_TMP}" \
+                -e "${DAYS_VALID_TMP}" \
+                -e "${DISPLAY_CN_TMP}" \
+                -e "${OPENSSL_COMMAND_TMP}" \
+                -e "${SELFSIGNEDCERT_TMP}" \
+                -e "${SHORTNAME_TMP}" \
+                -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
+                -e "${SSL_LABS_HOST_GRADE_TMP}" \
+                -e "${PROTOCOL_TMP}"
 
         else
 

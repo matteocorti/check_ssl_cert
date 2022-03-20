@@ -341,7 +341,7 @@ testInfo() {
 }
 
 testFQDN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com.  --ignore-exp
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com. --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -505,7 +505,7 @@ testWildcardAltNames2() {
         --cn somehost.spapps.ethz.ch \
         --cn otherhost.sPaPPs.ethz.ch \
         --cn spapps.ethz.ch \
-       --ignore-exp \
+        --ignore-exp \
         --altnames
 
     EXIT_CODE=$?

@@ -6,41 +6,40 @@ _check_ssl_cert() {
 
     COMPREPLY=()
 
- 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD - 1]}"
 
     # list of command line options
     #   we list only the long version (more readable)
-	opts="--file --host --noauth --all --all-local --allow-empty-san --clientcert --critical --check-ciphers --check-ciphers-warnings  --check-ssl-labs-warn --clientpass --crl --curl-bin --curl-user-agent --custom-http-header --dane --date --debug-cert --debug-file --debug-time --dig-bin --ecdsa --element --file-bin --fingerprint --first-element-only --force-dconv-date --force-perl-date --format --http-use-get --ignore-altnames --ignore-connection-problems --ignore-exp --ignore-host-cn --ignore-incomplete-chain --ignore-ocsp --ignore-ocsp-errors --ignore-ocsp-timeout --ignore-sct --ignore-sig-alg --ignore-ssl-labs-cache --ignore-tls-renegotiation --inetproto protocol --info --issuer-cert-cache --long-output --nmap-bin --no-perf --no-proxy --no-proxy-curl --no-proxy-s_client --no-ssl2 --no-ssl3 --no-tls1 --no-tls1_1 --no-tls1_2 --no-tls1_3 --not-issued-by --not-valid-longer-than --ocsp-critical --ocsp-warning --openssl --password --precision --prometheus --proxy --require-client-cert --require-no-ssl2 --require-no-ssl3 --require-no-tls1 --require-no-tls1_1 --require-ocsp-stapling --resolve  --rootcert-dir --rootcert-file --rsa --serial --skip-element --sni --ssl2 --ssl3 --temp --terse --tls1 --tls1_1 --tls1_2 --tls1_3 --xmpphost -4 -6 --clientkey --protocol --version --debug --email --help --issuer --cn --org  --port port --rootcert --quiet --selfsigned --timeout --url --verbose --warning"
-
+    opts="--file --host --noauth --all --all-local --allow-empty-san --clientcert --critical --check-ciphers --check-ciphers-warnings  --check-ssl-labs-warn --clientpass --crl --curl-bin --curl-user-agent --custom-http-header --dane --date --debug-cert --debug-file --debug-time --dig-bin --ecdsa --element --file-bin --fingerprint --first-element-only --force-dconv-date --force-perl-date --format --http-use-get --ignore-altnames --ignore-connection-problems --ignore-exp --ignore-host-cn --ignore-incomplete-chain --ignore-ocsp --ignore-ocsp-errors --ignore-ocsp-timeout --ignore-sct --ignore-sig-alg --ignore-ssl-labs-cache --ignore-tls-renegotiation --inetproto protocol --info --issuer-cert-cache --long-output --nmap-bin --no-perf --no-proxy --no-proxy-curl --no-proxy-s_client --no-ssl2 --no-ssl3 --no-tls1 --no-tls1_1 --no-tls1_2 --no-tls1_3 --not-issued-by --not-valid-longer-than --ocsp-critical --ocsp-warning --openssl --password --precision --prometheus --proxy --require-client-cert --require-no-ssl2 --require-no-ssl3 --require-no-tls1 --require-no-tls1_1 --require-ocsp-stapling --resolve  --rootcert-dir --rootcert-file --rsa --serial --skip-element --sni --ssl2 --ssl3 --temp --terse --tls1 --tls1_1 --tls1_2 --tls1_3 --xmpphost -4 -6 --clientkey --protocol --version --debug --email --help --issuer --cn --org  --port port --rootcert --quiet --selfsigned --timeout --url --verbose --warning"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]]; then
- 		COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
         return 0
     fi
 
     # options with arguments
     case "${prev}" in
-        # options with files as argument
-        -f|--file|-C|--clientcert|--curl-bin|--date|--debug-file|--dig-bin|--file-bin|--issuer-cert-cache|--nmap-bin|--openssl|--rootcert-dir|--rootcert-file|--temp|-K|--clientkey|-r|--rootcert)
-            _filedir
-            ;;
-        # optios with hosts as argument
-        -H|--host|--resolve)
-            _known_hosts_real "${cur}"
-            ;;
-        # grades
-        --check-ciphers|--check-ssl-labs-warn)
-            COMPREPLY=( $(compgen -W "A B C D E F" -- ${cur}) )
-            ;;
-        --dane)
-            COMPREPLY=( $(compgen -W "211 301 302 311 312" -- ${cur}) )
-            ;;
-        --protocol|-P)
-            COMPREPLY=( $(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp imap irc ldap pop3 postgres sieve smtp:" -- ${cur}) )
-            ;;
-        *)
-            ;;
+    # options with files as argument
+    -f | --file | -C | --clientcert | --curl-bin | --date | --debug-file | --dig-bin | --file-bin | --issuer-cert-cache | --nmap-bin | --openssl | --rootcert-dir | --rootcert-file | --temp | -K | --clientkey | -r | --rootcert)
+        _filedir
+        ;;
+    # optios with hosts as argument
+    -H | --host | --resolve)
+        _known_hosts_real "${cur}"
+        ;;
+    # grades
+    --check-ciphers | --check-ssl-labs-warn)
+        COMPREPLY=($(compgen -W "A B C D E F" -- ${cur}))
+        ;;
+    --dane)
+        COMPREPLY=($(compgen -W "211 301 302 311 312" -- ${cur}))
+        ;;
+    --protocol | -P)
+        COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp imap irc ldap pop3 postgres sieve smtp:" -- ${cur}))
+        ;;
+    *) ;;
+
     esac
 
 }
