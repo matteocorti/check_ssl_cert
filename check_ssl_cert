@@ -4778,7 +4778,9 @@ main() {
 
             else
 
+                debuglog "checking if the common name matches ^${CN}\$"
                 if echo "${COMMON_NAME}" | grep -q -i "^${CN}$"; then
+                    debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
                     ok="true"
                 fi
 
