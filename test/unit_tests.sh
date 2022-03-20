@@ -1013,6 +1013,25 @@ testCertificateWithEmptySubject() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testCertificateWithEmptySAN() {
+    CERT=$(createSelfSignedCertificate 30)
+
+    ${SCRIPT} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n localhost
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testCertificateWithEmptySANFail() {
+    # Test with wrong CN's
+    CERT=$(createSelfSignedCertificate 30)
+
+    ${SCRIPT} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n wrong.com
+    EXIT_CODE=$?
+
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testResolveSameName() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --resolve www.github.com --ignore-exp
     EXIT_CODE=$?
