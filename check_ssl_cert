@@ -2284,6 +2284,10 @@ fetch_certificate() {
         open_for_writing "${HOST_NAME}.crt"
         cp "${CERT}" "${HOST_NAME}.crt"
 
+        debuglog "storing a text copy of the retrieved certificate in ${HOST_NAME}.crt.txt for debugging purposes"
+        open_for_writing "${HOST_NAME}.crt.txt"
+        "${OPENSSL}" x509 -in "${HOST_NAME}.crt" -text -out "${HOST_NAME}.crt.txt"
+
         debuglog "storing a copy of the OpenSSL errors in ${HOST_NAME}.error for debugging purposes"
         open_for_writing "${HOST_NAME}.error"
         cp "${ERROR}" "${HOST_NAME}.error"
