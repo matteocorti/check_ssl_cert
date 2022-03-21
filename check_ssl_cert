@@ -4778,7 +4778,9 @@ main() {
 
             else
 
+                debuglog "checking if the common name matches ^${CN}\$"
                 if echo "${COMMON_NAME}" | grep -q -i "^${CN}$"; then
+                    debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
                     ok="true"
                 fi
 
@@ -4891,6 +4893,12 @@ main() {
                     if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
                         prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
                     fi
+                fi
+
+            else
+
+                if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
+                    prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
                 fi
 
             fi
