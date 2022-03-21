@@ -4397,6 +4397,7 @@ main() {
         if [ -z "${IGNORE_TLS_RENEGOTIATION}" ] && [ -z "${FILE}" ]; then
 
             debuglog "checking TLS renegotiation"
+            verboselog "checking TLS renegotiation" 2
 
             # see https://www.mcafee.com/blogs/enterprise/tips-securing-ssl-renegotiation/
 
