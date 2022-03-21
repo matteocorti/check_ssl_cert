@@ -1,3 +1,7 @@
+2022-03-21  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): added missing proxy options for curl and s_client
+
 2022-03-15  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: status UKNOWN only for plugin-internal problems (see https://nagios-plugins.org/doc/guidelines.html#AEN78)

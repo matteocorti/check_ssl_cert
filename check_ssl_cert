@@ -2143,7 +2143,7 @@ fetch_certificate() {
             RET=$?
             ;;
         xmpp | xmpp-server)
-            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${XMPPPORT} ${XMPPHOST} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${XMPPPORT} ${XMPPHOST} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         mysql)
@@ -4271,7 +4271,7 @@ main() {
         # we check with curl if a connection is possible
         debuglog "Executing: ${CURL_BIN} --silent --connect-timeout ${TIMEOUT} ${HOST}:${PORT}"
 
-        "${CURL_BIN}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" >/dev/null
+        "${CURL_BIN}" "${CURL_PROXY}" "${CURL_PROXY_ARGUMENT}" "${INETPROTO}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" >/dev/null
         CURL_EXIT_STATUS=$?
 
         debuglog "  curl exited with status ${CURL_EXIT_STATUS}"
