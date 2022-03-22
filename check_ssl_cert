@@ -3133,7 +3133,7 @@ parse_command_line_options() {
             if ! echo "${OPTION}" | grep -q -- '^--' &&
                 [ "${OPTION_TMP}" -gt 3 ]; then
                 if [ "${DEBUG}" -gt 0 ]; then
-                    echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group"
+                    echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group" 1>&2
                 fi
                 for letter in $(echo "${OPTION}" | sed 's/^-//' | grep -o .); do
                     parse_command_line_options "-${letter}"
@@ -3915,7 +3915,7 @@ main() {
         debuglog "OpenSSL binary: ${OPENSSL}"
         if [ "${DEBUG}" -ge 1 ]; then
             debuglog "OpenSSL info:"
-            ${OPENSSL} version -a | sed 's/^/[DBG] /'
+            ${OPENSSL} version -a | sed 's/^/[DBG] /' 1>&2
         fi
         OPENSSL_DIR="$(${OPENSSL} version -d | sed -E 's/OPENSSLDIR: "([^"]*)"/\1/')"
 
@@ -4251,7 +4251,7 @@ main() {
                 verboselog "DANE OK"
             fi
             DANE="${DANE} -dane_tlsa_domain ${HOST_ADDR} "
-            debuglog "DBG] DANE = ${DANE}"
+            debuglog "DANE = ${DANE}"
         else
             unknown 'OpenSSL s_client does not support DNS-based Authentication of Named Entities'
         fi

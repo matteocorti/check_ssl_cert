@@ -1,3 +1,7 @@
+2022-03-22  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): fixes debugging output on STDERR
+
 2022-03-21  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): added missing proxy options for curl and s_client
