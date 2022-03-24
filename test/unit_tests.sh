@@ -398,9 +398,19 @@ testPrometheus() {
     OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --prometheus --critical 1000 --warning 1100)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong output" "${OUTPUT}" '# HELP cert_valid '
-    assertContains "wrong output" "${OUTPUT}" 'cert_valid_chain_elem{cn="github.com", element=1} 2'
-    assertContains "wrong output" "${OUTPUT}" 'cert_days_chain_elem{cn="github.com", element=1}'
+
+    echo "${OUTPUT}" | grep -q '# HELP cert_valid'
+    EXIT_CODE=$?
+    assertEquals "output does not contain '# HELP cert_valid'" "${OK}" "${EXIT_CODE}"
+
+    echo "${OUTPUT}" | grep -q 'cert_valid_chain_elem{cn="github.com", element=1} 2'
+    EXIT_CODE=$?
+    assertEquals "output does not contain 'cert_valid_chain_elem{cn=\"github.com\", element=1} 2'" "${OK}" "${EXIT_CODE}"
+
+    echo "${OUTPUT}" | grep -q 'cert_days_chain_elem{cn="github.com", element=1}'
+    EXIT_CODE=$?
+    assertEquals "output does not contain 'cert_days_chain_elem{cn=\"github.com\", element=1}'" "${OK}" "${EXIT_CODE}"
+
 }
 
 testGitHub() {
