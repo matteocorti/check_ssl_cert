@@ -109,7 +109,9 @@
 --long-output list;and fingerprint.
 --long-output list;'all' will include all the available
 --long-output list;attributes.
--n,--cn name;pattern to match the CN of the certificate
+-m,--match name;pattern to match the CN or AltName
+-m,--match name;(can be specified multiple times)
+-n,--cn name;pattern to match the CN or AltName
 -n,--cn name;(can be specified multiple times)
 --nmap-bin path;path of the nmap binary to be used
 --no-perf;do not show performance data

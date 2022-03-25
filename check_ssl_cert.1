@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "March, 2022" "2.22.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "March, 2022" "2.23.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -217,8 +217,8 @@ SSL Labs assessment (please check https://www.ssllabs.com/about/terms.html). Cri
 append the specified comma separated (no spaces) list of attributes to the plugin output on additional lines.
 Valid attributes are: enddate, startdate, subject, issuer, modulus, serial, hash, email, ocsp_uri and fingerprint. 'all' will include all the available attributes.
 .TP
-.BR "-n,--cn" " name"
-pattern to match the CN of the certificate (can be specified multiple times)
+.BR "-m,--match" " name"
+pattern to match the CN or AltName (can be specified multiple times)
 .TP
 .BR "   --nmap-bin" " path"
 path of the nmap binary to be used
@@ -395,6 +395,9 @@ matches the pattern specified in -n with alternate names too (enabled by default
 .TP
 .BR "-d,--days" " days"
 minimum number of days a certificate has to be valid (see --critical and --warning)
+.TP
+.BR "-n,--cn" " name"
+pattern to match the CN or AltName (can be specified multiple times)
 .TP
 .BR "-N,--host-cn"
 match CN with the host name (enabled by default)

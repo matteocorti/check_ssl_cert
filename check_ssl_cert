@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.22.0
+VERSION=2.23.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -223,8 +223,9 @@ usage() {
     echo "                                   'all' will include all the available"
     echo "                                   attributes."
     # Delimiter at 78 chars ############################################################
-    echo "   -n,--cn name                    pattern to match the CN of the certificate"
+    echo "   -m,--match.                     pattern to match the CN or AltName"
     echo "                                   (can be specified multiple times)"
+    # Delimiter at 78 chars ############################################################
     echo "      --nmap-bin path              path of the nmap binary to be used"
     echo "      --no-perf                    do not show performance data"
     echo "      --no-proxy                   ignores the http_proxy and https_proxy"
@@ -335,6 +336,8 @@ usage() {
     echo "      --days days                  minimum number of days a certificate has"
     echo "                                   to be valid"
     echo "                                   (see --critical and --warning)"
+    echo "   -n,--cn name                    pattern to match the CN or AltName"
+    echo "                                   (can be specified multiple times)"
     echo "   -N,--host-cn                    match CN with the host name"
     echo "                                   (enabled by default)"
     echo "      --no_ssl2                    disable SSLv2 (deprecated use --no-ssl2)"
@@ -364,6 +367,10 @@ usage() {
 ################################################################################
 # Prints the given message to STDERR with the prefix '[DBG] ' if the debug
 # command line option was specified
+#
+# We are writing to STDERR since according to POSIX, STDERR is 'for writing diagnostic output'
+# see https://unix.stackexchange.com/questions/331611/do-progress-reports-logging-information-belong-on-stderr-or-stdout
+#
 # $1: string
 # $2: level (optional default 1)
 debuglog() {
@@ -2568,7 +2575,7 @@ parse_command_line_options() {
             shift
             ;;
         --ignore-host-cn)
-            COMMON_NAME=
+            NAMES_TO_BE_CHECKED=
             ALTNAMES=
             shift
             ;;
@@ -2638,8 +2645,10 @@ parse_command_line_options() {
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
             shift
             ;;
+        # deprecated: this is enabled by defualt!
         -N | --host-cn)
-            COMMON_NAME="__HOST__"
+            # __HOST__ ist a placeholder for the specified host name which is always checked
+            NAMES_TO_BE_CHECKED="__HOST__"
             shift
             ;;
         --prometheus)
@@ -2821,8 +2830,9 @@ parse_command_line_options() {
         -f | --file)
             check_option_argument ' -f|--file' "$2"
             FILE="$2"
-            # remove _HOST_ from COMMON_NAME
-            COMMON_NAME=$(echo "${COMMON_NAME}" | sed 's/__HOST__\ *//')
+            # remove _HOST_ from the names to be checked as no host was specified
+            # we leave the remaining hosts specified with --cn
+            NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__\ *//')
             ALTNAMES=
             shift 2
             ;;
@@ -2902,14 +2912,14 @@ parse_command_line_options() {
             LONG_OUTPUT_ATTR="$2"
             shift 2
             ;;
-        -n | --cn)
+        -n | --cn | -m | --match)
             check_option_argument ' -n|--cn' "$2"
-            if [ -z "${COMMON_NAME}" ]; then
-                COMMON_NAME="${2}"
+            if [ -z "${NAMES_TO_BE_CHECKED}" ]; then
+                NAMES_TO_BE_CHECKED="${2}"
             else
-                COMMON_NAME="${COMMON_NAME} ${2}"
+                NAMES_TO_BE_CHECKED="${NAMES_TO_BE_CHECKED} ${2}"
             fi
-            debuglog "--cn specified: COMMON_NAME = ${COMMON_NAME}"
+            debuglog "--cn specified: NAMES_TO_BE_CHECKED = ${NAMES_TO_BE_CHECKED}"
             shift 2
             ;;
         --not-issued-by)
@@ -3163,7 +3173,7 @@ main() {
     # Default values
 
     ALTNAMES=1             # enabled by default
-    COMMON_NAME="__HOST__" # enabled by default
+    NAMES_TO_BE_CHECKED="__HOST__" # enabled by default
     CRITICAL_DAYS=15
     CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
     CRL=""
@@ -3391,17 +3401,18 @@ main() {
 
     fi
 
-    debuglog "SNI         = ${SNI}"
-    debuglog "HOST_NAME   = ${HOST_NAME}"
-    debuglog "HOST_ADDR   = ${HOST_ADDR}"
-    debuglog "COMMON_NAME = ${COMMON_NAME}"
+    debuglog "SNI                 = ${SNI}"
+    debuglog "HOST_NAME           = ${HOST_NAME}"
+    debuglog "HOST_ADDR           = ${HOST_ADDR}"
+    debuglog "NAMES_TO_BE_CHECKED = ${NAMES_TO_BE_CHECKED}"
 
-    # if the host name contains a / (e.g., a URL) the regex for COMMON_NAME substitution fails
+    # if the host name contains a / (e.g., a URL) the regex for NAMES_TO_BE_CHECKED substitution fails
     #   we check that only allowed characters are present
     #   we don't need a complete validation since a wrong host name will fail anyway
 
-    IS_IP_TMP="$(is_ip "${HOST_NAME}")"
-    if [ "${IS_IP_TMP}" -eq 0 ]; then
+    HOST_IS_IP="$(is_ip "${HOST_NAME}")"
+    debuglog "HOST_IS_IP.         = ${HOST_IS_IP}"
+    if [ "${HOST_IS_IP}" -eq 0 ]; then
 
         if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
             unknown "Invalid host name: ${HOST_NAME}"
@@ -3416,20 +3427,25 @@ main() {
     fi
 
     ################################################################################
-    # Set COMMON_NAME to hostname if -N was given as argument.
-    # COMMON_NAME may be a space separated list of hostnames.
-    case ${COMMON_NAME} in
-    *__HOST__*)
-        # localhost is used for files to be checked: we ignore it
-        if [ "${HOST_NAME}" != 'localhost' ]; then
-            COMMON_NAME=$(echo "${COMMON_NAME}" | sed "s/__HOST__/${HOST_NAME}/")
-        fi
+    # Set NAMES_TO_BE_CHECKED to hostname (replance __HOST__ if present)
+    # NAMES_TO_BE_CHECKED is a space separated list of hostnames.
+    case ${NAMES_TO_BE_CHECKED} in
+        *__HOST__*)
+            # localhost is used for files to be checked: we ignore it
+            IS_IP_TMP="$(is_ip "${HOST_NAME}")"
+            if [ "${HOST_NAME}" != 'localhost' ] && [ "${IS_IP_TMP}" -eq 0 ]; then
+                debuglog "Adding ${HOST_NAME} to NAMES_TO_BE_CHECKED"
+                NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__/${HOST_NAME}/")
+            else
+                debuglog "Removing __HOST__ to the names to be checked as the host is 'localhost' or an IP address"
+                NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__//")
+            fi
         ;;
     *) ;;
     esac
-    debuglog "COMMON_NAME = ${COMMON_NAME}"
+    debuglog "NAMES_TO_BE_CHECKED = ${NAMES_TO_BE_CHECKED}"
 
-    if [ -n "${ALTNAMES}" ] && [ -z "${COMMON_NAME}" ]; then
+    if [ -n "${ALTNAMES}" ] && [ -z "${NAMES_TO_BE_CHECKED}" ] && [ "${HOST_IS_IP}" -eq 0 ]; then
         unknown "--altnames requires a common name to match (--cn or --host-cn)"
     fi
 
@@ -4749,166 +4765,126 @@ main() {
     done
 
     ################################################################################
-    # Check the CN
-    if [ -n "${COMMON_NAME}" ]; then
+    # Check the names in the certificate
+    if [ -n "${NAMES_TO_BE_CHECKED}" ]; then
 
-        ok=""
+        debuglog "Check the common name and alternative names"
 
-        debuglog "check CN                   ${CN}"
-        debuglog "COMMON_NAME              = ${COMMON_NAME}"
+        # the CN of the certificate (can also be empty)
+        debuglog "CN                       = ${CN}"
+
+        # the subject alternative names present in the certificate
+        if [ "${DEBUG}" -gt 0 ]; then
+            echo "${SUBJECT_ALTERNATIVE_NAME}" | tr ' ' '\n' | sed 's/^/[DBG] SUBJECT_ALTERNATIVE_NAME = /' 1>&2
+        fi
+
+        # should we check the alternative names (almost always 1)
         debuglog "ALTNAMES                 = ${ALTNAMES}"
-        debuglog "SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
 
-        IS_IP_TMP="$(is_ip "${COMMON_NAME}")"
-        if [ "${IS_IP_TMP}" -eq 0 ]; then
+        # the names that should be present
+        debuglog "NAMES_TO_BE_CHECKED      = ${NAMES_TO_BE_CHECKED}"
 
+        for name in ${NAMES_TO_BE_CHECKED}; do
+
+            debuglog "  checking '${name}'"
+
+            ok=""
+
+            # 1) common name
             # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
+            debuglog "    common name"
             if echo "${CN}" | grep -q -i '^\*\.'; then
+
+                # wildcard
 
                 # Or the literal with the wildcard
                 CN_TMP="$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
-                debuglog "checking if the common name matches ^${CN_TMP}\$"
-                if echo "${COMMON_NAME}" | grep -q -i "^${CN_TMP}\$"; then
-                    debuglog "the common name ${COMMON_NAME} matches ^${CN_TMP}\$"
+                debuglog "        checking (1) if ${name} matches ^${CN_TMP}\$"
+                if echo "${name}" | grep -q -i "^${CN_TMP}\$"; then
+                    debuglog "        ${name} matches ^${CN_TMP}\$"
                     ok="true"
                 fi
 
                 # Or if both are exactly the same
-                debuglog "checking if the common name matches ^${CN}\$"
-
-                if echo "${COMMON_NAME}" | grep -q -i "^${CN}\$"; then
-                    debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
+                debuglog "      checking (2) if the ${name} matches ^${CN}\$"
+                if echo "${name}" | grep -q -i "^${CN}\$"; then
+                    debuglog "        ${name} matches ^${CN}\$"
                     ok="true"
                 fi
 
             else
 
-                debuglog "checking if the common name matches ^${CN}\$"
-                if echo "${COMMON_NAME}" | grep -q -i "^${CN}$"; then
-                    debuglog "the common name ${COMMON_NAME} matches ^${CN}\$"
+                debuglog "      checking if (3) ${name} matches ^${CN}\$"
+                if echo "${name}" | grep -q -i "^${CN}$"; then
+                    debuglog "        ${name} matches ^${CN}\$"
                     ok="true"
                 fi
 
             fi
 
-        else
+            if [ -n "${ALTNAMES}" ]; then
 
-            verboselog "Skipping the matching of the host name (${COMMON_NAME}) as it is an IP address"
-            COMMON_NAME_IS_AN_IP=1
+                debuglog "    alternative names"
 
-        fi
+                for alt_name in ${SUBJECT_ALTERNATIVE_NAME}; do
 
-        if [ -n "${REQUIRE_SAN}" ] && [ -z "${SUBJECT_ALTERNATIVE_NAME}" ]; then
+                    debuglog "      check altname: ${alt_name}"
 
-            prepend_critical_message "The certificate does not have any Subject Alternative Names"
+                    if echo "${alt_name}" | grep -q -i '^\*\.'; then
 
-        else
+                        # Match the domain
+                        debuglog "        the altname ${alt_name} begins with a '*'"
+                        ALT_NAME_TMP="$(echo "${alt_name}" | cut -c 3-)"
+                        debuglog "        checking if (4) ${name} matches ^${ALT_NAME_TMP}\$"
 
-            # Check alternate names
-            #   SUBJECT_ALTERNATIVE_NAME can also be empty
-
-            CN_TMP="$(echo "${CN}" | sed "s/|/ PIPE /g")"
-
-            if [ -n "${SUBJECT_ALTERNATIVE_NAME}" ]; then
-
-                CN_TMP="$(echo "${SUBJECT_ALTERNATIVE_NAME}" | sed "s/|/ PIPE /g")"
-
-                if [ -n "${ALTNAMES}" ] && [ -z "${ok}" ]; then
-
-                    debuglog "Checking alternate names: ${COMMON_NAME}"
-
-                    for cn in ${COMMON_NAME}; do
-
-                        IS_IP_TMP="$(is_ip "${cn}")"
-                        if [ "${IS_IP_TMP}" -eq 1 ]; then
-                            verboselog "Skipping the matching of ${cn} as it is an IP address"
-                            continue
+                        if echo "${name}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                            debuglog "        ${name} matches ^${ALT_NAME_TMP}\$"
+                            ok="true"
                         fi
 
-                        ok=""
+                        # Or the literal with the wildcard
+                        ALT_NAME_TMP="$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
+                        debuglog "      checking if (5) ${name} matches ^${ALT_NAME_TMP}\$"
 
-                        debuglog '==============================='
-                        debuglog "checking altnames against ${cn}"
-                        debuglog "  SUBJECT_ALTERNATIVE_NAME = ${SUBJECT_ALTERNATIVE_NAME}"
-
-                        for alt_name in ${SUBJECT_ALTERNATIVE_NAME}; do
-
-                            debuglog "check Altname: ${alt_name}"
-
-                            if echo "${alt_name}" | grep -q -i '^\*\.'; then
-
-                                # Match the domain
-                                debuglog "the altname ${alt_name} begins with a '*'"
-                                ALT_NAME_TMP="$(echo "${alt_name}" | cut -c 3-)"
-                                debuglog "checking if the common name matches ^${ALT_NAME_TMP}\$"
-
-                                if echo "${cn}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
-                                    debuglog "the common name ${cn} matches ^${ALT_NAME_TMP}\$"
-                                    ok="true"
-
-                                fi
-
-                                # Or the literal with the wildcard
-                                ALT_NAME_TMP="$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
-                                debuglog "checking if the common name matches ^${ALT_NAME_TMP}\$"
-
-                                if echo "${cn}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
-                                    debuglog "the common name ${cn} matches ^${ALT_NAME_TMP}\$"
-                                    ok="true"
-                                fi
-
-                                # Or if both are exactly the same
-                                debuglog "checking if the common name matches ^${alt_name}\$"
-
-                                if echo "${cn}" | grep -q -i "^${alt_name}\$"; then
-                                    debuglog "the common name ${cn} matches ^${alt_name}\$"
-                                    ok="true"
-                                fi
-
-                            else
-
-                                if echo "${cn}" | grep -q -i "^${alt_name}$"; then
-                                    debuglog "the common name ${cn} matches ^${alt_name}\$"
-                                    ok="true"
-                                fi
-
-                            fi
-
-                            if [ -n "${ok}" ]; then
-                                break
-                            fi
-
-                        done
-
-                        if [ -z "${ok}" ]; then
-                            if [ -z "${fail}" ]; then
-                                fail="${cn}"
-                            else
-                                fail="${fail}, ${cn}"
-                            fi
+                        if echo "${name}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                            debuglog "        ${name} matches ^${ALT_NAME_TMP}\$"
+                            ok="true"
                         fi
 
-                    done
+                        # Or if both are exactly the same
+                        debuglog "        checking if (6) ${name} matches ^${alt_name}\$"
 
-                fi
+                        if echo "${name}" | grep -q -i "^${alt_name}\$"; then
+                            debuglog "        ${name} matches ^${alt_name}\$"
+                            ok="true"
+                        fi
 
-                if [ -n "${fail}" ]; then
-                    prepend_critical_message "invalid CN ('${fail}' not found in '${CN_TMP}')"
-                else
-                    if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
-                        prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
+                    else
+
+                        if echo "${name}" | grep -q -i "^${alt_name}$"; then
+                            debuglog "      ${name} matches ^${alt_name}\$"
+                            ok="true"
+                        fi
+
                     fi
+
+                done
+
+                if [ -z "${ok}" ]; then
+                    prepend_critical_message "'${name}' does not match the CN nor an alternative name"
                 fi
 
             else
 
-                if [ -z "${ok}" ] && [ -z "${COMMON_NAME_IS_AN_IP}" ]; then
-                    prepend_critical_message "invalid CN ('${CN_TMP}' does not match '${COMMON_NAME}')"
+                debuglog "Ignoring altnames"
+                if [ -z "${ok}" ]; then
+                    prepend_critical_message "'${name}' does not match the CN (altnames ignored)"
                 fi
 
             fi
 
-        fi
+
+        done
 
         debuglog " CN check finished"
 
@@ -5411,10 +5387,10 @@ ${WARNING}"
         # If --altnames was specified or if the certificate is wildcard,
         # then we show the specified CN in addition to the certificate CN
         CHECKEDNAMES=""
-        if [ -n "${ALTNAMES}" ] && [ -n "${COMMON_NAME}" ] && [ "${CN}" != "${COMMON_NAME}" ]; then
-            CHECKEDNAMES="(${COMMON_NAME}) "
-        elif [ -n "${COMMON_NAME}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
-            CHECKEDNAMES="(${COMMON_NAME}) "
+        if [ -n "${ALTNAMES}" ] && [ -n "${NAME_TO_BE_CHECKED}" ] && [ "${CN}" != "${NAMES_TO_BE_CHECKED}" ]; then
+            CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
+        elif [ -n "${NAMES_TO_BE_CHECKED}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
+            CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
         fi
 
         if [ -n "${DAYS_VALID}" ]; then

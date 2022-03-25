@@ -140,7 +140,7 @@ Options:
                                      and fingerprint.
                                    'all' will include all the available
                                    attributes.
-   -n,--cn name                    pattern to match the CN of the certificate
+   -m,--match name                 pattern to match the CN or AltName
                                    (can be specified multiple times)
       --nmap-bin path              path of the nmap binary to be used
       --no-perf                    do not show performance data
@@ -241,6 +241,8 @@ Deprecated options:
       --days days                  minimum number of days a certificate has
                                    to be valid
                                    (see --critical and --warning)
+   -n,--cn name                    pattern to match the CN or AltName
+                                   (can be specified multiple times)
    -N,--host-cn                    match CN with the host name
                                    (enabled by default)
       --no_ssl2                    disable SSLv2 (deprecated use --no-ssl2)

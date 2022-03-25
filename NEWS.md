@@ -1,3 +1,5 @@
+* 2022-03-24 Version 2.23.0
+  * Fixes a bug when the specified --match is an IP address
   * An Unknown status is only returned for plugin-internal issues
 * 2022-03-11 Version 2.22.0
   * The protocol is shown in the output
