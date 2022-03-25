@@ -522,8 +522,14 @@ testWildcardAltNames2() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testAltNamesCaseInsensitve() {
+testAltNamesCaseInsensitive() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn WWW.GITHUB.COM --altnames --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testAltNamesCaseMixed() {
+    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn WwW.gItHuB.cOm --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -545,6 +551,20 @@ testMultipleAltNamesFailOne() {
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
     ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n wrong.ch -n www.github.com --altnames --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testMultipleAltNamesFailIPOne() {
+    # Test with multiple CN's but last one is an incorrect IP
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n www.github.com -n 192.168.0.1 --altnames --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testMultipleAltNamesFailIPTwo() {
+    # Test with multiple CN's but first one is an incorrect IP
+    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n 192.168.0.1 -n www.github.com --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
