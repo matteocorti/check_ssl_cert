@@ -5387,7 +5387,7 @@ ${WARNING}"
         # If --altnames was specified or if the certificate is wildcard,
         # then we show the specified CN in addition to the certificate CN
         CHECKEDNAMES=""
-        if [ -n "${ALTNAMES}" ] && [ -n "${NAME_TO_BE_CHECKED}" ] && [ "${CN}" != "${NAMES_TO_BE_CHECKED}" ]; then
+        if [ -n "${ALTNAMES}" ] && [ -n "${NAMES_TO_BE_CHECKED}" ] && [ "${CN}" != "${NAMES_TO_BE_CHECKED}" ]; then
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
         elif [ -n "${NAMES_TO_BE_CHECKED}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
