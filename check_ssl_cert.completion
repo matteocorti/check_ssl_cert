@@ -35,8 +35,11 @@ _check_ssl_cert() {
     --dane)
         COMPREPLY=($(compgen -W "211 301 302 311 312" -- ${cur}))
         ;;
+    --port | -p)
+        COMPREPLY=($(compgen -W "21 22 80 443 143 993 194 994 389 636 3306 110 995 5432 4190 25 465 5222 5269" -- ${cur}))
+        ;;
     --protocol | -P)
-        COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp imap irc ldap pop3 postgres sieve smtp:" -- ${cur}))
+        COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server ftp" -- ${cur}))
         ;;
     *) ;;
 
