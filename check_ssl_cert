@@ -1686,7 +1686,7 @@ check_ocsp() {
                     FILE_NAME=${ELEMENT_ISSUER_URI%/}
 
                     # remove everything up to the last slash
-                    FILE_NAME="${FILE_NAME##*/}".crt
+                    FILE_NAME="${FILE_NAME##*/}"
 
                     debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME} for debugging purposes"
 
