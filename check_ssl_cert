@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.23.0
+VERSION=2.24.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -5138,6 +5138,10 @@ ${WARNING}"
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ]; then
 
+        create_temporary_file
+        JSON=${TEMPFILE}
+        debuglog "Storing the SSL Labs JSON output to ${JSON}"
+
         while true; do
 
             debuglog "http_proxy  = ${http_proxy}"
@@ -5145,12 +5149,14 @@ ${WARNING}"
             debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
             if [ -n "${SNI}" ]; then
-                JSON="$(${CURL_BIN} "${CURL_PROXY}" "${CURL_PROXY_ARGUMENT}" "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}")"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             else
-                JSON="$(${CURL_BIN} "${CURL_PROXY}" "${CURL_PROXY_ARGUMENT}" "${INETPROTO}" --silent "https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}")"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             fi
+
+            debuglog "curl return code = ${CURL_RETURN_CODE}"
 
             if [ "${CURL_RETURN_CODE}" -ne 0 ]; then
 
@@ -5160,43 +5166,40 @@ ${WARNING}"
 
             fi
 
-            JSON="$(printf '%s' "${JSON}" | tr '\n' ' ')"
-
             debuglog "Checking SSL Labs: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}\""
-            debuglog "SSL Labs JSON: ${JSON}"
+            if [ "${DEBUG}" -gt 0 ]; then
+                sed 's/^/[DBG] SSL Labs JSON/' "${JSON}" 1>&2
+                echo 1>&2
+            fi
 
             # We clear the cache only on the first run
             IGNORE_SSL_LABS_CACHE=""
 
-            if echo "${JSON}" | grep -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later'; then
+            if grep -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' "${JSON}"; then
                 verboselog '  SSL Labs running at full capacity'
             else
 
-                SSL_LABS_HOST_STATUS=$(echo "${JSON}" |
-                    sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/')
+                SSL_LABS_HOST_STATUS=$( sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/' "${JSON}" )
 
                 debuglog "SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 
                 case "${SSL_LABS_HOST_STATUS}" in
                 'ERROR')
-                    SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" |
-                        sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
+                    SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
                     prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
                     break
                     ;;
                 'READY')
-                    if ! echo "${JSON}" | grep -F -q "grade"; then
+                    if ! grep -F -q "grade" "${JSON}" ; then
 
                         # Something went wrong
-                        SSL_LABS_STATUS_MESSAGE=$(echo "${JSON}" |
-                            sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/')
+                        SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
                         prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
                         break
 
                     else
 
-                        SSL_LABS_HOST_GRADE=$(echo "${JSON}" |
-                            sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/')
+                        SSL_LABS_HOST_GRADE=$(sed 's/.*"grade":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
 
                         debuglog "SSL Labs grade: ${SSL_LABS_HOST_GRADE}"
 
@@ -5225,7 +5228,8 @@ ${WARNING}"
                     ;;
                 'IN_PROGRESS')
                     # Data not yet available: warn and continue
-                    PROGRESS=$(echo "${JSON}" | sed 's/.*progress"://' | sed 's/,.*//')
+                    PROGRESS=$(sed 's/.*progress"://' "${JSON}" | sed 's/,.*//')
+                    debuglog "Progress = ${PROGRESS}"
                     if [ "${PROGRESS}" -eq -1 ]; then
                         verboselog "  warning: no cached data by SSL Labs, check in progress" 2
                     else
@@ -5237,11 +5241,10 @@ ${WARNING}"
                     ;;
                 *)
                     # Try to extract a message
-                    SSL_LABS_ERROR_MESSAGE=$(echo "${JSON}" |
-                        sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/')
+                    SSL_LABS_ERROR_MESSAGE=$(sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
 
                     if [ -z "${SSL_LABS_ERROR_MESSAGE}" ]; then
-                        SSL_LABS_ERROR_MESSAGE="${JSON}"
+                        SSL_LABS_ERROR_MESSAGE="cat ${JSON}"
                     fi
 
                     prepend_critical_message "Cannot check status on SSL Labs: ${SSL_LABS_ERROR_MESSAGE}"
@@ -5253,7 +5256,7 @@ ${WARNING}"
             WAIT_TIME=60
             verboselog "  waiting ${WAIT_TIME} seconds" 2
 
-            sleep "${WAIT_TIME}"
+            exec_with_timeout "sleep ${WAIT_TIME}"
 
         done
 

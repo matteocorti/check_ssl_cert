@@ -1,3 +1,7 @@
+2022-04-06  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Timeout support for SSL Labs
+
 2022-03-22  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): fixes debugging output on STDERR
