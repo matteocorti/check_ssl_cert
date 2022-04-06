@@ -1,6 +1,7 @@
 2022-04-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Timeout support for SSL Labs
+        * check_ssl_cert (check_attr): Adding a missing -6 option (if specified) to nmap
 
 2022-03-22  Matteo Corti  <matteo@corti.li>
 
