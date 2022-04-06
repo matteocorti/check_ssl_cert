@@ -575,16 +575,15 @@ testMultipleAltNamesFailIPTwo() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-# not working
-# testXMPPHost() {
-#     out=$(${SCRIPT} --rootcert-file cabundle.crt -H prosody.xmpp.is --port 5222 --protocol xmpp --xmpphost xmpp.is --ignore-exp)
-#     EXIT_CODE=$?
-#     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
-#         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-#     else
-#         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#     fi
-# }
+testXMPPHost() {
+     out=$(${SCRIPT} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org)
+     EXIT_CODE=$?
+     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
+         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+     else
+         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+     fi
+ }
 
 testTimeOut() {
     ${SCRIPT} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout 1 --ignore-exp
@@ -630,17 +629,25 @@ testSMTPS() {
 }
 
 # Disabled as test.rebex.net is currently not working. Should find another public FTP server with TLS
-#testFTP() {
-#    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
-#
-#testFTPS() {
-#    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
+
+testFTP() {
+
+    # https://sockettools.com/kb/testing-secure-connections-with-openssl/
+
+    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testFTPS() {
+
+    # https://forum.rebex.net/1343/open-ftps-and-sftp-servers-for-testing-code-and-connectivity?_ga=2.116138566.194752155.1649251930-302064088.1649251930&_gl=1*14ztj2j*_ga*MzAyMDY0MDg4LjE2NDkyNTE5MzA.*_ga_6V4LCG72WC*MTY0OTI1MTkyNi4xLjAuMTY0OTI1MTkyNi4w
+
+    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+}
 
 ################################################################################
 # From https://badssl.com
@@ -829,7 +836,9 @@ testIPv6() {
 
             echo "IPv6 is configured"
 
-            if ping -c 3 -6 www.google.com >/dev/null 2>&1; then
+            if ping6 -c 3 www.google.com >/dev/null 2>&1; then
+
+                echo "IPv6 is working"
 
                 ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6 --ignore-exp
                 EXIT_CODE=$?
@@ -862,7 +871,9 @@ testIPv6Numeric() {
 
             echo "IPv6 is configured"
 
-            if ping -c 3 -6 ipv6.google.com >/dev/null 2>&1; then
+            if ping6 -c 3 ipv6.google.com >/dev/null 2>&1; then
+
+                echo "IPv6 is working"
 
                 ${SCRIPT} --rootcert-file cabundle.crt -H 2a00:1450:4001:803::200e --ignore-exp
                 EXIT_CODE=$?
@@ -932,41 +943,6 @@ testDANE211() {
         echo "dig not available: skipping DANE test"
     fi
 }
-
-# does not work anymore
-#testDANE311SMTP() {
-#    ${SCRIPT} --rootcert-file cabundle.crt --dane 311 --port 25 -P smtp -H mail.ietf.org
-#    EXIT_CODE=$?
-#    if [ -n "${DANE}" ] ; then
-#        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#    else
-#        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-#    fi
-#}
-#
-#testDANE311() {
-#    ${SCRIPT} --rootcert-file cabundle.crt --dane 311 -H www.ietf.org
-#    EXIT_CODE=$?
-#    if [ -n "${DANE}" ] ; then
-#        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#    else
-#        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-#    fi
-#}
-#
-#testDANE301ECDSA() {
-#    if command -v dig > /dev/null ; then
-#        ${SCRIPT} --rootcert-file cabundle.crt --dane 301 --ecdsa -H mail.aegee.org --ignore-exp
-#        EXIT_CODE=$?
-#        if [ -n "${DANE}" ] ; then
-#            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#        else
-#            assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-#        fi
-#    else
-#        echo "dig not available: skipping DANE test"
-#    fi
-#}
 
 testRequiredProgramFile() {
     ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist --ignore-exp
@@ -1079,12 +1055,6 @@ testResolveDifferentName() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
-
-#testNewQuoVadis() {
-#    ${SCRIPT} --rootcert-file cabundle.crt -H matteo.github.com
-#    EXIT_CODE=$?
-#    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-#}
 
 testResolveCorrectIP() {
     # dig is needed to resolve the IP address

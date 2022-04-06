@@ -1,5 +1,7 @@
 2022-04-06  Matteo Corti  <matteo@corti.li>
 
+        * test/unit_tests.sh (testIPv6): Corrected the IPv6 tests
+
         * check_ssl_cert (check_attr): Timeout support for SSL Labs
         * check_ssl_cert (check_attr): Adding a missing -6 option (if specified) to nmap
 
