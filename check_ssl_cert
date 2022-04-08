@@ -2141,7 +2141,7 @@ fetch_certificate() {
             exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        postgres|postgresql)
+        postgres | postgresql)
             exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
@@ -3172,7 +3172,7 @@ main() {
 
     # Default values
 
-    ALTNAMES=1             # enabled by default
+    ALTNAMES=1                     # enabled by default
     NAMES_TO_BE_CHECKED="__HOST__" # enabled by default
     CRITICAL_DAYS=15
     CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
@@ -3282,7 +3282,7 @@ main() {
             imaps)
                 PORT=993
                 ;;
-            postgres|postgresql)
+            postgres | postgresql)
                 PORT=5432
                 ;;
             sieve)
@@ -3430,16 +3430,16 @@ main() {
     # Set NAMES_TO_BE_CHECKED to hostname (replance __HOST__ if present)
     # NAMES_TO_BE_CHECKED is a space separated list of hostnames.
     case ${NAMES_TO_BE_CHECKED} in
-        *__HOST__*)
-            # localhost is used for files to be checked: we ignore it
-            IS_IP_TMP="$(is_ip "${HOST_NAME}")"
-            if [ "${HOST_NAME}" != 'localhost' ] && [ "${IS_IP_TMP}" -eq 0 ]; then
-                debuglog "Adding ${HOST_NAME} to NAMES_TO_BE_CHECKED"
-                NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__/${HOST_NAME}/")
-            else
-                debuglog "Removing __HOST__ to the names to be checked as the host is 'localhost' or an IP address"
-                NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__//")
-            fi
+    *__HOST__*)
+        # localhost is used for files to be checked: we ignore it
+        IS_IP_TMP="$(is_ip "${HOST_NAME}")"
+        if [ "${HOST_NAME}" != 'localhost' ] && [ "${IS_IP_TMP}" -eq 0 ]; then
+            debuglog "Adding ${HOST_NAME} to NAMES_TO_BE_CHECKED"
+            NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__/${HOST_NAME}/")
+        else
+            debuglog "Removing __HOST__ to the names to be checked as the host is 'localhost' or an IP address"
+            NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__//")
+        fi
         ;;
     *) ;;
     esac
@@ -4883,7 +4883,6 @@ main() {
 
             fi
 
-
         done
 
         debuglog " CN check finished"
@@ -5179,7 +5178,7 @@ ${WARNING}"
                 verboselog '  SSL Labs running at full capacity'
             else
 
-                SSL_LABS_HOST_STATUS=$( sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/' "${JSON}" )
+                SSL_LABS_HOST_STATUS=$(sed 's/.*"status":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
 
                 debuglog "SSL Labs status: ${SSL_LABS_HOST_STATUS}"
 
@@ -5190,7 +5189,7 @@ ${WARNING}"
                     break
                     ;;
                 'READY')
-                    if ! grep -F -q "grade" "${JSON}" ; then
+                    if ! grep -F -q "grade" "${JSON}"; then
 
                         # Something went wrong
                         SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
