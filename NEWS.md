@@ -1,3 +1,5 @@
+* 2022-04-13 Version 2.25.0
+  * Caching of the host names to be used with bash completion
 * 2022-04-06 Version 2.24.0
   * Fixes a problem with timeouts and SSL Labs
 * 2022-03-24 Version 2.23.0

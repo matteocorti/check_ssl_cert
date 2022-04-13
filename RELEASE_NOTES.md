@@ -1,1 +1,1 @@
-Fixes a problem with timeouts and SSL Labs
+Caching of the host names to be used with bash completion

@@ -1,3 +1,8 @@
+2022-04-13  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Added a cache for checked hosts (to be used with bash completion)
+        * check_ssl_cert (usage): Fixed the capitalization of the help messages
+
 2022-04-06  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh (testIPv6): Corrected the IPv6 tests
