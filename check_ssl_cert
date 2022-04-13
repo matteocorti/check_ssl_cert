@@ -2602,6 +2602,7 @@ parse_command_line_options() {
             shift
             ;;
         --init-host-cache)
+            INIT_HOST_CACHE=1
             if ! [ -f "${HOST_CACHE}" ]; then
                 debuglog "Initializing host cache"
                 if ! touch "${HOST_CACHE}"; then
@@ -3355,7 +3356,11 @@ main() {
     # Check options: sanity checks
 
     if [ -z "${HOST}" ] && [ -z "${FILE}" ]; then
-        usage "No host specified"
+        if [ -z "${INIT_HOST_CACHE}" ]; then
+            unknown "No host specified"
+        else
+            exit
+        fi
     elif [ -z "${HOST}" ] && [ -n "${FILE}" ]; then
         HOST='localhost'
     fi
