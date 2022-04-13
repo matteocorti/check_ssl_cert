@@ -80,10 +80,6 @@ set_variable() {
 #   $1 error message (optional)
 usage() {
 
-    if [ -n "$1" ]; then
-        echo "Error: $1" 1>&2
-    fi
-
     echo
     echo "Usage: check_ssl_cert -H host [OPTIONS]"
     echo "       check_ssl_cert -f file [OPTIONS]"

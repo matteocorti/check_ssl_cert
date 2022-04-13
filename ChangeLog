@@ -4,6 +4,7 @@
         * check_ssl_cert.completion (_check_ssl_cert): check if the host cache exists
         * check_ssl_cert (main): Added a cache for checked hosts (to be used with bash completion)
         * check_ssl_cert (usage): Fixed the capitalization of the help messages
+        * check_ssl_cert (usage): Usage errors should trigger an unknown status
 
 2022-04-06  Matteo Corti  <matteo@corti.li>
 

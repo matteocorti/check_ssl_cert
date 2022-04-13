@@ -321,6 +321,8 @@ An asterisk ```*``` is automatically escaped by nagios. If you need to specify a
 
 Once the host name cache (```${HOME}/.check_ssl_cert-cache```) is initialized (with the ```--init-host-cache``` option), every specified host is cached.
 
+The host name cache is a plain text file which contains an host name per line. Each time a new host is specified, it is automatically added to the cache. The file can be edited with a text editor (to delete or edit entries).
+
 When using bash completion with the ```--host``` command line option the cache is then read and used as a suggestion.
 
 ## Development
