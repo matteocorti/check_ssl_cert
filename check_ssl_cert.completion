@@ -29,8 +29,10 @@ _check_ssl_cert() {
     # optios with hosts as argument
     -H | --host | --resolve)
         _known_hosts_real "${cur}"
-        # concatenate the array with the cached hosts: https://stackoverflow.com/questions/31143874/how-to-concatenate-arrays-in-bash
-        COMPREPLY+=($(compgen -W "$(cat ~/.check_ssl_cert-cache | tr "\n" ' ' )" -- ${cur}))
+        if [ -r ~/.check_ssl_cert-cache ]; then
+            # concatenate the array with the cached hosts: https://stackoverflow.com/questions/31143874/how-to-concatenate-arrays-in-bash
+            COMPREPLY+=($(compgen -W "$(cat ~/.check_ssl_cert-cache | tr "\n" ' ' )" -- ${cur}))
+        fi
         ;;
     # grades
     --check-ciphers | --check-ssl-labs-warn)
