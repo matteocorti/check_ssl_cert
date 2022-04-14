@@ -29,3 +29,4 @@ Following tools are required for development:
 
 * Simply copy the plugin to your Nagios/Icinga plugin directory
 * Use ```make install``` by  defining the ```DESTDIR``` and ```MANDIR``` variables with the installation targets. E.g, ```make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install```
+* To install the bash completion script run ```sudo make install_bash_completion``` (it will install the completion script in the directory defined by ```pkg-config --variable=completionsdir bash-completion```
