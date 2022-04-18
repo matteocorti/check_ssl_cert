@@ -1892,9 +1892,7 @@ check_cert_end_date() {
         debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number} (${element_cn})"
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 >/dev/null; then
             if compare "${ELEM_DAYS_VALID}" "<" 1; then
-                DAYS_AGO='today'
-            elif compare "${ELEM_DAYS_VALID}" "<" 2; then
-                DAYS_AGO='yesterday'
+                DAYS_AGO='less than one day ago'
             else
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
@@ -3390,7 +3388,7 @@ main() {
         debuglog "Host cache ${HOST_CACHE} is present"
         if ! grep -q "^${HOST}$" "${HOST_CACHE}"; then
             debuglog "Adding ${HOST} to the host cache"
-            echo "${HOST}" >> "${HOST_CACHE}"
+            echo "${HOST}" >>"${HOST_CACHE}"
         else
             debuglog "${HOST} is already cached"
         fi
@@ -5419,15 +5417,12 @@ ${WARNING}"
 
         if [ -n "${DAYS_VALID}" ]; then
             # nicer formatting
-            if compare "${DAYS_VALID}" '>=' 2; then
+            if compare "${DAYS_VALID}" '>=' 1; then
                 DAYS_VALID=" (expires in ${DAYS_VALID} days)"
-            elif compare "${DAYS_VALID}" '>=' 1; then
-                DAYS_VALID=" (expires tomorrow)"
             elif compare "${DAYS_VALID}" '>=' 0; then
-                DAYS_VALID=" (expires today)"
+                DAYS_VALID=" (expires in less than one day)"
             elif compare "${DAYS_VALID}" '>=' '-1'; then
-                DAYS_VALID=" (expired yesterday)"
-            else
+                DAYS_VALID=$(( -DAYS_VALID ))
                 DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
             fi
         fi

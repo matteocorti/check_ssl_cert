@@ -1,1 +1,1 @@
-Caching of the host names to be used with bash completion
+Fixed a bug in the display of the expiration date
