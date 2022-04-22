@@ -1817,7 +1817,8 @@ check_ocsp() {
 
                         fi
 
-                        prepend_critical_message "OCSP error (-v for details)"
+                        debuglog "${OCSP_RESP}"
+                        prepend_critical_message "OCSP error"
 
                     fi
 
@@ -3385,6 +3386,7 @@ main() {
     fi
 
     debuglog "HOST = ${HOST}"
+    info Host "${HOST}"
 
     if [ -r "${HOST_CACHE}" ]; then
         debuglog "Host cache ${HOST_CACHE} is present"
