@@ -1,3 +1,7 @@
+2022-04-25  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_ocsp): Better error message in case of OCSP problems
+
 2022-04-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Allows to run with the --init-host-cache option only

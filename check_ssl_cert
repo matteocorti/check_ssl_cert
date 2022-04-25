@@ -1818,7 +1818,8 @@ check_ocsp() {
                         fi
 
                         debuglog "${OCSP_RESP}"
-                        prepend_critical_message "OCSP error"
+                        OCSP_ERROR_MESSAGE=$( echo "${OCSP_RESP}" | head -n 1 )
+                        prepend_critical_message "OCSP error (${OCSP_ERROR_MESSAGE})"
 
                     fi
 
