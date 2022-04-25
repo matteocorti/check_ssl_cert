@@ -26,7 +26,7 @@ for option in $(grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//'
     *)
 
         # check if the option is documented in the help.txt file
-        if ! grep -q -- "${option}" help.txt; then
+        if ! grep -q -- "${option}" utils/help.txt; then
             echo "Error: ${option} is not documented in help.txt"
             ERROR=1
         fi
@@ -88,6 +88,6 @@ while read -r line; do
         fi
     fi
 
-done <help.txt
+done <utils/help.txt
 
 exit "${ERROR}"
