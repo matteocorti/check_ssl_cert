@@ -1724,6 +1724,9 @@ check_ocsp() {
 
             debuglog "OCSP: host = ${OCSP_HOST}"
 
+            # ocsp has an own timeout option
+            start_time=$(date +%s)
+
             if [ -n "${OCSP_HOST}" ]; then
 
                 # check if -header is supported
@@ -1834,6 +1837,12 @@ check_ocsp() {
                 verboselog "Warning: no OCSP host found: disabling OCSP checks"
 
             fi
+
+            # update the timeout
+            debuglog "Timeout before OCSP check: ${TIMEOUT}"
+            end_time=$(date +%s)
+            TIMEOUT=$((TIMEOUT - end_time + start_time))
+            debuglog "Timeout after OCSP check:  ${TIMEOUT}"
 
         done
 

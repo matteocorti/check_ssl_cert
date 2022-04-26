@@ -1,3 +1,7 @@
+2022-04-26  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_ocsp): Updating the timeout when using the timeout option of 'ocsp'
+
 2022-04-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_ocsp): Better error message in case of OCSP problems
