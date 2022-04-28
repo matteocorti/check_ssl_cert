@@ -1111,9 +1111,41 @@ testCiphersOK() {
 
 }
 
-testCiphersError() {
+testCiphersNonStandardPort() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
+#    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
+#        echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
+#    el
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+        echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
+    else
+
+        # check if nmap is installed
+        if command -v nmap >/dev/null; then
+
+            # check if ssl-enum-ciphers is present
+            if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine'; then
+
+                ${SCRIPT} --rootcert-file cabundle.crt --host corti.li --port 8443 --check-ciphers C --ignore-exp
+                EXIT_CODE=$?
+                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+            else
+                echo "no ssl-enum-ciphers nmap script found: skipping ciphers test"
+            fi
+
+        else
+            echo "no nmap found: skipping ciphers test"
+        fi
+
+    fi
+
+}
+
+testCiphersError() {
+
+    # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7w
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
     elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
