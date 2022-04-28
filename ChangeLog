@@ -1,3 +1,7 @@
+2022-04-28  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Using --script +ssl-enum-ciphers for older versions of nmap
+
 2022-04-26  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_ocsp): Updating the timeout when using the timeout option of 'ocsp'

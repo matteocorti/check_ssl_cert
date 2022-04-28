@@ -4227,9 +4227,11 @@ main() {
             NMAP_INETPROTO='-6'
         fi
 
-        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script ssl-enum-ciphers \"${HOST_ADDR}\" 2>&1 | grep '^|'"
+        # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-        OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script ssl-enum-ciphers "${HOST_ADDR}" 2>&1 | grep '^|')
+        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${HOST_ADDR}\" 2>&1 | grep '^|'"
+
+        OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${HOST_ADDR}" 2>&1 | grep '^|')
 
         debuglog "offered ciphers and protocols:"
         debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
