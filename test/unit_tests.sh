@@ -956,15 +956,16 @@ testRequiredProgramPermissions() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
-testSieveECDSA() {
-    if ! { "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'usage:'; }; then
-        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --ignore-exp
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    else
-        echo "Skipping sieve tests (not supported)"
-    fi
-}
+# not always working
+#testSieveECDSA() {
+#    if ! { "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'usage:'; }; then
+#        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --ignore-exp
+#        EXIT_CODE=$?
+#        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+#    else
+#        echo "Skipping sieve tests (not supported)"
+#    fi
+#}
 
 testHTTP2() {
     ${SCRIPT} --rootcert-file cabundle.crt -H rwserve.readwritetools.com --ignore-exp
