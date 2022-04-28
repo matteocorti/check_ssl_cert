@@ -1,3 +1,5 @@
+* 2022-04-28 Version 2.27.0
+ * Fixed a bug with the ciphers check with older nmap versions
 * 2022-04-28 Version 2.26.0
  * Fixed a bug with the ciphers check with older nmap versions
  * Fixed a bug in the display of the expiration date

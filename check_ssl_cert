@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.26.0
+VERSION=2.27.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -5080,7 +5080,7 @@ main() {
 
         # -Pn is needed even if we specify a port
         TIMEOUT_REASON="checking ciphers"
-        exec_with_timeout "${NMAP_BIN} -Pn --script ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+        exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
         if [ "${DEBUG}" -ge 1 ]; then
             debuglog 'nmap output:'
