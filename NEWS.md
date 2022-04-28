@@ -1,4 +1,6 @@
-  * Fixed a bug in the display of the expiration date
+* 2022-04-28 Version 2.26.0
+ * Fixed a bug with the ciphers check with older nmap versions
+ * Fixed a bug in the display of the expiration date
 * 2022-04-13 Version 2.25.0
   * Caching of the host names to be used with bash completion
 * 2022-04-06 Version 2.24.0
