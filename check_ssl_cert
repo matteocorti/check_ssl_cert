@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.27.0
+VERSION=2.28.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4320,43 +4320,43 @@ main() {
     # Connection check
     if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
 
-        debuglog "Testing connection with ${HOST}:${PORT} with timeout ${TIMEOUT}"
+        debuglog "Testing connection with ${HOST}:${PORT}"
 
-        # we check with curl if a connection is possible
-        debuglog "Executing: ${CURL_BIN} --silent --connect-timeout ${TIMEOUT} ${HOST}:${PORT}"
+        # we need nc
+        check_required_prog nc
+        NC=${PROG}
 
-        "${CURL_BIN}" "${CURL_PROXY}" "${CURL_PROXY_ARGUMENT}" "${INETPROTO}" --silent --connect-timeout "${TIMEOUT}" "${HOST}":"${PORT}" >/dev/null
-        CURL_EXIT_STATUS=$?
+        # we try for 2 seconds
+        #  proxy should be considered (-x)
+        debuglog "Executing: 'echo | ${NC} ${INETPROTO} -G 2 ${HOST} ${PORT}'"
 
-        debuglog "  curl exited with status ${CURL_EXIT_STATUS}"
+        # shellcheck disable=SC2086
+        echo | ${NC} ${INETPROTO} -G 2 "${HOST}" "${PORT}"
+        NC_EXIT_STATUS=$?
 
-        # curl exit codes
-        # -  7 Failed to connect to host
-        # - 28 Timeout
-        if [ "${CURL_EXIT_STATUS}" -eq 28 ] ||
-            [ "${CURL_EXIT_STATUS}" -eq 7 ]; then
+        debuglog "  nc exited with status ${NC_EXIT_STATUS}"
 
-            debuglog "  connection timed out: exiting with code ${IGNORE_CONNECTION_STATE}"
+        if [ "${NC_EXIT_STATUS}" -eq 1 ] ; then
 
             case "${IGNORE_CONNECTION_STATE}" in
-            "${STATUS_OK}")
-                echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                exit "${STATUS_OK}"
-                ;;
-            "${STATUS_WARNING}")
-                echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                exit "${STATUS_WARNING}"
-                ;;
-            "${STATUS_CRITICAL}")
-                echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                exit "${STATUS_CRITICAL}"
-                ;;
-            "${STATUS_UNKNOWN}")
-                critical "Cannot connect to ${HOST}:${PORT}"
-                ;;
-            *)
-                unknown "Wrong exit code () specified for --ignore-connection-problem"
-                ;;
+                "${STATUS_OK}")
+                    echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_OK}"
+                    ;;
+                "${STATUS_WARNING}")
+                    echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_WARNING}"
+                    ;;
+                "${STATUS_CRITICAL}")
+                    echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_CRITICAL}"
+                    ;;
+                "${STATUS_UNKNOWN}")
+                    critical "Cannot connect to ${HOST}:${PORT}"
+                    ;;
+                *)
+                    unknown "Wrong exit code () specified for --ignore-connection-problem"
+                    ;;
             esac
 
             exit

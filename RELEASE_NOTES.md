@@ -1,1 +1,1 @@
- * Fixed a bug with the ciphers check with older nmap versions
+Fixed a bug in the conenction check when ```--ignore-connection-problems```

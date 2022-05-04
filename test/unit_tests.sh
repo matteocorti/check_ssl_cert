@@ -1314,9 +1314,15 @@ testIgnoreConnectionStateWARNING() {
 }
 
 testIgnoreConnectionStateError() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-state 4
+    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems 4
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
+testIgnoreConnectionStateHTTP() {
+    ${SCRIPT} -H www.github.com --port 443 --ignore-connection-problems 0
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSubdomainWithUnderscore() {

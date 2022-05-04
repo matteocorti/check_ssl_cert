@@ -16,6 +16,7 @@
 * ```expand``` for ```--info```
 * ```tar``` and ```bzip2``` to build release packages
 * ```ip``` or ```ifconfig``` to be able to use the ```-4``` and ```-6``` options
+* [nectcat](https://nc110.sourceforge.io) for ```--ignore-connection-state```
 
 ## Development
 

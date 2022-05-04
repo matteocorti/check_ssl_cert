@@ -1,3 +1,7 @@
+2022-05-04  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Using netcat to check connections
+
 2022-04-28  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Using --script +ssl-enum-ciphers for older versions of nmap
