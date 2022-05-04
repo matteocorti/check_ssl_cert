@@ -4336,7 +4336,7 @@ main() {
 
         debuglog "  nc exited with status ${NC_EXIT_STATUS}"
 
-        if [ "${NC_EXIT_STATUS}" -eq 1 ] ; then
+        if [ "${NC_EXIT_STATUS}" -ne 0 ] ; then
 
             case "${IGNORE_CONNECTION_STATE}" in
                 "${STATUS_OK}")
