@@ -1,5 +1,5 @@
 * 2022-05-04 Version 2.28.0
-  * Fixed a bug in the conenction check when ```--ignore-connection-problems```
+  * Fixed a bug in the conenction check when specifying ```--ignore-connection-problems```
 * 2022-04-28 Version 2.27.0
  * Fixed a bug with the ciphers check with older nmap versions
 * 2022-04-28 Version 2.26.0
