@@ -74,24 +74,24 @@ jobs:
           - distro: 'debian:testing'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools bc bash-completion ncat
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools bc bash-completion
           - distro: 'debian:10'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion ncat
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion
 
           - distro: 'ubuntu:16.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion netcat
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion
           - distro: 'ubuntu:18.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion netcat
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion
           - distro: 'ubuntu:20.04'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion ncat
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion
 
 
           - distro: 'alpine:3.13'
@@ -106,17 +106,17 @@ jobs:
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion nmap-ncat
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion
           - distro: 'fedora:34'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion nmap-ncat
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion
           - distro: 'fedora:35'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion nmap-ncat
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion
 
 
     steps:

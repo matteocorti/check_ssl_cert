@@ -1,3 +1,7 @@
+2022-05-05  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): using nmap instead of netcat
+
 2022-05-04  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Using netcat to check connections

@@ -3832,11 +3832,12 @@ main() {
     # nmap
     if [ -z "${NMAP_BIN}" ]; then
 
-        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
+        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] || [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
 
             if [ -n "${DISALLOWED_PROTOCOLS}" ]; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"; fi
             if [ -n "${CHECK_CIPHERS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS = ${CHECK_CIPHERS}"; fi
             if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS_WARNINGS"; fi
+            if [ -n "${IGNORE_CONNECTION_STATE}" ]; then debuglog "nmap binary needed. IGNORE_CONNECTION_STATE"; fi
             debuglog "nmap binary not specified"
 
             check_required_prog nmap
@@ -4322,21 +4323,9 @@ main() {
 
         debuglog "Testing connection with ${HOST}:${PORT}"
 
-        # we need nc
-        check_required_prog nc
-        NC=${PROG}
+        debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -p ${PORT} ${HOST}'"
 
-        # we try for 2 seconds
-        #  proxy should be considered (-x)
-        debuglog "Executing: 'echo | ${NC} ${INETPROTO} -G 2 ${HOST} ${PORT}'"
-
-        # shellcheck disable=SC2086
-        echo | ${NC} ${INETPROTO} -G 2 "${HOST}" "${PORT}"
-        NC_EXIT_STATUS=$?
-
-        debuglog "  nc exited with status ${NC_EXIT_STATUS}"
-
-        if [ "${NC_EXIT_STATUS}" -ne 0 ] ; then
+        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -p "${PORT}" "${HOST}" 2>&1 | grep -q "${PORT}.*open" ; then
 
             case "${IGNORE_CONNECTION_STATE}" in
                 "${STATUS_OK}")
