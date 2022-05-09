@@ -16,6 +16,18 @@ SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
 
 XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
 
+.PHONY: install clean test rpm distclean check version_check
+
+# checks if the verison is updated in all the files
+version_check:
+	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
+	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec
+	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
+	grep -q "\"$(VERSION)\"" $(PLUGIN).1
+	grep -q -F "${VERSION}" NEWS.md
+	grep -q  "^version:\ ${VERSION}" CITATION.cff
+	echo "Version check: OK"
+
 # builds the relase files
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -48,16 +60,6 @@ install_bash_completion:
 ifdef COMPLETIONS_DIR
 	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
 endif
-
-# checks if the verison is updated in all the files
-version_check:
-	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
-	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec
-	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
-	grep -q "\"$(VERSION)\"" $(PLUGIN).1
-	grep -q -F "${VERSION}" NEWS.md
-	grep -q  "^version:\ ${VERSION}" CITATION.cff
-	echo "Version check: OK"
 
 # we check for tabs
 # and remove trailing blanks
@@ -117,5 +119,3 @@ rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
 	cp $(DIST_DIR).tar.gz rpmroot/SOURCES
 	rpmbuild --define "_topdir `pwd`/rpmroot" -ba check_ssl_cert.spec
-
-.PHONY: install clean test rpm distclean check
