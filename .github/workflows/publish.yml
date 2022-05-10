@@ -21,6 +21,7 @@ jobs:
           - 'fedora:33'
           - 'fedora:34'
           - 'fedora:35'
+          - 'fedora:36'
         include:
           - distro: 'fedora:33'
             pre: >-
@@ -31,6 +32,10 @@ jobs:
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
           - distro: 'fedora:35'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
+          - distro: 'fedora:36'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
