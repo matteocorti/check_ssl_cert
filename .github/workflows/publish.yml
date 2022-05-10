@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   release:
     types: [published]
+permissions:
+  contents: read
+
 jobs:
   linux:
     # The host should always be linux
