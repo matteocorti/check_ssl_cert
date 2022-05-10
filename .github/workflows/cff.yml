@@ -5,6 +5,9 @@ on:
       - CITATION.cff
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 name: CITATION.cff
 jobs:
   Validate-CITATION-cff:
