@@ -71,6 +71,7 @@ jobs:
           - 'fedora:33'
           - 'fedora:34'
           - 'fedora:35'
+          - 'fedora:36'
         include:
 
 
@@ -120,6 +121,11 @@ jobs:
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion
+          - distro: 'fedora:36'
+            pre: >-
+              dnf upgrade -y &&
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion
 
 
     steps:
@@ -156,6 +162,7 @@ jobs:
           - 'fedora:33'
           - 'fedora:34'
           - 'fedora:35'
+          - 'fedora:36'
         include:
           - distro: 'fedora:32'
             pre: >-
@@ -170,6 +177,10 @@ jobs:
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
           - distro: 'fedora:35'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
+          - distro: 'fedora:36'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -218,6 +229,10 @@ jobs:
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'fedora:35'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:36'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
