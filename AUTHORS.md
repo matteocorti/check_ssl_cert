@@ -136,3 +136,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Kim Jahn](https://github.com/mookie-) for
   * the conversion typo and
   * the underscore fixes
+* Many thanks to [Naveen](https://github.com/naveensrinivasan) for the GitHub actions permissions fix
