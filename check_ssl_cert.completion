@@ -45,7 +45,7 @@ _check_ssl_cert() {
         ;;
     --port | -p)
         # shellcheck disable=2207
-        COMPREPLY=($(compgen -W "21 22 80 443 143 993 194 994 389 636 3306 110 995 5432 4190 25 465 5222 5269" -- "${cur}" ))
+        COMPREPLY=($(compgen -W "21 22 80 443 143 993 194 994 389 587 636 3306 110 995 5432 4190 25 465 5222 5269" -- "${cur}" ))
         ;;
     --protocol | -P)
         # shellcheck disable=2207
