@@ -701,7 +701,7 @@ testGRCRevoked() {
 }
 
 testBadSSLIncompleteChain() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com --ignore-exp
+    ${SCRIPT} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
