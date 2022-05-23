@@ -2428,7 +2428,7 @@ fetch_certificate() {
     else
 
         if ascii_grep usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ]; then
-            critical "it seems that OpenSSL -starttls does not support yet LDAP"
+            critical "it seems that OpenSSL -starttls does not yet support LDAP"
         fi
 
         NEGOTIATED_PROTOCOL=$(grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
