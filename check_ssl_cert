@@ -1877,7 +1877,7 @@ check_cert_end_date() {
 
     HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
 
-    # TO DO: flaoting point
+    # TO DO: floating point
 
     ELEM_DAYS_VALID=$(compute "${HOURS_UNTIL}/24")
     ELEM_SECONDS_VALID=$(compute "${HOURS_UNTIL} * 3600")
@@ -2428,7 +2428,7 @@ fetch_certificate() {
     else
 
         if ascii_grep usage "${ERROR}" && [ "${PROTOCOL}" = "ldap" ]; then
-            critical "it seems that OpenSSL -starttls does not support yet LDAP"
+            critical "it seems that OpenSSL -starttls does not yet support LDAP"
         fi
 
         NEGOTIATED_PROTOCOL=$(grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
@@ -2662,9 +2662,9 @@ parse_command_line_options() {
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
             shift
             ;;
-        # deprecated: this is enabled by defualt!
+        # deprecated: this is enabled by default!
         -N | --host-cn)
-            # __HOST__ ist a placeholder for the specified host name which is always checked
+            # __HOST__ is a placeholder for the specified host name which is always checked
             NAMES_TO_BE_CHECKED="__HOST__"
             shift
             ;;
