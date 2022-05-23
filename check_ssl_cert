@@ -2664,7 +2664,7 @@ parse_command_line_options() {
             ;;
         # deprecated: this is enabled by defualt!
         -N | --host-cn)
-            # __HOST__ ist a placeholder for the specified host name which is always checked
+            # __HOST__ is a placeholder for the specified host name which is always checked
             NAMES_TO_BE_CHECKED="__HOST__"
             shift
             ;;
