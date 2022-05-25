@@ -45,6 +45,9 @@
 --debug-time;Write timing information in the
 --debug-time;debugging output
 --dig-bin path;Path of the dig binary to be used
+--dtls;Use the DTLS protocol
+--dtls1;Use the DTLS protocol 1.0
+--dtls1_2;Use the DTLS protocol 1.2
 --ecdsa;Signature algorithm selection: force ECDSA
 --ecdsa;certificate
 --element number;Check up to the N cert element from the

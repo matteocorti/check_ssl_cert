@@ -69,6 +69,9 @@ Options:
       --debug-file file            Write the debug messages to file
       --debug-time                 Write timing information in the
                                    debugging output
+      --dtls                       Use the DTLS protocol
+      --dtls1                      Use the DTLS protocol 1.0
+      --dtls1_2                    Use the DTLS protocol 1.2
       --dig-bin path               Path of the dig binary to be used
    -e,--email address              Pattern to match the email address
                                    contained in the certificate
