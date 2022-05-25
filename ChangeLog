@@ -1,6 +1,7 @@
 2022-05-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (parse_command_line_options): Support for DTLS
+        * check_ssl_cert (parse_command_line_options): Check if two protocols are specified at the same time
 
 2022-05-10  Matteo Corti  <matteo@corti.li>
 

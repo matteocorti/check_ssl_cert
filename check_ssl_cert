@@ -2560,14 +2560,23 @@ parse_command_line_options() {
 
         # DTLS
         --dtls)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--dtls: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-dtls"
             shift
             ;;
         --dtls1)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--dtls1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-dtls1"
             shift
             ;;
         --dtls1_2)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--dtls1_2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-dtls1_2"
             shift
             ;;
@@ -2731,26 +2740,44 @@ parse_command_line_options() {
             shift
             ;;
         --ssl2)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--ssl2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-ssl2"
             shift
             ;;
         --ssl3)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--ssl3: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-ssl3"
             shift
             ;;
         --tls1)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--tls1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-tls1"
             shift
             ;;
         --tls1_1)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--tls1_1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-tls1_1"
             shift
             ;;
         --tls1_2)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--tls1_2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-tls1_2"
             shift
             ;;
         --tls1_3)
+            if [ -n "${SSL_VERSION}" ] ; then
+                unknown "--tls1_3: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
+            fi
             SSL_VERSION="-tls1_3"
             shift
             ;;
