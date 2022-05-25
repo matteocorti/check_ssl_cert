@@ -1,3 +1,5 @@
+* 2022-05-24 Version 2.29.0
+  * Support for DTLS
 * 2022-05-04 Version 2.28.0
   * Fixed a bug in the conenction check when specifying ```--ignore-connection-problems```
 * 2022-04-28 Version 2.27.0

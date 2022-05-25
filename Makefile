@@ -20,6 +20,7 @@ XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs
 
 # checks if the verison is updated in all the files
 version_check:
+	echo "Checking version $(VERSION)"
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec
 	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec

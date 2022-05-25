@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.28.0
+VERSION=2.29.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -142,6 +142,9 @@ usage() {
     echo "      --debug-time                 Write timing information in the"
     echo "                                   debugging output"
     echo "      --dig-bin path               Path of the dig binary to be used"
+    echo "      --dtls                       Use the DTLS protocol"
+    echo "      --dtls1                      Use the DTLS protocol 1.0"
+    echo "      --dtls1_2                    Use the DTLS protocol 1.2"
     # Delimiter at 78 chars ############################################################
     echo "   -e,--email address              Pattern to match the email address"
     echo "                                   contained in the certificate"
@@ -2554,6 +2557,21 @@ parse_command_line_options() {
             DEBUG_TIME=$(date +%s)
             shift
             ;;
+
+        # DTLS
+        --dtls)
+            SSL_VERSION="-dtls"
+            shift
+            ;;
+        --dtls1)
+            SSL_VERSION="-dtls1"
+            shift
+            ;;
+        --dtls1_2)
+            SSL_VERSION="-dtls1_2"
+            shift
+            ;;
+
         -h | --help | -\?)
             usage
             ;;

@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "May, 2022" "2.28.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "May, 2022" "2.29.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -97,6 +97,15 @@ Write timing information in the debugging output
 .TP
 .BR "   --dig-bin" " path"
 Path of the dig binary to be used
+.TP
+.BR "   --dtls"
+Use the DTLS protocol
+.TP
+.BR "   --dtls1"
+Use the DTLS protocol 1.0
+.TP
+.BR "   --dtls1_2"
+Use the DTLS protocol 1.2
 .TP
 .BR "-e,--email" " address"
 Pattern to match the email address contained in the certificate
