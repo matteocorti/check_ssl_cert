@@ -2563,6 +2563,7 @@ parse_command_line_options() {
             if [ -n "${SSL_VERSION}" ] ; then
                 unknown "--dtls: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
+            require_s_client_option '-dtls'
             SSL_VERSION="-dtls"
             shift
             ;;
@@ -2570,6 +2571,7 @@ parse_command_line_options() {
             if [ -n "${SSL_VERSION}" ] ; then
                 unknown "--dtls1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
+            require_s_client_option '-dtls1'
             SSL_VERSION="-dtls1"
             shift
             ;;
@@ -2577,6 +2579,7 @@ parse_command_line_options() {
             if [ -n "${SSL_VERSION}" ] ; then
                 unknown "--dtls1_2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
+            require_s_client_option '-dtls1_2'
             SSL_VERSION="-dtls1_2"
             shift
             ;;
@@ -3358,6 +3361,12 @@ main() {
                 ;;
             mysql)
                 PORT=3306
+                ;;
+            xmpp)
+                PORT=5222
+                ;;
+            xmpp-server)
+                PORT=5269
                 ;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"

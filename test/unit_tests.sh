@@ -585,6 +585,16 @@ testXMPPHost() {
     fi
 }
 
+testXMPPHostDefaultPort() {
+    out=$(${SCRIPT} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org)
+    EXIT_CODE=$?
+    if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
+        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+    else
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    fi
+}
+
 testTimeOut() {
     ${SCRIPT} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout 1 --ignore-exp
     EXIT_CODE=$?

@@ -1,1 +1,2 @@
-Support for DTLS
+ * Support for DTLS
+ * Default ports for XMPP
