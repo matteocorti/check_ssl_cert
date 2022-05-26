@@ -2160,7 +2160,7 @@ fetch_certificate() {
             RET=$?
             ;;
         xmpp | xmpp-server)
-            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${XMPPPORT} ${XMPPHOST} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${XMPPHOST} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         mysql)
@@ -3025,7 +3025,6 @@ parse_command_line_options() {
         -p | --port)
             check_option_argument '-p|--port' "$2"
             PORT="$2"
-            XMPPPORT="$2"
             shift 2
             ;;
         --precision)
@@ -3281,7 +3280,6 @@ main() {
     WARNING_DAYS=20
     WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
     XMPPHOST=""
-    XMPPPORT="5222"
 
     if [ -z "${TIMEOUT}" ]; then
         TIMEOUT="120"
