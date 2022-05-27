@@ -14,5 +14,4 @@ jobs:
           check_filenames: true
           check_hidden: true
           exclude_file: test/cabundle.crt
-          # is a tag
-          ignore_words_list: ba
+          ignore_words_file: .codespell-ignore

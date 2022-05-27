@@ -16,7 +16,7 @@ SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
 
 XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
 
-.PHONY: install clean test rpm distclean check version_check
+.PHONY: install clean test rpm distclean check version_check codespell
 
 # checks if the version is updated in all the files
 version_check:
@@ -28,6 +28,13 @@ version_check:
 	grep -q -F "${VERSION}" NEWS.md
 	grep -q  "^version:\ ${VERSION}" CITATION.cff
 	echo "Version check: OK"
+
+# spelling check
+codespell:
+	codespell \
+	--ignore-words .codespell-ignore \
+	--exclude-file test/cabundle.crt \
+	.
 
 # builds the release files
 dist: version_check
@@ -96,7 +103,7 @@ SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
 SHUNIT := $(shell command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi )
 
 distcheck: disttest
-disttest: dist formatting_check shellcheck
+disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
