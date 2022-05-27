@@ -339,7 +339,7 @@ testPrecision4() {
 }
 
 testPrecision0() {
-    # we force integers even if critical is a floting point
+    # we force integers even if critical is a floating point
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in\ [0-9]*[.]'
     EXIT_CODE=$?

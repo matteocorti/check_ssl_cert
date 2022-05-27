@@ -25,7 +25,7 @@ _check_ssl_cert() {
     -f | --file | -C | --clientcert | --curl-bin | --date | --debug-file | --dig-bin | --file-bin | --issuer-cert-cache | --nmap-bin | --openssl | --rootcert-dir | --rootcert-file | --temp | -K | --clientkey | -r | --rootcert)
         _filedir
         ;;
-    # optios with hosts as argument
+    # options with hosts as argument
     -H | --host | --resolve)
         _known_hosts_real "${cur}"
         if [ -r ~/.check_ssl_cert-cache ]; then
