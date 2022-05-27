@@ -44,7 +44,6 @@ jobs:
       - name: Run the tests
         run:  |
           uname -a \
-          && export TEST_DEBUG=--debug \
           && make test \
           && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && make dist \
