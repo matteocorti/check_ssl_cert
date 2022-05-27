@@ -60,7 +60,7 @@
 
 2022-03-15  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert: status UKNOWN only for plugin-internal problems (see https://nagios-plugins.org/doc/guidelines.html#AEN78)
+        * check_ssl_cert: status UNKNOWN only for plugin-internal problems (see https://nagios-plugins.org/doc/guidelines.html#AEN78)
 
 2022-03-14  Matteo Corti  <matteo@corti.li>
 
