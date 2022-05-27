@@ -18,7 +18,7 @@ XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs
 
 .PHONY: install clean test rpm distclean check version_check
 
-# checks if the verison is updated in all the files
+# checks if the version is updated in all the files
 version_check:
 	echo "Checking version $(VERSION)"
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
@@ -29,7 +29,7 @@ version_check:
 	grep -q  "^version:\ ${VERSION}" CITATION.cff
 	echo "Version check: OK"
 
-# builds the relase files
+# builds the release files
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
