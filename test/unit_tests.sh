@@ -1508,7 +1508,6 @@ testOrganizationFail() {
 }
 
 testOrganizationOK() {
-    echo "${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub,\ Inc.' --ignore-exp"
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub,\ Inc.' --ignore-exp
     EXIT_CODE=$?
