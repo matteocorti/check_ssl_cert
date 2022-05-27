@@ -1,3 +1,7 @@
+2022-05-27  Matteo Corti  <matteo@corti.li>
+
+        * test/unit_tests.sh: Added the possibility to set the debug mode for all the tests
+
 2022-05-26  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): added default ports for XMPP

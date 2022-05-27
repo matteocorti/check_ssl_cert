@@ -341,6 +341,13 @@ To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
 
 Run ```make test``` to execute the whole test suite.
 
+To enable debugging ouput for the tests set the ```TEST_DEBUG``` environment variable to ```--debug```:
+
+```
+export TEST_DEBUG=--debug
+make test
+```
+
 With ```make disttest``` you can check the formatting of the files (e.g. tabs and blanks at the end of the lines) and run ShellCheck to lint the scripts.
 
 To run a single test:

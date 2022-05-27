@@ -279,69 +279,81 @@ testDependencies() {
 }
 
 testIntegerOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 2 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIntegerNotOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2.2 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 2.2 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 2.a --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 2.a --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testFloatOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 2.2 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 2.2 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testFloatNotOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 2.2a --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 2.2a --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical .2 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical .2 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testPrecision() {
     # if nothing is specified integers should be used
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --ignore-exp | grep -q -E 'in\ [0-9]*[.]'
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --ignore-exp | grep -q -E 'in\ [0-9]*[.]'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
 
 testPrecisionCW() {
     # if critical or warning is not an integer we should switch to floating point
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 | grep -q -E 'in\ [0-9]*[.][0-9]{2}'
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 | grep -q -E 'in\ [0-9]*[.][0-9]{2}'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
 
 testPrecision4() {
     # we force a precision of 4
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --precision 4 --critical 1 | grep -q -E 'in\ [0-9]*[.][0-9]{4}'
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 4 --critical 1 | grep -q -E 'in\ [0-9]*[.][0-9]{4}'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
 
 testPrecision0() {
     # we force integers even if critical is a floting point
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in\ [0-9]*[.]'
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in\ [0-9]*[.]'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
 
 testInfo() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --info --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --info --ignore-exp
 }
 
 testFQDN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com. --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com. --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -353,49 +365,57 @@ testSCT() {
     ${OPENSSL} version
     if openssl_version '1.1.0'; then
         echo "OpenSSL >= 1.1.0: SCTs supported"
-        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
         echo "OpenSSL < 1.1.0: SCTs not supported"
-        ${SCRIPT} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
 }
 
 testUsage() {
-    ${SCRIPT} >/dev/null 2>&1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testMissingArgument() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --critical >/dev/null 2>&1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --critical >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testMissingArgument2() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --critical --warning 10 >/dev/null 2>&1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --critical --warning 10 >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testGroupedVariables() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -vvv >/dev/null 2>&1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -vvv >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testGroupedVariablesError() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -vvxv >/dev/null 2>&1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -vvxv >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testPrometheus() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --prometheus --critical 1000 --warning 1100)
+    # shellcheck disable=SC2086
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --prometheus --critical 1000 --warning 1100)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
@@ -414,43 +434,50 @@ testPrometheus() {
 }
 
 testGitHub() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testLetsEncrypt() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H helloworld.letsencrypt.org --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H helloworld.letsencrypt.org --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testGITHUBCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn GITHUB.COM --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn GITHUB.COM --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIPOK() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIPOKAltName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --cn pasi.corti.li --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --cn pasi.corti.li --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIPFailAltName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H 138.201.94.172 --cn bogus.corti.li --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --cn bogus.corti.li --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIPCN() {
-    ${SCRIPT} --rootcert-file cabundle.crt --host github.com --cn 1.1.1.1 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host github.com --cn 1.1.1.1 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -458,7 +485,8 @@ testIPCN() {
 testETHZWildCard() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sp.ethz.ch --ignore-altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sp.ethz.ch --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -466,58 +494,67 @@ testETHZWildCard() {
 testETHZWildCardCaseInsensitive() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --ignore-altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSubCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRootIssuer() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --issuer 'DigiCert Inc' --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --issuer 'DigiCert Inc' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testValidity() {
     # Tests bug #8
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testValidityWithPerl() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1 --force-perl-date
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1 --force-perl-date
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testAltNames() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn www.github.com --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn www.github.com --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 #Check for wildcard support in Alternative Names
 testWildcardAltNames2() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch \
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch \
         --cn somehost.spapps.ethz.ch \
         --cn otherhost.sPaPPs.ethz.ch \
         --cn spapps.ethz.ch \
@@ -529,54 +566,62 @@ testWildcardAltNames2() {
 }
 
 testAltNamesCaseInsensitive() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn WWW.GITHUB.COM --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn WWW.GITHUB.COM --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testAltNamesCaseMixed() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --cn WwW.gItHuB.cOm --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn WwW.gItHuB.cOm --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesOK() {
     # Test with multiple CN's
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li -n www.corti.li -n rpm.corti.li --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li -n www.corti.li -n rpm.corti.li --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailOne() {
     # Test with multiple CN's but last one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n www.github.com -n wrong.com --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n www.github.com -n wrong.com --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n wrong.ch -n www.github.com --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n wrong.ch -n www.github.com --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailIPOne() {
     # Test with multiple CN's but last one is an incorrect IP
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n www.github.com -n 192.168.0.1 --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n www.github.com -n 192.168.0.1 --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testMultipleAltNamesFailIPTwo() {
     # Test with multiple CN's but first one is an incorrect IP
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com -n 192.168.0.1 -n www.github.com --altnames --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n 192.168.0.1 -n www.github.com --altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testXMPPHost() {
-    out=$(${SCRIPT} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org)
+    # shellcheck disable=SC2086
+    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org)
     EXIT_CODE=$?
     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
@@ -586,7 +631,8 @@ testXMPPHost() {
 }
 
 testXMPPHostDefaultPort() {
-    out=$(${SCRIPT} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org)
+    # shellcheck disable=SC2086
+    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org)
     EXIT_CODE=$?
     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
@@ -596,44 +642,51 @@ testXMPPHostDefaultPort() {
 }
 
 testTimeOut() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout 1 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H gmail.com --protocol imap --port 993 --timeout 1 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIMAP() {
     # minimal critical and warning as they renew pretty late
-    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H imap.gmx.com --port 143 --timeout 30 --protocol imap --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIMAPS() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H imap.gmail.com --port 993 --timeout 30 --protocol imaps --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testPOP3S() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H pop.gmail.com --port 995 --timeout 30 --protocol pop3s --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPSubmbission() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 587 --timeout 60 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testSMTPS() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60 --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtps --port 465 --timeout 60 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -644,7 +697,8 @@ testFTP() {
 
     # https://sockettools.com/kb/testing-secure-connections-with-openssl/
 
-    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -653,7 +707,8 @@ testFTPS() {
 
     # https://forum.rebex.net/1343/open-ftps-and-sftp-servers-for-testing-code-and-connectivity?_ga=2.116138566.194752155.1649251930-302064088.1649251930&_gl=1*14ztj2j*_ga*MzAyMDY0MDg4LjE2NDkyNTE5MzA.*_ga_6V4LCG72WC*MTY0OTI1MTkyNi4xLjAuMTY0OTI1MTkyNi4w
 
-    ${SCRIPT} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -663,67 +718,78 @@ testFTPS() {
 # From https://badssl.com
 
 testBadSSLExpired() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H expired.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLExpiredAndWarnThreshold() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H expired.badssl.com --warning 3000
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H expired.badssl.com --warning 3000
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLWrongHost() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H wrong.host.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H wrong.host.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSelfSigned() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H self-signed.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H self-signed.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLUntrustedRoot() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H untrusted-root.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H untrusted-root.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRevoked() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRevokedCRL() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testGRCRevoked() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H revoked.grc.com
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.grc.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLIncompleteChain() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H incomplete-chain.badssl.com
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLDH480() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H dh480.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H dh480.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLDH512() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H dh512.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H dh512.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -731,7 +797,8 @@ testBadSSLDH512() {
 testBadSSLRC4MD5() {
     # older versions of OpenSSL validate RC4-MD5
     if ! "${OPENSSL}" ciphers RC4-MD5 >/dev/null 2>&1; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H rc4-md5.badssl.com --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -742,7 +809,8 @@ testBadSSLRC4MD5() {
 testBadSSLRC4() {
     # older versions of OpenSSL validate RC4
     if ! "${OPENSSL}" ciphers RC4 >/dev/null 2>&1; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H rc4.badssl.com --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H rc4.badssl.com --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -753,7 +821,8 @@ testBadSSLRC4() {
 testBadSSL3DES() {
     # older versions of OpenSSL validate RC4
     if ! "${OPENSSL}" ciphers 3DES >/dev/null 2>&1; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H 3des.badssl.com --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 3des.badssl.com --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -762,61 +831,71 @@ testBadSSL3DES() {
 }
 
 testBadSSLNULL() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H null.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H null.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA256() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha256.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sha256.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc256() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ecc256.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H ecc256.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLEcc384() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H ecc384.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H ecc384.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLRSA8192() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H rsa8192.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H rsa8192.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomainWithDashes() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLLongSubdomain() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA12016() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2016.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sha1-2016.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSHA12017() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H sha1-2017.badssl.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sha1-2017.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testRequireOCSP() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H videolan.org --require-ocsp-stapling --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H videolan.org --require-ocsp-stapling --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -824,7 +903,8 @@ testRequireOCSP() {
 # tests for -4 and -6
 testIPv4() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -4; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -4 --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -4 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -850,7 +930,8 @@ testIPv6() {
 
                 echo "IPv6 is working"
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com -6 --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -6 --ignore-exp
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -885,7 +966,8 @@ testIPv6Numeric() {
 
                 echo "IPv6 is working"
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H 2a00:1450:4001:803::200e --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 2a00:1450:4001:803::200e --ignore-exp
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -903,14 +985,16 @@ testIPv6Numeric() {
 }
 
 testFormatShort() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
+    # shellcheck disable=SC2086
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK github.com from 'DigiCert Inc'" "${OUTPUT}"
 }
 
 testMoreErrors() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g')
+    # shellcheck disable=SC2086
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -918,7 +1002,8 @@ testMoreErrors() {
 }
 
 testMoreErrors2() {
-    OUTPUT=$(${SCRIPT} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g')
+    # shellcheck disable=SC2086
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -936,7 +1021,8 @@ testDANE211() {
 
             # check if a connection is possible
             if printf 'QUIT\\n' | "${OPENSSL}" s_client -connect hummus.csx.cam.ac.uk:25 -starttls smtp >/dev/null 2>&1; then
-                ${SCRIPT} --rootcert-file cabundle.crt --dane 211 --port 25 -P smtp -H hummus.csx.cam.ac.uk --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --dane 211 --port 25 -P smtp -H hummus.csx.cam.ac.uk --ignore-exp
                 EXIT_CODE=$?
                 if [ -n "${DANE}" ]; then
                     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -955,13 +1041,15 @@ testDANE211() {
 }
 
 testRequiredProgramFile() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --file-bin /doesnotexist --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testRequiredProgramPermissions() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --file-bin /etc/hosts --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --file-bin /etc/hosts --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
@@ -969,7 +1057,7 @@ testRequiredProgramPermissions() {
 # not always working
 #testSieveECDSA() {
 #    if ! { "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || "${OPENSSL}" s_client -starttls sieve 2>&1 | grep -F -q 'usage:'; }; then
-#        ${SCRIPT} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --ignore-exp
+#        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -P sieve -p 4190 -H mail.aegee.org --ecdsa --ignore-exp
 #        EXIT_CODE=$?
 #        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #    else
@@ -978,14 +1066,16 @@ testRequiredProgramPermissions() {
 #}
 
 testHTTP2() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H rwserve.readwritetools.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H rwserve.readwritetools.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testForceHTTP2() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -F alpn; then
-        ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --protocol h2 --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --protocol h2 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -994,37 +1084,43 @@ testForceHTTP2() {
 }
 
 testNotLongerValidThan() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --not-valid-longer-than 2
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --not-valid-longer-than 2
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testDERCert() {
-    ${SCRIPT} --rootcert-file cabundle.crt -f ./der.cer --ignore-sct --ignore-exp --allow-empty-san -s
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -f ./der.cer --ignore-sct --ignore-exp --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testDERCertURI() {
-    ${SCRIPT} --rootcert-file cabundle.crt -f "file://${PWD}/der.cer" --ignore-sct --ignore-exp --allow-empty-san -s
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -f "file://${PWD}/der.cer" --ignore-sct --ignore-exp --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testDERCertSymbolicLink() {
-    ${SCRIPT} --rootcert-file cabundle.crt -f ./derlink.cer --ignore-sct --ignore-exp --allow-empty-san -s
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -f ./derlink.cer --ignore-sct --ignore-exp --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificateWithoutCN() {
-    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificateWithEmptySubject() {
-    ${SCRIPT} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1032,7 +1128,8 @@ testCertificateWithEmptySubject() {
 testCertificateWithEmptySAN() {
     CERT=$(createSelfSignedCertificate 30)
 
-    ${SCRIPT} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n localhost
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n localhost
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -1042,20 +1139,23 @@ testCertificateWithEmptySANFail() {
     # Test with wrong CN's
     CERT=$(createSelfSignedCertificate 30)
 
-    ${SCRIPT} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n wrong.com
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n wrong.com
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testResolveSameName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H www.github.com --resolve www.github.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --resolve www.github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testResolveDifferentName() {
-    ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li --resolve www.google.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -1064,7 +1164,8 @@ testResolveCorrectIP() {
     # dig is needed to resolve the IP address
     if command -v dig >/dev/null; then
         RESOLVED_IP="$(dig +short github.com)"
-        ${SCRIPT} --rootcert-file cabundle.crt -H github.com --resolve "${RESOLVED_IP}" --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --resolve "${RESOLVED_IP}" --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -1076,7 +1177,8 @@ testResolveWrongIP() {
     # dig is needed to resolve the IP address
     if command -v dig >/dev/null; then
         RESOLVED_IP="$(dig +short www.google.com)"
-        ${SCRIPT} --rootcert-file cabundle.crt -H corti.li --resolve "${RESOLVED_IP}"--ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li --resolve "${RESOLVED_IP}"--ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     else
@@ -1099,7 +1201,8 @@ testCiphersOK() {
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine'; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H cloudflare.com --check-ciphers C --ignore-exp
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1131,7 +1234,8 @@ testCiphersNonStandardPort() {
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine'; then
 
-                ${SCRIPT} --rootcert-file cabundle.crt --host corti.li --port 8443 --check-ciphers C --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host corti.li --port 8443 --check-ciphers C --ignore-exp
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1161,7 +1265,8 @@ testCiphersError() {
 
             # check if ssl-enum-ciphers is present
             if ! nmap --script ssl-enum-ciphers 2>&1 | grep -q -F 'NSE: failed to initialize the script engine'; then
-                ${SCRIPT} --rootcert-file cabundle.crt -H www.google.com --check-ciphers A --check-ciphers-warnings --ignore-exp
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --check-ciphers A --check-ciphers-warnings --ignore-exp
                 EXIT_CODE=$?
                 assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
@@ -1181,7 +1286,8 @@ testCiphersError() {
 
 testGitHubWithSSLLabs() {
     # we assume www.github.com gets at least a B
-    ${SCRIPT} --rootcert-file cabundle.crt -H github.com --cn github.com --check-ssl-labs B --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --check-ssl-labs B --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1204,7 +1310,8 @@ testGithubComCRL() {
     echo "${GITHUB_CRL_URI}"
     curl --silent "${GITHUB_CRL_URI}" >"${TEMPFILE_CRL}"
 
-    ${SCRIPT} --file "${TEMPFILE_CRL}" --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1212,7 +1319,8 @@ testGithubComCRL() {
 
 testFloatingPointThresholds() {
 
-    ${SCRIPT} -H github.com --warning 2.5 --critical 1.5
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --warning 2.5 --critical 1.5
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1220,7 +1328,8 @@ testFloatingPointThresholds() {
 
 testFloatingPointThresholdsWrongUsage() {
 
-    ${SCRIPT} -H github.com --warning 1.5 --critical 2.5
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --warning 1.5 --critical 2.5
     EXIT_CODE=$?
     assertEquals "expecting error message about --warning is less or equal --critical, but got wrong exit code, " "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 
@@ -1230,7 +1339,8 @@ testCertExpiringInLessThanOneDay() {
 
     CERT=$(createSelfSignedCertificate 1)
 
-    ${SCRIPT} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned --allow-empty-san --ignore-sig-alg
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 1.5 --critical 0.5 --selfsigned --allow-empty-san --ignore-sig-alg
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
@@ -1239,7 +1349,8 @@ testCertExpiringInLessThanOneDay() {
 
 testAcceptableClientCertCAMissing() {
 
-    ${SCRIPT} -H www.github.com --require-client-cert --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.github.com --require-client-cert --ignore-exp
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -1250,7 +1361,7 @@ testAcceptableClientCertCAMissing() {
 
 # testAcceptableClientCertCAGeneric() {
 #
-#     ${SCRIPT} -H klik.nlb.si --require-client-cert
+#     ${SCRIPT} ${TEST_DEBUG} -H klik.nlb.si --require-client-cert
 #     EXIT_CODE=$?
 #
 #     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -1259,7 +1370,7 @@ testAcceptableClientCertCAMissing() {
 
 # testAcceptableClientCertCAList() {
 #
-#     ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB
+#     ${SCRIPT} ${TEST_DEBUG} -H klik.nlb.si --require-client-cert ACNLB,NLB
 #     EXIT_CODE=$?
 #
 #     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -1268,7 +1379,8 @@ testAcceptableClientCertCAMissing() {
 
 testAcceptableClientCertCAListWrong() {
 
-    ${SCRIPT} -H klik.nlb.si --require-client-cert ACNLB,NLB,fake
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H klik.nlb.si --require-client-cert ACNLB,NLB,fake
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -1280,12 +1392,14 @@ testMaxDateOn32BitSystems() {
     # generate a cert expiring after 2038-01-19
     CERT=$(createSelfSignedCertificate 7000)
 
-    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
-    ${SCRIPT} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'invalid\ date'
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'invalid\ date'
     EXIT_CODE=$?
 
     assertEquals "Invalid date" 1 "${EXIT_CODE}"
@@ -1293,37 +1407,43 @@ testMaxDateOn32BitSystems() {
 }
 
 testIgnoreConnectionStateOK() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_OK}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_OK}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateWARNING() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateCRITICAL() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_CRITICAL}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_CRITICAL}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateWARNING() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateError() {
-    ${SCRIPT} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems 4
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems 4
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateHTTP() {
-    ${SCRIPT} -H www.github.com --port 443 --ignore-connection-problems 0
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H www.github.com --port 443 --ignore-connection-problems 0
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1341,33 +1461,38 @@ testSubdomainWithUnderscore() {
             fail "error connecting to ${TEST_HOST}"
         fi
     else
-        ${SCRIPT} -H "${TEST_HOST}" --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H "${TEST_HOST}" --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
 }
 
 testChainOK() {
-    ${SCRIPT} -f ./fullchain.pem --allow-empty-san --ignore-sct --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f ./fullchain.pem --allow-empty-san --ignore-sct --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testChainFail() {
-    ${SCRIPT} -f ./incomplete_chain.pem --allow-empty-san --ignore-sct --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f ./incomplete_chain.pem --allow-empty-san --ignore-sct --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testChainFailIgnored() {
-    ${SCRIPT} -f ./incomplete_chain.pem --ignore-incomplete-chain --allow-empty-san --ignore-sct --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f ./incomplete_chain.pem --ignore-incomplete-chain --allow-empty-san --ignore-sct --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRSA() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -sigalgs; then
-        ${SCRIPT} -H github.com --rsa --tls1_2 --ignore-exp
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H github.com --rsa --tls1_2 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     else
@@ -1376,13 +1501,16 @@ testRSA() {
 }
 
 testOrganizationFail() {
-    ${SCRIPT} -H github.com -o 'SomeOrg' --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'SomeOrg' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testOrganizationOK() {
-    ${SCRIPT} -H github.com -o 'GitHub,\ Inc.' --ignore-exp
+    echo "${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub,\ Inc.' --ignore-exp"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub,\ Inc.' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
