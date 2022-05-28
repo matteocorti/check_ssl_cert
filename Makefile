@@ -112,7 +112,7 @@ disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
-test: disttest
+test:
 ifndef SHUNIT
 	echo "No shUnit2 installed: see README.md"
 	exit 1
