@@ -29,13 +29,6 @@ version_check:
 	grep -q  "^version:\ ${VERSION}" CITATION.cff
 	echo "Version check: OK"
 
-# spelling check
-codespell:
-	codespell \
-	--ignore-words .codespell-ignore \
-	--exclude-file test/cabundle.crt \
-	.
-
 # builds the release files
 dist: version_check
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
@@ -74,6 +67,18 @@ endif
 formatting_check:
 	! grep -q '[[:blank:]]$$' $(FORMATTED_FILES)
 
+CODESPELL := $(shell command -v codespell 2> /dev/null )
+# spell check
+codespell:
+ifndef CODESPELL
+	echo "no codespell instlled"
+else
+	codespell \
+	--ignore-words .codespell-ignore \
+	--exclude-file test/cabundle.crt \
+	.
+endif
+
 SHFMT := $(shell command -v shfmt 2> /dev/null)
 format:
 ifndef SHFMT
@@ -103,7 +108,7 @@ SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
 SHUNIT := $(shell command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi )
 
 distcheck: disttest
-disttest: dist formatting_check shellcheck
+disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
