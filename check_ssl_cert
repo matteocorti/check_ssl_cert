@@ -1885,7 +1885,7 @@ check_cert_end_date() {
     ELEM_DAYS_VALID=$(compute "${HOURS_UNTIL}/24")
     ELEM_SECONDS_VALID=$(compute "${HOURS_UNTIL} * 3600")
 
-    add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=${el_number}} ${ELEM_DAYS_VALID}"
+    add_prometheus_days_output_line "cert_days_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} ${ELEM_DAYS_VALID}"
 
     debuglog "  valid for ${ELEM_DAYS_VALID} days"
 
@@ -1914,7 +1914,7 @@ check_cert_end_date() {
             if [ -z "${CN}" ]; then
                 CN='unavailable'
             fi
-            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 2"
             return 2
         fi
 
@@ -1927,7 +1927,7 @@ check_cert_end_date() {
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
-                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 2"
                 return 2
             fi
 
@@ -1942,7 +1942,7 @@ check_cert_end_date() {
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
-                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 1"
                 return 1
             fi
 
@@ -1953,7 +1953,7 @@ check_cert_end_date() {
             if compare "${DAYS_VALID}" '>' "${NOT_VALID_LONGER_THAN}"; then
                 debuglog "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days"
                 prepend_critical_message "Certificate expires in ${DAYS_VALID} days which is more than ${NOT_VALID_LONGER_THAN} days" "${replace_current_message}"
-                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 2"
                 return 2
             fi
         fi
@@ -1963,7 +1963,7 @@ check_cert_end_date() {
         # We always check expired certificates
         if compare "${ELEM_SECONDS_VALID}" '<' 1; then
             prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE})" "${replace_current_message}"
-            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+            add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 2"
             return 2
         fi
 
@@ -1974,7 +1974,7 @@ check_cert_end_date() {
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
-                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 2"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 2"
                 return 2
             fi
 
@@ -1987,7 +1987,7 @@ check_cert_end_date() {
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
-                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 1"
+                add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 1"
                 return 1
             fi
 
@@ -1998,7 +1998,7 @@ check_cert_end_date() {
         CN='unavailable'
     fi
     verboselog "Certificate element ${el_number} (${element_cn}) is valid for ${ELEM_DAYS_VALID} days"
-    add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=${el_number}} 0"
+    add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 0"
 
 }
 
