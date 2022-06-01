@@ -423,13 +423,13 @@ testPrometheus() {
     EXIT_CODE=$?
     assertEquals "output does not contain '# HELP cert_valid'" "${OK}" "${EXIT_CODE}"
 
-    echo "${OUTPUT}" | grep -q 'cert_valid_chain_elem{cn="github.com", element=1} 2'
+    echo "${OUTPUT}" | grep -q 'cert_valid_chain_elem{cn="github.com", element="1"} 2'
     EXIT_CODE=$?
-    assertEquals "output does not contain 'cert_valid_chain_elem{cn=\"github.com\", element=1} 2'" "${OK}" "${EXIT_CODE}"
+    assertEquals "output does not contain 'cert_valid_chain_elem{cn=\"github.com\", element=\"1\"} 2'" "${OK}" "${EXIT_CODE}"
 
-    echo "${OUTPUT}" | grep -q 'cert_days_chain_elem{cn="github.com", element=1}'
+    echo "${OUTPUT}" | grep -q 'cert_days_chain_elem{cn="github.com", element="1"}'
     EXIT_CODE=$?
-    assertEquals "output does not contain 'cert_days_chain_elem{cn=\"github.com\", element=1}'" "${OK}" "${EXIT_CODE}"
+    assertEquals "output does not contain 'cert_days_chain_elem{cn=\"github.com\", element=\"1\"}'" "${OK}" "${EXIT_CODE}"
 
 }
 

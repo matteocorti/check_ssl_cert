@@ -1,2 +1,1 @@
- * Support for DTLS
- * Default ports for XMPP
+Fixed a bug in the prometheus output

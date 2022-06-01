@@ -138,3 +138,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
   * the conversion typo and
   * the underscore fixes
 * Many thanks to [Naveen](https://github.com/naveensrinivasan) for the GitHub actions permissions fix
+* Many thanks to [Varac](https://github.com/varac) for the Prometheus fix

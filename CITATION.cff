@@ -231,9 +231,11 @@ authors:
   website: https://github.com/dilyanpalauzov
 - name: "Naveen"
   website: https://github.com/naveensrinivasan
+- name: "Varac"
+  website: https://github.com/varac
 title: "check_ssl_cert"
-version: 2.29.0
-date-released: 2022-05-25
+version: 2.30.0
+date-released: 2022-06-01
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
