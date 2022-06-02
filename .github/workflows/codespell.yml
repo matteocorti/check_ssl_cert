@@ -13,5 +13,5 @@ jobs:
         with:
           check_filenames: true
           check_hidden: true
-          skip: test/cabundle.crt
+          exclude_file: test/cabundle.crt
           ignore_words_file: .codespell-ignore
