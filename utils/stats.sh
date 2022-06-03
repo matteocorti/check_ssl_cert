@@ -73,12 +73,32 @@ echo "--------------------------------------------------------------------------
 echo "-- Tests"
 echo
 
+LIST_LIMIT=10000
+
+# in_progewss
+# success
+# failure
+
 tests=$(grep -c '^test' test/unit_tests.sh)
-workflows=$(gh workflow list -L 1000 | wc -l)
-runs=$(gh run list -L 10000 | wc -l)
+workflows=$(gh workflow list -L "${LIST_LIMIT}" | wc -l)
+
+# cache the result
+
+RUNS=$(gh run list -L "${LIST_LIMIT}")
+
+runs=$(echo "${RUNS}" | wc -l)
+
+runs_in_progress=$(echo "${RUNS}" | grep -c in_progress)
+runs_success=$(echo "${RUNS}" | grep -c success)
+runs_failure=$(echo "${RUNS}" | grep -c failure)
+runs_cancelled=$(echo "${RUNS}" | grep -c cancelled)
 
 printf "Tests:\\t\\t\\t%'10d\\n" "${tests}"
 printf "GH workflows:\\t\\t%'10d\\n" "${workflows}"
 printf "GH runs:\\t\\t%'10d\\n" "${runs}"
+printf "  running:\\t\\t%'10d\\n" "${runs_in_progress}"
+printf "  failed:\\t\\t%'10d\\n" "${runs_failure}"
+printf "  ok:\\t\\t\\t%'10d\\n" "${runs_success}"
+printf "  cancelled:\\t\\t%'10d\\n" "${runs_cancelled}"
 
 echo
