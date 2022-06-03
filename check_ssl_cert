@@ -1283,6 +1283,10 @@ extract_cert_attribute() {
             grep -F URI |
             sed 's/^.*URI://'
         ;;
+    version)
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep Version | head -n 1 | sed 's/.*Version:\ //'
+        ;;
+
     sig_algo)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Signature Algorithm'
         ;;
@@ -4641,8 +4645,11 @@ main() {
 
         SERIAL="$(extract_cert_attribute 'serial' "${CERT}")"
         debuglog "SERIAL = ${SERIAL}"
-
         info "Serial Number" "${SERIAL}"
+
+        X509_VERSION="$(extract_cert_attribute 'version' "${CERT}")"
+        debuglog "X509_VERSION = ${X509_VERSION}"
+        info "X.509 version" "${X509_VERSION}"
 
         FINGERPRINT="$(extract_cert_attribute 'fingerprint' "${CERT}")"
         debuglog "FINGERPRINT = ${FINGERPRINT}"
