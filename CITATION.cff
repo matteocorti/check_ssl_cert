@@ -132,6 +132,8 @@ authors:
 - family-names: "Niewiara"
   given-names: "Michael"
   website: https://github.com/mobitux
+- name: Naveen
+  website: https://github.com/naveensrinivasan
 - name: Nico
   website: https://github.com/nicox
 - family-names: "Lafont"
@@ -176,6 +178,8 @@ authors:
   website: https://github.com/va1entin
 - name: Vamp898
   website: https://github.com/Vamp898
+- name: Varac
+  website: https://github.com/varac
 - family-names: "Horky"
   given-names: "Vojtech"
   website: https://github.com/vhotspur
@@ -229,10 +233,6 @@ authors:
 - family-names: "Палаузов"
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
-- name: "Naveen"
-  website: https://github.com/naveensrinivasan
-- name: "Varac"
-  website: https://github.com/varac
 title: "check_ssl_cert"
 version: 2.30.0
 date-released: 2022-06-01
