@@ -924,7 +924,7 @@ prometheus_output() {
     if [ -n "${PROMETHEUS_OUTPUT_STATUS}" ]; then
         echo "# HELP cert_valid   If cert is ok (0), warning (1) or critical (2)"
         echo "# TYPE cert_valid gauge"
-        echo "${PROMETHEUS_OUTPUT_STATUS}"
+        printf '%b\n' "${PROMETHEUS_OUTPUT_STATUS}"
         NL=1
     fi
 
@@ -934,7 +934,7 @@ prometheus_output() {
         fi
         echo "# HELP cert_valid_chain_elem  If chain element is ok (0), warning (1) or critical (2)"
         echo "# TYPE cert_valid_chain_elem gauge"
-        echo "${PROMETHEUS_OUTPUT_VALID}"
+        printf '%b\n' "${PROMETHEUS_OUTPUT_VALID}"
         NL=1
     fi
 
@@ -944,7 +944,7 @@ prometheus_output() {
         fi
         echo "# HELP cert_days_chain_elem Days until chain element expires"
         echo "# TYPE cert_days_chain_elem gauge"
-        echo "${PROMETHEUS_OUTPUT_DAYS}"
+        printf '%b\n' "${PROMETHEUS_OUTPUT_DAYS}"
     fi
 }
 
