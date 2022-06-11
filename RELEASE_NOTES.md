@@ -1,1 +1,1 @@
-Fixed a bug in the prometheus output
+Fixed a problem with Prometheus output

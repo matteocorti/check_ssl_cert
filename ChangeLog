@@ -1,3 +1,7 @@
+2022-06-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: fixed a problem with Prometheus output
+
 2022-06-03  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): X.509 version printed with --info

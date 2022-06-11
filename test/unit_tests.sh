@@ -621,7 +621,7 @@ testMultipleAltNamesFailIPTwo() {
 
 testXMPPHost() {
     # shellcheck disable=SC2086
-    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org)
+    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org --ignore-exp)
     EXIT_CODE=$?
     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
@@ -632,7 +632,7 @@ testXMPPHost() {
 
 testXMPPHostDefaultPort() {
     # shellcheck disable=SC2086
-    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org)
+    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org --ignore-exp)
     EXIT_CODE=$?
     if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
         assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"

@@ -139,6 +139,8 @@ authors:
 - family-names: "Lafont"
   given-names: "Nicolas"
   website: https://github.com/ManicoW
+- name: PSSGCSim
+  website: https://github.com/PSSGCSim
 - family-names: "Rochnyak"
   given-names: "Pavel"
   website: https://github.com/rpv-tomsk
@@ -234,8 +236,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.30.0
-date-released: 2022-06-01
+version: 2.31.0
+date-released: 2022-06-11
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
