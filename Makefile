@@ -30,7 +30,7 @@ version_check:
 	echo "Version check: OK"
 
 # builds the release files
-dist: version_check
+dist: version_check CITATION.cff
 	rm -rf $(DIST_DIR) $(DIST_DIR).tar.gz
 	mkdir $(DIST_DIR)
 	cp -r $(DIST_FILES) $(DIST_DIR)
@@ -61,6 +61,9 @@ install_bash_completion:
 ifdef COMPLETIONS_DIR
 	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
 endif
+
+CITATION.cff: AUTHORS.md
+	./utils/update_citation.sh
 
 # we check for tabs
 # and remove trailing blanks

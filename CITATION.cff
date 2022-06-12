@@ -244,7 +244,7 @@ keywords:
   - "certificate"
   - "openssl"
   - "shell-script"
-  - " nagios-plugin"
+  - "nagios-plugin"
 abstract: A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection.
 contact:
   - email: matteo@corti.li
