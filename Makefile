@@ -77,8 +77,6 @@ ifndef CODESPELL
 	echo "no codespell installed"
 else
 	codespell \
-	--ignore-words .codespell-ignore \
-	--exclude-file test/cabundle.crt \
 	.
 endif
 
