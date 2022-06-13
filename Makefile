@@ -74,7 +74,7 @@ CODESPELL := $(shell command -v codespell 2> /dev/null )
 # spell check
 codespell:
 ifndef CODESPELL
-	echo "no codespell instlled"
+	echo "no codespell installed"
 else
 	codespell \
 	--ignore-words .codespell-ignore \
