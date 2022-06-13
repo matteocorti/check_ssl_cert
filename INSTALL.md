@@ -25,7 +25,7 @@ Following tools are required for development:
 * [shUnit2](https://github.com/kward/shunit2) for the tests
 * [shfmt](https://github.com/mvdan/sh) to format the source files
 * [ShellCheck](https://www.shellcheck.net) for the code quality checks
-* [codespell](https://github.com/codespell-project/codespell) for the spell checks
+* [codespell](https://github.com/codespell-project/codespell) for the spelling checks
 
 ## Installation
 
