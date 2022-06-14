@@ -123,9 +123,6 @@ EOT
 
 }
 
-##############################################################################
-# Initial setup
-
 oneTimeSetUp() {
     # constants
 
@@ -177,6 +174,7 @@ oneTimeTearDown() {
 setUp() {
     echo
     # print the test number
+    # shellcheck disable=SC2154
     echo "Running test ${COUNTER} of ${__shunit_testsTotal}"
     COUNTER=$((COUNTER+1))
 }
@@ -1526,27 +1524,52 @@ testOrganizationOK() {
 
 testHostCache() {
 
+    echo 100
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --init-host-cache
 
+    echo 200
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+
+    echo 210
     grep -q '^github.com$'  ~/.check_ssl_cert-cache
     EXIT_CODE=$?
     assertEquals "wrong exit code (host not cached)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
+    echo 300
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+
+    echo 310
+
     grep -c '^github.com$'  ~/.check_ssl_cert-cache | grep -q '^1$'
     EXIT_CODE=$?
     assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
+    echo 400
+
     TEST_IPV6=$( dig -t AAAA google.com +short )
+
+    echo "Testing ${TEST_IPV6}"
+
     PARAMETER="[${TEST_IPV6}]"
+
+    echo "Commnad line parameter ${PARAMETER}"
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+
+    echo 500
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+
+    echo 510
+
     grep -c "${TEST_IPV6}"  ~/.check_ssl_cert-cache | grep -q '^1$'
     EXIT_CODE=$?
     assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
