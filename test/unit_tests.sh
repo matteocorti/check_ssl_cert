@@ -1552,7 +1552,8 @@ testHostCache() {
 
     echo 400
 
-    TEST_IPV6=$( dig -t AAAA google.com +short )
+    # take the first IPv6 address
+    TEST_IPV6=$( dig -t AAAA google.com +short | head -n 1 )
 
     echo "Testing ${TEST_IPV6}"
 
