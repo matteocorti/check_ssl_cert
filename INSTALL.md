@@ -26,6 +26,7 @@ Following tools are required for development:
 * [shfmt](https://github.com/mvdan/sh) to format the source files
 * [ShellCheck](https://www.shellcheck.net) for the code quality checks
 * [codespell](https://github.com/codespell-project/codespell) for the spelling checks
+* ```dig``` for IPv6 tests
 
 ## Installation
 

@@ -137,6 +137,8 @@ oneTimeSetUp() {
     OK=0
     NOT_OK=1
 
+    COUNTER=1
+
     if [ -z "${TMPDIR}" ]; then
         TMPDIR=/tmp
     fi
@@ -172,6 +174,12 @@ oneTimeTearDown() {
     cleanup_temporary_test_files ${SIGNALS}
 }
 
+setUp() {
+    # print the test number
+    echo "Running test ${COUNTER} of ${__shunit_testsTotal}"
+    COUNTER=$((COUNTER+1))
+}
+
 ##############################################################################
 # Tests
 
@@ -188,6 +196,9 @@ testHoursUntilNow() {
 }
 
 testHoursUntil5Hours() {
+    echo "III ${COUNTER} / ${__shunit_testsTotal}"
+    COUNTER=$((COUNTER+1))
+
     # testing with perl
     if perl -e 'use Date::Parse;' >/dev/null 2>&1; then
         export DATETYPE='PERL'
@@ -1521,7 +1532,7 @@ testHostCache() {
 
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
-    grep -q github.com  ~/.check_ssl_cert-cache
+    grep -q '^github.com$'  ~/.check_ssl_cert-cache
     EXIT_CODE=$?
     assertEquals "wrong exit code (host not cached)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
