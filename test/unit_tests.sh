@@ -1543,41 +1543,66 @@ testHostCache() {
     EXIT_CODE=$?
     assertEquals "wrong exit code (host not cached)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
-    echo 300
+    # test the caching of IPv6 addresses (if IPv6 is available)
+    IPV6=
+    if command -v ifconfig >/dev/null && ifconfig -a | grep -q -F inet6; then
+        IPV6=1
+    elif command -v ip >/dev/null && ip addr | grep -q -F inet6; then
+        IPV6=1
+    fi
 
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+    if [ -n "${IPV6}" ]; then
 
-    echo 310
+        echo "IPv6 is configured"
 
-    grep -c '^github.com$'  ~/.check_ssl_cert-cache | grep -q '^1$'
-    EXIT_CODE=$?
-    assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+        if ping6 -c 3 www.google.com >/dev/null 2>&1; then
 
-    echo 400
+            echo "IPv6 is working"
 
-    # take the first IPv6 address
-    TEST_IPV6=$( dig -t AAAA google.com +short | head -n 1 )
+                echo 300
 
-    echo "Testing ${TEST_IPV6}"
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
 
-    PARAMETER="[${TEST_IPV6}]"
+                echo 310
 
-    echo "Command line parameter ${PARAMETER}"
+                grep -c '^github.com$'  ~/.check_ssl_cert-cache | grep -q '^1$'
+                EXIT_CODE=$?
+                assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+                echo 400
 
-    echo 500
+                # take the first IPv6 address
+                TEST_IPV6=$( dig -t AAAA google.com +short | head -n 1 )
 
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+                echo "Testing ${TEST_IPV6}"
 
-    echo 510
+                PARAMETER="[${TEST_IPV6}]"
 
-    grep -c "${TEST_IPV6}"  ~/.check_ssl_cert-cache | grep -q '^1$'
-    EXIT_CODE=$?
-    assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+                echo "Command line parameter ${PARAMETER}"
+
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+
+                echo 500
+
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+
+                echo 510
+
+                grep -c "${TEST_IPV6}"  ~/.check_ssl_cert-cache | grep -q '^1$'
+                EXIT_CODE=$?
+                assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+        else
+            echo "IPv6 is configured but not working: skipping test"
+        fi
+
+    else
+        echo "Skipping forcing IPv6: not IPv6 configured locally"
+    fi
+
 
 }
 
