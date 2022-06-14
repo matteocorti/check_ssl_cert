@@ -1514,14 +1514,33 @@ testOrganizationOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testCache() {
+testHostCache() {
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --init-host-cache
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
     grep -q github.com  ~/.check_ssl_cert-cache
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    assertEquals "wrong exit code (host not cached)" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+    grep -c '^github.com$'  ~/.check_ssl_cert-cache | grep -q '^1$'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    TEST_IPV6=$( dig -t AAAA google.com +short )
+    PARAMETER="[${TEST_IPV6}]"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+    grep -c "${TEST_IPV6}"  ~/.check_ssl_cert-cache | grep -q '^1$'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+
 }
 
 # the script will exit without executing main
