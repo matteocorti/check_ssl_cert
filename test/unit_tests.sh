@@ -170,6 +170,44 @@ oneTimeTearDown() {
     # Using named signals to be POSIX compliant
     # shellcheck disable=SC2086
     cleanup_temporary_test_files ${SIGNALS}
+
+    NOW=$( date +%s )
+    ELAPSED=$(( NOW - START_TIME ))
+    # shellcheck disable=SC2154
+    ELAPSED_STRING=$( seconds2String "${ELAPSED}" )
+    echo
+    echo "Total time: ${ELAPSED_STRING}"
+
+}
+
+seconds2String() {
+    seconds=$1
+    if [ "${seconds}" -gt 60 ] ; then
+        minutes=$(( seconds / 60 ))
+        seconds=$(( seconds % 60 ))
+        if [ "${minutes}" -gt 1 ] ; then
+            MINUTE_S="minutes"
+        else
+            MINUTE_S="minute"
+        fi
+        if [ "${seconds}" -eq 1 ] ; then
+            SECOND_S=" and ${seconds} second"
+        elif [ "${seconds}" -eq 0 ] ; then
+            SECOND_S=
+        else
+            SECOND_S=" and ${seconds} seconds"
+        fi
+        string="${minutes} ${MINUTE_S}${SECOND_S}"
+    else
+        if [ "${seconds}" -eq 1 ] ; then
+            SECOND_S="second"
+        else
+            SECOND_S="seconds"
+        fi
+        string="${seconds} ${SECOND_S}"
+    fi
+    echo "${string}"
+
 }
 
 setUp() {
@@ -179,32 +217,10 @@ setUp() {
     PERCENT=$( echo "scale=2; ${COUNTER} / ${__shunit_testsTotal} * 100" | bc | sed 's/[.].*//' )
 
     NOW=$( date +%s )
+    ELAPSED=$(( NOW - START_TIME ))
     # shellcheck disable=SC2154
-    REMAINING_S=$( echo "scale=2; ${__shunit_testsTotal} * ( ${NOW} - ${START_TIME} ) / ${COUNTER} " | bc | sed 's/[.].*//' )
-    if [ "${REMAINING_S}" -gt 60 ] ; then
-        REMAINING_M=$(( REMAINING_S / 60 ))
-        REMAINING_S=$(( REMAINING_S % 60 ))
-        if [ "${REMAINING_M}" -gt 1 ] ; then
-            MINUTE_S="minutes"
-        else
-            MINUTE_S="minute"
-        fi
-        if [ "${REMAINING_S}" -eq 1 ] ; then
-            SECOND_S=" and ${REMAINING_S} second"
-        elif [ "${REMAINING_S}" -eq 0 ] ; then
-            SECOND_S=
-        else
-            SECOND_S=" and ${REMAINING_S} seconds"
-        fi
-        REMAINING="${REMAINING_M} ${MINUTE_S}${SECOND_S}"
-    else
-        if [ "${REMAINING_S}" -eq 1 ] ; then
-            SECOND_S="second"
-        else
-            SECOND_S="seconds"
-        fi
-        REMAINING="${REMAINING_S} ${SECOND_S}"
-    fi
+    REMAINING_S=$( echo "scale=2; ${__shunit_testsTotal} * ( ${ELAPSED} ) / ${COUNTER} - ${ELAPSED}" | bc | sed 's/[.].*//' )
+    REMAINING=$( seconds2String "${REMAINING_S}" )
 
     # print the test number
     # shellcheck disable=SC2154
