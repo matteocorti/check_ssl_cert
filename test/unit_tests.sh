@@ -135,6 +135,7 @@ oneTimeSetUp() {
     NOT_OK=1
 
     COUNTER=1
+    START_TIME=$( date +%s )
 
     if [ -z "${TMPDIR}" ]; then
         TMPDIR=/tmp
@@ -177,9 +178,37 @@ setUp() {
     # shellcheck disable=SC2154
     PERCENT=$( echo "scale=2; ${COUNTER} / ${__shunit_testsTotal} * 100" | bc | sed 's/[.].*//' )
 
+    NOW=$( date +%s )
+    # shellcheck disable=SC2154
+    REMAINING_S=$( echo "scale=2; ${__shunit_testsTotal} * ( ${NOW} - ${START_TIME} ) / ${COUNTER} " | bc | sed 's/[.].*//' )
+    if [ "${REMAINING_S}" -gt 60 ] ; then
+        REMAINING_M=$(( REMAINING_S / 60 ))
+        REMAINING_S=$(( REMAINING_S % 60 ))
+        if [ "${REMAINING_M}" -gt 1 ] ; then
+            MINUTE_S="minutes"
+        else
+            MINUTE_S="minute"
+        fi
+        if [ "${REMAINING_S}" -eq 1 ] ; then
+            SECOND_S=" and ${REMAINING_S} second"
+        elif [ "${REMAINING_S}" -eq 0 ] ; then
+            SECOND_S=
+        else
+            SECOND_S=" and ${REMAINING_S} seconds"
+        fi
+        REMAINING="${REMAINING_M} ${MINUTE_S}${SECOND_S}"
+    else
+        if [ "${REMAINING_S}" -eq 1 ] ; then
+            SECOND_S="second"
+        else
+            SECOND_S="seconds"
+        fi
+        REMAINING="${REMAINING_S} ${SECOND_S}"
+    fi
+
     # print the test number
     # shellcheck disable=SC2154
-    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%)"
+    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining"
     COUNTER=$((COUNTER+1))
 }
 
