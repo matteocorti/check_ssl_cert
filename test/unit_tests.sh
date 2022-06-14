@@ -1514,6 +1514,13 @@ testOrganizationOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testCache() {
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+    grep -q github.com  ~/.check_ssl_cert-cache
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

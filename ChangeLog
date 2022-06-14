@@ -1,3 +1,7 @@
+2022-06-14  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): fixed a problem with the caching of IPv6 hosts
+
 2022-06-11  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: fixed a problem with Prometheus output

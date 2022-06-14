@@ -3454,7 +3454,14 @@ main() {
 
     if [ -r "${HOST_CACHE}" ]; then
         debuglog "Host cache ${HOST_CACHE} is present"
-        if ! grep -q "^${HOST}$" "${HOST_CACHE}"; then
+
+        if echo "${HOST}" | grep -q -F '[' ; then
+            PATTERN=$( echo "${HOST}" | sed -e 's/\[//' -e 's/\]//' )
+        else
+            PATTERN="^${HOST}$"
+        fi
+
+        if ! grep -q "${PATTERN}" "${HOST_CACHE}"; then
             debuglog "Adding ${HOST} to the host cache"
             echo "${HOST}" >>"${HOST_CACHE}"
         else
