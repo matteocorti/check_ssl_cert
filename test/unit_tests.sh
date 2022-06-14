@@ -173,9 +173,13 @@ oneTimeTearDown() {
 
 setUp() {
     echo
+
+    # shellcheck disable=SC2154
+    PERCENT=$( echo "scale=2; ${COUNTER} / ${__shunit_testsTotal} * 100" | bc | sed 's/[.].*//' )
+
     # print the test number
     # shellcheck disable=SC2154
-    echo "Running test ${COUNTER} of ${__shunit_testsTotal}"
+    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%)"
     COUNTER=$((COUNTER+1))
 }
 
@@ -1559,7 +1563,7 @@ testHostCache() {
 
     PARAMETER="[${TEST_IPV6}]"
 
-    echo "Commnad line parameter ${PARAMETER}"
+    echo "Command line parameter ${PARAMETER}"
 
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
