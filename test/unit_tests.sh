@@ -1515,6 +1515,7 @@ testOrganizationOK() {
 }
 
 testCache() {
+    # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
     grep -q github.com  ~/.check_ssl_cert-cache
     EXIT_CODE=$?
