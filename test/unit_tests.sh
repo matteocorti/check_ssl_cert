@@ -175,6 +175,7 @@ oneTimeTearDown() {
 }
 
 setUp() {
+    echo
     # print the test number
     echo "Running test ${COUNTER} of ${__shunit_testsTotal}"
     COUNTER=$((COUNTER+1))
@@ -196,8 +197,6 @@ testHoursUntilNow() {
 }
 
 testHoursUntil5Hours() {
-    echo "III ${COUNTER} / ${__shunit_testsTotal}"
-    COUNTER=$((COUNTER+1))
 
     # testing with perl
     if perl -e 'use Date::Parse;' >/dev/null 2>&1; then
