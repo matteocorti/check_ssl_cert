@@ -165,21 +165,6 @@ oneTimeSetUp() {
 
 }
 
-oneTimeTearDown() {
-    # Cleanup before program termination
-    # Using named signals to be POSIX compliant
-    # shellcheck disable=SC2086
-    cleanup_temporary_test_files ${SIGNALS}
-
-    NOW=$( date +%s )
-    ELAPSED=$(( NOW - START_TIME ))
-    # shellcheck disable=SC2154
-    ELAPSED_STRING=$( seconds2String "${ELAPSED}" )
-    echo
-    echo "Total time: ${ELAPSED_STRING}"
-
-}
-
 seconds2String() {
     seconds=$1
     if [ "${seconds}" -gt 60 ] ; then
@@ -208,6 +193,20 @@ seconds2String() {
     fi
     echo "${string}"
 
+}
+
+oneTimeTearDown() {
+    # Cleanup before program termination
+    # Using named signals to be POSIX compliant
+    # shellcheck disable=SC2086
+    cleanup_temporary_test_files ${SIGNALS}
+
+    NOW=$( date +%s )
+    ELAPSED=$(( NOW - START_TIME ))
+    # shellcheck disable=SC2154
+    ELAPSED_STRING=$( seconds2String "${ELAPSED}" )
+    echo
+    echo "Total time: ${ELAPSED_STRING}"
 }
 
 setUp() {
@@ -1433,16 +1432,16 @@ testAcceptableClientCertCAMissing() {
 #     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 #
 # }
-
-testAcceptableClientCertCAListWrong() {
-
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H klik.nlb.si --require-client-cert ACNLB,NLB,fake
-    EXIT_CODE=$?
-
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-
-}
+#
+#testAcceptableClientCertCAListWrong() {
+#
+#    # shellcheck disable=SC2086
+#    ${SCRIPT} ${TEST_DEBUG} -H klik.nlb.si --require-client-cert ACNLB,NLB,fake
+#    EXIT_CODE=$?
+#
+#    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+#
+#}
 
 testMaxDateOn32BitSystems() {
 
