@@ -51,7 +51,7 @@ _check_ssl_cert() {
         local CWORD=${COMP_WORDS[COMP_CWORD]}
 
         # This is our word list (in a bash array for convenience)
-        local WORD_LIST=('Digital Signature' 'Key Encipherment' 'Key Agreement' 'Certificate Sign' 'Certificate Revocation List (CRL) Sign')
+        local WORD_LIST=('Digital Signature' 'Key Encipherment' 'Key Agreement' 'Certificate Sign' 'Certificate Revocation List (CRL) Sign' 'CRL Sign')
 
         # Commands below depend on this IFS
         local IFS=$'\n'
