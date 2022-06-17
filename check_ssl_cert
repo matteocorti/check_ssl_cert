@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.31.0
+VERSION=2.32.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -280,6 +280,9 @@ usage() {
     echo "                                   certificate. 'list' is an optional comma"
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
+    echo "      --require-purpose usage      requires the specified key usage (can be"
+    echo "                                   specified more then once)"
+    echo "      --require-purpose-critical   the key usage must be critical"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
@@ -1307,6 +1310,13 @@ extract_cert_attribute() {
             sed -e "s/IP Address://g" |
             sed -e "s/,//g" |
             sed -e 's/^\ *//'
+        ;;
+    keyUsage)
+        if echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage | grep -q critical ; then
+            PURPOSE_CRITICAL=1
+        fi
+        PURPOSE=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage | tail -n 1 | sed 's/^[[:blank:]]*//')
+        echo "${PURPOSE}"
         ;;
     *)
         return 1
@@ -2734,6 +2744,10 @@ parse_command_line_options() {
             REQUIRE_OCSP_STAPLING=1
             shift
             ;;
+        --require-purpose-critical)
+            REQUIRE_PURPOSE_CRITICAL=1
+            shift
+            ;;
         --require-san)
             REQUIRE_SAN=1
             shift
@@ -2968,6 +2982,16 @@ parse_command_line_options() {
                 SKIP_ELEMENT="$2"
             else
                 SKIP_ELEMENT="${SKIP_ELEMENT}\\n$2"
+            fi
+            shift 2
+            ;;
+        --require-purpose)
+            check_option_argument '--require-purpose' "$2"
+            if [ -z "${REQUIRE_PURPOSE}" ]; then
+                REQUIRE_PURPOSE="$2"
+            else
+                REQUIRE_PURPOSE="${REQUIRE_PURPOSE}
+$2"
             fi
             shift 2
             ;;
@@ -4663,6 +4687,43 @@ main() {
 
         FINGERPRINT_INFO="$(echo "${FINGERPRINT}" | sed 's/Fingerprint=//')"
         info "Fingerprint" "${FINGERPRINT_INFO}"
+
+        KEY_USAGE="$(extract_cert_attribute 'keyUsage' "${CERT}")"
+
+        # info
+        if [ -n "${PURPOSE_CRITICAL}" ] ; then
+            debuglog "Certificate purpose is defined as critical"
+            PURPOSE_LABEL="Purpose (critical)"
+        else
+            debuglog "Certificate purpose is not defined as critical"
+            PURPOSE_LABEL="Purpose"
+            if [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
+                prepend_critical_message "Certificate purpose is not defined as critical (as required)"
+            fi
+        fi
+        info "${PURPOSE_LABEL}" "${KEY_USAGE}"
+
+        # check the certificate purpose
+        if [ -n "${REQUIRE_PURPOSE}" ] ; then
+            debuglog "Checking certificate purpose(s)"
+
+            while IFS= read -r purpose ; do
+
+                debuglog "  Check if '${purpose}' is defined"
+
+                # the purposes are in a 'comma space' separated list
+                if ! echo "${KEY_USAGE}" | grep -q -i "^${purpose}$" &&
+                        ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\ " &&
+                        ! echo "${KEY_USAGE}" | grep -q -i ",\ ${purpose}$" &&
+                        ! echo "${KEY_USAGE}" | grep -q -i ",\ ${purpose},\ " ; then
+                    prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
+                fi
+
+            done <<EOF
+${REQUIRE_PURPOSE}
+EOF
+
+        fi
 
         # TO DO: we just take the first result: a loop over all the hosts should
         # be implemented

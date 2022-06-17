@@ -1,1 +1,1 @@
-Fixed a problem with Prometheus output
+Added checks for the certificate purpose

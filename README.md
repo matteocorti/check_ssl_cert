@@ -201,6 +201,9 @@ Options:
       --require-no-tls1            Critical if TLS 1 is offered
       --require-no-tls1_1          Critical if TLS 1.1 is offered
       --require-ocsp-stapling      Require OCSP stapling
+      --require-purpose usage      requires the specified key usage (can be
+                                   specified more then once)
+      --require-purpose-critical   the key usage must be critical
       --resolve ip                 Provide a custom IP address for the
                                    specified host
       --rootcert-dir path          Root directory to be used for certificate

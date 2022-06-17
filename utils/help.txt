@@ -170,6 +170,9 @@
 --require-no-ssl3;Critical if SSL version 3 is offered
 --require-no-tls1;Critical if TLS 1 is offered
 --require-no-tls1_1;Critical if TLS 1.1 is offered
+--require-purpose usage;requires the specified key usage (can be
+--require-purpose usage;specified more then once)
+--require-purpose-critical;the key usage must be critical
 --resolve ip;Provide a custom IP address for the
 --resolve ip;specified host
 -s,--selfsigned;Allow self-signed certificates
