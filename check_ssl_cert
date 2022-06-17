@@ -1201,7 +1201,6 @@ require_s_client_option() {
 #
 require_x509_option() {
     debuglog "Checking if x509 supports the $1 option"
-    echo "${OPENSSL} x509 -help 2>&1 | grep -q -- \"[[:blank:]]$1[[:blank:]]\""
     if ! "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"; then
         unknown "x509 does not support the $1 option$2"
     fi
