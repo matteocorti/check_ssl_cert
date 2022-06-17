@@ -1194,6 +1194,20 @@ require_s_client_option() {
 }
 
 ################################################################################
+# Exits with unknown if x509 does not support the given option
+#
+# Usage:
+#   require_s_client_option '-no_ssl2'
+#
+require_x509_option() {
+    debuglog "Checking if x509 supports the $1 option"
+    echo "${OPENSSL} x509 -help 2>&1 | grep -q -- \"[[:blank:]]$1[[:blank:]]\""
+    if ! "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"; then
+        unknown "x509 does not support the $1 option$2"
+    fi
+}
+
+################################################################################
 # Extract specific attributes from a certificate
 # $1 attribute name
 # $2 cert file or cert content
@@ -3587,6 +3601,12 @@ main() {
     fi
     check_required_prog "${OPENSSL}"
     OPENSSL=${PROG}
+
+    ##############################################################################
+    # OpenSSL options
+    if [ -n "${REQUIRE_PURPOSE}" ] || [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
+        require_x509_option "-ext" " (required for certificate purpose)"
+    fi
 
     ##############################################################################
     # Root certificate
