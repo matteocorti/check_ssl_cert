@@ -4713,9 +4713,9 @@ main() {
 
                 # the purposes are in a 'comma space' separated list
                 if ! echo "${KEY_USAGE}" | grep -q -i "^${purpose}$" &&
-                        ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\ " &&
-                        ! echo "${KEY_USAGE}" | grep -q -i ",\ ${purpose}$" &&
-                        ! echo "${KEY_USAGE}" | grep -q -i ",\ ${purpose},\ " ; then
+                        ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\\ " &&
+                        ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose}$" &&
+                        ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose},\\ " ; then
                     prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
                 fi
 
