@@ -5454,7 +5454,7 @@ ${WARNING}"
         if [ -n "${EMAIL}" ]; then
             info "Email" "${EMAIL}"
         else
-            info "No email"
+            info "Email" "-"
         fi
 
     fi
