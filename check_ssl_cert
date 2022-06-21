@@ -7,7 +7,7 @@
 # - checks if the CA matches a given pattern
 # - checks the validity
 #
-# See  the INSTALL.md file for installation instructions
+# See the INSTALL.md file for installation instructions
 #
 # Copyright (c) 2007-2012 ETH Zurich.
 # Copyright (c) 2007-2022 Matteo Corti <matteo@corti.li>
@@ -2437,6 +2437,12 @@ fetch_certificate() {
             ERROR="Cannot read or parse the supplied certificate (e.g., root certificate)"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
+
+        elif ascii_grep "Unable to load certificate file" "${ERROR}"; then
+
+            ERROR="Cannot read certificate file"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
 
         else
 
