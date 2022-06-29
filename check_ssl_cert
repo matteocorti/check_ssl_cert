@@ -1207,6 +1207,56 @@ require_x509_option() {
 }
 
 ################################################################################
+# Extract specific field from a subject
+# $1 field
+# $2 subject
+parse_subject() {
+
+    FIELD=$1
+    SUBJECT=$2
+
+    debuglog "Extracting '${FIELD}' from '${SUBJECT}'"
+
+    # on older systems the fields where separated by /, e.g.,
+    #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
+    # on newer systems the fields are separated by , and are sometimes quoted (if they contain a comma), e.g.,
+    #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
+    #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
+
+    if echo "${SUBJECT}" | grep -q '^subject=\ \/'; then
+
+        # old format
+        debuglog "  old format separated by /"
+
+        if echo "${SUBJECT}" | grep -q "${FIELD}=" ; then
+            echo "${SUBJECT}" | sed -e "s/.*\/${FIELD}=//" -e 's/\/.*//'
+        fi
+
+    else
+
+        # new format
+        debuglog "  new format separated by ,"
+
+        if echo "${SUBJECT}" | grep -q "${FIELD}\ =" ; then
+
+            if echo "${SUBJECT}" | grep -q "${FIELD}\ =\ \""; then
+                # quotes
+                debuglog "  quotes"
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\ =\ \"//" -e 's/".*//'
+            else
+                # no quotes
+                debuglog "  no quotes"
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\ =\ //" -e 's/\,\ .*//'
+            fi
+
+        fi
+
+    fi
+
+}
+
+
+################################################################################
 # Extract specific attributes from a certificate
 # $1 attribute name
 # $2 cert file or cert content
@@ -1269,26 +1319,26 @@ extract_cert_attribute() {
         ;;
     org)
         cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
-
-        # on older systems the fields where separated by /, e.g.,
-        #   subject= /C=US/ST=California/L=San Francisco/O=GitHub, Inc./CN=github.com
-        # on newer systems the fields are separated by , and are sometimes quoted (if they contain a comma), e.g.,
-        #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
-        #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
-
-        if echo "${cert_subject}" | grep -q '^subject=\ \/'; then
-            # old format
-            echo "${cert_subject}" | sed -e 's/.*\/O=//' -e 's/\/.*//'
-        else
-            # new format
-            if echo "${cert_subject}" | grep -q 'O\ =\ "'; then
-                # quotes
-                echo "${cert_subject}" | sed -e 's/.*O\ =\ "//' -e 's/".*//'
-            else
-                # no quotes
-                echo "${cert_subject}" | sed -e 's/.*O\ =\ //' -e 's/\,\ .*//'
-            fi
-        fi
+        parse_subject "O" "${cert_subject}"
+        ;;
+    org_unit)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        parse_subject "OU" "${cert_subject}"
+        ;;
+    key_length)
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
+        ;;
+    country)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        parse_subject "C" "${cert_subject}"
+        ;;
+    state)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        parse_subject "ST" "${cert_subject}"
+        ;;
+    locality)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        parse_subject "L" "${cert_subject}"
         ;;
     email)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
@@ -5457,11 +5507,31 @@ ${WARNING}"
         EMAIL="$(extract_cert_attribute 'email' "${CERT}")"
         debuglog "EMAIL = ${EMAIL}"
 
-        if [ -n "${EMAIL}" ]; then
-            info "Email" "${EMAIL}"
-        else
-            info "Email" "-"
-        fi
+        info "Email" "${EMAIL}"
+
+    fi
+
+    if [ -n "${INFO}" ] ; then
+
+        # see https://stackoverflow.com/questions/6464129/certificate-subject-x-509 for additional fields that could be implemented
+
+        CERT_ORG="$(extract_cert_attribute 'org' "${CERT}")"
+        info "Organization" "${CERT_ORG}"
+
+        CERT_OU="$(extract_cert_attribute 'org_unit' "${CERT}")"
+        info "Organizational unit" "${CERT_OU}"
+
+        CERT_COUNTRY="$(extract_cert_attribute 'country' "${CERT}")"
+        info "Country" "${CERT_COUNTRY}"
+
+        CERT_STATE="$(extract_cert_attribute 'state' "${CERT}")"
+        info "State or province" "${CERT_STATE}"
+
+        CERT_LOCALITY="$(extract_cert_attribute 'locality' "${CERT}")"
+        info "Locality" "${CERT_LOCALITY}"
+
+        KEY_LENGTH="$( extract_cert_attribute 'key_length' "${CERT}" )"
+        info "Public key length" "${KEY_LENGTH}"
 
     fi
 
