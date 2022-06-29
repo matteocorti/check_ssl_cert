@@ -219,6 +219,9 @@ setUp() {
     ELAPSED=$(( NOW - START_TIME ))
     # shellcheck disable=SC2154
     REMAINING_S=$( echo "scale=2; ${__shunit_testsTotal} * ( ${ELAPSED} ) / ${COUNTER} - ${ELAPSED}" | bc | sed 's/[.].*//' )
+    if [ -z "${REMAINING_S}" ] ; then
+        REMAINING_S=0
+    fi
     REMAINING=$( seconds2String "${REMAINING_S}" )
 
     # print the test number
