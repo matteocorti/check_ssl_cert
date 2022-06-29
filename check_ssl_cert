@@ -1229,7 +1229,7 @@ parse_subject() {
         debuglog "  old format separated by /"
 
         if echo "${SUBJECT}" | grep -q "${FIELD}=" ; then
-            echo "${SUBJECT}" | sed -e "s/.*\/${FIELD}=//" -e 's/\/.*//'
+            echo "${SUBJECT}" | sed -e "s/.*\\/${FIELD}=//" -e 's/\/.*//'
         fi
 
     else
@@ -1237,16 +1237,16 @@ parse_subject() {
         # new format
         debuglog "  new format separated by ,"
 
-        if echo "${SUBJECT}" | grep -q "${FIELD}\ =" ; then
+        if echo "${SUBJECT}" | grep -q "${FIELD}\\ =" ; then
 
-            if echo "${SUBJECT}" | grep -q "${FIELD}\ =\ \""; then
+            if echo "${SUBJECT}" | grep -q "${FIELD}\\ =\\ \""; then
                 # quotes
                 debuglog "  quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\ =\ \"//" -e 's/".*//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ =\\ \"//" -e 's/".*//'
             else
                 # no quotes
                 debuglog "  no quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\ =\ //" -e 's/\,\ .*//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ =\\ //" -e 's/\,\ .*//'
             fi
 
         fi
