@@ -1,1 +1,1 @@
-Added checks for the certificate purpose
+Added DNSSEC checks

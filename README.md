@@ -196,6 +196,7 @@ Options:
                                    certificate. 'list' is an optional comma
                                    separated list of expected client
                                    certificate CAs
+      --require-dnssec             Require DNSSEC
       --require-no-ssl2            Critical if SSL version 2 is offered
       --require-no-ssl3            Critical if SSL version 3 is offered
       --require-no-tls1            Critical if TLS 1 is offered

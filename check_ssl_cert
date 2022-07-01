@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.32.0
+VERSION=2.33.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -280,14 +280,15 @@ usage() {
     echo "                                   certificate. 'list' is an optional comma"
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
-    echo "      --require-purpose usage      requires the specified key usage (can be"
-    echo "                                   specified more then once)"
-    echo "      --require-purpose-critical   the key usage must be critical"
+    echo "      --require-dnssec             Require DNSSEC"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
     echo "      --require-no-tls1_1          Critical if TLS 1.1 is offered"
     echo "      --require-ocsp-stapling      Require OCSP stapling"
+    echo "      --require-purpose usage      requires the specified key usage (can be"
+    echo "                                   specified more then once)"
+    echo "      --require-purpose-critical   the key usage must be critical"
     echo "      --resolve ip                 Provide a custom IP address for the"
     echo "                                   specified host"
     echo "      --rootcert-dir path          Root directory to be used for certificate"
@@ -2793,6 +2794,10 @@ parse_command_line_options() {
             RSA=1
             shift
             ;;
+        --require-dnssec)
+            REQUIRE_DNSSEC=1
+            shift
+            ;;
         --require-no-ssl2)
             DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} SSLv2"
             shift
@@ -4357,6 +4362,63 @@ main() {
         require_s_client_option "${S_CLIENT_OPTION}"
     done
 
+    ##############################################################################
+    # DNSSEC checks
+    #
+    # see
+    # - https://dnsinstitute.com/documentation/dnssec-guide/ch03s02.html
+    # - https://serverfault.com/questions/154016/querying-and-verifying-dnssec
+    #
+    if [ -n "${REQUIRE_DNSSEC}" ] ; then
+
+        if [ -n "${FILE}" ] ; then
+            unknown "--require-dnssec cannot be used with --file"
+        fi
+
+        # we use dig as delv has several problems on macOS and Fedora
+
+        if [ -z "${DIG_BIN}" ]; then
+            DIG_BIN='dig'
+        fi
+        check_required_prog "${DIG_BIN}"
+        DIG_BIN=${PROG}
+
+        debuglog "Checking DNSSEC with ${DIG_BIN} +dnssec ${HOST}"
+        DIG_OUTPUT=$( ${DIG_BIN} +dnssec "${HOST}" )
+
+        if [ "${DEBUG}" -gt 0 ]; then
+            echo "${DIG_OUTPUT}" | sed 's/^/[DBG]     /' 1>&2
+        fi
+
+        DNSSEC_ERROR=
+        # check for the presence of the Authenticated Data (ad) flag in the header
+        if ! echo "${DIG_OUTPUT}" | grep ';;\ flags:' | grep -q 'ad[; ]' ; then
+            prepend_critical_message "DNSSEC: the Authenticated Data (ad) flag is not present"
+            DNSSEC_ERROR=1
+        fi
+
+        # check the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware
+        if ! echo "${DIG_OUTPUT}" | grep ',\ flags:' | grep -q 'do[; ]' ; then
+            prepend_critical_message "DNSSEC: the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware is not present"
+            DNSSEC_ERROR=1
+        fi
+
+        # check for the presence of an additional resource record of type RRSIG, with the same name as the A record.
+        if ! echo "${DIG_OUTPUT}" | grep -q 'RRSIG' ; then
+            prepend_critical_message "DNSSEC: the RRSIG resource record is not present"
+            DNSSEC_ERROR=1
+        fi
+
+        if [ -z "${DNSSEC_ERROR}" ] ; then
+            verboselog "DNSSEC ok"
+            info "DNSSEC" "ok"
+        else
+            verboselog "DNSSEC not present"
+            info "DNSSEC" "no"
+        fi
+
+    fi
+
     ################################################################################
     # define the HTTP request string
     if [ -n "${SNI}" ]; then
@@ -4418,12 +4480,15 @@ main() {
     ##############################################################################
     # DANE
     if [ -n "${DANE}" ]; then
+
         debuglog 'checking DANE'
+
         if [ -z "${DIG_BIN}" ]; then
             DIG_BIN='dig'
         fi
         check_required_prog "${DIG_BIN}"
         DIG_BIN=${PROG}
+
         # check if OpenSSL supports -dane_tlsa_rrdata
         if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -dane_tlsa_rrdata; then
             DIG_RESULT=$("${DIG_BIN}" +short TLSA "_${PORT}._tcp.${HOST_ADDR}" | while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done)

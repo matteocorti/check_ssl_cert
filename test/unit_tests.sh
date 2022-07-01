@@ -1654,6 +1654,20 @@ testPurpose() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testDNSSECOk() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H switch.ch --ignore-exp --require-dnssec
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testDNSSECError() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H corti.li --ignore-exp --require-dnssec
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

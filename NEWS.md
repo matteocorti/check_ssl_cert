@@ -1,3 +1,5 @@
+* 2022-07-01 Version 2.33.0
+  * Added DNSSEC checks
 * 2022-06-17 Version 2.32.0
   * Added checks for the certificate purpose
 * 2022-06-11 Version 2.31.0

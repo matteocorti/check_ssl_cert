@@ -11,7 +11,9 @@
 ## Optional dependencies
 
 * check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system timeouts will be disabled.
-* ```dig``` for DANE checks
+* ```dig``` for
+  * DANE checks
+  * DNSSEC checks
 * [nmap](https://nmap.org) for the disallowed protocols and cyphers checks
 * ```expand``` for ```--info```
 * ```tar``` and ```bzip2``` to build release packages
