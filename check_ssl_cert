@@ -4383,8 +4383,9 @@ main() {
         check_required_prog "${DIG_BIN}"
         DIG_BIN=${PROG}
 
-        debuglog "Checking DNSSEC with ${DIG_BIN} +dnssec ${HOST}"
-        DIG_OUTPUT=$( ${DIG_BIN} +dnssec "${HOST}" )
+        # a lot of DNS servers have no support for DNSSEC: we use Google's public DNS
+        debuglog "Checking DNSSEC with ${DIG_BIN} +dnssec ${HOST} @8.8.8.8"
+        DIG_OUTPUT=$( ${DIG_BIN} +dnssec "${HOST}" @8.8.8.8 )
 
         if [ "${DEBUG}" -gt 0 ]; then
             echo "${DIG_OUTPUT}" | sed 's/^/[DBG]     /' 1>&2
