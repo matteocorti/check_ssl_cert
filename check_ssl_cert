@@ -3482,6 +3482,14 @@ main() {
         date >>"${DEBUG_FILE}"
     fi
 
+    if [ "${DEBUG}" -gt 0 ] ; then
+
+        debuglog "Shell: ${SHELL}"
+        SHELL_VERSION=$( "${SHELL}" --version)
+        echo "${SHELL_VERSION}" | sed 's/^/[DBG]   /' 1>&2
+
+    fi
+
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
     debuglog "  TMPDIR = ${TMPDIR}"
 
