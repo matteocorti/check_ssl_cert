@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.33.0
+VERSION=2.34.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1198,14 +1198,29 @@ require_s_client_option() {
 # Exits with unknown if x509 does not support the given option
 #
 # Usage:
-#   require_s_client_option '-no_ssl2'
+#   require_x509_option '-no_ssl2'
 #
 require_x509_option() {
-    debuglog "Checking if x509 supports the $1 option"
+    debuglog "Checking if x509 supports the required $1 option"
     if ! "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"; then
         unknown "x509 does not support the $1 option$2"
     fi
 }
+
+################################################################################
+# Exits with unknown if x509 does not support the given option
+# $1 option to be checked
+# returns 0 for true and 1 for false
+#
+# Usage:
+#   check_x509_option '-no_ssl2'
+#
+check_x509_option() {
+    debuglog "Checking if x509 supports the $1 option"
+    "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"
+    return $?
+}
+
 
 ################################################################################
 # Extract specific field from a subject
@@ -3488,6 +3503,9 @@ main() {
         SHELL_VERSION=$( "${SHELL}" --version)
         echo "${SHELL_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
+        # should take a look at
+        # https://github.com/stephane-chazelas/misc-scripts/blob/master/which_interpreter
+
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
@@ -4837,40 +4855,45 @@ main() {
         FINGERPRINT_INFO="$(echo "${FINGERPRINT}" | sed 's/Fingerprint=//')"
         info "Fingerprint" "${FINGERPRINT_INFO}"
 
-        KEY_USAGE="$(extract_cert_attribute 'keyUsage' "${CERT}")"
+        # only works with -ext
+        if check_x509_option '-ext' ; then
 
-        # info
-        if [ -n "${PURPOSE_CRITICAL}" ] ; then
-            debuglog "Certificate purpose is defined as critical"
-            PURPOSE_LABEL="Purpose (critical)"
-        else
-            debuglog "Certificate purpose is not defined as critical"
-            PURPOSE_LABEL="Purpose"
-            if [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
-                prepend_critical_message "Certificate purpose is not defined as critical (as required)"
-            fi
-        fi
-        info "${PURPOSE_LABEL}" "${KEY_USAGE}"
+            KEY_USAGE="$(extract_cert_attribute 'keyUsage' "${CERT}")"
 
-        # check the certificate purpose
-        if [ -n "${REQUIRE_PURPOSE}" ] ; then
-            debuglog "Checking certificate purpose(s)"
-
-            while IFS= read -r purpose ; do
-
-                debuglog "  Check if '${purpose}' is defined"
-
-                # the purposes are in a 'comma space' separated list
-                if ! echo "${KEY_USAGE}" | grep -q -i "^${purpose}$" &&
-                        ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\\ " &&
-                        ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose}$" &&
-                        ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose},\\ " ; then
-                    prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
+            # info
+            if [ -n "${PURPOSE_CRITICAL}" ] ; then
+                debuglog "Certificate purpose is defined as critical"
+                PURPOSE_LABEL="Purpose (critical)"
+            else
+                debuglog "Certificate purpose is not defined as critical"
+                PURPOSE_LABEL="Purpose"
+                if [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
+                    prepend_critical_message "Certificate purpose is not defined as critical (as required)"
                 fi
+            fi
+            info "${PURPOSE_LABEL}" "${KEY_USAGE}"
 
-            done <<EOF
+            # check the certificate purpose
+            if [ -n "${REQUIRE_PURPOSE}" ] ; then
+                debuglog "Checking certificate purpose(s)"
+
+                while IFS= read -r purpose ; do
+
+                    debuglog "  Check if '${purpose}' is defined"
+
+                    # the purposes are in a 'comma space' separated list
+                    if ! echo "${KEY_USAGE}" | grep -q -i "^${purpose}$" &&
+                            ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\\ " &&
+                            ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose}$" &&
+                            ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose},\\ " ; then
+                        prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
+                    fi
+
+                done <<EOF
 ${REQUIRE_PURPOSE}
 EOF
+
+            fi
 
         fi
 

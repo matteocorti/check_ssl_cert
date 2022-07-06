@@ -1,3 +1,5 @@
+* 2022-07-06 Version 2.34.0
+  * If x509 -ext is not supported no info on the certificate purpose is extracted
 * 2022-07-01 Version 2.33.0
   * Added DNSSEC checks
 * 2022-06-17 Version 2.32.0
