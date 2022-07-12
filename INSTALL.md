@@ -33,7 +33,7 @@ Following tools are required for development:
 ## Installation
 
 * You can run the plugin from the shell.
-* If you want to install it systemwide, copy the plugin to a directory in the path, and ```check_ssl_cert.1``` in an appropriate directory in the ```$MANPATH``` 
+* If you want to install it systemwide, copy the plugin to a directory in the path, and ```check_ssl_cert.1``` in an appropriate directory in the ```$MANPATH```
 * Simply copy the plugin to your Nagios/Icinga plugin directory (e.g., ```/usr/lib64/nagios/plugins/```)
 * Use ```make install``` by  defining the ```DESTDIR``` and ```MANDIR``` variables with the installation targets. E.g, ```make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install```
 * To install the bash completion script run ```sudo make install_bash_completion``` (it will install the completion script in the directory defined by ```pkg-config --variable=completionsdir bash-completion```)

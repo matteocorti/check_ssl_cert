@@ -9,7 +9,7 @@ DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md
 YEAR=`date +"%Y"`
 
 # file to be checked for formatting
-FORMATTED_FILES=test/unit_tests.sh AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
+FORMATTED_FILES=test/unit_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
 
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
