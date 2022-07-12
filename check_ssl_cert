@@ -4898,7 +4898,7 @@ EOF
         fi
 
         # TO DO: we just take the first result: a loop over all the hosts should
-        # be implemented
+        # be implemented (I just need an example to be able to test)
         OCSP_URI="$(extract_cert_attribute 'oscp_uri_single' "${CERT}")"
         debuglog "OCSP_URI = ${OCSP_URI}"
 

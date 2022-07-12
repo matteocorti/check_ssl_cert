@@ -14,10 +14,10 @@
 * 2022-05-04 Version 2.28.0
   * Fixed a bug in the connection check when specifying ```--ignore-connection-problems```
 * 2022-04-28 Version 2.27.0
- * Fixed a bug with the ciphers check with older nmap versions
+* Fixed a bug with the ciphers check with older nmap versions
 * 2022-04-28 Version 2.26.0
- * Fixed a bug with the ciphers check with older nmap versions
- * Fixed a bug in the display of the expiration date
+* Fixed a bug with the ciphers check with older nmap versions
+* Fixed a bug in the display of the expiration date
 * 2022-04-13 Version 2.25.0
   * Caching of the host names to be used with bash completion
 * 2022-04-06 Version 2.24.0
@@ -45,501 +45,501 @@
 * 2021-12-21 Version 2.17.0
   * Fixed several issues when specifying a numeric IPv6 address
   * Checking the whole chain with STARTTLS
- * 2021-12-20 Version 2.16.0
+* 2021-12-20 Version 2.16.0
   * Remove the trailing . from FQDNs
   * Fixed a problem with self signed certificates
- * 2021-12-15 Version 2.15.0
-    * Error if HTTP/2 is requested but not offered by the server
+* 2021-12-15 Version 2.15.0
+  * Error if HTTP/2 is requested but not offered by the server
   * SSL 2.0 and SSL 3.0 disabled by --all and --all-local
- * 2021-12-10 Version 2.14.0
+* 2021-12-10 Version 2.14.0
   * Added an option --info to print certificate information
   * Fixed the IPv6 checks when ipconfig is not available
   * Fixed a bug causing an unnecessary scan when checking for disallowed protocols
- * 2021-11-24 Version 2.13.0
+* 2021-11-24 Version 2.13.0
   * Fixed a bug in the processing of error messages
   * Handling of root certificates in DER format
- * 2021-11-16 Version 2.12.0
+* 2021-11-16 Version 2.12.0
   * Improved verbose messages
- * 2021-11-11 Version 2.11.0
+* 2021-11-11 Version 2.11.0
   * Several fixes in the documentation
   * Works with OpenSSL 3.0.0
   * Fixes a bug in the processing of certificate issuers containing commas
- * 2021-10-22 Version 2.10.4
+* 2021-10-22 Version 2.10.4
   * Fixes the organization check
- * 2021-10-21 Version 2.10.3
+* 2021-10-21 Version 2.10.3
   * Fixes --rsa on systems not supporting PSS
   * Uses mktemp if available (the workaround is only used if not available for speed reasons)
- * 2021-10-14 Version 2.10.2
+* 2021-10-14 Version 2.10.2
   * Improved the certificate chain check of local bundles
- * 2021-10-12 Version 2.10.1
+* 2021-10-12 Version 2.10.1
   * Fixed the certificate chain check
- * 2021-10-11 Version 2.10.0
+* 2021-10-11 Version 2.10.0
   * Checks the certificate chain integrity
   * Does not accept certificates without SANs (use --allow-empty-san to ignore)
   * Bug fix in the handling of errors while fetching certificates
   * Allows a check on invalid FQDNs containing an underscore
- * 2021-10-06 Version 2.9.1
+* 2021-10-06 Version 2.9.1
   * Accepts certificates without subject alternative names
   * Added an option (--debug-time) to print the elapsed time in the debugging output
- * 2021-10-01 Version 2.9.0
+* 2021-10-01 Version 2.9.0
   * The --skip-element option can now be specified multiple times and specifies to skip a single
   * element of the certificate chain
- * 2021-09-29 Version 2.8.0
+* 2021-09-29 Version 2.8.0
   * Adds a check for acceptable client certificate CAs (--require-client-cert [list])
   * Supporting certificate expiration after 2038-01-19 on 32 bit systems
   * Adds an option (--ignore-connection-problem)  to set a custom state in case of connection failures
   * Adds two options to selectively disable proxy setting for curl and s_client
   * (--no-proxy-curl and --no-proxy-s_client)
- * 2021-09-24 Version 2.7.0
+* 2021-09-24 Version 2.7.0
   * Critical and warning can now be floating point numbers
- * 2021-09-21 Version 2.6.1
+* 2021-09-21 Version 2.6.1
   * Fixed the output of several messages
   * Fixed the order of the critical messages
   * Fixed a problem when checking a local CRL (no STC checks and automatic conversion from DER format)
   * Fixed a problem with the tests with IPv6
   * Fixed a problem when checking a local certificate (does not try to connect to localhost to check for renegotiation)
- * 2021-09-17 Version 2.6.0
+* 2021-09-17 Version 2.6.0
   * Added the --prometheus command line option to generate output for Prometheus/OpenMetrics
   * Automatically assume localhost if --file is specified
- * 2021-09-16 Version 2.5.2
+* 2021-09-16 Version 2.5.2
   * Bug fix: fixed the output in case or multiple errors
- * 2021-09-15 Version 2.5.1
+* 2021-09-15 Version 2.5.1
   * Bug fix: fixed the detection of server internal errors by OCSP checks
- * 2021-09-15 Version 2.5.0
+* 2021-09-15 Version 2.5.0
   * Added the --ignore-ocsp-errors command line option
   * Bug fix: fixed the behavior of the --element command line option
- * 2021-08-31 Version 2.4.3
+* 2021-08-31 Version 2.4.3
   * Fixed the connection to the TLS renegotiation on FreeBSD
   * Detects old BSD date without -f and computes the date with dconv
- * 2021-08-27 Version 2.4.2
+* 2021-08-27 Version 2.4.2
   * Fixed the handling of IP addresses
- * 2021-08-19 Version 2.4.1
+* 2021-08-19 Version 2.4.1
   * Fixed the handling of --file and --cn
- * 2021-08-16 Version 2.4.0
+* 2021-08-16 Version 2.4.0
   * Support DANE TLSA 312
- * 2021-08-13 Version 2.3.8
+* 2021-08-13 Version 2.3.8
   * Bug fix: fixed the parsing of the --cn command line option
   * Bug fix: better validation of the host command line argument
- * 2021-07-09 Version 2.3.7
+* 2021-07-09 Version 2.3.7
   * Bug fix: performance data is no more shown by critical and warning message when --no-perf is specified
- * 2021-06-23 Version 2.3.6
+* 2021-06-23 Version 2.3.6
   * Bug fix: follows symbolic links
- * 2021-06-22 Version 2.3.5
+* 2021-06-22 Version 2.3.5
   * Bug fix: correct parsing of file(1) ou
- * 2021-06-18 Version 2.3.4
+* 2021-06-18 Version 2.3.4
   * Stop the SSL Labs checks after an error
- * 2021-06-16 Version 2.3.3
+* 2021-06-16 Version 2.3.3
   * Speedup the offered ciphers check
- * 2021-06-03 Version 2.3.2
+* 2021-06-03 Version 2.3.2
   * Bug fix: always uses the specifies OpenSSL binary and respects the specified IP version
- * 2021-05-28 Version 2.3.1
+* 2021-05-28 Version 2.3.1
   * Compatibility fixes for LibreSSL on macOS
   * Added sanity checks for file write operations
- * 2021-05-21 Version 2.3.0
+* 2021-05-21 Version 2.3.0
   * Added the --debug-file option
- * 2021-05-07 Version 2.2.0
+* 2021-05-07 Version 2.2.0
   * Bug fix: --debug does not store any information in $TMPDIR anymore
   * To locally store the retrieved certificates in debug mode the option --debug-cert has to be specified
- * 2021-05-06 Version 2.1.4
+* 2021-05-06 Version 2.1.4
   * Bug fix in the handling of Qualy's SSL Lab command line options
- * 2021-05-05 Version 2.1.3
+* 2021-05-05 Version 2.1.3
   * Bug fix in the Qualy's SSL Lab check of non-reachable machines
- * 2021-04-30 Version 2.1.2
+* 2021-04-30 Version 2.1.2
   * Add domain if FQDN is missing
- * 2021-04-29 Version 2.1.1
+* 2021-04-29 Version 2.1.1
   * Correct handling of subdomains with underscores
- * 2021-04-25 Version 2.1.0
+* 2021-04-25 Version 2.1.0
   * Added an option to hide performance data
   * Fixed a bug in the critical and warning output when the CN is not available
- * 2021-04-07 Version 2.0.1
+* 2021-04-07 Version 2.0.1
   * Fixed a bug in renegotiation checks with STARTTLS
- * 2021-03-29 Version 2.0.0
+* 2021-03-29 Version 2.0.0
   * Fixed the documentation of various options
   * The host name must now always match with the certificate
   * Short options can be grouped (e.g., -vs -c 10 -w 15)
   * Different verbosity levels can now be specified (-v can be used more than once)
   * Added the --resolve option to specify a custom IP for the checked host
- * 2021-03-25 Version 1.146.0
+* 2021-03-25 Version 1.146.0
   * Added --all to enable all the optional checks
   * Fixed a bug in the processing of client certificate requirements
   * Improved the error handling in case a TLS connection is not possible
- * 2021-03-15 Version 1.145-0 Fix in the parsing of OpenSSL version
- * 2021-03-14 Version 1.144.0
+* 2021-03-15 Version 1.145-0 Fix in the parsing of OpenSSL version
+* 2021-03-14 Version 1.144.0
   * Getting rid of the man dependency
- * 2021-03-12 Version 1.143.0
+* 2021-03-12 Version 1.143.0
   * Better handling of the timeout
   * Checks ciphers with nmap (--check-ciphers and --check-ciphers-warnings)
   * Checks all the supplied OCSP URIs
- * 2021-03-10 Version 1.142.0
+* 2021-03-10 Version 1.142.0
   * Improved the TLS renegotiation check
   * Added --password to specify a password source for PCKS12 certificates
- * 2021-03-09 Version 1.141.0
+* 2021-03-09 Version 1.141.0
   * Do not check SCTs if the certificate is self signed
   * Fixed the processing of --inetproto
   * Supports local PCKS #12 and DER formatted certificates
- * 2021-02-25 Version 1.140.0
+* 2021-02-25 Version 1.140.0
   * Fixed a bug in the SCT check
- * 2021-02-24 Version 1.139.0
+* 2021-02-24 Version 1.139.0
   * Fixed a bug in the TLS renegotiation check
- * 2021-02-24 Version 1.138.0
+* 2021-02-24 Version 1.138.0
   * Checks for TLS renegotiation<
- * 2021-02-18 Version 1.137.0
+* 2021-02-18 Version 1.137.0
   * Added  the --url option to specify the URL for the HTTP request
- * 2021-02-16 Version 1.136.0
+* 2021-02-16 Version 1.136.0
   * Fixed the signed certificate timestamps spelling (command line option)
- * 2021-01-28 Version 1.135.0
+* 2021-01-28 Version 1.135.0
   * Checks for signed certificate timestamps (SCTs)
- * 2021-01-27 Version 1.134.0
+* 2021-01-27 Version 1.134.0
   * Complete support for Alpine Linux and BusyBox
- * 2021-01-26 Version 1.133.0
+* 2021-01-26 Version 1.133.0
   * Added the --date option to specify the date binary
   * support for BusyBox date
- * 2021-01-18 Version 1.132.0
+* 2021-01-18 Version 1.132.0
   * Time-outed sub-processes can now be interrupted
   * Revocation via CRL can be checked with the --crl option
   *  Better error messages for DH with small keys and handshake failures
- * 2021-01-15 Version 1.131.0
+* 2021-01-15 Version 1.131.0
   * OCSP check on all the chain elements
- * 2021-01-14 Version 1.130.0
+* 2021-01-14 Version 1.130.0
   * Retries when SSL Labs has no available slot
- * 2020-12-24 Version 1.129.0
+* 2020-12-24 Version 1.129.0
   * Bug fix in the proxy parameters handling
- * 2020-12-22 Version 1.128.0
+* 2020-12-22 Version 1.128.0
   * Added --no-proxy to ignore proxy settings
- * 2020-12-21 Version 1.127.0
+* 2020-12-21 Version 1.127.0
   * Better handling of certificates without CN in the subject
- * 2020-12-16 Version 1.126.0
+* 2020-12-16 Version 1.126.0
   * Corrected the handling of old nmap versions
- * 2020-12-11 Version 1.125.0
+* 2020-12-11 Version 1.125.0
   * Corrected the handling of the issuer URI
- * 2020-11-31 Version 1.124.0
+* 2020-11-31 Version 1.124.0
   * Bug fix when using a proxy
- * 2020-11-30 Version 1.123.0
+* 2020-11-30 Version 1.123.0
   * Enhancement: option to check the nth element
- * 2020-08-07 Version 1.122.0
+* 2020-08-07 Version 1.122.0
   * Bug fix, --skip-element and --custom-header
- * 2020-07-24 Version 1.121.0
+* 2020-07-24 Version 1.121.0
   * Bug fix release
- * 2020-07-02 Version 1.120.0
+* 2020-07-02 Version 1.120.0
   * MySQL support
- * 2020-07-01 Version 1.119.0
+* 2020-07-01 Version 1.119.0
   * Bug fix release
- * 2020-06-12 Version 1.118.0
+* 2020-06-12 Version 1.118.0
   * Bug fix release
- * 2020-06-09 Version 1.117.0
+* 2020-06-09 Version 1.117.0
   * Fixed a bug in the output (expiration date of chain elements)
- * 2020-06-05 Version 1.116.0
+* 2020-06-05 Version 1.116.0
   * Supports s_client -proxy option
- * 2020-06-04 Version 1.115.0
+* 2020-06-04 Version 1.115.0
   * Checks all the certificates in the chain
   * New option to check that the issuer does not match a given pattern
- * 2020-05-27 Version 1.114.0
+* 2020-05-27 Version 1.114.0
   * Added an option to specify a proxy
- * 2020-05-19 Version 1.113.0
+* 2020-05-19 Version 1.113.0
   * Fixed a bug with nmap and hosts with IPv6 addresses only
- * 2020-04-07 Version 1.112.0
+* 2020-04-07 Version 1.112.0
   * Timeout for OCSP queries and option to ignore timeout errors and PostgreSQL support
- * 2020-03-09 Version 1.111.0
+* 2020-03-09 Version 1.111.0
   * New option (--not-valid-longer-than) to check if a certificate is valid longer than the
   * specified number of days
- * 2020-02-17 Version 1.110.0
+* 2020-02-17 Version 1.110.0
   * Added support for xmpp-server in the STARTTLS negotiation
- * 2020-01-07 Version 1.109.0
+* 2020-01-07 Version 1.109.0
   * Option to force HTTP/2
- * 2019-12-23 Version 1.108.0
+* 2019-12-23 Version 1.108.0
   * Better error message in case of connection refused
- * 2019-12-20 Version 1.107.0
+* 2019-12-20 Version 1.107.0
   * Better error message in case of an invalid host
- * 2019-11-21 Version 1.106.0
+* 2019-11-21 Version 1.106.0
   * Optional checks for protocols that should not be supported
- * 2019-11-04 Version 1.105.0
+* 2019-11-04 Version 1.105.0
   * SMTP connections with -name only with OpenSSL versions supporting it
- * 2019-11-04 Version 1.104.0
+* 2019-11-04 Version 1.104.0
   * Fixed a bug in the SMTP connection
- * 2019-10-31 Version 1.103.0
+* 2019-10-31 Version 1.103.0
   * Fixed a bug with the interpretation of OpenSSL errors
- * 2019-10-25 Version 1.102.0
+* 2019-10-25 Version 1.102.0
   * Option to specify the dig binary and fix in the command line validation checks
- * 2019-10-22 Version 1.101.0
+* 2019-10-22 Version 1.101.0
   * Fixed a bug printing both a critical and a warning message when both condition match
- * 2019-10-18 Version 1.100.0
+* 2019-10-18 Version 1.100.0
   * Fixed a bug ignoring --dane without parameters
- * 2019-10-16 Version 1.99.0
+* 2019-10-16 Version 1.99.0
   * DNS-based Authentication of Named Entities (DANE) checks
- * 2019-10-10 Version 1.98.0
+* 2019-10-10 Version 1.98.0
   * Bug fix release: A wildcard certificate does not match the 'main' domain, ciphers and TLS 1.3
- * 2019-10-09 Version 1.97.0
+* 2019-10-09 Version 1.97.0
   * Validate OCSP stapling expiring date, option to disable TLS 1.3
- * 2019-09-25 Version 1.96.0
+* 2019-09-25 Version 1.96.0
   * Bug fixes
- * 2019-09-24 Version 1.95.0
+* 2019-09-24 Version 1.95.0
   * Bug fixes
- * 2019-09-24 Version 1.94.0
+* 2019-09-24 Version 1.94.0
   * Several bugs fixed
- * 2019-09-24 Version 1.93.0
+* 2019-09-24 Version 1.93.0
   * Fixed a bug in the processing of the SSL Labs options
- * 2019-09-24 Version 1.92.0
+* 2019-09-24 Version 1.92.0
   * Bug fix in the OCSP check
- * 2019-09-23 Version 1.91.0
+* 2019-09-23 Version 1.91.0
   * Various minor improvements and fixes
- * 2019-09-19 Version 1.90.0
+* 2019-09-19 Version 1.90.0
   * Bug fix, did not always print all the detected errors
- * 2019-08-22 Version 1.89.0
+* 2019-08-22 Version 1.89.0
   * Prints all the errors
- * 2019-08-09 Version 1.88.0
+* 2019-08-09 Version 1.88.0
   * Add an option to force IPv4 or IPv6
- * 2019-08-08 Version 1.87.0
+* 2019-08-08 Version 1.87.0
   * LDAPS support
- * 2019-07-21 Version 1.86.0
+* 2019-07-21 Version 1.86.0
   * Fixed a bug and enabled extended regex search
- * 2019-06-02 Version 1.85.0
+* 2019-06-02 Version 1.85.0
   * Improved the warnings when using the --file option
- * 2019-03-28 Version 1.84.0
+* 2019-03-28 Version 1.84.0
   * Added an option to specify the curl user agent
- * 2019-03-01 Version 1.83.0
+* 2019-03-01 Version 1.83.0
   * Spelling corrections
- * 2019-02-08 Version 1.82.0
+* 2019-02-08 Version 1.82.0
   * Added a check on the readability of the certificate file
- * 2019-02-01 Version 1.81.0
+* 2019-02-01 Version 1.81.0
   * Added an option to specify a warning level with SSL Labs
- * 2019-01-16 Version 1.80.1
+* 2019-01-16 Version 1.80.1
   * Fixed a problem on systems not supporting echo -e
- * 2018-12-24 Version 1.80.0
+* 2018-12-24 Version 1.80.0
   * Better output in case of errors while using SNI
- * 2018-12-10 Version 1.79.0
+* 2018-12-10 Version 1.79.0
   * Differentiate between IMAP on port 143 and IMAPS on port 993
   * Fixed a vulnerability in the parsing of the certificate issuer
- * 2018-11-07 Version 1.78.0
+* 2018-11-07 Version 1.78.0
   * Bug fixes in IMAP and HTTP requests
- * 2018-11-05 Version 1.77.0
+* 2018-11-05 Version 1.77.0
   * CA file and directory support
- * 2018-10-19 Version 1.76.0
+* 2018-10-19 Version 1.76.0
   * Sends a correct HTTP request
- * 2018-10-18 Version 1.75.0
+* 2018-10-18 Version 1.75.0
   * Allow to specify a client certificate key
- * 2018-10-15 Version 1.74.0
+* 2018-10-15 Version 1.74.0
   * Fixed a bug generating a confusing error message on timeout
- * 2018-09-10 Version 1.73.0
+* 2018-09-10 Version 1.73.0
   * Fixed a bug in the cleanup of temporary files, fixed a bug with certificates without OCSP
   * Fixed tests with more reliable hosts
   * Allows to check against all the issuers in the CA chain
   * Fixed a bug with ```--long-output``` on Linux
   * Fixed the validation of ```--critical``` and ```--warning```
- * 2018-07-01 Version 1.72.0
+* 2018-07-01 Version 1.72.0
   * Corrected a bug introduced in 1.71.0 remove temporary files
- * 2018-07-01 Version 1.71.0
+* 2018-07-01 Version 1.71.0
   * Corrected a bug introduced in 1.70.0 wrong exit codes
- * 2018-06-28 Version 1.70.0
+* 2018-06-28 Version 1.70.0
   * Improved the management of temporary files
- * 2018-06-25 Version 1.69.0
+* 2018-06-25 Version 1.69.0
   * Added an option to require OCSP stapling
- * 2018-04-29 Version 1.68.0
+* 2018-04-29 Version 1.68.0
   * Removed the SNI name check
- * 2018-04-17 Version 1.67.0
+* 2018-04-17 Version 1.67.0
   * Terse output, warning if the specified server name is not found in the certificate and --format option
- * 2018-04-06 Version 1.66.0
+* 2018-04-06 Version 1.66.0
   * UTF-8 output
- * 2018-03-29 Version 1.65.0
+* 2018-03-29 Version 1.65.0
   * Bug fix release
- * 2018-03-28 Version 1.64.0
+* 2018-03-28 Version 1.64.0
   * Remove curl dependency
- * 2018-03-17 Version 1.63.0
+* 2018-03-17 Version 1.63.0
   * Support for TLS 1.3
- * 2018-03-06 Version 1.62.0
+* 2018-03-06 Version 1.62.0
   * Support for LibreSSL
- * 2018-01-19 Version 1.61.0
+* 2018-01-19 Version 1.61.0
   * Fixed a bug handling more than one OCSP host
- * 2017-12-15 Version 1.60.0
+* 2017-12-15 Version 1.60.0
   * Fixed a bug related to XMPP introduced in the last version
- * 2017-12-14 Version 1.59.0
+* 2017-12-14 Version 1.59.0
   * Added an option to specify the 'to' attribute of the XMPP stream element
- * 2017-11-29 Version 1.58.0
+* 2017-11-29 Version 1.58.0
   * Support for DER encoded CRL files
- * 2017-11-28 Version 1.57.0
+* 2017-11-28 Version 1.57.0
   * Added --fingerprint to check the SHA1 fingerprint of the certificate
- * 2017-11-17 Version 1.56.0
+* 2017-11-17 Version 1.56.0
   * Added support for -xmpphost if available
- * 2017-11-16 Version 1.55.0
+* 2017-11-16 Version 1.55.0
   * Fixed XMPP support and IPv6 addresses as host
- * 2017-09-19 Version 1.54.0
+* 2017-09-19 Version 1.54.0
   * With the -f command line option, you can also specify a certificate revocation list (CRL)
- * 2017-09-10 Version 1.53.0
+* 2017-09-10 Version 1.53.0
   * The timeout is applied to OCSP checks
- * 2017-09-09 Version 1.52.0
+* 2017-09-09 Version 1.52.0
   * The SAN requirement check is now optional
- * 2017-07-28 Version 1.51.0
+* 2017-07-28 Version 1.51.0
   * Use openssl s_client's -help option to test for SNI support
- * 2017-07-24 Version 1.50.0
+* 2017-07-24 Version 1.50.0
   * Fix in the Common Name parsing
- * 2017-07-17 Version 1.49.0
+* 2017-07-17 Version 1.49.0
   * Support for OpenSSL 1.1
- * 2017-06-22 Version 1.48.0
+* 2017-06-22 Version 1.48.0
   * Checks for missing subjectAlternativeName extension (https://support.google.com/chrome/a/answer/7391219?hl=en)
- * 2017-06-15 Version 1.47.0
+* 2017-06-15 Version 1.47.0
   * Fixed an issue with OCSP URI with protocols other than HTTP or HTTPS
- * 2017-05-15 Version 1.46.0
+* 2017-05-15 Version 1.46.0
   * Fixed a problem with the detection of OCSP URLs
- * 2017-05-02 Version 1.45.0
+* 2017-05-02 Version 1.45.0
   * Fixed bugs in the date computation and OCSP checks
- * 2017-04-28 Version 1.44.0
+* 2017-04-28 Version 1.44.0
   * Fixed a bug occurring when more than one issuer URI is present
- * 2017-03-07 Version 1.43.0
+* 2017-03-07 Version 1.43.0
   * Support for LDAP
- * 2017-02-16 Version 1.42.0
+* 2017-02-16 Version 1.42.0
   * Support for OpenSSL > 1.1.0
- * 2017-02-10 Version 1.41.0
+* 2017-02-10 Version 1.41.0
   * Added --sni to specify the server name
- * 2017-02-08 Version 1.40.0
+* 2017-02-08 Version 1.40.0
   * Changed the CN output when --altnames is used
- * 2017-02-02 Version 1.39.0
+* 2017-02-02 Version 1.39.0
   * Fixed a bug related to SNI
- * 2017-02-02 Version 1.38.2
+* 2017-02-02 Version 1.38.2
   * Fixed a bug in the command line argument parsing
- * 2017-01-29 Version 1.38.1
+* 2017-01-29 Version 1.38.1
   * Small corrections in the documentation
- * 2017-01-28 Version 1.38.0
+* 2017-01-28 Version 1.38.0
   * Added support for wildcards in alternative names and caching of the issuer certificate
- * 2016-12-23 Version 1.37.0
+* 2016-12-23 Version 1.37.0
   * Added a patch to specify multiple CNs
- * 2016-12-13 Version 1.36.2
+* 2016-12-13 Version 1.36.2
   * fixed a minor problem with --debug
- * 2016-12-06 Version 1.36.1
+* 2016-12-06 Version 1.36.1
   * fixed a problem when specifying a CN beginning with *
- * 2016-12-04 Version 1.36.0
+* 2016-12-04 Version 1.36.0
   * fixed problem when file is returning PEM certificate on newer Linux distributions
   * added an option to specify the location of the file utility
- * 2016-10-18 Version 1.35.0
+* 2016-10-18 Version 1.35.0
   * added support for the selection of the cipher authentication
- * 2016-09-19 Version 1.34.0
+* 2016-09-19 Version 1.34.0
   * added proxy support for the OCSP checks (thanks to Leynos)
- * 2016-08-04 Version 1.33.0
+* 2016-08-04 Version 1.33.0
   * disabling OCSP checks when no issuer URI is found
- * 2016-07-29 Version 1.32.0
+* 2016-07-29 Version 1.32.0
   * added support for date with timestamp calculation and fixed case sensitive comparison of CN
- * 2016-07-12 Version 1.31.0
+* 2016-07-12 Version 1.31.0
   * Fixed the parsing of the CN field
- * 2016-06-30 Version 1.30.0
+* 2016-06-30 Version 1.30.0
   * OCSP check is fixed and enabled by default
- * 2016-06-15 Version 1.29.0
+* 2016-06-15 Version 1.29.0
   * New option to clear the cached value at SSL Labs IRC support
- * 2016-06-01 Version 1.28.0
+* 2016-06-01 Version 1.28.0
   * Increased control over which SSL/TLS versions to use
- * 2016-03-29 Version 1.27.0
+* 2016-03-29 Version 1.27.0
   * Fixes a bug in the OpenSSL error parsing
- * 2016-03-29 Version 1.26.0
+* 2016-03-29 Version 1.26.0
   * Fixes a bug in wildcard match
- * 2016-03-21 Version 1.25.0
+* 2016-03-21 Version 1.25.0
   * Fixes a bug on CN parsing on non-GNU systems
   * Handle wildcard certificates
- * 2016-03-09 Version 1.24.0
+* 2016-03-09 Version 1.24.0
   * Waits for SSL Labs Results
- * 2016-03-07 Version 1.23.0
+* 2016-03-07 Version 1.23.0
   * Supports SNI even when not checking CN and does not issue a critical when SSL Labs is still checking a host
- * 2016-03-03 Version 1.22.0
+* 2016-03-03 Version 1.22.0
   * Initial support for SSL Labs checks
   *  Support for UTF output (thanks to Konstantin Shalygin)
- * 2016-03-01 Version 1.21.0
+* 2016-03-01 Version 1.21.0
   * Fixed a bug which prevented the check on the expiration date
- * 2016-02-26 Version 1.20.0
+* 2016-02-26 Version 1.20.0
   * Added debugging output (-d or --debug)
   * Improved the handling of OpenSSL error messages
   * Does not stop the validation if the server requires aclient certificate
- * 2016-02-25 Version 1.19.0
+* 2016-02-25 Version 1.19.0
   * Added a check for certificates signed with SHA-1 or MD5 Added an option to disable the expiration date check
- * 2015-10-31 Version 1.18.0
+* 2015-10-31 Version 1.18.0
   * Added an option to check the certificate's serial number (thanks to Milan Koudelka)
- * 2015-10-20 Version 1.17.2
+* 2015-10-20 Version 1.17.2
   * Fixed a bug with OCSP
- * 2015-04-07 Version 1.17.1
+* 2015-04-07 Version 1.17.1
   * Fixed the check on the openssl binary
- * 2014-10-21 Version 1.17.0
+* 2014-10-21 Version 1.17.0
   * Added an option to check revocation via OCSP
- * 2014-06-06 Version 1.16.2
+* 2014-06-06 Version 1.16.2
   * Fixed a problem with -servername when -n was not specified
- * 2014-02-28 Version 1.16.1
+* 2014-02-28 Version 1.16.1
   * Added a Make target for the RPM package
- * 2013-12-23 Version 1.16.0
+* 2013-12-23 Version 1.16.0
   * Added an option to force TLS version 1
- * 2013-07-29 Version 1.15.0
+* 2013-07-29 Version 1.15.0
   * Added an option to force a certain SSL version (thanks to Max Winterstein)
- * 2013-05-12 Version 1.14.6
+* 2013-05-12 Version 1.14.6
   * Added XMPP and timeout support (thanks to Christian Ruppert and Robin H. Johnson)
- * 2013-03-02 Version 1.14.5
+* 2013-03-02 Version 1.14.5
   * Fixed a bug occurring with TLS and multiple names int he certificate
- * 2012-12-07 Version 1.14.4
+* 2012-12-07 Version 1.14.4
   * Fixed a bug causing ```-N``` to always compare the CN with 'localhost'
- * 2012-09-19 Version 1.14.3
+* 2012-09-19 Version 1.14.3
   * Improved the error message in case of a failure in the certificate download
- * 2012-07-13 Version 1.14.2
+* 2012-07-13 Version 1.14.2
   * Added the name since or to expiration in the plugin output.
- * 2012-07-11 Version 1.14.1
+* 2012-07-11 Version 1.14.1
   * Fixed a bug with Perl date computation on some systems
- * 2012-07-06 Version 1.14.0
+* 2012-07-06 Version 1.14.0
   * The status now includes performance data in days until expiration (requires Perl with [Date::Parse](https://metacpan.org/pod/Date::Parse)).
   * It is now possible to print additional information in the plugins long output (multi-line, Nagios 3 only)
- * 2012-04-05 Version 1.13.0
+* 2012-04-05 Version 1.13.0
   * The plugin will now try to fetch the certificate without without TLS extensions in case of error
- * 2012-04-04 Version 1.12.0
+* 2012-04-04 Version 1.12.0
   * Fixed a bug in the chain verification (hard coded error number)
- * 2011-10-22 Version 1.11.0
+* 2011-10-22 Version 1.11.0
   * ```--altname``` option
- * 2011-09-01 Version 1.10.0
+* 2011-09-01 Version 1.10.0
   * Applied a patch from Sven Nierlein to authenticate using a client certificate
- * 2011-03-10 Version 1.9.1
+* 2011-03-10 Version 1.9.1
   * Allows HTTP as protocol and fixes ```-N``` with wildcards
- * 2011-01-24 Version 1.9.0
+* 2011-01-24 Version 1.9.0
   * Added an option to specify the ```openssl``` executable
- * 2010-12-16 Version 1.8.1
+* 2010-12-16 Version 1.8.1
   * Fixed bugs with environment bleeding & shell globbing
- * 2010-12-08 Version 1.8.0
+* 2010-12-08 Version 1.8.0
   * Added support for TLS servername extension in ```ClientHello```
- * 2010-10-28 Version 1.7.7
+* 2010-10-28 Version 1.7.7
   * Fixed a bug in the signal specification introduced 1.7.6
- * 2010-10-28 Version 1.7.6
+* 2010-10-28 Version 1.7.6
   * Better temporary file clean up (thanks to Lawren Quigley-Jones)
- * 2010-10-14 Version 1.7.5
+* 2010-10-14 Version 1.7.5
   * Applied a patch from Yannick Gravel fixing the test order
- * 2010-10-01 Version 1.7.4
+* 2010-10-01 Version 1.7.4
   * Applied a patch from Lawren Quigley-Jones adding the ```-A``` option
- * 2010-09-15 Version 1.7.3
+* 2010-09-15 Version 1.7.3
   * Fixed a bug in the option processing
- * 2010-08-26 Version 1.7.2
+* 2010-08-26 Version 1.7.2
   * Removes useless use of ```cat```, better test for ```expect``` utility
- * 2010-08-26 Version 1.7.1
+* 2010-08-26 Version 1.7.1
   * Replaces ```-verify 6``` which was erroneously removed in the previous version
- * 2010-08-26 Version 1.7.0
+* 2010-08-26 Version 1.7.0
   * Overloaded ```--rootcert``` option to allow ```-CApath``` as well as ```-CAfile```
- * 2010-07-21 Version 1.6.1
+* 2010-07-21 Version 1.6.1
   * Added an option to specify where to temporarily store the certificate
- * 2010-07-09 Version 1.6.0
+* 2010-07-09 Version 1.6.0
   * Added long command line options and substituted ```-days``` with ```--critical``` and ```--warning```
- * 2010-07-07 Version 1.5.2
+* 2010-07-07 Version 1.5.2
   * Added the ```-f``` option to check a local file
- * 2010-07-01 Version 1.5.1
+* 2010-07-01 Version 1.5.1
   * Fixed the plugin output
- * 2010-03-11 Version 1.4.4
+* 2010-03-11 Version 1.4.4
   * Fixed bug #64 (```==``` bashism)
- * 2010-03-09 Version 1.4.3
+* 2010-03-09 Version 1.4.3
   * -N and -n options to compare the CN to an hostname
- * 2009-12-02 Version 1.4.2
+* 2009-12-02 Version 1.4.2
   * the ```-i ISSUER``` option now checks if the ```O=``` or the ```CN=``` fields of the root certificate match
- * 2009-11-30 Version 1.4.1
+* 2009-11-30 Version 1.4.1
   * ```-r``` to specify the root cert to be used for verification
- * 2009-11-30 Version 1.4.0
+* 2009-11-30 Version 1.4.0
   * certificate chain verification
- * 2009-03-30 Version 1.3.0
+* 2009-03-30 Version 1.3.0
   * ```-P``` option to check TLS certificates (SMTP, FTP, POP3, ...)
- * 2008-05-13 Version 1.2.2
+* 2008-05-13 Version 1.2.2
   * include the CN in the messages (D. Wallis)
- * 2008-02-25 Version 1.2.1
+* 2008-02-25 Version 1.2.1
   * better error handling
- * 2008-02-25 Version 1.2.0
+* 2008-02-25 Version 1.2.0
   * general cleanup (POSIX compliance, removednmap dependency, ...) from Dan Wallis
- * 2007-08-31 Version 1.1.0
+* 2007-08-31 Version 1.1.0
   * option to enforce a given email address
   * option to enforce a given organization
   * temporary files cleanup upon exit
- * 2007-08-15 Version 1.0.1
+* 2007-08-15 Version 1.0.1
   * Bug fix: openssl did not close the connection cleanly
- * 2007-08-10 Version 1.0.0
+* 2007-08-10 Version 1.0.0
   * First release (1.0)

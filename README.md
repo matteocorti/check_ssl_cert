@@ -1,12 +1,12 @@
 
- &copy; Matteo Corti, ETH Zurich, 2007-2012
-
- &copy; Matteo Corti, 2007-2022
-  see AUTHORS.md for the complete list of contributors
+ &copy; Matteo Corti, ETH Zurich, 2007-2012.  
+ &copy; Matteo Corti, 2007-2022. 
+ 
+ see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
 
 # check\_ssl\_cert
 
-A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection
+A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection and certificate
 
 ## Usage
 
@@ -276,17 +276,17 @@ Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 
 ## Expect & timeout
 
-check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system timeouts will be disabled.
+check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system, timeouts will be disabled.
 
 ## Virtual servers
 
-check\_ssl\_cert supports the servername TLS extension in ClientHello
+check\_ssl\_cert supports the servername TLS extension in ```ClientHello```
 if the installed OpenSSL version provides it. This is needed if you
 are checking a server with virtual hosts.
 
 ## SSL Labs
 
-If `-L` or `--check-ssl-labs` are specified the plugin will check the
+If `-L` or `--check-ssl-labs` are specified, the plugin will check the
 cached status using the [SSL Labs Assessment API](https://www.ssllabs.com/about/terms.html).
 
 The plugin will ask for a cached result (maximum age 1 day) to avoid
@@ -296,7 +296,7 @@ get an outdated result.
 ## Root Certificate
 
 The root certificate corresponding to the checked certificate must be
-available to OpenSSL or specified with the `-r cabundle` or
+available to OpenSSL or must be specified with the `-r cabundle` or
 `--rootcert cabundle` option, where ```cabundle``` is either a file for `-CAfile`
 or a directory for `-CApath`.
 
@@ -353,6 +353,8 @@ make test
 ```
 
 With ```make disttest``` you can check the formatting of the files (e.g. tabs and blanks at the end of the lines) and run ShellCheck to lint the scripts.
+
+With ```make codespell``` ypu can perform a spell check on the code and documentation.
 
 To run a single test:
 

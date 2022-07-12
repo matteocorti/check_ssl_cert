@@ -3,7 +3,7 @@
 Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](mailto:matteo@.corti.li)>
 
 * Many thanks to Kenny McCormack for his help on comp.unix.shell on how to implement a timeout
-* Many thanks to Dan Wallis for several patches and fixes (see the Changelog)
+* Many thanks to Dan Wallis for several patches and fixes (see the [Changelog](Changelog))
 * Many thanks to Tuomas Haarala for the ```-P``` option patch to check TLS certs using other protocols
 * Many thanks to Marcus Rejås for the ```-N``` and ```-n``` patches
 * Many thanks to Marc Fournier for
