@@ -362,6 +362,10 @@ To run a single test:
  * change the directory to the test suite: ```cd test```
  * execute the test suite with the tests to be run as argument after ```--```. For example ```./unit_tests.sh -- testName```
 
+## Documentation
+
+The majority of the documentation files are written using the [GitHub Flavored Markdown](https://github.github.com/gfm/) language.
+
 ## Bugs
 
 Report bugs to [https://github.com/matteocorti/check_ssl_cert/issues](https://github.com/matteocorti/check_ssl_cert/issues)
