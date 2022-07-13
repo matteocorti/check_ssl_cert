@@ -94,8 +94,8 @@ else
 endif
 
 clean:
-	rm -f *~
-	rm -f *.bak
+	find . -name "*~" -delete
+	find . -name "*.bak" -delete
 	rm -rf rpmroot
 
 distclean: clean
