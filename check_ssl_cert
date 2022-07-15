@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.34.0
+VERSION=2.35.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2432,6 +2432,12 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
+        elif ascii_grep 'No route to host' "${ERROR}"; then
+
+            ERROR='No route to host'
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
+
         elif ascii_grep 'Connection timed out' "${ERROR}"; then
 
             ERROR='OpenSSL connection timed out'
@@ -3608,6 +3614,11 @@ main() {
     if [ -n "${RESOLVE}" ]; then
 
         debuglog "Forcing ${HOST} to resolve to ${RESOLVE}"
+
+        if echo "${RESOLVE}" | grep -q '^[a-fA-F0-9].*:' ; then
+            debuglog "--resolve with an IPv6 (${RESOLVE}) without brackets: adding ([${RESOLVE}])"
+            RESOLVE="[${RESOLVE}]"
+        fi
 
         HOST_ADDR="${RESOLVE}"
         HOST_NAME="${HOST}"

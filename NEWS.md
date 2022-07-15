@@ -1,3 +1,6 @@
+* 2022-07-15 Version 2.35.0
+  * Better error handling
+  * Better handling of IPv6 addresses
 * 2022-07-06 Version 2.34.0
   * If x509 -ext is not supported no info on the certificate purpose is extracted
 * 2022-07-01 Version 2.33.0

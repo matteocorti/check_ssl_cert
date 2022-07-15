@@ -1,1 +1,2 @@
-If x509 -ext is not supported no info on the certificate purpose is extracted
+  * Better error handling
+  * Better handling of IPv6 addresses

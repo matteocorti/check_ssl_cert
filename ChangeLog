@@ -1,3 +1,7 @@
+2022-07-15  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (fetch_certificate): Fetching 'no route to host' errors
+
 2022-07-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): if x509 -ext is not supported no info on the cert purpose is extracted
