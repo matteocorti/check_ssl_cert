@@ -28,9 +28,14 @@ echo "--------------------------------------------------------------------------
 echo "-- Code"
 echo
 
+make distclean > /dev/null
+cloc --quiet . | grep -v AlDanial
+
+echo
+
 loc=$(grep -c '.' check_ssl_cert)
 
-printf "LoC:\\t\\t\\t%'10d\\n" "${loc}"
+printf "Script LoC:\\t\\t%'10d\\n" "${loc}"
 echo
 
 echo "------------------------------------------------------------------------------"
