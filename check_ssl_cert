@@ -1429,9 +1429,14 @@ exec_with_timeout() {
         ERRFILE=$3
     fi
 
-    if [ -n "${TIMEOUT_REASON}" ]; then
-        # add a blank before the reason in parenthesis
-        TIMEOUT_REASON=" (${TIMEOUT_REASON})"
+    debuglog "exec_with_timeout $1 $2 $3"
+    debuglog "  TIMEOUT_REASON = ${TIMEOUT_REASON}"
+
+    if [ -n "${TIMEOUT_REASON}" ] ; then
+        if ! echo "${TIMEOUT_REASON}" | grep -q '^ '; then
+            # add a blank before the reason in parenthesis
+            TIMEOUT_REASON=" (${TIMEOUT_REASON})"
+        fi
     fi
 
     start_time=$(date +%s)

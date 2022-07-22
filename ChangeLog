@@ -1,3 +1,7 @@
+2022-07-22  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (exec_with_timeout): Better error output by timeouts
+
 2022-07-15  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (fetch_certificate): Fetching 'no route to host' errors
