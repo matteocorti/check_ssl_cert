@@ -1,7 +1,7 @@
 
- &copy; Matteo Corti, ETH Zurich, 2007-2012.  
- &copy; Matteo Corti, 2007-2022. 
- 
+ &copy; Matteo Corti, ETH Zurich, 2007-2012.
+ &copy; Matteo Corti, 2007-2022.
+
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
 
 # check\_ssl\_cert
@@ -45,8 +45,6 @@ Options:
       --crl                        Check revocation via CRL (requires
                                    --rootcert-file)
       --curl-bin path              Path of the curl binary to be used
-      --curl-user-agent string     User agent that curl shall use to obtain
-                                   the issuer cert
       --custom-http-header string  Custom HTTP header sent when getting the
                                    cert example: 'X-Check-Ssl-Cert: Foobar=1'
    -d,--debug                      Produce debugging output (can be
@@ -69,10 +67,10 @@ Options:
       --debug-file file            Write the debug messages to file
       --debug-time                 Write timing information in the
                                    debugging output
+      --dig-bin path               Path of the dig binary to be used
       --dtls                       Use the DTLS protocol
       --dtls1                      Use the DTLS protocol 1.0
       --dtls1_2                    Use the DTLS protocol 1.2
-      --dig-bin path               Path of the dig binary to be used
    -e,--email address              Pattern to match the email address
                                    contained in the certificate
       --ecdsa                      Signature algorithm selection: force ECDSA
@@ -232,6 +230,8 @@ Options:
       --tls1_2                     Force TLS version 1.2
       --tls1_3                     Force TLS version 1.3
    -u,--url URL                    HTTP request URL
+      --user-agent string          User agent that shall be used for HTTPS
+                                   connections
    -v,--verbose                    Verbose output (can be specified more than
                                    once)
    -V,--version                    Version
@@ -270,8 +270,11 @@ Deprecated options:
                                    extension
    -S,--ssl version                Force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
+      --curl-user-agent string     User agent that curl shall use to obtain
+                                   the issuer cert
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
+
 ```
 
 ## Expect & timeout

@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "July, 2022" "2.35.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "July, 2022" "2.36.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -55,9 +55,6 @@ Check revocation via CRL (requires --rootcert-file)
 .TP
 .BR "   --curl-bin" " path"
 Path of the curl binary to be used
-.TP
-.BR "   --curl-user-agent" " string"
-User agent that curl shall use to obtain the issuer cert
 .TP
 .BR "   --custom-http-header" " string"
 Custom HTTP header sent when getting the cert example: 'X-Check-Ssl-Cert: Foobar=1'
@@ -392,6 +389,9 @@ Force TLS version 1.3
 .BR "-u,--url" " URL"
 HTTP request URL
 .TP
+.BR "   --user-agent" " string"
+User agent that shall be used for HTTPS connections
+.TP
 .BR "-v,--verbose"
 Verbose output (can be specified more than once)
 .TP
@@ -449,6 +449,9 @@ Require the presence of a Subject Alternative Name extension
 .TP
 .BR "-S,--ssl" " version"
 Force SSL version (2,3) (see: --ssl2 or --ssl3)
+.TP
+.BR "   --curl-user-agent" " string"
+User agent that curl shall use to obtain the issuer cert
 
 .SH NOTES
 If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Identificator) with the -N (or --host-cn) option.

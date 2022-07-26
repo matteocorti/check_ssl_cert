@@ -204,6 +204,8 @@
 --tls1_2;Force TLS version 1.2
 --tls1_3;Force TLS version 1.3
 -u,--url URL;HTTP request URL
+--user-agent string;User agent that shall be used for HTTPS
+--user-agent string;connections
 -v,--verbose;Verbose output (can be specified more than
 -v,--verbose;once)
 -V,--version;version

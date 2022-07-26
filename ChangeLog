@@ -1,3 +1,7 @@
+2022-07-26  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (usage): New option --user-agent to specify the user agent used by curl and by OpenSSL for HTTPS connections
+
 2022-07-22  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (exec_with_timeout): Better error output by timeouts

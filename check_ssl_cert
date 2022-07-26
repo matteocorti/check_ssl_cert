@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.35.0
+VERSION=2.36.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -116,8 +116,6 @@ usage() {
     echo "      --crl                        Check revocation via CRL (requires"
     echo "                                   --rootcert-file)"
     echo "      --curl-bin path              Path of the curl binary to be used"
-    echo "      --curl-user-agent string     User agent that curl shall use to obtain"
-    echo "                                   the issuer cert"
     echo "      --custom-http-header string  Custom HTTP header sent when getting the"
     echo "                                   cert example: 'X-Check-Ssl-Cert: Foobar=1'"
     # Delimiter at 78 chars ############################################################
@@ -319,6 +317,8 @@ usage() {
     echo "      --tls1_3                     Force TLS version 1.3"
     # Delimiter at 78 chars ############################################################
     echo "   -u,--url URL                    HTTP request URL"
+    echo "      --user-agent string          User agent that shall be used for HTTPS"
+    echo "                                   connections"
     # Delimiter at 78 chars ############################################################
     echo "   -v,--verbose                    Verbose output (can be specified more than"
     echo "                                   once)"
@@ -361,6 +361,8 @@ usage() {
     echo "                                   extension"
     echo "   -S,--ssl version                Force SSL version (2,3)"
     echo "                                   (see: --ssl2 or --ssl3)"
+    echo "      --curl-user-agent string     User agent that curl shall use to obtain"
+    echo "                                   the issuer cert"
     echo
     echo "Report bugs to https://github.com/matteocorti/check_ssl_cert/issues"
     echo
@@ -1601,8 +1603,8 @@ check_crl() {
         debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
 
         TIMEOUT_REASON="fetching CRL"
-        if [ -n "${CURL_USER_AGENT}" ]; then
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+        if [ -n "${HTTP_USER_AGENT}" ]; then
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
         else
             exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
         fi
@@ -1719,8 +1721,8 @@ check_ocsp() {
                 debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
 
                 TIMEOUT_REASON="OCSP: fetching issuer ${ELEMENT_ISSUER_URI}"
-                if [ -n "${CURL_USER_AGENT}" ]; then
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                if [ -n "${HTTP_USER_AGENT}" ]; then
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 else
                     exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
@@ -2965,7 +2967,7 @@ parse_command_line_options() {
             ;;
         --curl-user-agent)
             check_option_argument '--curl-user-agent' "$2"
-            CURL_USER_AGENT="$2"
+            HTTP_USER_AGENT="$2"
             shift 2
             ;;
         --custom-http-header)
@@ -3240,6 +3242,11 @@ $2"
             HTTP_REQUEST_URL="$2"
             shift 2
             ;;
+        --user-agent)
+            check_option_argument '--user-agent' "$2"
+            HTTP_USER_AGENT="$2"
+            shift 2
+            ;;
         -w | --warning)
             check_option_argument '-w|--warning' "$2"
             check_float "$2" "--warning: the number of days should be an integer or a float"
@@ -3371,7 +3378,7 @@ main() {
     CRL=""
     CURL_BIN=""
     CURL_PROXY=""
-    CURL_USER_AGENT="check_ssl_cert/${VERSION}"
+    HTTP_USER_AGENT="check_ssl_cert/${VERSION}"
     CUSTOM_HTTP_HEADER=""
     DANE=""
     DEBUG="0"
@@ -3851,8 +3858,8 @@ main() {
             debuglog "Fetching ${FILE_URI} to ${FILE}"
 
             TIMEOUT_REASON="fetching certificate file"
-            if [ -n "${CURL_USER_AGENT}" ]; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${CURL_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
+            if [ -n "${HTTP_USER_AGENT}" ]; then
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
             else
                 exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
             fi
@@ -4483,7 +4490,7 @@ main() {
         HTTP_VERSION="1.1"
     fi
 
-    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: ${CURL_USER_AGENT}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
+    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: ${HTTP_USER_AGENT}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
     ##############################################################################
     # Check for disallowed protocols

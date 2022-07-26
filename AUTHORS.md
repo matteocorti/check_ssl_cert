@@ -140,3 +140,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Naveen](https://github.com/naveensrinivasan) for the GitHub actions permissions fix
 * Many thanks to [Varac](https://github.com/varac) for the Prometheus fix
 * Many thanks to [PSSGCSim](https://github.com/PSSGCSim) for the Prometheus fix
+* Many thanks to [Dick Visser](https://github.com/dnmvisser) for the user agent fix
