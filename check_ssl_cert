@@ -3371,7 +3371,7 @@ main() {
     CRL=""
     CURL_BIN=""
     CURL_PROXY=""
-    CURL_USER_AGENT=""
+    CURL_USER_AGENT="check_ssl_cert/${VERSION}"
     CUSTOM_HTTP_HEADER=""
     DANE=""
     DEBUG="0"
@@ -4483,7 +4483,7 @@ main() {
         HTTP_VERSION="1.1"
     fi
 
-    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: check_ssl_cert/${VERSION}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
+    HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: ${CURL_USER_AGENT}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
     ##############################################################################
     # Check for disallowed protocols
