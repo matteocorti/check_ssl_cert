@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "July, 2022" "2.36.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "August, 2022" "2.37.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -311,6 +311,9 @@ The server must accept a client certificate. 'list' is an optional comma separat
 .TP
 .BR "   --require-dnssec"
 Require DNSSEC
+.TP
+.BR "     --require-hsts"
+Require HTTP Strict Transport Security
 .TP
 .BR "   --require-no-ssl2"
 Critical if SSL version 2 is offered

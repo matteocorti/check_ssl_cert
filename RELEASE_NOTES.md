@@ -1,1 +1,1 @@
-New option --user-agent to specify the user agent used by curl and by OpenSSL for HTTPS connections
+New option ```--require--hsts``` to check for HTTP Strict Transport Security

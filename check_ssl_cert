@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.36.0
+VERSION=2.37.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -279,6 +279,7 @@ usage() {
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
     echo "      --require-dnssec             Require DNSSEC"
+    echo "      --require-hsts               Require HTTP Strict Transport Security"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
@@ -2826,6 +2827,10 @@ parse_command_line_options() {
             REQUIRE_DNSSEC=1
             shift
             ;;
+        --require-hsts)
+            REQUIRE_HSTS=1
+            shift
+            ;;
         --require-no-ssl2)
             DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} SSLv2"
             shift
@@ -3551,6 +3556,11 @@ main() {
         else
             # disable SSL 3.0 (SSL 2.0 is not supported anymore)
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
+        fi
+
+        # we check HSTS only with HTTP/HTTPS
+        if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
+            REQUIRE_HSTS=1
         fi
 
     fi
@@ -4704,6 +4714,20 @@ main() {
 
             prepend_critical_message 'cannot fetch certificate: OpenSSL got an unexpected message'
 
+        fi
+
+    fi
+
+    # check HSTS
+    if [ -n "${REQUIRE_HSTS}" ] ; then
+
+        debuglog "Checking HSTS"
+
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent -D- --user-agent '${HTTP_USER_AGENT}' https://${HOST} | grep -i ^strict-transport-security:"
+        RET=$?
+
+        if [ "${RET}" -eq 1 ] ; then
+            prepend_critical_message "HSTS is not supported"
         fi
 
     fi

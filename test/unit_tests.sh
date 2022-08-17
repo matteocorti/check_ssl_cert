@@ -1601,6 +1601,20 @@ testOrganizationOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testHSTSOK() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --require-hsts --host github.com --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testHSTSFail() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --require-hsts --host google.com --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testHostCache() {
 
     # shellcheck disable=SC2086

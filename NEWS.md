@@ -1,5 +1,7 @@
+* 2022-08-27 Version 2.37.0
+  * New option ```--require--hsts``` to check for HTTP Strict Transport Security
 * 2022-07-26 Version 2.36.0
-  * New option --user-agent to specify the user agent used by curl and by OpenSSL for HTTPS connections
+  * New option ```--user-agent``` to specify the user agent used by curl and by OpenSSL for HTTPS connections
 * 2022-07-15 Version 2.35.0
   * Better error handling
   * Better handling of IPv6 addresses

@@ -1,4 +1,4 @@
-%global version          2.36.0
+%global version          2.37.0
 %global release          0
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
@@ -22,7 +22,7 @@ BuildRoot: %{_tmppath}/%{packagename}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:       https://github.com/matteocorti/check_ssl_cert
 Source:    https://github.com/matteocorti/check_ssl_cert/releases/download/v%{version}/check_ssl_cert-%{version}.tar.gz
 
-Requires:  nagios-plugins expect perl(Date::Parse) bc
+Requires:  nagios-plugins expect perl(Date::Parse) bc curl openssl file
 
 %description
 A shell script (that can be used as a Nagios plugin) to check an SSL/TLS connection
@@ -54,6 +54,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Aug  17 2022 Matteo Corti <matteo@corti.li> - 2.37.0-0
+- Updated to 2.37.0
+- Added dependencies to curl, openssl and file
+
 * Tue Jul  26 2022 Matteo Corti <matteo@corti.li> - 2.36.0-0
 - Updated to 2.36.0
 
