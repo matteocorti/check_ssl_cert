@@ -106,7 +106,7 @@ distclean: clean
 check: test
 
 SHELLCHECK := $(shell command -v shellcheck 2> /dev/null)
-SHUNIT := $(shell if [ -z "${SHUNIT2}" ] ; then command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi fi )
+SHUNIT := $(shell if [ -z "${SHUNIT2}" ] ; then command -v shunit2 2> /dev/null || if [ -x /usr/share/shunit2/shunit2 ] ; then echo /usr/share/shunit2/shunit2 ; fi; else echo "${SHUNIT2}"; fi )
 
 distcheck: disttest
 disttest: dist formatting_check shellcheck codespell
