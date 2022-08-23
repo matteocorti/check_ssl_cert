@@ -226,7 +226,7 @@ setUp() {
 
     # print the test number
     # shellcheck disable=SC2154
-    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining"
+    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed)"
     COUNTER=$((COUNTER+1))
 }
 

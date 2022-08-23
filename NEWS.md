@@ -1,4 +1,6 @@
-* 2022-08-27 Version 2.37.0
+* 2022-08-23 Version 2.38.0
+  * Fixed the handling of ```--ignore-connection-problems```
+* 2022-08-17 Version 2.37.0
   * New option ```--require--hsts``` to check for HTTP Strict Transport Security
 * 2022-07-26 Version 2.36.0
   * New option ```--user-agent``` to specify the user agent used by curl and by OpenSSL for HTTPS connections

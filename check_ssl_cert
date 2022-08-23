@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.37.0
+VERSION=2.38.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4058,12 +4058,12 @@ main() {
     # nmap
     if [ -z "${NMAP_BIN}" ]; then
 
-        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] || [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] || [ -z "${IGNORE_CONNECTION_STATE}" ] ; then
 
             if [ -n "${DISALLOWED_PROTOCOLS}" ]; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"; fi
             if [ -n "${CHECK_CIPHERS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS = ${CHECK_CIPHERS}"; fi
             if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS_WARNINGS"; fi
-            if [ -n "${IGNORE_CONNECTION_STATE}" ]; then debuglog "nmap binary needed. IGNORE_CONNECTION_STATE"; fi
+            if [ -z "${IGNORE_CONNECTION_STATE}" ]; then debuglog "nmap binary needed. IGNORE_CONNECTION_STATE not specified"; fi
             debuglog "nmap binary not specified"
 
             check_required_prog nmap
@@ -4078,6 +4078,24 @@ main() {
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
 
+    fi
+
+    # nmap does not understand brackets in IPv6 addresses
+    NMAP_HOST_ADDR="${HOST_ADDR}"
+    if echo "${NMAP_HOST_ADDR}" | grep -q '^\[' ; then
+        NMAP_HOST_ADDR=$( echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//' )
+    fi
+
+    # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
+    debuglog "Checking IPs: host ${HOST_ADDR}"
+    if echo "${HOST_ADDR}" | grep -q '[a-z]' && ! host "${HOST_ADDR}" | grep -F -q ' has address '; then
+        debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
+        NMAP_INETPROTO='-6'
+    fi
+
+    if echo "${NMAP_HOST_ADDR}" | grep -q ':' ; then
+        debuglog "host specified as an IPv6 address: forcing IPv6 with nmap"
+        NMAP_INETPROTO='-6'
     fi
 
     # Expect (optional)
@@ -4506,17 +4524,11 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ]; then
 
-        # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
-        if ! host "${HOST_ADDR}" | grep -F -q ' has address '; then
-            debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
-            NMAP_INETPROTO='-6'
-        fi
-
         # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${HOST_ADDR}\" 2>&1 | grep '^|'"
+        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | grep '^|'"
 
-        OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${HOST_ADDR}" 2>&1 | grep '^|')
+        OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | grep '^|')
 
         debuglog "offered ciphers and protocols:"
         debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
@@ -4606,36 +4618,42 @@ main() {
 
     ################################################################################
     # Connection check
-    if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
+    if [ -z "${FILE}" ] ; then
 
         debuglog "Testing connection with ${HOST}:${PORT}"
 
-        debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -p ${PORT} ${HOST}'"
+        debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -p "${PORT}" "${HOST}" 2>&1 | grep -q "${PORT}.*open" ; then
+        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -q "${PORT}.*open" ; then
 
-            case "${IGNORE_CONNECTION_STATE}" in
-                "${STATUS_OK}")
-                    echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_OK}"
-                    ;;
-                "${STATUS_WARNING}")
-                    echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_WARNING}"
-                    ;;
-                "${STATUS_CRITICAL}")
-                    echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_CRITICAL}"
-                    ;;
-                "${STATUS_UNKNOWN}")
-                    critical "Cannot connect to ${HOST}:${PORT}"
-                    ;;
-                *)
-                    unknown "Wrong exit code () specified for --ignore-connection-problem"
-                    ;;
-            esac
+            if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
 
-            exit
+                case "${IGNORE_CONNECTION_STATE}" in
+                    "${STATUS_OK}")
+                        echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_OK}"
+                        ;;
+                    "${STATUS_WARNING}")
+                        echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_WARNING}"
+                        ;;
+                    "${STATUS_CRITICAL}")
+                        echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_CRITICAL}"
+                        ;;
+                    "${STATUS_UNKNOWN}")
+                        critical "Cannot connect to ${HOST}:${PORT}"
+                        ;;
+                    *)
+                        debuglog "Ignoring connection test"
+                        ;;
+                esac
+
+            else
+
+                critical "Cannot connect to ${HOST} on port ${PORT}"
+
+            fi
 
         fi
 

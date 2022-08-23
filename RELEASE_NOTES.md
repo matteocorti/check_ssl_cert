@@ -1,1 +1,1 @@
-New option ```--require--hsts``` to check for HTTP Strict Transport Security
+Fixed the handling of ```--ignore-connection-problems```
