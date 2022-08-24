@@ -49,6 +49,7 @@ Options:
                                    cert example: 'X-Check-Ssl-Cert: Foobar=1'
    -d,--debug                      Produce debugging output (can be
                                    specified more than once)
+      --default-format             Print the default output format and exit
       --dane                       Verify that valid DANE records exist
                                    (since OpenSSL 1.1.0)
       --dane 211                   Verify that a valid DANE-TA(2) SPKI(1)
@@ -89,19 +90,21 @@ Options:
                                    example: '%SHORTNAME% OK %CN% from
                                    %CA_ISSUER_MATCHED%'
                                    list of possible variables:
-                                   - %HOST%
-                                   - %PORT%
                                    - %CA_ISSUER_MATCHED%
                                    - %CHECKEDNAMES%
                                    - %CN%
                                    - %DATE%
                                    - %DAYS_VALID%
                                    - %DYSPLAY_CN%
+                                   - %HOST%
+                                   - %OCSP_EXPIRES_IN_HOURS%
                                    - %OPENSSL_COMMAND%
+                                   - %PORT%
                                    - %SELFSIGNEDCERT%
                                    - %SHORTNAME%
-                                   - %OCSP_EXPIRES_IN_HOURS%
+                                   - %SIGALGO%
                                    - %SSL_LABS_HOST_GRADE%
+                                   See --default-format for the default
    -h,--help,-?                    This help message
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks

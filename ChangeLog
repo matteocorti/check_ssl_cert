@@ -1,6 +1,8 @@
 2022-08-24  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): nmap is now always required
+        * check_ssl_cert (main): new formatting option %SIGALGO%
+        * check_ssl_cert (main): new command line argument --default-format
 
 2022-08-23  Matteo Corti  <matteo@corti.li>
 
