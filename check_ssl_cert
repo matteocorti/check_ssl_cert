@@ -1373,8 +1373,19 @@ extract_cert_attribute() {
         ;;
 
     sig_algo)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Signature Algorithm'
+
+        # The Signature Algorithm refers to the signature of the certificate created by the issuer
+        # The Public Key Algorithm refers to the public key inside the certificate
+        #
+        #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
+
+        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Public Key Algorithm' | sed -e 's/.*:\ //')
+
+        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Public-Key' | sed 's/.*:\ //' )
+
+        echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
+
     startdate)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -startdate | sed -e "s/^notBefore=//"
         ;;
