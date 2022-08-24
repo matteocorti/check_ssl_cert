@@ -4058,23 +4058,13 @@ main() {
     # nmap
     if [ -z "${NMAP_BIN}" ]; then
 
-        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] || [ -z "${IGNORE_CONNECTION_STATE}" ] ; then
-
-            if [ -n "${DISALLOWED_PROTOCOLS}" ]; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"; fi
-            if [ -n "${CHECK_CIPHERS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS = ${CHECK_CIPHERS}"; fi
-            if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS_WARNINGS"; fi
-            if [ -z "${IGNORE_CONNECTION_STATE}" ]; then debuglog "nmap binary needed. IGNORE_CONNECTION_STATE not specified"; fi
             debuglog "nmap binary not specified"
-
             check_required_prog nmap
             NMAP_BIN=${PROG}
-
             debuglog "nmap available: ${NMAP_BIN}"
-        else
-            debuglog "nmap binary not needed. No disallowed protocols"
-        fi
 
     else
+
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
 
