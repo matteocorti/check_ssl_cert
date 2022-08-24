@@ -19,7 +19,7 @@ XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs
 .PHONY: install clean test rpm distclean check version_check codespell
 
 # checks if the version is updated in all the files
-version_check:
+version_check: CITATION.cff
 	echo "Checking version $(VERSION)"
 	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec

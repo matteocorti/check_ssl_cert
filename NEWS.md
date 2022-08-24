@@ -1,3 +1,5 @@
+* 2022-08-24 Version 2.40.0
+  * Fixed the parsing of the signature algorithm
 * 2022-08-24 Version 2.39.0
   * ```nmap``` is always required
   * added ```%SIGALGO%``` to the possible output formatting
