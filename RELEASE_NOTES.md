@@ -1,1 +1,3 @@
-Fixed the handling of ```--ignore-connection-problems```
+ * ```nmap``` is always required
+ * added ```%SIGALGO%``` to the possible output formatting
+ * added ```--default-format``` to display the default formatting output

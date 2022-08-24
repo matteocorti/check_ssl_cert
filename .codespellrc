@@ -1,5 +1,5 @@
 [codespell]
-check-filenames = 
-check-hidden = 
-skip = ./test/cabundle.crt
+check-filenames =
+check-hidden =
+skip = ./test/cabundle.crt,.git
 ignore-words = .codespell-ignore

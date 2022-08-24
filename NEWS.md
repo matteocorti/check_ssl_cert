@@ -1,3 +1,7 @@
+* 2022-08-24 Version 2.39.0
+  * ```nmap``` is always required
+  * added ```%SIGALGO%``` to the possible output formatting
+  * added ```--default-format``` to display the default formatting output
 * 2022-08-23 Version 2.38.0
   * Fixed the handling of ```--ignore-connection-problems```
 * 2022-08-17 Version 2.37.0

@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.38.0
+VERSION=2.39.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -53,6 +53,8 @@ EARLIEST_VALIDITY_HOURS=""
 DEBUG=0
 DEBUG_FILE=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
+
+DEFAULT_FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
 
 # if --critical or --warning are floating point then switch to floating point output, otherwise integer
 
@@ -121,6 +123,7 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -d,--debug                      Produce debugging output (can be"
     echo "                                   specified more than once)"
+    echo "      --default-format             Print the default output format and exit"
     echo "      --dane                       Verify that valid DANE records exist"
     echo "                                   (since OpenSSL 1.1.0)"
     echo "      --dane 211                   Verify that a valid DANE-TA(2) SPKI(1)"
@@ -163,19 +166,21 @@ usage() {
     echo "                                   example: '%SHORTNAME% OK %CN% from"
     echo "                                   %CA_ISSUER_MATCHED%'"
     echo "                                   list of possible variables:"
-    echo "                                   - %HOST%"
-    echo "                                   - %PORT%"
     echo "                                   - %CA_ISSUER_MATCHED%"
     echo "                                   - %CHECKEDNAMES%"
     echo "                                   - %CN%"
     echo "                                   - %DATE%"
     echo "                                   - %DAYS_VALID%"
     echo "                                   - %DYSPLAY_CN%"
+    echo "                                   - %HOST%"
+    echo "                                   - %OCSP_EXPIRES_IN_HOURS%"
     echo "                                   - %OPENSSL_COMMAND%"
+    echo "                                   - %PORT%"
     echo "                                   - %SELFSIGNEDCERT%"
     echo "                                   - %SHORTNAME%"
-    echo "                                   - %OCSP_EXPIRES_IN_HOURS%"
+    echo "                                   - %SIGALGO%"
     echo "                                   - %SSL_LABS_HOST_GRADE%"
+    echo "                                   See --default-format for the default"
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "      --http-use-get               Use GET instead of HEAD (default) for the"
@@ -2682,6 +2687,11 @@ parse_command_line_options() {
             shift
             ;;
 
+        --default-format)
+            echo "${DEFAULT_FORMAT}"
+            exit
+            ;;
+
         # DTLS
         --dtls)
             if [ -n "${SSL_VERSION}" ] ; then
@@ -4069,23 +4079,13 @@ main() {
     # nmap
     if [ -z "${NMAP_BIN}" ]; then
 
-        if [ -n "${DISALLOWED_PROTOCOLS}" ] || [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ] || [ -z "${IGNORE_CONNECTION_STATE}" ] ; then
-
-            if [ -n "${DISALLOWED_PROTOCOLS}" ]; then debuglog "nmap binary needed. DISALLOWED_PROTOCOLS = ${DISALLOWED_PROTOCOLS}"; fi
-            if [ -n "${CHECK_CIPHERS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS = ${CHECK_CIPHERS}"; fi
-            if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then debuglog "nmap binary needed. CHECK_CIPHERS_WARNINGS"; fi
-            if [ -z "${IGNORE_CONNECTION_STATE}" ]; then debuglog "nmap binary needed. IGNORE_CONNECTION_STATE not specified"; fi
             debuglog "nmap binary not specified"
-
             check_required_prog nmap
             NMAP_BIN=${PROG}
-
             debuglog "nmap available: ${NMAP_BIN}"
-        else
-            debuglog "nmap binary not needed. No disallowed protocols"
-        fi
 
     else
+
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
 
@@ -5854,7 +5854,7 @@ ${WARNING}"
             if [ -n "${TERSE}" ]; then
                 FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
             else
-                FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+                FORMAT="${DEFAULT_FORMAT}"
             fi
         fi
 
@@ -5887,36 +5887,38 @@ ${WARNING}"
 
         if [ -z "${PROMETHEUS}" ]; then
 
-            HOST_TMP="$(var_for_sed HOST "${HOST}")"
-            PORT_TMP="$(var_for_sed PORT "${PORT}")"
             CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
             CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
             CN_TMP="$(var_for_sed CN "${CN}")"
             DATE_TMP="$(var_for_sed DATE "${DATE}")"
             DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
             DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
+            HOST_TMP="$(var_for_sed HOST "${HOST}")"
+            OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
             OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
+            PORT_TMP="$(var_for_sed PORT "${PORT}")"
+            PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
             SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
             SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
-            OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
+            SIGALGO_TMP="$(var_for_sed SIGALGO "${SIGNATURE_ALGORITHM}")"
             SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
-            PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
 
             echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-                -e "${PORT_TMP}" \
-                -e "${HOST_TMP}" \
                 -e "${CA_ISSUER_MATCHED_TMP}" \
                 -e "${CHECKEDNAMES_TMP}" \
                 -e "${CN_TMP}" \
                 -e "${DATE_TMP}" \
                 -e "${DAYS_VALID_TMP}" \
                 -e "${DISPLAY_CN_TMP}" \
+                -e "${HOST_TMP}" \
+                -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
                 -e "${OPENSSL_COMMAND_TMP}" \
+                -e "${PORT_TMP}" \
+                -e "${PROTOCOL_TMP}" \
                 -e "${SELFSIGNEDCERT_TMP}" \
                 -e "${SHORTNAME_TMP}" \
-                -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
-                -e "${SSL_LABS_HOST_GRADE_TMP}" \
-                -e "${PROTOCOL_TMP}"
+                -e "${SIGALGO_TMP}" \
+                -e "${SSL_LABS_HOST_GRADE_TMP}"
 
         else
 

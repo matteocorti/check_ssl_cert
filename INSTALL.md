@@ -7,6 +7,7 @@
 * ```date```
 * ```file```
 * ```bc```
+* [nmap](https://nmap.org)
 
 ## Optional dependencies
 
@@ -14,7 +15,6 @@
 * ```dig``` for
   * DANE checks
   * DNSSEC checks
-* [nmap](https://nmap.org) for the disallowed protocols and cyphers checks
 * ```expand``` for ```--info```
 * ```tar``` and ```bzip2``` to build release packages
 * ```ip``` or ```ifconfig``` to be able to use the ```-4``` and ```-6``` options
