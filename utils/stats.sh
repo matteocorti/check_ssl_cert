@@ -8,6 +8,13 @@ versions=$(grep -c Version NEWS.md)
 
 version=$(head -n 1 VERSION)
 
+PROG=$(command -v gh 2>/dev/null)
+
+if [ -z "${PROG}" ]; then
+    echo "cannot find gh" 1>&2
+    exit 1
+fi
+
 echo
 printf '\tcheck_ssl_cert version %s\n' "${version}"
 echo
