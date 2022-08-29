@@ -1635,6 +1635,13 @@ testOrganizationOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testOrganizationOKUmlaut() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H ethz.ch -o 'ETH Zürich' --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testHSTSOK() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --require-hsts --host github.com --ignore-exp

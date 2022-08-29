@@ -1,3 +1,7 @@
+2022-08-25  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (extract_cert_attribute): Parse UTF-8 attributes (e.g., Location, ...)
+
 2022-08-24  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): nmap is now always required

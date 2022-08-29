@@ -1246,6 +1246,7 @@ parse_subject() {
     # on newer systems the fields are separated by , and are sometimes quoted (if they contain a comma), e.g.,
     #   subject=C = US, ST = California, L = San Francisco, O = "GitHub, Inc.", CN = github.com
     #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
+    # if the field could contain UTF-8 characters (and -nameopt utf8 is specified) there it no space around =
 
     if echo "${SUBJECT}" | grep -q '^subject=\ \/'; then
 
@@ -1261,16 +1262,16 @@ parse_subject() {
         # new format
         debuglog "  new format separated by ,"
 
-        if echo "${SUBJECT}" | grep -q "${FIELD}\\ =" ; then
+        if echo "${SUBJECT}" | grep -q "${FIELD}\\ *=" ; then
 
-            if echo "${SUBJECT}" | grep -q "${FIELD}\\ =\\ \""; then
+            if echo "${SUBJECT}" | grep -q "${FIELD}\\ *=\\ *\""; then
                 # quotes
                 debuglog "  quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ =\\ \"//" -e 's/".*//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *\"//" -e 's/".*//'
             else
                 # no quotes
                 debuglog "  no quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ =\\ //" -e 's/\,\ .*//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *//" -e 's/\,\ [^,]*$//'
             fi
 
         fi
@@ -1306,7 +1307,8 @@ extract_cert_attribute() {
         fi
         ;;
     subject)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject
+        # the Subject could contain UTF-8 characters
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject -nameopt utf8
         ;;
     serial)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -serial | sed -e "s/^serial=//"
@@ -1342,26 +1344,26 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
         ;;
     org)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
         parse_subject "O" "${cert_subject}"
         ;;
     org_unit)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
         parse_subject "OU" "${cert_subject}"
         ;;
     key_length)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
         ;;
     country)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
         parse_subject "C" "${cert_subject}"
         ;;
     state)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
         parse_subject "ST" "${cert_subject}"
         ;;
     locality)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
         parse_subject "L" "${cert_subject}"
         ;;
     email)
