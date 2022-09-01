@@ -4767,6 +4767,8 @@ main() {
 
         if [ "${RET}" -eq 1 ] ; then
             prepend_critical_message "HSTS is not supported"
+        else
+            verboselog "HSTS is supported"
         fi
 
     fi

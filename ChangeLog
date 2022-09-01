@@ -1,6 +1,7 @@
 2022-09-01  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): follow redirects when checking HSTS
+        * check_ssl_cert (main): Add verbose message for HSTS
 
 2022-08-31  Matteo Corti  <matteo@corti.li>
 
