@@ -4641,7 +4641,7 @@ main() {
 
         debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -q "${PORT}.*open" ; then
+        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -E -q "${PORT}.*(?>open|filtered)" ; then
 
             if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
 
