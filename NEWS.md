@@ -1,5 +1,7 @@
-* Fixed the parsing of UTF-8 certificate subjects
-
+* 2022-09-01 Version 2.41.0
+  * Fixed the parsing of UTF-8 certificate subjects
+  * Better OpenSSL error handling
+  * Fixed the HSTS check
 * 2022-08-24 Version 2.40.0
   * Fixed the parsing of the signature algorithm
 * 2022-08-24 Version 2.39.0

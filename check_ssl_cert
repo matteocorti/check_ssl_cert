@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.40.0
+VERSION=2.41.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2500,6 +2500,10 @@ fetch_certificate() {
 
             prepend_critical_message 'Error decoding certificate'
 
+        elif ascii_grep 'excessive message size' "${ERROR}"; then
+
+            prepend_critical_message 'Error fetching the certificate (excessive message size)'
+
         elif ascii_grep 'gethostbyname failure' "${ERROR}"; then
 
             ERROR='Invalid host name'
@@ -4754,7 +4758,11 @@ main() {
 
         debuglog "Checking HSTS"
 
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent -D- --user-agent '${HTTP_USER_AGENT}' https://${HOST} | grep -i ^strict-transport-security:"
+        # -s (--silent)
+        # -D (--dump-header)
+        # -A (--user-agent)
+        # -L (--location): follow redirects
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST} | grep -i ^strict-transport-security:"
         RET=$?
 
         if [ "${RET}" -eq 1 ] ; then

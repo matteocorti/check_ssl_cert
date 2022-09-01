@@ -1,3 +1,11 @@
+2022-09-01  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): follow redirects when checking HSTS
+
+2022-08-31  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (fetch_certificate): parsing 'excessive message size' errors
+
 2022-08-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (extract_cert_attribute): Parse UTF-8 attributes (e.g., Location, ...)
