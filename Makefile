@@ -62,7 +62,7 @@ ifdef COMPLETIONS_DIR
 	cp check_ssl_cert.completion $(COMPLETIONS_DIR)/check_ssl_cert
 endif
 
-CITATION.cff: AUTHORS.md
+CITATION.cff: AUTHORS.md VERSION NEWS.md
 	./utils/update_citation.sh
 
 # we check for tabs

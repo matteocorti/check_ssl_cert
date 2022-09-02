@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.41.0
+VERSION=2.42.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4364,6 +4364,24 @@ main() {
     debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
     debuglog "  curl        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
 
+    # nmap doesn't work properly behind a proxy.
+    #
+    # See e.g.,
+    # https://subscription.packtpub.com/book/networking-and-servers/9781786467454/2/ch02lvl1sec37/scanning-through-proxies
+    # https://security.stackexchange.com/questions/120708/nmap-through-proxy
+    #
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ] ||
+           [ -n "${SCLIENT_PROXY}" ] ||
+           [ -n "${CURL_PROXY}" ] ; then
+        DISABLE_NMAP=1
+        debuglog "A proxy is specified: nmap disabled"
+        verboselog "A proxy is specified: nmap checks disabled"
+    fi
+
+
     ################################################################################
     # Check if openssl s_client supports the -name option
     #
@@ -4541,27 +4559,36 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ]; then
 
-        # see https://github.com/matteocorti/check_ssl_cert/issues/378
+        if [ -n "${DISABLE_NMAP}" ] ; then
 
-        debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | grep '^|'"
+            verboselog "Using a proxy: cannot check for disable protocols"
+            debuglog "Using a proxy: cannot check for disable protocols"
 
-        OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | grep '^|')
+        else
 
-        debuglog "offered ciphers and protocols:"
-        debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
+            # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-        DISALLOWED_PROTOCOLS_FAIL=
-        for protocol in ${DISALLOWED_PROTOCOLS}; do
-            debuglog "Checking if '${protocol}' is offered"
-            if echo "${OFFERED_PROTOCOLS}" | grep -F -v 'No supported ciphers found' | grep -q "${protocol}"; then
-                debuglog "'${protocol}' is offered"
-                DISALLOWED_PROTOCOLS_FAIL=1
-                prepend_critical_message "${protocol} is offered"
+            debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | grep '^|'"
+
+            OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | grep '^|')
+
+            debuglog "offered ciphers and protocols:"
+            debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
+
+            DISALLOWED_PROTOCOLS_FAIL=
+            for protocol in ${DISALLOWED_PROTOCOLS}; do
+                debuglog "Checking if '${protocol}' is offered"
+                if echo "${OFFERED_PROTOCOLS}" | grep -F -v 'No supported ciphers found' | grep -q "${protocol}"; then
+                    debuglog "'${protocol}' is offered"
+                    DISALLOWED_PROTOCOLS_FAIL=1
+                    prepend_critical_message "${protocol} is offered"
+                fi
+            done
+
+            if [ -z "${DISALLOWED_PROTOCOLS_FAIL}" ]; then
+                verboselog "no disallowed protocols offered"
             fi
-        done
 
-        if [ -z "${DISALLOWED_PROTOCOLS_FAIL}" ]; then
-            verboselog "no disallowed protocols offered"
         fi
 
     fi
@@ -4637,38 +4664,47 @@ main() {
     # Connection check
     if [ -z "${FILE}" ] ; then
 
-        debuglog "Testing connection with ${HOST}:${PORT}"
+        if [ -n "${DISABLE_NMAP}" ] ; then
 
-        debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
+            verboselog "Using a proxy: cannot test connection"
+            debuglog "Using a proxy: cannot test connection"
 
-        if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -q "${PORT}.*open" ; then
+        else
 
-            if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+            debuglog "Testing connection with ${HOST}:${PORT}"
 
-                case "${IGNORE_CONNECTION_STATE}" in
-                    "${STATUS_OK}")
-                        echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_OK}"
-                        ;;
-                    "${STATUS_WARNING}")
-                        echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_WARNING}"
-                        ;;
-                    "${STATUS_CRITICAL}")
-                        echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_CRITICAL}"
-                        ;;
-                    "${STATUS_UNKNOWN}")
-                        critical "Cannot connect to ${HOST}:${PORT}"
-                        ;;
-                    *)
-                        debuglog "Ignoring connection test"
-                        ;;
-                esac
+            debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            else
+            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -q "${PORT}.*open" ; then
 
-                critical "Cannot connect to ${HOST} on port ${PORT}"
+                if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+
+                    case "${IGNORE_CONNECTION_STATE}" in
+                        "${STATUS_OK}")
+                            echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                            exit "${STATUS_OK}"
+                            ;;
+                        "${STATUS_WARNING}")
+                            echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                            exit "${STATUS_WARNING}"
+                            ;;
+                        "${STATUS_CRITICAL}")
+                            echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                            exit "${STATUS_CRITICAL}"
+                            ;;
+                        "${STATUS_UNKNOWN}")
+                            critical "Cannot connect to ${HOST}:${PORT}"
+                            ;;
+                        *)
+                            debuglog "Ignoring connection test"
+                            ;;
+                    esac
+
+                else
+
+                    critical "Cannot connect to ${HOST} on port ${PORT}"
+
+                fi
 
             fi
 
@@ -5445,97 +5481,106 @@ EOF
     # Check nmap
     if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
 
-        if [ -n "${CHECK_CIPHERS}" ]; then
-            debuglog "Checking offered ciphers (minimum level ${CHECK_CIPHERS}: ${CHECK_CIPHERS_NUMERIC})"
-        fi
+        if [ -n "${DISABLE_NMAP}" ] ; then
 
-        create_temporary_file
-        NMAP_OUT=${TEMPFILE}
-        create_temporary_file
-        NMAP_ERR=${TEMPFILE}
+            verboselog "Using a proxy: cannot check ciphers"
+            debuglog "Using a proxy: cannot check ciphers"
 
-        # -Pn is needed even if we specify a port
-        TIMEOUT_REASON="checking ciphers"
-        exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+        else
 
-        if [ "${DEBUG}" -ge 1 ]; then
-            debuglog 'nmap output:'
-            while read -r LINE; do
-                debuglog "${LINE}"
-            done <"${NMAP_OUT}"
-            debuglog 'nmap errors:'
-            if [ -s "${NMAP_ERR}" ]; then
+            if [ -n "${CHECK_CIPHERS}" ]; then
+                debuglog "Checking offered ciphers (minimum level ${CHECK_CIPHERS}: ${CHECK_CIPHERS_NUMERIC})"
+            fi
+
+            create_temporary_file
+            NMAP_OUT=${TEMPFILE}
+            create_temporary_file
+            NMAP_ERR=${TEMPFILE}
+
+            # -Pn is needed even if we specify a port
+            TIMEOUT_REASON="checking ciphers"
+            exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+
+            if [ "${DEBUG}" -ge 1 ]; then
+                debuglog 'nmap output:'
                 while read -r LINE; do
                     debuglog "${LINE}"
-                done <"${NMAP_ERR}"
-            fi
-        fi
-
-        if [ -s "${NMAP_ERR}" ]; then
-
-            NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
-
-            # check for -Pn warning
-            if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
-                critical "nmap exited with error: ${NMAP_ERROR}"
-            fi
-
-        fi
-
-        if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
-            critical "empty nmap result while checking ciphers"
-        fi
-
-        if [ -n "${CHECK_CIPHERS}" ]; then
-
-            if ! grep -q -F 'least strength' "${NMAP_OUT}"; then
-                critical 'nmap does not deliver cipher strength'
-            fi
-
-            NMAP_GRADE=$(grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
-            convert_grade "${NMAP_GRADE}"
-            NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
-
-            verboselog "Cipher grade ${NMAP_GRADE_NUMERIC}: ${NMAP_GRADE}"
-
-            # Check the grade
-            if [ "${NMAP_GRADE_NUMERIC}" -lt "${CHECK_CIPHERS_NUMERIC}" ]; then
-                prepend_critical_message "${HOST_ADDR} offers ciphers with grade ${NMAP_GRADE} (instead of ${CHECK_CIPHERS})"
-            fi
-
-        fi
-
-        if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
-
-            if grep -F -q 'warnings:' "${NMAP_OUT}"; then
-
-                PARSING_WARNINGS=
-                WARNINGS=
-                while IFS= read -r line; do
-
-                    if echo "${line}" | grep -q -F 'warnings:'; then
-                        PARSING_WARNINGS=1
-                    elif echo "${line}" | grep -q -F ':'; then
-                        PARSING_WARNINGS=
-                    elif [ -n "${PARSING_WARNINGS}" ]; then
-                        WARNING=$(echo "${line}" | sed 's/|\ *//')
-                        if [ -n "${WARNINGS}" ]; then
-                            debuglog "Cipher warning '${WARNING}'"
-                            WARNINGS="${WARNINGS}
-${WARNING}"
-                        else
-                            WARNINGS="${WARNING}"
-                        fi
-                    fi
-
                 done <"${NMAP_OUT}"
+                debuglog 'nmap errors:'
+                if [ -s "${NMAP_ERR}" ]; then
+                    while read -r LINE; do
+                        debuglog "${LINE}"
+                    done <"${NMAP_ERR}"
+                fi
+            fi
 
-                WARNINGS="$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//')"
-                prepend_critical_message "${HOST_ADDR} offers ciphers with warnings: ${WARNINGS}"
+            if [ -s "${NMAP_ERR}" ]; then
 
-            else
+                NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
-                verboselog "No ciphers with warnings are offered"
+                # check for -Pn warning
+                if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
+                    critical "nmap exited with error: ${NMAP_ERROR}"
+                fi
+
+            fi
+
+            if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
+                critical "empty nmap result while checking ciphers"
+            fi
+
+            if [ -n "${CHECK_CIPHERS}" ]; then
+
+                if ! grep -q -F 'least strength' "${NMAP_OUT}"; then
+                    critical 'nmap does not deliver cipher strength'
+                fi
+
+                NMAP_GRADE=$(grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
+                convert_grade "${NMAP_GRADE}"
+                NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
+
+                verboselog "Cipher grade ${NMAP_GRADE_NUMERIC}: ${NMAP_GRADE}"
+
+                # Check the grade
+                if [ "${NMAP_GRADE_NUMERIC}" -lt "${CHECK_CIPHERS_NUMERIC}" ]; then
+                    prepend_critical_message "${HOST_ADDR} offers ciphers with grade ${NMAP_GRADE} (instead of ${CHECK_CIPHERS})"
+                fi
+
+            fi
+
+            if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
+
+                if grep -F -q 'warnings:' "${NMAP_OUT}"; then
+
+                    PARSING_WARNINGS=
+                    WARNINGS=
+                    while IFS= read -r line; do
+
+                        if echo "${line}" | grep -q -F 'warnings:'; then
+                            PARSING_WARNINGS=1
+                        elif echo "${line}" | grep -q -F ':'; then
+                            PARSING_WARNINGS=
+                        elif [ -n "${PARSING_WARNINGS}" ]; then
+                            WARNING=$(echo "${line}" | sed 's/|\ *//')
+                            if [ -n "${WARNINGS}" ]; then
+                                debuglog "Cipher warning '${WARNING}'"
+                                WARNINGS="${WARNINGS}
+${WARNING}"
+                            else
+                                WARNINGS="${WARNING}"
+                            fi
+                        fi
+
+                    done <"${NMAP_OUT}"
+
+                    WARNINGS="$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//')"
+                    prepend_critical_message "${HOST_ADDR} offers ciphers with warnings: ${WARNINGS}"
+
+                else
+
+                    verboselog "No ciphers with warnings are offered"
+
+                fi
 
             fi
 
