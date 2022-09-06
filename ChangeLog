@@ -1,6 +1,8 @@
 2022-09-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Added --require-x-frame-options to check for the X-Frame-Options header
+        * check_ssl_cert (main): Disallowing --require-hsts and --require-x-frame-options if no HTTPS is used
+        * check_ssl_cert (extract_cert_attribute): Fixed a bug when parsing certificates without purpose
 
 2022-09-02  Matteo Corti  <matteo@corti.li>
 

@@ -1,2 +1,2 @@
- * Disable checks with nmap if a proxy is specified
- * Added   ```--require-x-frame-options``` to check for the X-Frame-Options header
+ * Disallowing ```--require-hsts``` and ```--require-x-frame-options``` if no HTTPS is used
+ * Fixed a bug when parsing certificates without purpose

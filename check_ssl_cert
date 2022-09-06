@@ -1414,11 +1414,18 @@ extract_cert_attribute() {
             sed -e 's/^\ *//'
         ;;
     keyUsage)
-        if echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage | grep -q critical ; then
-            PURPOSE_CRITICAL=1
+        KEY_USAGE_TMP=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1 )
+        if echo "${KEY_USAGE_TMP}" | grep -q 'No extensions in certificate' ; then
+            echo
+        else
+
+            if echo "${KEY_USAGE_TMP}" | grep -q critical ; then
+                PURPOSE_CRITICAL=1
+            fi
+            PURPOSE=$( echo "${KEY_USAGE_TMP}" | tail -n 1 | sed 's/^[[:blank:]]*//')
+            echo "${PURPOSE}"
+
         fi
-        PURPOSE=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage | tail -n 1 | sed 's/^[[:blank:]]*//')
-        echo "${PURPOSE}"
         ;;
     *)
         return 1
@@ -3611,6 +3618,19 @@ main() {
     elif [ -z "${HOST}" ] && [ -n "${FILE}" ]; then
         HOST='localhost'
     fi
+
+    # HTTP checks do only make sense with HTTP
+    # do not split the next line otherwise ShellCheck will fail to parse it
+    # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
+    if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
+        if [ -n "${REQUIRE_HSTS}" ] ; then
+            unknown "--require-hsts only works with HTTP[S]"
+        fi
+        if [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
+            unknown "--require-x-frame-options only works with HTTP[S]"
+        fi
+    fi
+
 
     # we need the FQDN of an host to check the CN
     debuglog "Adding the domain if missing"
