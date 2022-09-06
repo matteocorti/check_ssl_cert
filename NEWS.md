@@ -1,5 +1,6 @@
 * 2022-09-02 Version 2.42.0
   * Disable nmap checks if a proxy is specified
+  * Added ```--require-x-frame-options``` to check for the X-Frame-Options header
 * 2022-09-01 Version 2.41.0
   * Fixed the parsing of UTF-8 certificate subjects
   * Better OpenSSL error handling

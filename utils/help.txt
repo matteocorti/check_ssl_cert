@@ -151,12 +151,14 @@
 --require-no-tls1;Critical if TLS 1 is offered
 --require-no-tls1_1;Critical if TLS 1.1 is offered
 --require-ocsp-stapling;Require OCSP stapling
---require-purpose usage;requires the specified key usage (can be
+--require-purpose usage;Require the specified key usage (can be
 --require-purpose usage;specified more then once)
 --require-purpose-critical;the key usage must be critical
 --require-san;Alternative Name
 --require-san;Require the presence of a Subject
 --require-san;extension
+--require-x-frame-options;Require the presence of the
+--require-x-frame-options;X-Frame-Options HTTP header
 --resolve ip;Provide a custom IP address for the
 --resolve ip;specified host
 --rootcert-dir path;Root directory to be used for

@@ -204,7 +204,7 @@ Options:
       --require-no-tls1            Critical if TLS 1 is offered
       --require-no-tls1_1          Critical if TLS 1.1 is offered
       --require-ocsp-stapling      Require OCSP stapling
-      --require-purpose usage      requires the specified key usage (can be
+      --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)
       --require-purpose-critical   the key usage must be critical
       --resolve ip                 Provide a custom IP address for the
@@ -272,6 +272,8 @@ Deprecated options:
       --require-san                Require the presence of a Subject
                                    Alternative Name
                                    extension
+      --require-x-frame-options    Require the presence of the
+                                   X-Frame-Options HTTP header
    -S,--ssl version                Force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
       --curl-user-agent string     User agent that curl shall use to obtain

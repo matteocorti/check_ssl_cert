@@ -54,7 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Thu Sep   2 2022 Matteo Corti <matteo@corti.li> - 2.42.0-0
+* Tue Sep   6 2022 Matteo Corti <matteo@corti.li> - 2.42.0-0
 - Updated to 2.42.0
 
 * Thu Sep   1 2022 Matteo Corti <matteo@corti.li> - 2.41.0-0

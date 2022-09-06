@@ -1,3 +1,7 @@
+2022-09-06  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Added --require-x-frame-options to check for the X-Frame-Options header
+
 2022-09-02  Matteo Corti  <matteo@corti.li>
 
         * Makefile (CITATION.cff): rebuild if a new version was specified

@@ -338,7 +338,7 @@ Critical if TLS 1.1 is offered
 Require OCSP stapling
 .TP
 .BR "    --require-purpose" " usage"
-requires the specified key usage (can be specified more then once)
+Require the specified key usage (can be specified more then once)
 .TP
 .BR "    --require-purpose-critical"
 the key usage must be critical
@@ -456,6 +456,9 @@ Check revocation via OCSP (enabled by default)
 .TP
 .BR "   --require-san"
 Require the presence of a Subject Alternative Name extension
+.TP
+.BR "   --require-x-frame-options"
+Require the presence of the X-Frame-Options HTTP header
 .TP
 .BR "-S,--ssl" " version"
 Force SSL version (2,3) (see: --ssl2 or --ssl3)

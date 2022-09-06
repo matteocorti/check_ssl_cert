@@ -1751,6 +1751,20 @@ testDNSSECError() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testXFrameOptionsOK() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-x-frame-options
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testXFrameOptionsFailed() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-x-frame-options
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
