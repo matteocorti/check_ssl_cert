@@ -272,8 +272,10 @@ Deprecated options:
       --require-san                Require the presence of a Subject
                                    Alternative Name
                                    extension
-      --require-x-frame-options    Require the presence of the
+      --require-x-frame-options [path] Require the presence of the
                                    X-Frame-Options HTTP header
+                                   'path' is the optional path to be used
+                                   in the URL to check for the header
    -S,--ssl version                Force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
       --curl-user-agent string     User agent that curl shall use to obtain

@@ -1,3 +1,7 @@
+2022-09-07  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (parse_command_line_options): added an optional path for the X-Frame-Options header retrieval
+
 2022-09-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Added --require-x-frame-options to check for the X-Frame-Options header

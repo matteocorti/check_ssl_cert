@@ -293,8 +293,10 @@ usage() {
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
     echo "      --require-purpose-critical   the key usage must be critical"
-    echo "      --require-x-frame-options    Require the presence of the"
+    echo "      --require-x-frame-options [path] Require the presence of the"
     echo "                                   X-Frame-Options HTTP header"
+    echo "                                   'path' is the optional path to be used"
+    echo "                                   in the URL to check for the header"
     echo "      --resolve ip                 Provide a custom IP address for the"
     echo "                                   specified host"
     echo "      --rootcert-dir path          Root directory to be used for certificate"
@@ -2895,10 +2897,6 @@ parse_command_line_options() {
             REQUIRE_SAN=1
             shift
             ;;
-        --require-x-frame-options)
-            REQUIRE_X_FRAME_OPTIONS=1
-            shift
-            ;;
         -s | --selfsigned)
             SELFSIGNED=1
             shift
@@ -3353,6 +3351,26 @@ $2"
 
             ;;
 
+        --require-x-frame-options)
+
+            # default path
+            REQUIRE_X_FRAME_OPTIONS='/'
+
+            # check the second optional parameter if it exist
+            if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
+                if [ "${2%${2#?}}"x = '-x' ]; then
+                    shift
+                else
+                    REQUIRE_X_FRAME_OPTIONS=$2
+                    shift 2
+                fi
+            else
+                shift
+            fi
+
+            ;;
+
         --ignore-connection-problems)
 
             # default OK
@@ -3601,7 +3619,7 @@ main() {
         # we check HSTS only with HTTP/HTTPS
         if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
             REQUIRE_HSTS=1
-            REQUIRE_X_FRAME_OPTIONS=1
+            REQUIRE_X_FRAME_OPTIONS='/'
         fi
 
     fi
@@ -4816,10 +4834,10 @@ main() {
 
     fi
 
-    # check HSTS and/or X-Frame-Options
-    if [ -n "${REQUIRE_HSTS}" ] || [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
+    # check HSTS
+    if [ -n "${REQUIRE_HSTS}" ] ; then
 
-        debuglog "Checking HTTP headers"
+        debuglog "Checking HSTS"
 
         create_temporary_file
         HTML=${TEMPFILE}
@@ -4836,28 +4854,38 @@ main() {
             prepend_critical_message "Cannot retrieve HTML headers"
         fi
 
-        if [ -n "${REQUIRE_HSTS}" ] ; then
-
-            debuglog "Checking HSTS"
-
-            if ! grep -q -i '^strict-transport-security:' "${HTML}" ; then
-                prepend_critical_message "HSTS is not supported"
-            else
-                verboselog "HSTS is supported"
-            fi
-
+        if ! grep -q -i '^strict-transport-security:' "${HTML}" ; then
+            prepend_critical_message "HSTS is not supported"
+        else
+            verboselog "HSTS is supported"
         fi
 
-        if [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
+    fi
 
-            debuglog "Checking X-Frame-Options"
+    # check X-Frame-Options
+    if [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
 
-            if ! grep -q -i '^X-Frame-Options' "${HTML}" ; then
-                prepend_critical_message "X-Frame-Options is not supported"
-            else
-                verboselog "X-Frame-Options is supported"
-            fi
+        debuglog "Checking X-Frame-Options with path ${REQUIRE_X_FRAME_OPTIONS}"
 
+        create_temporary_file
+        HTML=${TEMPFILE}
+
+        # -s (--silent)
+        # -D (--dump-header)
+        # -A (--user-agent)
+        # -L (--location): follow redirects
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST}${REQUIRE_X_FRAME_OPTIONS}" "${HTML}"
+        RET=$?
+
+        if [ "${RET}" -ne 0 ] ; then
+            debuglog "Cannot retrieve HTML headers (curl error code: ${RET})"
+            prepend_critical_message "Cannot retrieve HTML headers https"
+        fi
+
+        if ! grep -q -i '^X-Frame-Options' "${HTML}" ; then
+            prepend_critical_message "X-Frame-Options is not supported"
+        else
+            verboselog "X-Frame-Options is supported"
         fi
 
     fi

@@ -457,8 +457,8 @@ Check revocation via OCSP (enabled by default)
 .BR "   --require-san"
 Require the presence of a Subject Alternative Name extension
 .TP
-.BR "   --require-x-frame-options"
-Require the presence of the X-Frame-Options HTTP header
+.BR "   --require-x-frame-options [path]"
+Require the presence of the X-Frame-Options HTTP header. 'path' is the optional path to be used in the URL to check for the header
 .TP
 .BR "-S,--ssl" " version"
 Force SSL version (2,3) (see: --ssl2 or --ssl3)

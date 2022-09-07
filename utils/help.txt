@@ -157,8 +157,10 @@
 --require-san;Alternative Name
 --require-san;Require the presence of a Subject
 --require-san;extension
---require-x-frame-options;Require the presence of the
---require-x-frame-options;X-Frame-Options HTTP header
+--require-x-frame-options [path];Require the presence of the
+--require-x-frame-options [path];X-Frame-Options HTTP header
+--require-x-frame-options [path];'path' is the optional path to be used
+--require-x-frame-options [path];in the URL to check for the header
 --resolve ip;Provide a custom IP address for the
 --resolve ip;specified host
 --rootcert-dir path;Root directory to be used for
