@@ -4840,27 +4840,38 @@ main() {
         debuglog "Checking HSTS"
 
         create_temporary_file
-        HTML=${TEMPFILE}
+        HEADERS=${TEMPFILE}
 
         # -s (--silent)
         # -D (--dump-header)
         # -A (--user-agent)
         # -L (--location): follow redirects
         # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST}" "${HTML}"
+        # -o (--output): discard the output (we are only interested in the HTTP headers)
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}" "${HEADERS}"
         RET=$?
 
         if [ "${RET}" -ne 0 ] ; then
-            debuglog "Cannot retrieve HTML headers (curl error code: ${RET})"
-            prepend_critical_message "Cannot retrieve HTML headers"
+            debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
+            prepend_critical_message "Cannot retrieve HTTP headers"
         fi
 
-        if ! grep -q -i '^strict-transport-security:' "${HTML}" ; then
+        if [ "${DEBUG}" -gt 1 ]; then
+            sed "s/^/[DBG]   HTTP headers for https:\/\/${HOST}: /" "${HEADERS}" 1>&2
+        fi
+
+        if ! grep -q -i '^strict-transport-security:' "${HEADERS}" ; then
+            debuglog "strict-transport-securiy not found"
             prepend_critical_message "HSTS is not supported"
         else
             verboselog "HSTS is supported"
         fi
 
+    fi
+
+    CURL_RESOLVE=''
+    if [ -n "${RESOLVE}" ] ; then
+        CURL_RESOLVE="--resolve ${HOST}:${PORT}:${RESOLVE}"
     fi
 
     # check X-Frame-Options
@@ -4869,21 +4880,32 @@ main() {
         debuglog "Checking X-Frame-Options with path ${REQUIRE_X_FRAME_OPTIONS}"
 
         create_temporary_file
-        HTML=${TEMPFILE}
+        HEADERS=${TEMPFILE}
 
         # -s (--silent)
         # -D (--dump-header)
         # -A (--user-agent)
         # -L (--location): follow redirects
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST}${REQUIRE_X_FRAME_OPTIONS}" "${HTML}"
+        # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
+        # -o (--output): discard the output (we are only interested in the HTTP headers)
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${REQUIRE_X_FRAME_OPTIONS}" "${HEADERS}"
         RET=$?
 
         if [ "${RET}" -ne 0 ] ; then
-            debuglog "Cannot retrieve HTML headers (curl error code: ${RET})"
-            prepend_critical_message "Cannot retrieve HTML headers https"
+            debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
+            prepend_critical_message "Cannot retrieve HTTP headers"
         fi
 
-        if ! grep -q -i '^X-Frame-Options' "${HTML}" ; then
+        if [ "${DEBUG}" -gt 1 ]; then
+            ESCAPED_PATH=$( echo "${REQUIRE_X_FRAME_OPTIONS}" | sed 's/\//\\\//g' )
+            sed "s/^/[DBG]   HTTP headers for https:\/\/${HOST}${ESCAPED_PATH}: /" "${HEADERS}" 1>&2
+        fi
+
+        if ! grep -q -i '^X-Frame-Options' "${HEADERS}" ; then
+            debuglog "X-Frame-Options is not found"
+            if [ "${DEBUG}" -gt 0 ]; then
+                sed 's/^/[DBG]   HTTP header: /' "${HEADERS}" 1>&2
+            fi
             prepend_critical_message "X-Frame-Options is not supported"
         else
             verboselog "X-Frame-Options is supported"

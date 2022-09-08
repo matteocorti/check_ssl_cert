@@ -1,6 +1,7 @@
 2022-09-08  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): curl ignores TLS problems while retrieving headers
+        * check_ssl_cert (main): curl uses --resolve if specified when retrieving HTTP headers
 
 2022-09-07  Matteo Corti  <matteo@corti.li>
 
