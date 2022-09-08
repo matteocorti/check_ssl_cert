@@ -4857,7 +4857,7 @@ main() {
         fi
 
         if [ "${DEBUG}" -gt 1 ]; then
-            sed "s/^/[DBG]   HTTP headers for https:\/\/${HOST}: /" "${HEADERS}" 1>&2
+            sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}: /" "${HEADERS}" 1>&2
         fi
 
         if ! grep -q -i '^strict-transport-security:' "${HEADERS}" ; then
@@ -4898,7 +4898,7 @@ main() {
 
         if [ "${DEBUG}" -gt 1 ]; then
             ESCAPED_PATH=$( echo "${REQUIRE_X_FRAME_OPTIONS}" | sed 's/\//\\\//g' )
-            sed "s/^/[DBG]   HTTP headers for https:\/\/${HOST}${ESCAPED_PATH}: /" "${HEADERS}" 1>&2
+            sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" "${HEADERS}" 1>&2
         fi
 
         if ! grep -q -i '^X-Frame-Options' "${HEADERS}" ; then
