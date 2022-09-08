@@ -84,7 +84,7 @@ jobs:
           - distro: 'debian:11'
             pre: >-
               apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2
 
           - distro: 'ubuntu:18.04'
             pre: >-
