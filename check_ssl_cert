@@ -4846,7 +4846,8 @@ main() {
         # -D (--dump-header)
         # -A (--user-agent)
         # -L (--location): follow redirects
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST}" "${HTML}"
+        # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -L https://${HOST}" "${HTML}"
         RET=$?
 
         if [ "${RET}" -ne 0 ] ; then

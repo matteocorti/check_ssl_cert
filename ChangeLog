@@ -1,3 +1,7 @@
+2022-09-08  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): curl ignores TLS problems while retrieving headers
+
 2022-09-07  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (parse_command_line_options): added an optional path for the X-Frame-Options header retrieval
