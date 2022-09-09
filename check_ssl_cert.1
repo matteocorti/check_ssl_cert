@@ -436,11 +436,14 @@ Force IPv6
 .BR "   --altnames"
 Match the pattern specified in -n with alternate names too (enabled by default)
 .TP
-.BR "-d,--days" " days"
-Minimum number of days a certificate has to be valid (see --critical and --warning)
-.TP
 .BR "-n,--cn" " name"
 Pattern to match the CN or AltName (can be specified multiple times)
+.TP
+.BR "   --curl-user-agent" " string"
+User agent that curl shall use to obtain the issuer cert
+.TP
+.BR "-d,--days" " days"
+Minimum number of days a certificate has to be valid (see --critical and --warning)
 .TP
 .BR "-N,--host-cn"
 Match CN with the host name (enabled by default)
@@ -477,9 +480,6 @@ Require the presence of the X-Frame-Options HTTP header. 'path' is the optional 
 .TP
 .BR "-S,--ssl" " version"
 Force SSL version (2,3) (see: --ssl2 or --ssl3)
-.TP
-.BR "   --curl-user-agent" " string"
-User agent that curl shall use to obtain the issuer cert
 
 .SH NOTES
 If the host has multiple certificates and the installed openssl version supports the -servername option it is possible to specify the TLS SNI (Server Name Identificator) with the -N (or --host-cn) option.
