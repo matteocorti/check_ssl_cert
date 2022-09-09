@@ -132,8 +132,9 @@ check_security_header() {
         debuglog "Header '${header}' not found"
         prepend_critical_message "${header} is not supported"
     else
-        debuglog "Header '${header}' found"
-        verboselog "Header '${header}' is supported"
+        HEADER_VALUE=$( grep -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
+        debuglog "Header '${header}' found (${HEADER_VALUE})"
+        verboselog "Header '${header}' is supported  (${HEADER_VALUE})"
     fi
 
 }
