@@ -47,7 +47,7 @@ ALL_MSG=""
 CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
-DEFAULT_REQUIRED_SECURITY_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
+DEFAULT_REQUIRED_SECURITY_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy,X-Permitted-Cross-Domain-Policies"
 EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
 REQUIRED_SECURITY_HEADERS=""
@@ -132,8 +132,8 @@ check_security_header() {
         debuglog "Header '${header}' not found"
         prepend_critical_message "${header} is not supported"
     else
-        debuglog "header '${header}' found"
-        verboselog "header '${header}' is supported"
+        debuglog "Header '${header}' found"
+        verboselog "Header '${header}' is supported"
     fi
 
 }
@@ -369,12 +369,13 @@ usage() {
     echo "      --require-security-header header require the specified HTTP"
     echo "                                   security header (e.g., X-Frame-Options)"
     echo "      --require-security-headers   require all the HTTP security headers:"
-    echo "                                     strict-transport-security"
-    echo "                                     X-Frame-Options"
     echo "                                     Content-Security-Policy"
-    echo "                                     X-Content-Type-Options"
-    echo "                                     Referrer-Policy"
     echo "                                     Permissions-Policy"
+    echo "                                     Referrer-Policy"
+    echo "                                     strict-transport-security"
+    echo "                                     X-Content-Type-Options"
+    echo "                                     X-Frame-Options"
+    echo "                                     X-Permitted-Cross-Domain-Policies"
     echo "      --require-security-headers-path path the path to be used to fetch HTTP"
     echo "                                   security headers"
     echo "      --resolve ip                 Provide a custom IP address for the"

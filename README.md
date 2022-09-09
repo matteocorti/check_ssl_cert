@@ -209,12 +209,13 @@ Options:
       --require-security-header header require the specified HTTP
                                    security header (e.g., X-Frame-Options)
       --require-security-headers   require all the HTTP security headers:
-                                     strict-transport-security
-                                     X-Frame-Options
                                      Content-Security-Policy
-                                     X-Content-Type-Options
-                                     Referrer-Policy
                                      Permissions-Policy
+                                     Referrer-Policy
+                                     strict-transport-security
+                                     X-Content-Type-Options
+                                     X-Frame-Options
+                                     X-Permitted-Cross-Domain-Policies
       --require-security-headers-path path the path to be used to fetch HTTP
                                    security headers
       --resolve ip                 Provide a custom IP address for the

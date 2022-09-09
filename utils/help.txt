@@ -161,13 +161,14 @@
 --require-security-header header;security header (e.g., X-Frame-Options)
 --require-security-headers-path path;the path to be used to fetch HTTP
 --require-security-headers-path path;security headers
+--require-security-headers;require all the HTTP security headers:
 --require-security-headers;  Content-Security-Policy
 --require-security-headers;  Permissions-Policy
 --require-security-headers;  Referrer-Policy
+--require-security-headers;  strict-transport-security
 --require-security-headers;  X-Content-Type-Options
 --require-security-headers;  X-Frame-Options
---require-security-headers;require all the HTTP security headers:
---require-security-headers;strict-transport-security
+--require-security-headers;  X-Permitted-Cross-Domain-Policies
 --require-x-frame-options [path];'path' is the optional path to be used
 --require-x-frame-options [path];Require the presence of the
 --require-x-frame-options [path];X-Frame-Options HTTP header
