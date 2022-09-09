@@ -198,7 +198,6 @@ Options:
                                    separated list of expected client
                                    certificate CAs
       --require-dnssec             Require DNSSEC
-      --require-hsts               Require HTTP Strict Transport Security
       --require-no-ssl2            Critical if SSL version 2 is offered
       --require-no-ssl3            Critical if SSL version 3 is offered
       --require-no-tls1            Critical if TLS 1 is offered
@@ -207,6 +206,17 @@ Options:
       --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)
       --require-purpose-critical   the key usage must be critical
+      --require-security-header header require the specified HTTP
+                                   security header (e.g., X-Frame-Options)
+      --require-security-headers   require all the HTTP security headers:
+                                     strict-transport-security
+                                     X-Frame-Options
+                                     Content-Security-Policy
+                                     X-Content-Type-Options
+                                     Referrer-Policy
+                                     Permissions-Policy
+      --require-security-headers-path path the path to be used to fetch HTTP
+                                   security headers
       --resolve ip                 Provide a custom IP address for the
                                    specified host
       --rootcert-dir path          Root directory to be used for certificate
@@ -269,6 +279,9 @@ Deprecated options:
                                    --no-tls1_3)
       --ocsp                       Check revocation via OCSP (enabled by
                                    default)
+      --require-hsts               Require HTTP Strict Transport Security
+                                   (deprecated use --require-security-header
+                                   strict-transport-security)
       --require-san                Require the presence of a Subject
                                    Alternative Name
                                    extension
@@ -276,13 +289,15 @@ Deprecated options:
                                    X-Frame-Options HTTP header
                                    'path' is the optional path to be used
                                    in the URL to check for the header
+                                   (deprecated use --require-security-header
+                                   X-Frame-Options and
+                                   --require-security-headers-path path)
    -S,--ssl version                Force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
       --curl-user-agent string     User agent that curl shall use to obtain
                                    the issuer cert
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
-
 ```
 
 ## Expect & timeout

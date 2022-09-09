@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.42.0
+VERSION=2.43.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -42,17 +42,21 @@ TEMPFILE=""
 
 ################################################################################
 # Variables
-STATUS_OK=0
-STATUS_WARNING=1
-STATUS_CRITICAL=2
-STATUS_UNKNOWN=3
-WARNING_MSG=""
-CRITICAL_MSG=""
+
 ALL_MSG=""
-EARLIEST_VALIDITY_HOURS=""
+CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
+DEFAULT_REQUIRED_SECURITY_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
+EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
+REQUIRED_SECURITY_HEADERS=""
+REQUIRED_SECURITY_HEADERS_PATH="/"
+STATUS_CRITICAL=2
+STATUS_OK=0
+STATUS_UNKNOWN=3
+STATUS_WARNING=1
+WARNING_MSG=""
 
 DEFAULT_FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
 
@@ -63,6 +67,76 @@ SCALE=""
 
 ################################################################################
 # Functions
+
+################################################################################
+# Add the specified header to the list of required HTTP security headers
+# Usage:
+#   add_required_security_header X-Frame-Options
+add_required_security_header() {
+    header=$1
+    debuglog "Adding ${header} to the list of required HTTP security headers: ${REQUIRED_SECURITY_HEADERS}"
+    if [ -z "${REQUIRED_SECURITY_HEADERS}" ] ; then
+        REQUIRED_SECURITY_HEADERS="${header}"
+    else
+        REQUIRED_SECURITY_HEADERS="${REQUIRED_SECURITY_HEADERS},${header}"
+    fi
+}
+
+CACHED_HEADERS=
+
+check_security_header() {
+
+    header=$1
+    path=$2
+
+    # we fetch the headers and cache the result
+
+    debuglog "Checking header '${header}' with path '${path}'"
+
+    if [ -z "${CACHED_HEADERS}" ] ; then
+
+        debuglog "Fetching headers"
+
+        create_temporary_file
+        CACHED_HEADERS=${TEMPFILE}
+
+        CURL_RESOLVE=''
+        if [ -n "${RESOLVE}" ] ; then
+            CURL_RESOLVE="--resolve ${HOST}:${PORT}:${RESOLVE}"
+        fi
+
+        # curl options:
+        # -s (--silent)
+        # -D (--dump-header)
+        # -A (--user-agent)
+        # -L (--location): follow redirects
+        # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
+        # -o (--output): discard the output (we are only interested in the HTTP headers)
+        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
+        RET=$?
+
+        if [ "${RET}" -ne 0 ] ; then
+            debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
+            prepend_critical_message "Cannot retrieve HTTP headers"
+        fi
+
+        if [ "${DEBUG}" -gt 1 ]; then
+            ESCAPED_PATH=$( echo "${path}" | sed 's/\//\\\//g' )
+            # there might be empty lines
+            grep '[[:alpha:]]' "${CACHED_HEADERS}" | sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" 1>&2
+        fi
+
+    fi
+
+    if ! grep -q -i "^${header}:" "${CACHED_HEADERS}" ; then
+        debuglog "Header '${header}' not found"
+        prepend_critical_message "${header} is not supported"
+    else
+        debuglog "header '${header}' found"
+        verboselog "header '${header}' is supported"
+    fi
+
+}
 
 ################################################################################
 # To set a variable with an HEREDOC in a POSIX compliant way
@@ -284,7 +358,6 @@ usage() {
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
     echo "      --require-dnssec             Require DNSSEC"
-    echo "      --require-hsts               Require HTTP Strict Transport Security"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
@@ -293,10 +366,17 @@ usage() {
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
     echo "      --require-purpose-critical   the key usage must be critical"
-    echo "      --require-x-frame-options [path] Require the presence of the"
-    echo "                                   X-Frame-Options HTTP header"
-    echo "                                   'path' is the optional path to be used"
-    echo "                                   in the URL to check for the header"
+    echo "      --require-security-header header require the specified HTTP"
+    echo "                                   security header (e.g., X-Frame-Options)"
+    echo "      --require-security-headers   require all the HTTP security headers:"
+    echo "                                     strict-transport-security"
+    echo "                                     X-Frame-Options"
+    echo "                                     Content-Security-Policy"
+    echo "                                     X-Content-Type-Options"
+    echo "                                     Referrer-Policy"
+    echo "                                     Permissions-Policy"
+    echo "      --require-security-headers-path path the path to be used to fetch HTTP"
+    echo "                                   security headers"
     echo "      --resolve ip                 Provide a custom IP address for the"
     echo "                                   specified host"
     echo "      --rootcert-dir path          Root directory to be used for certificate"
@@ -366,9 +446,19 @@ usage() {
     echo "                                   --no-tls1_3)"
     echo "      --ocsp                       Check revocation via OCSP (enabled by"
     echo "                                   default)"
+    echo "      --require-hsts               Require HTTP Strict Transport Security"
+    echo "                                   (deprecated use --require-security-header"
+    echo "                                   strict-transport-security)"
     echo "      --require-san                Require the presence of a Subject"
     echo "                                   Alternative Name"
     echo "                                   extension"
+    echo "      --require-x-frame-options [path] Require the presence of the"
+    echo "                                   X-Frame-Options HTTP header"
+    echo "                                   'path' is the optional path to be used"
+    echo "                                   in the URL to check for the header"
+    echo "                                   (deprecated use --require-security-header"
+    echo "                                   X-Frame-Options and"
+    echo "                                   --require-security-headers-path path)"
     echo "   -S,--ssl version                Force SSL version (2,3)"
     echo "                                   (see: --ssl2 or --ssl3)"
     echo "      --curl-user-agent string     User agent that curl shall use to obtain"
@@ -2866,7 +2956,8 @@ parse_command_line_options() {
             shift
             ;;
         --require-hsts)
-            REQUIRE_HSTS=1
+            # deprecated
+            add_required_security_header 'strict-transport-security'
             shift
             ;;
         --require-no-ssl2)
@@ -2897,6 +2988,12 @@ parse_command_line_options() {
             REQUIRE_SAN=1
             shift
             ;;
+
+        --require-security-headers)
+            REQUIRED_SECURITY_HEADERS="${DEFAULT_REQUIRED_SECURITY_HEADERS}"
+            shift
+            ;;
+
         -s | --selfsigned)
             SELFSIGNED=1
             shift
@@ -3140,6 +3237,25 @@ $2"
             fi
             shift 2
             ;;
+
+        --require-security-header)
+
+            check_option_argument '--require-security-header header' "$2"
+
+            add_required_security_header "$2"
+
+            shift 2
+            ;;
+
+        --require-security-headers-path)
+
+            check_option_argument '--require-security-header-path path' "$2"
+
+            REQUIRED_SECURITY_HEADERS_PATH=$2
+
+            shift 2
+            ;;
+
         --fingerprint)
             check_option_argument '--fingerprint' "$2"
             FINGERPRINT_LOCK="$2"
@@ -3353,8 +3469,13 @@ $2"
 
         --require-x-frame-options)
 
+            # deprecated
+            add_required_security_header X-Frame-Options
+
             # default path
-            REQUIRE_X_FRAME_OPTIONS='/'
+            if [ -z "${REQUIRED_SECURITY_HEADERS_PATH}" ] ; then
+                REQUIRED_SECURITY_HEADERS_PATH='/'
+            fi
 
             # check the second optional parameter if it exist
             if [ $# -gt 1 ]; then
@@ -3362,7 +3483,7 @@ $2"
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     shift
                 else
-                    REQUIRE_X_FRAME_OPTIONS=$2
+                    REQUIRED_SECURITY_HEADERS_PATH=$2
                     shift 2
                 fi
             else
@@ -3616,10 +3737,9 @@ main() {
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
         fi
 
-        # we check HSTS only with HTTP/HTTPS
+        # we check security headers only with HTTP/HTTPS
         if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
-            REQUIRE_HSTS=1
-            REQUIRE_X_FRAME_OPTIONS='/'
+            REQUIRED_SECURITY_HEADERS="${DEFAULT_REQUIRED_SECURITY_HEADERS}"
         fi
 
     fi
@@ -3641,11 +3761,8 @@ main() {
     # do not split the next line otherwise ShellCheck will fail to parse it
     # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
     if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
-        if [ -n "${REQUIRE_HSTS}" ] ; then
-            unknown "--require-hsts only works with HTTP[S]"
-        fi
-        if [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
-            unknown "--require-x-frame-options only works with HTTP[S]"
+        if [ -n "${REQUIRE_SECURITY_HEADERS}" ] ; then
+            unknown "HTTP security header can only be checked with HTTP[S]"
         fi
     fi
 
@@ -4834,82 +4951,17 @@ main() {
 
     fi
 
-    # check HSTS
-    if [ -n "${REQUIRE_HSTS}" ] ; then
+    # check secuirity headers
+    if [ -n "${REQUIRED_SECURITY_HEADERS}" ] ; then
 
-        debuglog "Checking HSTS"
+        debuglog "Checking HTTP secuirty headers: ${REQUIRED_SECURITY_HEADERS}"
 
-        create_temporary_file
-        HEADERS=${TEMPFILE}
+        for header in $( echo "${REQUIRED_SECURITY_HEADERS}" | tr ',' '\n' ) ; do
 
-        # -s (--silent)
-        # -D (--dump-header)
-        # -A (--user-agent)
-        # -L (--location): follow redirects
-        # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
-        # -o (--output): discard the output (we are only interested in the HTTP headers)
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}" "${HEADERS}"
-        RET=$?
+            check_security_header "${header}" "${REQUIRED_SECURITY_HEADERS_PATH}"
 
-        if [ "${RET}" -ne 0 ] ; then
-            debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
-            prepend_critical_message "Cannot retrieve HTTP headers"
-        fi
+        done
 
-        if [ "${DEBUG}" -gt 1 ]; then
-            sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}: /" "${HEADERS}" 1>&2
-        fi
-
-        if ! grep -q -i '^strict-transport-security:' "${HEADERS}" ; then
-            debuglog "strict-transport-securiy not found"
-            prepend_critical_message "HSTS is not supported"
-        else
-            verboselog "HSTS is supported"
-        fi
-
-    fi
-
-    CURL_RESOLVE=''
-    if [ -n "${RESOLVE}" ] ; then
-        CURL_RESOLVE="--resolve ${HOST}:${PORT}:${RESOLVE}"
-    fi
-
-    # check X-Frame-Options
-    if [ -n "${REQUIRE_X_FRAME_OPTIONS}" ] ; then
-
-        debuglog "Checking X-Frame-Options with path ${REQUIRE_X_FRAME_OPTIONS}"
-
-        create_temporary_file
-        HEADERS=${TEMPFILE}
-
-        # -s (--silent)
-        # -D (--dump-header)
-        # -A (--user-agent)
-        # -L (--location): follow redirects
-        # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
-        # -o (--output): discard the output (we are only interested in the HTTP headers)
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${REQUIRE_X_FRAME_OPTIONS}" "${HEADERS}"
-        RET=$?
-
-        if [ "${RET}" -ne 0 ] ; then
-            debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
-            prepend_critical_message "Cannot retrieve HTTP headers"
-        fi
-
-        if [ "${DEBUG}" -gt 1 ]; then
-            ESCAPED_PATH=$( echo "${REQUIRE_X_FRAME_OPTIONS}" | sed 's/\//\\\//g' )
-            sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" "${HEADERS}" 1>&2
-        fi
-
-        if ! grep -q -i '^X-Frame-Options' "${HEADERS}" ; then
-            debuglog "X-Frame-Options is not found"
-            if [ "${DEBUG}" -gt 0 ]; then
-                sed 's/^/[DBG]   HTTP header: /' "${HEADERS}" 1>&2
-            fi
-            prepend_critical_message "X-Frame-Options is not supported"
-        else
-            verboselog "X-Frame-Options is supported"
-        fi
 
     fi
 

@@ -1,2 +1,2 @@
- * Disallowing ```--require-hsts``` and ```--require-x-frame-options``` if no HTTPS is used
+ * Rewrote the HTTP security header checks (see documentation)
  * Fixed a bug when parsing certificates without purpose

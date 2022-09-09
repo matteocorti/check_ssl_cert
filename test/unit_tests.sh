@@ -1765,6 +1765,34 @@ testXFrameOptionsFailed() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testHTTPHeadersOK() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-security-headers
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testHTTPHeadersFailed() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-security-headers
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testHTTPHeaderOK() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-security-header X-Frame-Options --require-security-header x-xss-protection
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testHTTPHeaderFailed() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-security-header X-Frame-Options --require-security-header x-xss-protection
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
