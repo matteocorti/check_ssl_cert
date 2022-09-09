@@ -1,2 +1,1 @@
- * Rewrote the HTTP security header checks (see documentation)
- * Fixed a bug when parsing certificates without purpose
+ * Added ```--debug-headers``` to store the HTTP headers in the headers.txt file

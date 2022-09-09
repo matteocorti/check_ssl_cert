@@ -59,9 +59,6 @@ Path of the curl binary to be used
 .BR "   --custom-http-header" " string"
 Custom HTTP header sent when getting the cert example: 'X-Check-Ssl-Cert: Foobar=1'
 .TP
-.BR "-d,--debug"
-Produce debugging output (can be specified more than once)
-.TP
 .BR "   --dane"
 Verify that valid DANE records exist (since OpenSSL 1.1.0)
 .TP
@@ -83,11 +80,17 @@ Verify that a valid DANE-EE(3) SPKI(1) SHA2-512(1) TLSA record exists
 .BR "   --date" " path"
 Path of the date binary to be used
 .TP
+.BR "-d,--debug"
+Produce debugging output (can be specified more than once)
+.TP
 .BR "   --debug-cert"
 Store the retrieved certificates in the current directory
 .TP
 .BR "   --debug-file" " file"
 Write the debug messages to file
+.TP
+.BR "   --debug-headers"
+Store the retrieved HTLM headers in the headers.txt file
 .TP
 .BR "   --debug-time"
 Write timing information in the debugging output

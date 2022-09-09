@@ -47,8 +47,6 @@ Options:
       --curl-bin path              Path of the curl binary to be used
       --custom-http-header string  Custom HTTP header sent when getting the
                                    cert example: 'X-Check-Ssl-Cert: Foobar=1'
-   -d,--debug                      Produce debugging output (can be
-                                   specified more than once)
       --default-format             Print the default output format and exit
       --dane                       Verify that valid DANE records exist
                                    (since OpenSSL 1.1.0)
@@ -63,9 +61,13 @@ Options:
       --dane 312                   Verify that a valid DANE-EE(3)
                                    SPKI(1) SHA2-512(1) TLSA record exists
       --date path                  Path of the date binary to be used
+   -d,--debug                      Produce debugging output (can be
+                                   specified more than once)
       --debug-cert                 Store the retrieved certificates in the
                                    current directory
       --debug-file file            Write the debug messages to file
+      --debug-headers              Store the retrieved HTLM headers in the
+                                   headers.txt file
       --debug-time                 Write timing information in the
                                    debugging output
       --dig-bin path               Path of the dig binary to be used

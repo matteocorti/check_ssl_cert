@@ -102,6 +102,7 @@ distclean: clean
 	rm -rf check_ssl_cert-[0-9]*
 	rm -f *.crt
 	rm -f *.error
+	rm -f headers.txt
 
 check: test
 

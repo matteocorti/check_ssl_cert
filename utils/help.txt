@@ -38,6 +38,8 @@
 --debug-cert;Store the retrieved certificates in the
 --debug-cert;current directory
 --debug-file file;Write the debug messages to file
+--debug-headers;Store the retrieved HTLM headers in the
+--debug-headers;headers.txt file
 --debug-time;Write timing information in the
 --debug-time;debugging output
 --default-format;Print the default output format and exit

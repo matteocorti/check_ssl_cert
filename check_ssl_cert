@@ -126,6 +126,10 @@ check_security_header() {
             grep '[[:alpha:]]' "${CACHED_HEADERS}" | sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" 1>&2
         fi
 
+        if [ -n "${DEBUG_HEADERS}" ] ; then
+            cp "${CACHED_HEADERS}" headers.txt
+        fi
+
     fi
 
     if ! grep -q -i "^${header}:" "${CACHED_HEADERS}" ; then
@@ -196,8 +200,6 @@ usage() {
     echo "      --custom-http-header string  Custom HTTP header sent when getting the"
     echo "                                   cert example: 'X-Check-Ssl-Cert: Foobar=1'"
     # Delimiter at 78 chars ############################################################
-    echo "   -d,--debug                      Produce debugging output (can be"
-    echo "                                   specified more than once)"
     echo "      --default-format             Print the default output format and exit"
     echo "      --dane                       Verify that valid DANE records exist"
     echo "                                   (since OpenSSL 1.1.0)"
@@ -212,8 +214,12 @@ usage() {
     echo "      --dane 312                   Verify that a valid DANE-EE(3)"
     echo "                                   SPKI(1) SHA2-512(1) TLSA record exists"
     echo "      --date path                  Path of the date binary to be used"
+    echo "   -d,--debug                      Produce debugging output (can be"
+    echo "                                   specified more than once)"
     echo "      --debug-cert                 Store the retrieved certificates in the"
     echo "                                   current directory"
+    echo "      --debug-headers              Store the retrieved HTLM headers in the"
+    echo "                                   headers.txt file"
     echo "      --debug-file file            Write the debug messages to file"
     echo "      --debug-time                 Write timing information in the"
     echo "                                   debugging output"
@@ -2787,6 +2793,10 @@ parse_command_line_options() {
             ;;
         --debug-cert)
             DEBUG_CERT=1
+            shift
+            ;;
+        --debug-headers)
+            DEBUG_HEADERS=1
             shift
             ;;
         --debug-time)

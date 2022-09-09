@@ -1,3 +1,7 @@
+2022-09-09  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_security_header): added --debug-headers to store the HTTP headers in the headers.txt file
+
 2022-09-08  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): curl ignores TLS problems while retrieving headers
