@@ -3761,7 +3761,7 @@ main() {
     # do not split the next line otherwise ShellCheck will fail to parse it
     # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
     if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
-        if [ -n "${REQUIRE_SECURITY_HEADERS}" ] ; then
+        if [ -n "${REQUIRED_SECURITY_HEADERS}" ] ; then
             unknown "HTTP security header can only be checked with HTTP[S]"
         fi
     fi
@@ -4954,7 +4954,7 @@ main() {
     # check secuirity headers
     if [ -n "${REQUIRED_SECURITY_HEADERS}" ] ; then
 
-        debuglog "Checking HTTP secuirty headers: ${REQUIRED_SECURITY_HEADERS}"
+        debuglog "Checking HTTP security headers: ${REQUIRED_SECURITY_HEADERS}"
 
         for header in $( echo "${REQUIRED_SECURITY_HEADERS}" | tr ',' '\n' ) ; do
 
