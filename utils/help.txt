@@ -168,7 +168,6 @@
 --require-security-headers;  strict-transport-security
 --require-security-headers;  X-Content-Type-Options
 --require-security-headers;  X-Frame-Options
---require-security-headers;  X-Permitted-Cross-Domain-Policies
 --require-x-frame-options [path];'path' is the optional path to be used
 --require-x-frame-options [path];Require the presence of the
 --require-x-frame-options [path];X-Frame-Options HTTP header

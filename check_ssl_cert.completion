@@ -80,7 +80,7 @@ _check_ssl_cert() {
     --require-security-header)
 
         # shellcheck disable=2207
-        COMPREPLY=($(compgen -W "strict-transport-security X-Frame-Options Content-Security-Policy X-Content-Type-Options Referrer-Policy Permissions-Policy" -- "${cur}"))
+        COMPREPLY=($(compgen -W "strict-transport-security X-Frame-Options Content-Security-Policy X-Content-Type-Options Referrer-Policy Permissions-Policy X-Permitted-Cross-Domain-Policies" -- "${cur}"))
         ;;
 
     --port | -p)

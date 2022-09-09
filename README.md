@@ -215,7 +215,6 @@ Options:
                                      strict-transport-security
                                      X-Content-Type-Options
                                      X-Frame-Options
-                                     X-Permitted-Cross-Domain-Policies
       --require-security-headers-path path the path to be used to fetch HTTP
                                    security headers
       --resolve ip                 Provide a custom IP address for the
