@@ -1,3 +1,7 @@
+2022-09-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (usage): default port in the help text
+
 2022-09-09  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_security_header): added --debug-headers to store the HTTP headers in the headers.txt file

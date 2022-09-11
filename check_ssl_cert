@@ -338,7 +338,7 @@ usage() {
     echo "                                   has to be valid to issue a warning status"
     echo "      --openssl path               Path of the openssl binary to be used"
     # Delimiter at 78 chars ############################################################
-    echo "   -p,--port port                  TCP port"
+    echo "   -p,--port port                  TCP port (default 443)"
     echo "      --precision digits           Number of decimal places for durations:"
     echo "                                   defaults to 0 if critical or warning are"
     echo "                                   integers, 2 otherwise"
