@@ -4123,8 +4123,13 @@ main() {
         SCALE=0
     fi
 
+    # reuired utilitied
+
     check_required_prog 'bc'
     BCBIN=${PROG}
+
+    check_required_prog 'host'
+    check_required_prog 'hostname'
 
     if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] && [ -n "${WARNING_SECONDS}" ]; then
 
