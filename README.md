@@ -107,6 +107,7 @@ Options:
                                    - %SIGALGO%
                                    - %SSL_LABS_HOST_GRADE%
                                    See --default-format for the default
+      --grep-bin path              Path of the grep binary to be used
    -h,--help,-?                    This help message
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks

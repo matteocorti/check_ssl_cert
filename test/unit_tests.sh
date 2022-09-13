@@ -163,6 +163,11 @@ oneTimeSetUp() {
     fi
     "${OPENSSL}" version
 
+    if [ -z "${GREP_BIN}" ]; then
+        GREP_BIN=$( command -v grep) # needed by openssl_version
+    fi
+    "${GREP_BIN}" -V
+
 }
 
 seconds2String() {

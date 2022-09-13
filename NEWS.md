@@ -1,3 +1,4 @@
+  * Added ```--grep-bin``` to specify the grep binary to be used
   * Added ```--debug-headers``` to store the HTTP headers in the headers.txt file
 * 2022-09-09 Version 2.43.0
   * Rewrote the HTTP security header checks
@@ -32,7 +33,7 @@
   * Added checks for the certificate purpose
 * 2022-06-11 Version 2.31.0
   * Fixed a problem with Prometheus output
-* 2022-06-01 Version 2.30.0
+* 2022-06-01 Version 2.30.0<
   * Fixed a bug in the prometheus output
 * 2022-05-24 Version 2.29.0
   * Support for DTLS

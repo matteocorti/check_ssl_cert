@@ -123,7 +123,7 @@ check_security_header() {
         if [ "${DEBUG}" -gt 1 ]; then
             ESCAPED_PATH=$( echo "${path}" | sed 's/\//\\\//g' )
             # there might be empty lines
-            grep '[[:alpha:]]' "${CACHED_HEADERS}" | sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" 1>&2
+            "${GREP_BIN}" '[[:alpha:]]' "${CACHED_HEADERS}" | sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" 1>&2
         fi
 
         if [ -n "${DEBUG_HEADERS}" ] ; then
@@ -132,11 +132,11 @@ check_security_header() {
 
     fi
 
-    if ! grep -q -i "^${header}:" "${CACHED_HEADERS}" ; then
+    if ! "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}" ; then
         debuglog "Header '${header}' not found"
         prepend_critical_message "${header} is not supported"
     else
-        HEADER_VALUE=$( grep -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
+        HEADER_VALUE=$( "${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
         debuglog "Header '${header}' found (${HEADER_VALUE})"
         verboselog "Header '${header}' is supported  (${HEADER_VALUE})"
     fi
@@ -262,6 +262,8 @@ usage() {
     echo "                                   - %SIGALGO%"
     echo "                                   - %SSL_LABS_HOST_GRADE%"
     echo "                                   See --default-format for the default"
+    # Delimiter at 78 chars ############################################################
+    echo "      --grep-bin path              Path of the grep binary to be used"
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
     echo "      --http-use-get               Use GET instead of HEAD (default) for the"
@@ -726,7 +728,7 @@ hours_until() {
         debuglog "Computing date with dconv"
 
         # detect the date -j required format
-        if date --help 2>&1 | grep -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]'; then
+        if date --help 2>&1 | "${GREP_BIN}" -q '\[\[\[mm\]dd]HH\]MM\[\[cc\]yy\]\[\.ss\]\]'; then
 
             # e.g., macOS
 
@@ -742,7 +744,7 @@ hours_until() {
 
             debuglog "hours computed with ${DCONV_BIN}: ${HOURS_UNTIL}"
 
-        elif date --help 2>&1 | grep -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]'; then
+        elif date --help 2>&1 | "${GREP_BIN}" -q '\[\[\[\[\[\[cc\]yy\]mm\]dd\]HH\]MM\[\.SS\]\]'; then
 
             # e.g., old BSD
 
@@ -810,7 +812,7 @@ days_to_seconds() {
 
     NUMBER_OF_DAYS=$1
 
-    if echo "${NUMBER_OF_DAYS}" | grep -q '^[0-9][0-9]*$'; then
+    if echo "${NUMBER_OF_DAYS}" | "${GREP_BIN}" -q '^[0-9][0-9]*$'; then
         debuglog "Converting ${NUMBER_OF_DAYS} days into seconds by shell function"
         NUMBER_OF_SECONDS=$((NUMBER_OF_DAYS * 86400))
     else
@@ -846,7 +848,7 @@ openssl_version() {
 ${MIN_VERSION}
 EOF
 
-    if echo "${MIN_MINOR}" | grep -q '[[:alpha:]]'; then
+    if echo "${MIN_MINOR}" | "${GREP_BIN}" -q '[[:alpha:]]'; then
         MIN_FIX=$(echo "${MIN_MINOR}" | sed 's/[[:digit:]][[:digit:]]*//')
         MIN_MINOR=$(echo "${MIN_MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//')
     fi
@@ -867,7 +869,7 @@ EOF
 ${OPENSSL_VERSION}
 EOF
 
-    if echo "${MINOR}" | grep -q '[[:alpha:]]'; then
+    if echo "${MINOR}" | "${GREP_BIN}" -q '[[:alpha:]]'; then
         FIX=$(echo "${MINOR}" | sed 's/[[:digit:]][[:digit:]]*//')
         MINOR=$(echo "${MINOR}" | sed 's/[[:alpha:]][[:alpha:]]*//')
     fi
@@ -928,7 +930,7 @@ prepend_critical_message() {
     debuglog "prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
 
     if [ -n "${CN}" ]; then
-        if echo "${CN}" | grep -q -F 'unavailable'; then
+        if echo "${CN}" | "${GREP_BIN}" -q -F 'unavailable'; then
             tmp=" ${SUBJECT_ALTERNATIVE_NAME}"
         else
             tmp=" ${CN}"
@@ -1128,7 +1130,7 @@ append_warning_message() {
     debuglog "prepend_warning_message: ALL_MSG 1   = ${ALL_MSG}"
 
     if [ -n "${CN}" ]; then
-        if echo "${CN}" | grep -q -F 'unavailable'; then
+        if echo "${CN}" | "${GREP_BIN}" -q -F 'unavailable'; then
             tmp=" ${SUBJECT_ALTERNATIVE_NAME}"
         else
             tmp=" ${CN}"
@@ -1272,7 +1274,7 @@ compute() {
 check_integer() {
     value=$1
     message=$2
-    if ! echo "$1" | grep -q '^[0-9][0-9]*$'; then
+    if ! echo "$1" | "${GREP_BIN}" -q '^[0-9][0-9]*$'; then
         unknown "${message}"
     fi
 }
@@ -1285,7 +1287,7 @@ check_integer() {
 check_float() {
     value=$1
     message=$2
-    if ! echo "$1" | grep -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$'; then
+    if ! echo "$1" | "${GREP_BIN}" -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$'; then
         unknown "${message}"
     fi
 }
@@ -1298,7 +1300,7 @@ check_float() {
 #
 require_s_client_option() {
     debuglog "Checking if s_client supports the $1 option"
-    if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "$1"; then
+    if ! "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -- "$1"; then
         unknown "s_client does not support the $1 option"
     fi
 }
@@ -1311,7 +1313,7 @@ require_s_client_option() {
 #
 require_x509_option() {
     debuglog "Checking if x509 supports the required $1 option"
-    if ! "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"; then
+    if ! "${OPENSSL}" x509 -help 2>&1 | "${GREP_BIN}" -q -- "[[:blank:]]$1[[:blank:]]"; then
         unknown "x509 does not support the $1 option$2"
     fi
 }
@@ -1326,7 +1328,7 @@ require_x509_option() {
 #
 check_x509_option() {
     debuglog "Checking if x509 supports the $1 option"
-    "${OPENSSL}" x509 -help 2>&1 | grep -q -- "[[:blank:]]$1[[:blank:]]"
+    "${OPENSSL}" x509 -help 2>&1 | "${GREP_BIN}" -q -- "[[:blank:]]$1[[:blank:]]"
     return $?
 }
 
@@ -1349,12 +1351,12 @@ parse_subject() {
     #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
     # if the field could contain UTF-8 characters (and -nameopt utf8 is specified) there it no space around =
 
-    if echo "${SUBJECT}" | grep -q '^subject=\ \/'; then
+    if echo "${SUBJECT}" | "${GREP_BIN}" -q '^subject=\ \/'; then
 
         # old format
         debuglog "  old format separated by /"
 
-        if echo "${SUBJECT}" | grep -q "${FIELD}=" ; then
+        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}=" ; then
             echo "${SUBJECT}" | sed -e "s/.*\\/${FIELD}=//" -e 's/\/.*//'
         fi
 
@@ -1363,9 +1365,9 @@ parse_subject() {
         # new format
         debuglog "  new format separated by ,"
 
-        if echo "${SUBJECT}" | grep -q "${FIELD}\\ *=" ; then
+        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}\\ *=" ; then
 
-            if echo "${SUBJECT}" | grep -q "${FIELD}\\ *=\\ *\""; then
+            if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}\\ *=\\ *\""; then
                 # quotes
                 debuglog "  quotes"
                 echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *\"//" -e 's/".*//'
@@ -1399,7 +1401,7 @@ extract_cert_attribute() {
     # shellcheck disable=SC2086,SC2016
     case $1 in
     cn)
-        if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject 2>/dev/null | grep -F -q 'CN' >/dev/null; then
+        if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject 2>/dev/null | "${GREP_BIN}" -F -q 'CN' >/dev/null; then
             echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject |
                 sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//" -e 's/\/[[:alpha:]][[:alpha:]]*=.*$//' -e "s/,.*//"
         else
@@ -1436,7 +1438,7 @@ extract_cert_attribute() {
             sed 's/^\ *//'
         ;;
     issuer_uri)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -F "CA Issuers" | grep -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -F "CA Issuers" | "${GREP_BIN}" -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
         ;;
     issuer_uri_single)
         extract_cert_attribute 'issuer_uri' "${cert_content}" | head -n 1
@@ -1453,7 +1455,7 @@ extract_cert_attribute() {
         parse_subject "OU" "${cert_subject}"
         ;;
     key_length)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
         ;;
     country)
         cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
@@ -1472,12 +1474,12 @@ extract_cert_attribute() {
         ;;
     crl_uri)
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -text |
-            grep -F -A 4 'X509v3 CRL Distribution Points' |
-            grep -F URI |
+            "${GREP_BIN}" -F -A 4 'X509v3 CRL Distribution Points' |
+            "${GREP_BIN}" -F URI |
             sed 's/^.*URI://'
         ;;
     version)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep Version | head -n 1 | sed 's/.*Version:\ //'
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version:\ //'
         ;;
 
     sig_algo)
@@ -1487,9 +1489,9 @@ extract_cert_attribute() {
         #
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
-        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Public Key Algorithm' | sed -e 's/.*:\ //')
+        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*:\ //')
 
-        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | grep -m 1 -F 'Public-Key' | sed 's/.*:\ //' )
+        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*:\ //' )
 
         echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
@@ -1501,11 +1503,11 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
         ;;
     sct)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | grep -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
         ;;
     subjectAlternativeName)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text |
-            grep -F -A 1 "509v3 Subject Alternative Name:" |
+            "${GREP_BIN}" -F -A 1 "509v3 Subject Alternative Name:" |
             tail -n 1 |
             sed -e "s/DNS://g" |
             sed -e "s/IP Address://g" |
@@ -1514,11 +1516,11 @@ extract_cert_attribute() {
         ;;
     keyUsage)
         KEY_USAGE_TMP=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1 )
-        if echo "${KEY_USAGE_TMP}" | grep -q 'No extensions in certificate' ; then
+        if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q 'No extensions in certificate' ; then
             echo
         else
 
-            if echo "${KEY_USAGE_TMP}" | grep -q critical ; then
+            if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q critical ; then
                 PURPOSE_CRITICAL=1
             fi
             PURPOSE=$( echo "${KEY_USAGE_TMP}" | tail -n 1 | sed 's/^[[:blank:]]*//')
@@ -1562,7 +1564,7 @@ exec_with_timeout() {
     debuglog "  TIMEOUT_REASON = ${TIMEOUT_REASON}"
 
     if [ -n "${TIMEOUT_REASON}" ] ; then
-        if ! echo "${TIMEOUT_REASON}" | grep -q '^ '; then
+        if ! echo "${TIMEOUT_REASON}" | "${GREP_BIN}" -q '^ '; then
             # add a blank before the reason in parenthesis
             TIMEOUT_REASON=" (${TIMEOUT_REASON})"
         fi
@@ -1748,7 +1750,7 @@ check_crl() {
         debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
         CRL_RESULT=$(
             "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}" "${CERT_ELEMENT}" 2>&1 |
-                grep -F ':' |
+                "${GREP_BIN}" -F ':' |
                 head -n 1 |
                 sed 's/^.*:\ //'
         )
@@ -1838,7 +1840,7 @@ check_ocsp() {
             if [ "${ELEMENT_ISSUER_URI}" != "${ELEMENT_ISSUER_URI_WO_SPACES_TMP}" ]; then
                 verboselog "Warning: unable to fetch the CA issuer certificate (spaces in URI): skipping"
                 continue
-            elif ! echo "${ELEMENT_ISSUER_URI}" | grep -q -i '^http'; then
+            elif ! echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -q -i '^http'; then
                 verboselog "Warning: unable to fetch the CA issuer certificate (unsupported protocol): skipping"
                 continue
             fi
@@ -1857,7 +1859,7 @@ check_ocsp() {
                 TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
                 debuglog "OCSP: issuer certificate type (1): ${TYPE_TMP}"
 
-                if echo "${ELEMENT_ISSUER_URI}" | grep -F -q 'p7c'; then
+                if echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -F -q 'p7c'; then
                     debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
 
                     open_for_writing "${ISSUER_CERT_TMP2}"
@@ -1871,15 +1873,15 @@ check_ocsp() {
                 debuglog "OCSP: issuer certificate type (2): ${TYPE_TMP}"
 
                 # check for errors
-                if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q HTML; then
+                if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q HTML; then
                     debuglog "OCSP: HTML page returned instead of a certificate"
                     critical "Unable to fetch a valid certificate issuer certificate (HTML page returned)."
                 fi
 
                 # check the result
-                if ! "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q '(ASCII|PEM)'; then
+                if ! "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(ASCII|PEM)'; then
 
-                    if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q '(data|Certificate)'; then
+                    if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
 
                         debuglog "OCSP: converting issuer certificate from DER to PEM"
 
@@ -1888,7 +1890,7 @@ check_ocsp() {
 
                         ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
-                    elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | grep -E -q 'empty'; then
+                    elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q 'empty'; then
 
                         # empty certs are allowed
                         debuglog "OCSP empty certificate detected: skipping"
@@ -1965,13 +1967,13 @@ check_ocsp() {
                 # ocsp -header is supported in OpenSSL versions from 1.0.0, but not documented until 1.1.0
                 # so we check if the major version is greater than 0
                 OPENSSL_VERSION_TMP="$(${OPENSSL} version | sed -e 's/OpenSSL \([0-9]\).*/\1/g')"
-                if "${OPENSSL}" version | grep -q '^LibreSSL' || [ "${OPENSSL_VERSION_TMP}" -gt 0 ]; then
+                if "${OPENSSL}" version | "${GREP_BIN}" -q '^LibreSSL' || [ "${OPENSSL_VERSION_TMP}" -gt 0 ]; then
 
                     debuglog "openssl ocsp supports the -header option"
 
                     # the -header option was first accepting key and value separated by space. The newer versions are using key=value
                     KEYVALUE=""
-                    if ${OPENSSL} ocsp -help 2>&1 | grep -F header | grep -F -q 'key=value'; then
+                    if ${OPENSSL} ocsp -help 2>&1 | "${GREP_BIN}" -F header | "${GREP_BIN}" -F -q 'key=value'; then
                         debuglog "${OPENSSL} ocsp -header requires 'key=value'"
                         KEYVALUE=1
                     else
@@ -2010,21 +2012,21 @@ check_ocsp() {
                     MESSAGE_TMP="$(echo "${OCSP_RESP}" | sed 's/^/OCSP: response = /')"
                     debuglog "${MESSAGE_TMP}"
 
-                    if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | grep -F -q -i "timeout on connect"; then
+                    if [ -n "${OCSP_IGNORE_TIMEOUT}" ] && echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "timeout on connect"; then
 
                         debuglog 'OCSP: Timeout on connect'
 
-                    elif echo "${OCSP_RESP}" | grep -F -q -i "revoked"; then
+                    elif echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "revoked"; then
 
                         debuglog 'OCSP: revoked'
 
                         prepend_critical_message "certificate element ${el_number} is revoked (OCSP)"
 
-                    elif echo "${OCSP_RESP}" | grep -F -q -i "internalerror" && [ -n "${OCSP_IGNORE_ERRORS}" ]; then
+                    elif echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "internalerror" && [ -n "${OCSP_IGNORE_ERRORS}" ]; then
 
                         verbose 'warning: the OCSP server returned an internal error'
 
-                    elif ! echo "${OCSP_RESP}" | grep -F -q -i "good"; then
+                    elif ! echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "good"; then
 
                         debuglog "OCSP: not good. HTTP_PROXY = ${HTTP_PROXY}"
 
@@ -2409,7 +2411,7 @@ fetch_certificate() {
             create_temporary_file
             CONVERSION_ERROR=${TEMPFILE}
 
-            if echo "${FILE}" | grep -q -E '[.](p12|pkcs12|pfx)$'; then
+            if echo "${FILE}" | "${GREP_BIN}" -q -E '[.](p12|pkcs12|pfx)$'; then
 
                 debuglog 'converting PKCS #12 to PEM'
 
@@ -2426,7 +2428,7 @@ fetch_certificate() {
                     unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                 fi
 
-            elif "${FILE_BIN}" -L -b "${FILE}" | grep -q -E '(data|Certificate)'; then
+            elif "${FILE_BIN}" -L -b "${FILE}" | "${GREP_BIN}" -q -E '(data|Certificate)'; then
 
                 debuglog 'converting DER to PEM'
                 "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
@@ -2437,7 +2439,7 @@ fetch_certificate() {
                     debuglog "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                     debuglog "Checking if ${FILE} is DER encoded CRL"
 
-                    if "${OPENSSL}" crl -in "${FILE}" -inform DER 2>/dev/null | grep -F -q "BEGIN X509 CRL"; then
+                    if "${OPENSSL}" crl -in "${FILE}" -inform DER 2>/dev/null | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
 
                         debuglog "The input file is a CRL in DER format: converting to PEM"
 
@@ -2468,9 +2470,9 @@ fetch_certificate() {
             TYPE_TMP="$(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
             debuglog "certificate type (2): ${TYPE_TMP}"
 
-            if ! grep -q -F 'CRL' "${CERT}"; then
+            if ! "${GREP_BIN}" -q -F 'CRL' "${CERT}"; then
 
-                NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+                NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
 
                 if [ "${NUM_CERTIFICATES}" -gt 1 ]; then
                     debuglog "Certificate seems to be ca ca-bundle, splitting it"
@@ -2660,8 +2662,8 @@ fetch_certificate() {
             #     Remove the 'verify and depth' lines
             #     Take the 1st line (seems OK with the use cases I tested)
             ERROR_MESSAGE=$(
-                grep -v '^depth' "${ERROR}" |
-                    grep -v '^verify' |
+                "${GREP_BIN}" -v '^depth' "${ERROR}" |
+                    "${GREP_BIN}" -v '^verify' |
                     head -n 1
             )
 
@@ -2677,12 +2679,12 @@ fetch_certificate() {
             critical "it seems that OpenSSL -starttls does not yet support LDAP"
         fi
 
-        NEGOTIATED_PROTOCOL=$(grep -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
+        NEGOTIATED_PROTOCOL=$("${GREP_BIN}" -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
         debuglog "Negotiated protocol: ${NEGOTIATED_PROTOCOL}"
 
         # check if the protocol was really HTTP/2
         if [ "${PROTOCOL}" = 'h2' ]; then
-            if ! grep -q -F 'ALPN protocol: h2' "${CERT}"; then
+            if ! "${GREP_BIN}" -q -F 'ALPN protocol: h2' "${CERT}"; then
                 prepend_critical_message 'The server does not support HTTP/2'
             fi
         fi
@@ -2725,7 +2727,7 @@ var_for_sed() {
 #  $2 file
 #
 ascii_grep() {
-    tr -d '\000' <"$2" | grep -q "$1"
+    tr -d '\000' <"$2" | "${GREP_BIN}" -q "$1"
 }
 
 ################################################################################
@@ -3182,12 +3184,17 @@ parse_command_line_options() {
             FORMAT="$2"
             shift 2
             ;;
+        --grep-bin)
+            check_option_argument '--grep-bin' "$2"
+            GREP_BIN="$2"
+            shift 2
+            ;;
         -H | --host)
             check_option_argument '-H|--host' "$2"
             HOST="$2"
 
             # remove http[s] from the input
-            if echo "${HOST}" | grep -F -q '://'; then
+            if echo "${HOST}" | "${GREP_BIN}" -F -q '://'; then
                 # try to remove the protocol (we do not consider URLs without
                 # an authority (https://en.wikipedia.org/wiki/URL)
                 debuglog "Stripping protocol and path from URL"
@@ -3534,12 +3541,12 @@ $2"
             OPTION="${1}"
             # if the option begins with a single dash and it's longer than one character
             OPTION_TMP="$(echo "${OPTION}" | wc -c | sed 's/\ //g')"
-            if ! echo "${OPTION}" | grep -q -- '^--' &&
+            if ! echo "${OPTION}" | "${GREP_BIN}" -q -- '^--' &&
                 [ "${OPTION_TMP}" -gt 3 ]; then
                 if [ "${DEBUG}" -gt 0 ]; then
                     echo "[DBG]   unknown option ${OPTION}: splitting since it could be an option group" 1>&2
                 fi
-                for letter in $(echo "${OPTION}" | sed 's/^-//' | grep -o .); do
+                for letter in $(echo "${OPTION}" | sed 's/^-//' | "${GREP_BIN}" -o .); do
                     parse_command_line_options "-${letter}"
                 done
                 shift
@@ -3563,6 +3570,14 @@ $2"
 # Main
 ################################################################################
 main() {
+
+    ##############################################################################
+    # we need grep from the bginning (will fix later if --grep-bin is specified)
+    if [ -z "${GREP_BIN}" ]; then
+        GREP_BIN='grep'
+    fi
+    check_required_prog "${GREP_BIN}"
+    GREP_BIN=${PROG}
 
     # Default values
 
@@ -3719,6 +3734,10 @@ main() {
         # should take a look at
         # https://github.com/stephane-chazelas/misc-scripts/blob/master/which_interpreter
 
+        debuglog "grep: ${GREP_BIN}"
+        GREP_VERSION=$( ${GREP_BIN} --version)
+        echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
+
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
@@ -3739,7 +3758,7 @@ main() {
         # enable ciphers warnings
         CHECK_CIPHERS_WARNINGS=1
 
-        if "${OPENSSL}" s_client -help 2>&1 | grep -q -- '-no_ssl2'; then
+        if "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -- '-no_ssl2'; then
             debuglog "s_client supports -no_ssl2: disabling"
             # disable SSL 2.0 and SSL 3.0
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2 -no_ssl3"
@@ -3784,9 +3803,9 @@ main() {
     # - we are not checking a file
     # - we are not checking localhost
     # - we are not checking an IPv6 address (which does not have dots
-    if ! echo "${HOST}" | grep -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | grep -q -F ':'; then
+    if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
         debuglog "Domain for ${HOST} missing"
-        DOMAIN=$(nslookup "${HOST}" | grep ^Name: | head -n 1 | cut -d. -f2-)
+        DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
             critical "Cannot resolve ${HOST}"
         fi
@@ -3796,7 +3815,7 @@ main() {
     fi
 
     # we do quick check if the argument seems an IPv6 address (no validity check)
-    if echo "${HOST}" | grep -q "^[0-9a-fA-F:]*$"; then
+    if echo "${HOST}" | "${GREP_BIN}" -q "^[0-9a-fA-F:]*$"; then
         debuglog "${HOST} seems an IPv6 address without []"
         HOST="[${HOST}]"
     fi
@@ -3807,13 +3826,13 @@ main() {
     if [ -r "${HOST_CACHE}" ]; then
         debuglog "Host cache ${HOST_CACHE} is present"
 
-        if echo "${HOST}" | grep -q -F '[' ; then
+        if echo "${HOST}" | "${GREP_BIN}" -q -F '[' ; then
             PATTERN=$( echo "${HOST}" | sed -e 's/\[//' -e 's/\]//' )
         else
             PATTERN="^${HOST}$"
         fi
 
-        if ! grep -q "${PATTERN}" "${HOST_CACHE}"; then
+        if ! "${GREP_BIN}" -q "${PATTERN}" "${HOST_CACHE}"; then
             debuglog "Adding ${HOST} to the host cache"
             echo "${HOST}" >>"${HOST_CACHE}"
         else
@@ -3837,7 +3856,7 @@ main() {
 
         debuglog "Forcing ${HOST} to resolve to ${RESOLVE}"
 
-        if echo "${RESOLVE}" | grep -q '^[a-fA-F0-9].*:' ; then
+        if echo "${RESOLVE}" | "${GREP_BIN}" -q '^[a-fA-F0-9].*:' ; then
             debuglog "--resolve with an IPv6 (${RESOLVE}) without brackets: adding ([${RESOLVE}])"
             RESOLVE="[${RESOLVE}]"
         fi
@@ -3866,7 +3885,7 @@ main() {
     debuglog "HOST_IS_IP.         = ${HOST_IS_IP}"
     if [ "${HOST_IS_IP}" -eq 0 ]; then
 
-        if ! echo "${HOST_NAME}" | grep -q '^[.a-zA-Z0-9\_\-]*$'; then
+        if ! echo "${HOST_NAME}" | "${GREP_BIN}" -q '^[.a-zA-Z0-9\_\-]*$'; then
             unknown "Invalid host name: ${HOST_NAME}"
         fi
 
@@ -3874,7 +3893,7 @@ main() {
 
     # we accept underscores since some hosts with an underscore exist but these names
     # are invalid: we issue a small warning
-    if echo "${HOST_NAME}" | grep -q '[\_]' && [ -n "${VERBOSE}" ]; then
+    if echo "${HOST_NAME}" | "${GREP_BIN}" -q '[\_]' && [ -n "${VERBOSE}" ]; then
         verboselog "Warning: ${HOST_NAME} contains an underscore (invalid)"
     fi
 
@@ -3910,6 +3929,14 @@ main() {
     FILE_BIN=${PROG}
 
     ##############################################################################
+    # custom grep
+    if [ -z "${GREP_BIN}" ]; then
+        GREP_BIN='grep'
+    fi
+    check_required_prog "${GREP_BIN}"
+    GREP_BIN=${PROG}
+
+    ##############################################################################
     # OpenSSL
     if [ -n "${OPENSSL}" ]; then
         if [ ! -x "${OPENSSL}" ]; then
@@ -3940,7 +3967,7 @@ main() {
         elif [ -f "${ROOT_CA}" ]; then
 
             # check if the file is in DER format and has to be converted
-            if "${FILE_BIN}" -L -b "${ROOT_CA}" | grep -E -q '(data|Certificate)'; then
+            if "${FILE_BIN}" -L -b "${ROOT_CA}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
 
                 create_temporary_file
                 ROOT_CA_PEM=${TEMPFILE}
@@ -4028,7 +4055,7 @@ main() {
     if [ -n "${FILE}" ]; then
         # is $FILE a URI? We detect URIs with an "authority" part, since locat paths are specified directly
         # see https://en.wikipedia.org/wiki/Uniform_Resource_Identifier for the syntax
-        FILE_URI=$(echo "${FILE}" | grep '^[a-z][a-z+.-]*://')
+        FILE_URI=$(echo "${FILE}" | "${GREP_BIN}" '^[a-z][a-z+.-]*://')
         debuglog "${FILE} is an URI with an authority"
     fi
 
@@ -4084,20 +4111,15 @@ main() {
 
     fi
 
-    # check if grep is in the path (see #244)
-    if ! echo 0 | grep 0 >/dev/null 2>&1; then
-        unknown "cannot execute grep: please check the PATH variable (${PATH})"
-    fi
-
     if [ -n "${CRITICAL_DAYS}" ]; then
 
         debuglog "-c specified: ${CRITICAL_DAYS}"
 
-        if ! echo "${CRITICAL_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$'; then
+        if ! echo "${CRITICAL_DAYS}" | "${GREP_BIN}" -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$'; then
             unknown "invalid number of days '${CRITICAL_DAYS}'"
         fi
 
-        if echo "${CRITICAL_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ]; then
+        if echo "${CRITICAL_DAYS}" | "${GREP_BIN}" -q '[.]' && [ -z "${SCALE}" ]; then
             # floating point critical and no precision set
             SCALE=2
         fi
@@ -4108,11 +4130,11 @@ main() {
 
         debuglog "-w specified: ${WARNING_DAYS}"
 
-        if ! echo "${WARNING_DAYS}" | grep -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$'; then
+        if ! echo "${WARNING_DAYS}" | "${GREP_BIN}" -E -q '^[0-9][0-9]*(\.[0-9][0-9]*)?$'; then
             unknown "invalid number of days '${WARNING_DAYS}'"
         fi
 
-        if echo "${WARNING_DAYS}" | grep -q '[.]' && [ -z "${SCALE}" ]; then
+        if echo "${WARNING_DAYS}" | "${GREP_BIN}" -q '[.]' && [ -z "${SCALE}" ]; then
             SCALE=2
         fi
 
@@ -4144,7 +4166,7 @@ main() {
 
         debuglog "--not-valid-longer-than specified: ${NOT_VALID_LONGER_THAN}"
 
-        if ! echo "${NOT_VALID_LONGER_THAN}" | grep -q '^[0-9][0-9]*$'; then
+        if ! echo "${NOT_VALID_LONGER_THAN}" | "${GREP_BIN}" -q '^[0-9][0-9]*$'; then
             unknown "invalid number of days '${NOT_VALID_LONGER_THAN}'"
         fi
 
@@ -4191,7 +4213,7 @@ main() {
     debuglog "ROOT_CA = ${ROOT_CA}"
 
     if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
-        if ! echo "${IGNORE_CONNECTION_STATE}" | grep -q '^[0-3]$'; then
+        if ! echo "${IGNORE_CONNECTION_STATE}" | "${GREP_BIN}" -q '^[0-3]$'; then
             unknown "The specified state (${IGNORE_CONNECTION_STATE}) is not valid (must be 0,1,2 or 3)"
         fi
     fi
@@ -4206,7 +4228,7 @@ main() {
 
     # check if -sigalgs is available
     if [ -n "${RSA}" ] || [ -n "${ECDSA}" ]; then
-        if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- -sigalgs; then
+        if ! "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -F -- -sigalgs; then
             unknown '--rsa or --ecdsa specified but OpenSSL does not support the -sigalgs option'
         fi
     fi
@@ -4219,11 +4241,11 @@ main() {
     if [ -n "${RSA}" ]; then
 
         # check if ciphers with PSS are available
-        if ! "${OPENSSL}" ciphers | grep -q -F 'PSS'; then
+        if ! "${OPENSSL}" ciphers | "${GREP_BIN}" -q -F 'PSS'; then
             NO_PSS=1
         fi
 
-        if echo "${SSL_VERSION_DISABLED}" | grep -F -q -- '-no_tls1_3' ||
+        if echo "${SSL_VERSION_DISABLED}" | "${GREP_BIN}" -F -q -- '-no_tls1_3' ||
             [ "${SSL_VERSION}" = '-tls1' ] ||
             [ "${SSL_VERSION}" = '-tls1_1' ] ||
             [ "${SSL_VERSION}" = '-tls1_2' ] ||
@@ -4277,18 +4299,18 @@ main() {
 
     # nmap does not understand brackets in IPv6 addresses
     NMAP_HOST_ADDR="${HOST_ADDR}"
-    if echo "${NMAP_HOST_ADDR}" | grep -q '^\[' ; then
+    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q '^\[' ; then
         NMAP_HOST_ADDR=$( echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//' )
     fi
 
     # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
     debuglog "Checking IPs: host ${HOST_ADDR}"
-    if echo "${HOST_ADDR}" | grep -q '[a-z]' && ! host "${HOST_ADDR}" | grep -F -q ' has address '; then
+    if echo "${HOST_ADDR}" | "${GREP_BIN}" -q '[a-z]' && ! host "${HOST_ADDR}" | "${GREP_BIN}" -F -q ' has address '; then
         debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
         NMAP_INETPROTO='-6'
     fi
 
-    if echo "${NMAP_HOST_ADDR}" | grep -q ':' ; then
+    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q ':' ; then
         debuglog "host specified as an IPv6 address: forcing IPv6 with nmap"
         NMAP_INETPROTO='-6'
     fi
@@ -4356,13 +4378,13 @@ main() {
 
         debuglog 'checking date version'
 
-        if "${DATEBIN}" --version 2>&1 | grep -F -q GNU; then
+        if "${DATEBIN}" --version 2>&1 | "${GREP_BIN}" -F -q GNU; then
             DATETYPE='GNU'
-        elif "${DATEBIN}" --version 2>&1 | grep -F -q BusyBox; then
+        elif "${DATEBIN}" --version 2>&1 | "${GREP_BIN}" -F -q BusyBox; then
             DATETYPE='BUSYBOX'
         else
             DATETYPE='BSD'
-            if "${DATEBIN}" -f "%b %d %T %Y %Z" '' 2>&1 | grep -q -F 'date: unknown option -- f'; then
+            if "${DATEBIN}" -f "%b %d %T %Y %Z" '' 2>&1 | "${GREP_BIN}" -q -F 'date: unknown option -- f'; then
                 debuglog "Old BSD date without -f: checking for dconv"
 
                 DCONV_BIN=$(command -v dconv)
@@ -4411,9 +4433,9 @@ main() {
 
         DEFAULT_CA=0
         if [ -f "${OPENSSL_DIR}"/cert.pem ]; then
-            DEFAULT_CA="$(grep -c BEGIN "${OPENSSL_DIR}"/cert.pem)"
+            DEFAULT_CA="$("${GREP_BIN}" -c BEGIN "${OPENSSL_DIR}"/cert.pem)"
         elif [ -f "${OPENSSL_DIR}"/certs ]; then
-            DEFAULT_CA="$(grep -c BEGIN "${OPENSSL_DIR}"/certs)"
+            DEFAULT_CA="$("${GREP_BIN}" -c BEGIN "${OPENSSL_DIR}"/certs)"
         fi
         debuglog "${DEFAULT_CA} root certificates installed by default"
 
@@ -4432,7 +4454,7 @@ main() {
     #      on standard error for these intermediate versions.
     #
     SERVERNAME=
-    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -servername; then
+    if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -servername; then
 
         if [ -n "${SNI}" ]; then
             SERVERNAME="-servername ${SNI}"
@@ -4451,7 +4473,7 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the specified protocol
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'sieve' ]; then
-        if ${OPENSSL} s_client "${INETPROTO}" -starttls sieve 2>&1 | grep -F -q 'Value must be one of:' || ${OPENSSL} s_client -starttls sieve 2>&1 | grep -F -q 'error: usage:'; then
+        if ${OPENSSL} s_client "${INETPROTO}" -starttls sieve 2>&1 | "${GREP_BIN}" -F -q 'Value must be one of:' || ${OPENSSL} s_client -starttls sieve 2>&1 | "${GREP_BIN}" -F -q 'error: usage:'; then
             unknown "OpenSSL does not support the protocol sieve"
         fi
     fi
@@ -4504,13 +4526,13 @@ main() {
             HTTPS_PROXY="${HTTP_PROXY}"
         fi
 
-        if [ -n "${CURL_BIN}" ] && ${CURL_BIN} --manual | grep -F -q -- --proxy; then
+        if [ -n "${CURL_BIN}" ] && ${CURL_BIN} --manual | "${GREP_BIN}" -F -q -- --proxy; then
             debuglog "Adding --proxy ${HTTP_PROXY} to the curl options"
             CURL_PROXY="--proxy"
             CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
         fi
 
-        if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -proxy; then
+        if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -proxy; then
             SCLIENT_PROXY="-proxy"
             SCLIENT_PROXY_ARGUMENT="$(echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//')"
 
@@ -4564,7 +4586,7 @@ main() {
     # Check if openssl s_client supports the -name option
     #
     S_CLIENT_NAME=
-    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -name || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -name; then
+    if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -name || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -name; then
 
         CURRENT_HOSTNAME=$(hostname)
         S_CLIENT_NAME="-name ${CURRENT_HOSTNAME}"
@@ -4580,7 +4602,7 @@ main() {
     ################################################################################
     # Check if openssl s_client supports the -xmpphost option
     #
-    if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -xmpphost; then
+    if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -xmpphost; then
         XMPPHOST="-xmpphost ${XMPPHOST:-${HOST_NAME}}"
         debuglog "'${OPENSSL} s_client' supports '-xmpphost': using ${XMPPHOST}"
     else
@@ -4594,7 +4616,7 @@ main() {
     ################################################################################
     # check if openssl s_client supports the SSL TLS version
     if [ -n "${SSL_VERSION}" ]; then
-        if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${SSL_VERSION}"; then
+        if ! "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -- "${SSL_VERSION}"; then
             unknown "OpenSSL does not support the ${SSL_VERSION} version"
         fi
     fi
@@ -4610,14 +4632,14 @@ main() {
         fi
 
         # Check if openssl s_client supports the -4 or -6 option
-        if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- "${INETPROTO}"; then
+        if ! "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -- "${INETPROTO}"; then
             unknown "OpenSSL does not support the ${INETPROTO} option"
         fi
 
         # Check if curl is needed and if it supports the -4 and -6 options
         if [ -z "${CURL_BIN}" ]; then
             if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ]; then
-                if ! "${CURL_BIN}" --manual | grep -F -q -- -6 && [ -n "${INETPROTO}" ]; then
+                if ! "${CURL_BIN}" --manual | "${GREP_BIN}" -F -q -- -6 && [ -n "${INETPROTO}" ]; then
                     unknown "curl does not support the ${INETPROTO} option"
                 fi
             fi
@@ -4625,10 +4647,10 @@ main() {
 
         # check if IPv6 is available locally
         if command -v ifconfig >/dev/null; then
-            ifconfig -a | grep -F -q inet6
+            ifconfig -a | "${GREP_BIN}" -F -q inet6
             IPV6_INTERFACE=$?
         elif command -v ip >/dev/null; then
-            ip addr | grep -F -q inet6
+            ip addr | "${GREP_BIN}" -F -q inet6
             IPV6_INTERFACE=$?
         else
             unknown "cannot determine if a network interface has IPv6 configured"
@@ -4683,19 +4705,19 @@ main() {
 
         DNSSEC_ERROR=
         # check for the presence of the Authenticated Data (ad) flag in the header
-        if ! echo "${DIG_OUTPUT}" | grep ';;\ flags:' | grep -q 'ad[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';;\ flags:' | "${GREP_BIN}" -q 'ad[; ]' ; then
             prepend_critical_message "DNSSEC: the Authenticated Data (ad) flag is not present"
             DNSSEC_ERROR=1
         fi
 
         # check the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware
-        if ! echo "${DIG_OUTPUT}" | grep ',\ flags:' | grep -q 'do[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ',\ flags:' | "${GREP_BIN}" -q 'do[; ]' ; then
             prepend_critical_message "DNSSEC: the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware is not present"
             DNSSEC_ERROR=1
         fi
 
         # check for the presence of an additional resource record of type RRSIG, with the same name as the A record.
-        if ! echo "${DIG_OUTPUT}" | grep -q 'RRSIG' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -q 'RRSIG' ; then
             prepend_critical_message "DNSSEC: the RRSIG resource record is not present"
             DNSSEC_ERROR=1
         fi
@@ -4746,9 +4768,9 @@ main() {
 
             # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-            debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | grep '^|'"
+            debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | \"${GREP_BIN}\" '^|'"
 
-            OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | grep '^|')
+            OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" '^|')
 
             debuglog "offered ciphers and protocols:"
             debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
@@ -4756,7 +4778,7 @@ main() {
             DISALLOWED_PROTOCOLS_FAIL=
             for protocol in ${DISALLOWED_PROTOCOLS}; do
                 debuglog "Checking if '${protocol}' is offered"
-                if echo "${OFFERED_PROTOCOLS}" | grep -F -v 'No supported ciphers found' | grep -q "${protocol}"; then
+                if echo "${OFFERED_PROTOCOLS}" | "${GREP_BIN}" -F -v 'No supported ciphers found' | "${GREP_BIN}" -q "${protocol}"; then
                     debuglog "'${protocol}' is offered"
                     DISALLOWED_PROTOCOLS_FAIL=1
                     prepend_critical_message "${protocol} is offered"
@@ -4784,7 +4806,7 @@ main() {
         DIG_BIN=${PROG}
 
         # check if OpenSSL supports -dane_tlsa_rrdata
-        if ${OPENSSL} s_client -help 2>&1 | grep -F -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | grep -F -q -- -dane_tlsa_rrdata; then
+        if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -dane_tlsa_rrdata || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -dane_tlsa_rrdata; then
             DIG_RESULT=$("${DIG_BIN}" +short TLSA "_${PORT}._tcp.${HOST_ADDR}" | while read -r L; do echo " -dane_tlsa_rrdata '${L}' "; done)
             debuglog "Checking DANE (${DANE})"
             debuglog "$(printf '%s\n' "${DIG_BIN} +short TLSA _${PORT}._tcp.${HOST_ADDR} =")"
@@ -4795,19 +4817,19 @@ main() {
                 DANE=$(echo "${DIG_RESULT}" | tr -d '\n')
                 ;;
             211)
-                DANE=$(echo "${DIG_RESULT}" | grep -F '2 1 1' | tr -d '\n')
+                DANE=$(echo "${DIG_RESULT}" | "${GREP_BIN}" -F '2 1 1' | tr -d '\n')
                 ;;
             301)
-                DANE=$(echo "${DIG_RESULT}" | grep -F '3 0 1' | tr -d '\n')
+                DANE=$(echo "${DIG_RESULT}" | "${GREP_BIN}" -F '3 0 1' | tr -d '\n')
                 ;;
             311)
-                DANE=$(echo "${DIG_RESULT}" | grep -F '3 1 1' | tr -d '\n')
+                DANE=$(echo "${DIG_RESULT}" | "${GREP_BIN}" -F '3 1 1' | tr -d '\n')
                 ;;
             312)
-                DANE=$(echo "${DIG_RESULT}" | grep -F '3 1 2' | tr -d '\n')
+                DANE=$(echo "${DIG_RESULT}" | "${GREP_BIN}" -F '3 1 2' | tr -d '\n')
                 ;;
             302)
-                DANE=$(echo "${DIG_RESULT}" | grep -F '3 0 2' | tr -d '\n')
+                DANE=$(echo "${DIG_RESULT}" | "${GREP_BIN}" -F '3 0 2' | tr -d '\n')
                 ;;
             *)
                 unknown "Internal error: unknown DANE check type ${DANE}"
@@ -4832,7 +4854,7 @@ main() {
     # OpenSSL 3.0.0 gives an error for legacy renegotiation: ignore the error if --ignore-tls-renegotiation was specified
     if [ -n "${IGNORE_TLS_RENEGOTIATION}" ]; then
         debuglog "--ignore-tls-renegotiation specified: checking OpenSSL version and -legacy_renegotiation support"
-        if "${OPENSSL}" s_client -help 2>&1 | grep -q -F -- "-legacy_renegotiation"; then
+        if "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -F -- "-legacy_renegotiation"; then
             debuglog "OpenSSL s_client supports the -legacy_renegotiation option"
             RENEGOTIATION="-legacy_renegotiation"
         fi
@@ -4853,7 +4875,7 @@ main() {
 
             debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | grep -q "${PORT}.*open" ; then
+            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open" ; then
 
                 if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
 
@@ -4997,11 +5019,11 @@ main() {
             TIMEOUT_REASON="checking TLS renegotiation"
             case "${PROTOCOL}" in
             pop3 | ftp | smtp | irc | ldap | imap | postgres | postgresql | sieve | xmpp | xmpp-server | mysql)
-                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -starttls ${PROTOCOL} 2>&1 | grep -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -starttls ${PROTOCOL} 2>&1 | ${GREP_BIN} -F -q err"
                 RET=$?
                 ;;
             *)
-                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} 2>&1 | grep -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} 2>&1 | ${GREP_BIN} -F -q err"
                 RET=$?
                 ;;
             esac
@@ -5036,8 +5058,8 @@ main() {
 
                 debuglog "  checking ${ca}"
 
-                if ! grep "${ca}" "${CERT}" | grep -q '^C\ =\ ' &&
-                    ! grep "${ca}" "${CERT}" | grep -q '^\/C='; then
+                if ! "${GREP_BIN}" "${ca}" "${CERT}" | "${GREP_BIN}" -q '^C\ =\ ' &&
+                    ! "${GREP_BIN}" "${ca}" "${CERT}" | "${GREP_BIN}" -q '^\/C='; then
                     prepend_critical_message "${ca} is not listed as an acceptable client certificate CA"
                 fi
 
@@ -5059,7 +5081,7 @@ main() {
 
                 if [ -r "${FILE}" ]; then
 
-                    if "${OPENSSL}" crl -in "${CERT}" -inform DER | grep -F -q "BEGIN X509 CRL"; then
+                    if "${OPENSSL}" crl -in "${CERT}" -inform DER | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
                         debuglog "File is DER encoded CRL"
 
                         OPENSSL_COMMAND="crl"
@@ -5178,10 +5200,10 @@ main() {
                     debuglog "  Check if '${purpose}' is defined"
 
                     # the purposes are in a 'comma space' separated list
-                    if ! echo "${KEY_USAGE}" | grep -q -i "^${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | grep -q -i "^${purpose},\\ " &&
-                            ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | grep -q -i ",\\ ${purpose},\\ " ; then
+                    if ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}$" &&
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose},\\ " &&
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ",\\ ${purpose}$" &&
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ",\\ ${purpose},\\ " ; then
                         prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
                     fi
 
@@ -5208,7 +5230,7 @@ EOF
         debuglog "Extracting issuers"
 
         # count the certificates in the chain
-        NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+        NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
         debuglog "  Number of certificates in the chain: ${NUM_CERTIFICATES}"
 
         debuglog "Checking certificate chain"
@@ -5218,7 +5240,7 @@ EOF
         while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
 
             debuglog "    extracting issuer for element ${CERT_IN_CHAIN}"
-            if echo "${SKIP_ELEMENT}" | grep -q "${CERT_IN_CHAIN}"; then
+            if echo "${SKIP_ELEMENT}" | "${GREP_BIN}" -q "${CERT_IN_CHAIN}"; then
                 debuglog "    skipping element ${CERT_IN_CHAIN}"
                 CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
                 continue
@@ -5234,7 +5256,7 @@ EOF
 
             # get the organization and common name
 
-            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | grep -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//')"
+            ELEMENT_ISSUER="$(extract_cert_attribute 'issuer' "${CERT_ELEMENT}" | ${GREP_BIN} -E "^(O|CN) ?= ?" | sed 's/^[^=]*=//')"
 
             MESSAGE="$(echo "${ELEMENT_ISSUER}" | sed 's/^/ELEMENT_ISSUER=/')"
             debuglog "${MESSAGE}"
@@ -5262,14 +5284,14 @@ EOF
     # Check OCSP stapling
     if [ -n "${REQUIRE_OCSP_STAPLING}" ]; then
 
-        grep -F -A 17 'OCSP response:' "${CERT}" >"${OCSP_RESPONSE_TMP}"
+        "${GREP_BIN}" -F -A 17 'OCSP response:' "${CERT}" >"${OCSP_RESPONSE_TMP}"
 
         debuglog "${OCSP_RESPONSE_TMP}"
 
         if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}"; then
             prepend_critical_message "OCSP stapling not enabled"
         else
-            NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
+            NEXT_UPDATE=$("${GREP_BIN}" -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
             OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
             verboselog "OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             if [ -n "${OCSP_CRITICAL}" ] && compare "${OCSP_CRITICAL}" '>=' "${OCSP_EXPIRES_IN_HOURS}"; then
@@ -5308,7 +5330,7 @@ EOF
     ISSUER_INFO="$(echo ${ISSUERS})"
     info "Issuers" "${ISSUER_INFO}"
 
-    if echo "${SIGNATURE_ALGORITHM}" | grep -F -q "sha1"; then
+    if echo "${SIGNATURE_ALGORITHM}" | "${GREP_BIN}" -F -q "sha1"; then
 
         if [ -n "${NOSIGALG}" ]; then
 
@@ -5322,7 +5344,7 @@ EOF
 
     fi
 
-    if echo "${SIGNATURE_ALGORITHM}" | grep -F -qi "md5"; then
+    if echo "${SIGNATURE_ALGORITHM}" | "${GREP_BIN}" -F -qi "md5"; then
 
         if [ -n "${NOSIGALG}" ]; then
 
@@ -5342,7 +5364,7 @@ EOF
 
         check_attr() {
             ATTR="$1"
-            if ! echo "${VALID_ATTRIBUTES}" | grep -q ",${ATTR},"; then
+            if ! echo "${VALID_ATTRIBUTES}" | "${GREP_BIN}" -q ",${ATTR},"; then
                 unknown "Invalid certificate attribute: ${ATTR}"
             else
                 # shellcheck disable=SC2086
@@ -5411,21 +5433,21 @@ EOF
             # 1) common name
             # Common name is case insensitive: using grep for comparison (and not 'case' with 'shopt -s nocasematch' as not defined in POSIX
             debuglog "    common name"
-            if echo "${CN}" | grep -q -i '^\*\.'; then
+            if echo "${CN}" | "${GREP_BIN}" -q -i '^\*\.'; then
 
                 # wildcard
 
                 # Or the literal with the wildcard
                 CN_TMP="$(echo "${CN}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
                 debuglog "        checking (1) if ${name} matches ^${CN_TMP}\$"
-                if echo "${name}" | grep -q -i "^${CN_TMP}\$"; then
+                if echo "${name}" | "${GREP_BIN}" -q -i "^${CN_TMP}\$"; then
                     debuglog "        ${name} matches ^${CN_TMP}\$"
                     ok="true"
                 fi
 
                 # Or if both are exactly the same
                 debuglog "      checking (2) if the ${name} matches ^${CN}\$"
-                if echo "${name}" | grep -q -i "^${CN}\$"; then
+                if echo "${name}" | "${GREP_BIN}" -q -i "^${CN}\$"; then
                     debuglog "        ${name} matches ^${CN}\$"
                     ok="true"
                 fi
@@ -5433,7 +5455,7 @@ EOF
             else
 
                 debuglog "      checking if (3) ${name} matches ^${CN}\$"
-                if echo "${name}" | grep -q -i "^${CN}$"; then
+                if echo "${name}" | "${GREP_BIN}" -q -i "^${CN}$"; then
                     debuglog "        ${name} matches ^${CN}\$"
                     ok="true"
                 fi
@@ -5448,14 +5470,14 @@ EOF
 
                     debuglog "      check altname: ${alt_name}"
 
-                    if echo "${alt_name}" | grep -q -i '^\*\.'; then
+                    if echo "${alt_name}" | "${GREP_BIN}" -q -i '^\*\.'; then
 
                         # Match the domain
                         debuglog "        the altname ${alt_name} begins with a '*'"
                         ALT_NAME_TMP="$(echo "${alt_name}" | cut -c 3-)"
                         debuglog "        checking if (4) ${name} matches ^${ALT_NAME_TMP}\$"
 
-                        if echo "${name}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                        if echo "${name}" | "${GREP_BIN}" -q -i "^${ALT_NAME_TMP}\$"; then
                             debuglog "        ${name} matches ^${ALT_NAME_TMP}\$"
                             ok="true"
                         fi
@@ -5464,7 +5486,7 @@ EOF
                         ALT_NAME_TMP="$(echo "${alt_name}" | sed -e 's/[.]/[.]/g' -e 's/[*]/[A-Za-z0-9_\-]*/')"
                         debuglog "      checking if (5) ${name} matches ^${ALT_NAME_TMP}\$"
 
-                        if echo "${name}" | grep -q -i "^${ALT_NAME_TMP}\$"; then
+                        if echo "${name}" | "${GREP_BIN}" -q -i "^${ALT_NAME_TMP}\$"; then
                             debuglog "        ${name} matches ^${ALT_NAME_TMP}\$"
                             ok="true"
                         fi
@@ -5472,14 +5494,14 @@ EOF
                         # Or if both are exactly the same
                         debuglog "        checking if (6) ${name} matches ^${alt_name}\$"
 
-                        if echo "${name}" | grep -q -i "^${alt_name}\$"; then
+                        if echo "${name}" | "${GREP_BIN}" -q -i "^${alt_name}\$"; then
                             debuglog "        ${name} matches ^${alt_name}\$"
                             ok="true"
                         fi
 
                     else
 
-                        if echo "${name}" | grep -q -i "^${alt_name}$"; then
+                        if echo "${name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
                             debuglog "      ${name} matches ^${alt_name}\$"
                             ok="true"
                         fi
@@ -5514,7 +5536,7 @@ EOF
         debuglog "check ISSUER: ${ISSUER}"
 
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | grep -E "^${ISSUER}\$" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | "${GREP_BIN}" -E "^${ISSUER}\$" | head -n1)
 
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
@@ -5536,10 +5558,10 @@ EOF
 
         debuglog "check NOT_ISSUED_BY: ${NOT_ISSUED_BY}"
 
-        debuglog "  executing echo \"${ISSUERS}\" | sed -E -e \"s/^(O|CN) ?= ?//\" | grep -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
+        debuglog "  executing echo \"${ISSUERS}\" | sed -E -e \"s/^(O|CN) ?= ?//\" | ${GREP_BIN} -E \"^${NOT_ISSUED_BY}\$\" | head -n1"
 
         ok=""
-        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | grep -E "^${NOT_ISSUED_BY}\$" | head -n1)
+        CA_ISSUER_MATCHED=$(echo "${ISSUERS}" | sed -E -e "s/^(O|CN) ?= ?//" | "${GREP_BIN}" -E "^${NOT_ISSUED_BY}\$" | head -n1)
 
         debuglog "   issuer matched = ${CA_ISSUER_MATCHED}"
 
@@ -5550,7 +5572,7 @@ EOF
             prepend_critical_message "invalid CA ('${NOT_ISSUED_BY_TMP}' matches '${ISSUERS_TMP}')"
         else
             ok="true"
-            CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | grep -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
+            CA_ISSUER_MATCHED="$(echo "${ISSUERS}" | ${GREP_BIN} -E "^CN ?= ?" | sed -E -e "s/^CN ?= ?//" | head -n1)"
         fi
 
     else
@@ -5565,7 +5587,7 @@ EOF
 
         ok=""
 
-        if echo "${SERIAL}" | grep -q "^${SERIAL_LOCK}\$"; then
+        if echo "${SERIAL}" | "${GREP_BIN}" -q "^${SERIAL_LOCK}\$"; then
             ok="true"
         fi
 
@@ -5583,7 +5605,7 @@ EOF
 
         ok=""
 
-        if echo "${FINGERPRINT}" | grep -q -E "^${FINGERPRINT_LOCK}\$"; then
+        if echo "${FINGERPRINT}" | "${GREP_BIN}" -q -E "^${FINGERPRINT_LOCK}\$"; then
             ok="true"
         fi
 
@@ -5607,7 +5629,7 @@ EOF
             check_cert_end_date "${DATE_TMP}"
         else
             # count the certificates in the chain
-            NUM_CERTIFICATES=$(grep -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+            NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
 
             CERT_IN_CHAIN=1
@@ -5616,7 +5638,7 @@ EOF
                 debuglog '------------------------------------------------------------------------------'
                 debuglog "-- Checking element ${CERT_IN_CHAIN}"
 
-                if echo "${SKIP_ELEMENT}" | grep -q "${CERT_IN_CHAIN}"; then
+                if echo "${SKIP_ELEMENT}" | "${GREP_BIN}" -q "${CERT_IN_CHAIN}"; then
                     debuglog "    skipping element ${CERT_IN_CHAIN}"
                     CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
                     continue
@@ -5691,23 +5713,23 @@ EOF
                 NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
                 # check for -Pn warning
-                if ! grep -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
+                if ! "${GREP_BIN}" -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
                     critical "nmap exited with error: ${NMAP_ERROR}"
                 fi
 
             fi
 
-            if ! grep -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
+            if ! "${GREP_BIN}" -F -q '| ssl-enum-ciphers' "${NMAP_OUT}"; then
                 critical "empty nmap result while checking ciphers"
             fi
 
             if [ -n "${CHECK_CIPHERS}" ]; then
 
-                if ! grep -q -F 'least strength' "${NMAP_OUT}"; then
+                if ! "${GREP_BIN}" -q -F 'least strength' "${NMAP_OUT}"; then
                     critical 'nmap does not deliver cipher strength'
                 fi
 
-                NMAP_GRADE=$(grep -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
+                NMAP_GRADE=$("${GREP_BIN}" -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
                 convert_grade "${NMAP_GRADE}"
                 NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
@@ -5722,15 +5744,15 @@ EOF
 
             if [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
 
-                if grep -F -q 'warnings:' "${NMAP_OUT}"; then
+                if "${GREP_BIN}" -F -q 'warnings:' "${NMAP_OUT}"; then
 
                     PARSING_WARNINGS=
                     WARNINGS=
                     while IFS= read -r line; do
 
-                        if echo "${line}" | grep -q -F 'warnings:'; then
+                        if echo "${line}" | "${GREP_BIN}" -q -F 'warnings:'; then
                             PARSING_WARNINGS=1
-                        elif echo "${line}" | grep -q -F ':'; then
+                        elif echo "${line}" | "${GREP_BIN}" -q -F ':'; then
                             PARSING_WARNINGS=
                         elif [ -n "${PARSING_WARNINGS}" ]; then
                             WARNING=$(echo "${line}" | sed 's/|\ *//')
@@ -5801,7 +5823,7 @@ ${WARNING}"
             # We clear the cache only on the first run
             IGNORE_SSL_LABS_CACHE=""
 
-            if grep -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' "${JSON}"; then
+            if "${GREP_BIN}" -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' "${JSON}"; then
                 verboselog '  SSL Labs running at full capacity'
             else
 
@@ -5816,7 +5838,7 @@ ${WARNING}"
                     break
                     ;;
                 'READY')
-                    if ! grep -F -q "grade" "${JSON}"; then
+                    if ! "${GREP_BIN}" -F -q "grade" "${JSON}"; then
 
                         # Something went wrong
                         SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
@@ -5898,7 +5920,7 @@ ${WARNING}"
         debuglog "  ORG          = ${ORG}"
         debuglog "  ORGANIZATION = ${ORGANIZATION}"
 
-        if ! echo "${ORG}" | grep -q -E "^${ORGANIZATION}"; then
+        if ! echo "${ORG}" | "${GREP_BIN}" -q -E "^${ORGANIZATION}"; then
             ORGANIZATION_TMP="$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")"
             prepend_critical_message "invalid organization ('${ORGANIZATION_TMP}' does not match '${ORG}')"
         fi
@@ -5949,7 +5971,7 @@ ${WARNING}"
 
         else
 
-            if ! echo "${EMAIL}" | grep -q -E "^${ADDR}"; then
+            if ! echo "${EMAIL}" | "${GREP_BIN}" -q -E "^${ADDR}"; then
                 EMAIL_TMP="$(echo "${ADDR}" | sed "s/|/ PIPE /g")"
                 prepend_critical_message "invalid email ('${EMAIL_TMP}' does not match ${EMAIL})"
             else
@@ -5986,8 +6008,8 @@ ${WARNING}"
             debuglog "${DEBUG_MESSAGE}"
 
             # Process errors
-            # details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
-            details=$(grep '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://')
+            # details=$(${GREP_BIN} '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
+            details=$("${GREP_BIN}" '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://')
             prepend_critical_message "Cannot verify certificate: ${details}"
 
         fi
@@ -6038,7 +6060,7 @@ ${WARNING}"
         CHECKEDNAMES=""
         if [ -n "${ALTNAMES}" ] && [ -n "${NAMES_TO_BE_CHECKED}" ] && [ "${CN}" != "${NAMES_TO_BE_CHECKED}" ]; then
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
-        elif [ -n "${NAMES_TO_BE_CHECKED}" ] && echo "${CN}" | grep -q -i '^\*\.'; then
+        elif [ -n "${NAMES_TO_BE_CHECKED}" ] && echo "${CN}" | "${GREP_BIN}" -q -i '^\*\.'; then
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
         fi
 

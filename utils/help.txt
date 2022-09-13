@@ -62,6 +62,7 @@
 --format FORMAT;%CA_ISSUER_MATCHED%'
 --format FORMAT;Format output template on success, for
 --format FORMAT;example: '%SHORTNAME% OK %CN% from
+--grep-bin path;Path of the grep binary to be used
 --http-use-get;HTTP related checks
 --http-use-get;Use GET instead of HEAD (default) for the
 --ignore-altnames;Ignore alternative names when matching
