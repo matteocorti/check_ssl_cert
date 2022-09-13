@@ -2548,43 +2548,43 @@ fetch_certificate() {
         debuglog "${MESSAGE_TMP}"
 
         # s_client could verify the server certificate because the server requires a client certificate
-        if ascii_grep '^Client Certificate Types' "${CERT}"; then
+        if ascii_grep '^Client\\ Certificate\\ Types' "${CERT}"; then
 
             verboselog "Warning: the server requires a client certificate"
 
-        elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
-            ascii_grep 'Name or service not known' "${ERROR}" ||
-            ascii_grep 'connect\ argument\ or\ target\ parameter\ malformed\ or\ ambiguous' "${ERROR}"; then
+        elif ascii_grep 'nodename\\ nor\\ servname\\ provided,\\ or\\ not\\ known' "${ERROR}" ||
+            ascii_grep 'Name\\ or\\ service\\ not\\ known' "${ERROR}" ||
+            ascii_grep 'connect\\ argument\\ or\\ target\\ parameter\\ malformed\\ or\\ ambiguous' "${ERROR}"; then
 
             ERROR="${HOST_ADDR} is not a valid hostname"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'Connection\ refused' "${ERROR}"; then
+        elif ascii_grep 'Connection\\ refused' "${ERROR}"; then
 
             ERROR='Connection refused'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'No route to host' "${ERROR}"; then
+        elif ascii_grep 'No\\ route\\ to\\ host' "${ERROR}"; then
 
-            ERROR='No route to host'
+            ERROR='No\\ route\\ to\\ host'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'Connection timed out' "${ERROR}"; then
+        elif ascii_grep 'Connection\\ timed\\ out' "${ERROR}"; then
 
             ERROR='OpenSSL connection timed out'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'unable to get local issuer certificate' "${ERROR}"; then
+        elif ascii_grep 'unable\\ to\\ get\\ local\\ issuer\\ certificate' "${ERROR}"; then
 
             if [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
                 prepend_critical_message 'Error verifying the certificate chain'
             fi
 
-        elif ascii_grep 'self[ -]signed certificate' "${ERROR}"; then
+        elif ascii_grep 'self[ -]signed\\ certificate' "${ERROR}"; then
 
             debuglog "self-signed certificate"
 
@@ -2592,33 +2592,33 @@ fetch_certificate() {
                 prepend_critical_message 'Self signed certificate'
             fi
 
-        elif ascii_grep 'dh\ key\ too\ small' "${ERROR}"; then
+        elif ascii_grep 'dh\\ key\\ too\\ small' "${ERROR}"; then
 
             prepend_critical_message 'DH with a key too small'
 
-        elif ascii_grep 'alert\ handshake\ failure' "${ERROR}"; then
+        elif ascii_grep 'alert\\ handshake\\ failure' "${ERROR}"; then
 
             prepend_critical_message 'Handshake failure'
 
-        elif ascii_grep 'wrong\ version\ number' "${ERROR}"; then
+        elif ascii_grep 'wrong\\ version\\ number' "${ERROR}"; then
 
             prepend_critical_message 'No TLS connection possible'
 
-        elif ascii_grep 'tlsv1 alert decode error' "${ERROR}"; then
+        elif ascii_grep 'tlsv1\\ alert\\ decode\\ error' "${ERROR}"; then
 
             prepend_critical_message 'Error decoding certificate'
 
-        elif ascii_grep 'excessive message size' "${ERROR}"; then
+        elif ascii_grep 'excessive\\ message\\ size' "${ERROR}"; then
 
             prepend_critical_message 'Error fetching the certificate (excessive message size)'
 
-        elif ascii_grep 'gethostbyname failure' "${ERROR}"; then
+        elif ascii_grep 'gethostbyname\\ failure' "${ERROR}"; then
 
             ERROR='Invalid host name'
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'Operation\ timed\ out' "${ERROR}"; then
+        elif ascii_grep 'Operation\\\ timed\\\ out' "${ERROR}"; then
 
             ERROR='OpenSSL timed out'
             prepend_critical_message "${ERROR}"
@@ -2630,25 +2630,25 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep "Didn't find STARTTLS in server response, trying anyway..." "${ERROR}"; then
+        elif ascii_grep "Didn't\\ find\\ STARTTLS\\ in\\ server\\ response,\\ trying\\ anyway..." "${ERROR}"; then
 
             ERROR="Didn't find STARTTLS in server response"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep "unsafe legacy renegotiation disabled" "${ERROR}"; then
+        elif ascii_grep "unsafe\\ legacy\\ renegotiation\\ disabled" "${ERROR}"; then
 
             ERROR="The server does not support the Renegotiation Indication Extension"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep "no certificate or crl found" "${ERROR}"; then
+        elif ascii_grep "no\\ certificate\\ or\\ crl\\ found" "${ERROR}"; then
 
             ERROR="Cannot read or parse the supplied certificate (e.g., root certificate)"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep "Unable to load certificate file" "${ERROR}"; then
+        elif ascii_grep "Unable\\ to\\ load\\ certificate\\ file" "${ERROR}"; then
 
             ERROR="Cannot read certificate file"
             prepend_critical_message "${ERROR}"
@@ -4948,11 +4948,12 @@ main() {
 
     fetch_certificate
 
-    if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}"; then
+    if ascii_grep 'sslv3\\ alert\\ unexpected\\ message' "${ERROR}"; then
 
         if [ -n "${SERVERNAME}" ]; then
 
             verboselog "'${OPENSSL} s_client' returned an error: trying without '-servername'"
+            debuglog "'${OPENSSL} s_client' returned an error: trying without '-servername'"
 
             SERVERNAME=""
             fetch_certificate
@@ -5028,7 +5029,7 @@ main() {
 
         debuglog "Checking required client cert CAs"
 
-        if ascii_grep "No client certificate CA names sent" "${CERT}"; then
+        if ascii_grep "No\\ client\\ certificate\\ CA\\ names\\ sent" "${CERT}"; then
             prepend_critical_message "Did not return any client certificate CA names"
         else
 
@@ -5266,7 +5267,7 @@ EOF
 
         debuglog "${OCSP_RESPONSE_TMP}"
 
-        if ! ascii_grep 'Next Update' "${OCSP_RESPONSE_TMP}"; then
+        if ! ascii_grep 'Next\\ Update' "${OCSP_RESPONSE_TMP}"; then
             prepend_critical_message "OCSP stapling not enabled"
         else
             NEXT_UPDATE=$(grep -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
@@ -5962,7 +5963,7 @@ ${WARNING}"
 
     ################################################################################
     # Check if the certificate was verified
-    if [ -z "${NOAUTH}" ] && ascii_grep '^verify\ error:' "${ERROR}"; then
+    if [ -z "${NOAUTH}" ] && ascii_grep '^verify\\ error:' "${ERROR}"; then
 
         debuglog 'Checking if the certificate was self signed'
 
