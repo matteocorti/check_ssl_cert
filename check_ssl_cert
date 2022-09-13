@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # check_ssl_cert
-#
+
 # Checks an X.509 certificate:
 # - checks if the server is running and delivers a valid certificate
 # - checks if the CA matches a given pattern
@@ -3576,8 +3576,6 @@ main() {
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN='grep'
     fi
-    check_required_prog "${GREP_BIN}"
-    GREP_BIN=${PROG}
 
     # Default values
 
@@ -4970,7 +4968,7 @@ main() {
 
     fetch_certificate
 
-    if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}"; then
+    if ascii_grep 'sslv3[ ]alert[ ]unexpected[ ]message' "${ERROR}"; then
 
         if [ -n "${SERVERNAME}" ]; then
 
@@ -4981,7 +4979,7 @@ main() {
 
         fi
 
-        if ascii_grep 'sslv3\ alert\ unexpected\ message' "${ERROR}"; then
+        if ascii_grep 'sslv3[ ]alert[ ]unexpected[ ]message' "${ERROR}"; then
 
             prepend_critical_message 'cannot fetch certificate: OpenSSL got an unexpected message'
 
@@ -5030,7 +5028,7 @@ main() {
 
             if [ "${RET}" -eq 1 ]; then
 
-                if ascii_grep '^Secure\ Renegotiation\ IS\ NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}"; then
+                if ascii_grep '^Secure[ ]Renegotiation[ ]IS[ ]NOT' "${CERT}" && ! ascii_grep 'TLSv1.3' "${CERT}"; then
                     prepend_critical_message 'TLS renegotiation is supported but not secure'
                 else
                     verboselog "TLS renegotiation OK"
@@ -5984,7 +5982,7 @@ ${WARNING}"
 
     ################################################################################
     # Check if the certificate was verified
-    if [ -z "${NOAUTH}" ] && ascii_grep '^verify\ error:' "${ERROR}"; then
+    if [ -z "${NOAUTH}" ] && ascii_grep '^verify[ ]error:' "${ERROR}"; then
 
         debuglog 'Checking if the certificate was self signed'
 

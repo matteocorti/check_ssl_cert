@@ -166,7 +166,11 @@ oneTimeSetUp() {
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN=$( command -v grep) # needed by openssl_version
     fi
-    "${GREP_BIN}" -V
+    if ! "${GREP_BIN}" -V > /dev/null 2>&1 ; then
+        echo "Cannot determine grep version (Busybox?)"
+    else
+        "${GREP_BIN}" -V
+    fi
 
 }
 
