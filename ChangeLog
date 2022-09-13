@@ -1,3 +1,7 @@
+2022-09-13  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: added --grep-bin to specify the grep binary to be used
+
 2022-09-11  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (usage): default port in the help text

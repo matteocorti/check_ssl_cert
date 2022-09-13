@@ -1,3 +1,5 @@
+* 2022-09-13 Version 2.44.0
+  * Fixed a problem with grep 3.8
   * Added ```--grep-bin``` to specify the grep binary to be used
   * Added ```--debug-headers``` to store the HTTP headers in the headers.txt file
 * 2022-09-09 Version 2.43.0
