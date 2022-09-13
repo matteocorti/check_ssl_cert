@@ -3572,7 +3572,7 @@ $2"
 main() {
 
     ##############################################################################
-    # we need grep from the bginning (will fix later if --grep-bin is specified)
+    # we need grep from the beginning (will fix later if --grep-bin is specified)
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN='grep'
     fi
