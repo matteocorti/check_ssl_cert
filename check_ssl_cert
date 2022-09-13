@@ -1351,7 +1351,7 @@ parse_subject() {
     #   subject=C = ES, ST = Madrid, L = Madrid, jurisdictionC = ES, O = Ibermutua Mutua Colaboradora con la Seguridad Social N\C3\BAmero 274, businessCategory = Private Organization, serialNumber = 1998-02-18, CN = www.ibermutua.es
     # if the field could contain UTF-8 characters (and -nameopt utf8 is specified) there it no space around =
 
-    if echo "${SUBJECT}" | "${GREP_BIN}" -q '^subject=\ \/'; then
+    if echo "${SUBJECT}" | "${GREP_BIN}" -q '^subject=[ ][/]'; then
 
         # old format
         debuglog "  old format separated by /"
@@ -1365,9 +1365,9 @@ parse_subject() {
         # new format
         debuglog "  new format separated by ,"
 
-        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}\\ *=" ; then
+        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*=" ; then
 
-            if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}\\ *=\\ *\""; then
+            if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*=[ ]*\""; then
                 # quotes
                 debuglog "  quotes"
                 echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *\"//" -e 's/".*//'
@@ -2554,15 +2554,15 @@ fetch_certificate() {
 
             verboselog "Warning: the server requires a client certificate"
 
-        elif ascii_grep 'nodename\ nor\ servname\ provided,\ or\ not\ known' "${ERROR}" ||
+        elif ascii_grep 'nodename[ ]nor[ ]servname[ ]provided,[ ]or[ ]not[ ]known' "${ERROR}" ||
             ascii_grep 'Name or service not known' "${ERROR}" ||
-            ascii_grep 'connect\ argument\ or\ target\ parameter\ malformed\ or\ ambiguous' "${ERROR}"; then
+            ascii_grep 'connect[ ]argument[ ]or[ ]target[ ]parameter[ ]malformed[ ]or[ ]ambiguous' "${ERROR}"; then
 
             ERROR="${HOST_ADDR} is not a valid hostname"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'Connection\ refused' "${ERROR}"; then
+        elif ascii_grep 'Connection[ ]refused' "${ERROR}"; then
 
             ERROR='Connection refused'
             prepend_critical_message "${ERROR}"
@@ -2594,15 +2594,15 @@ fetch_certificate() {
                 prepend_critical_message 'Self signed certificate'
             fi
 
-        elif ascii_grep 'dh\ key\ too\ small' "${ERROR}"; then
+        elif ascii_grep 'dh[ ]key[ ]too[ ]small' "${ERROR}"; then
 
             prepend_critical_message 'DH with a key too small'
 
-        elif ascii_grep 'alert\ handshake\ failure' "${ERROR}"; then
+        elif ascii_grep 'alert[ ]handshake[ ]failure' "${ERROR}"; then
 
             prepend_critical_message 'Handshake failure'
 
-        elif ascii_grep 'wrong\ version\ number' "${ERROR}"; then
+        elif ascii_grep 'wrong[ ]version[ ]number' "${ERROR}"; then
 
             prepend_critical_message 'No TLS connection possible'
 
@@ -2620,7 +2620,7 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
-        elif ascii_grep 'Operation\ timed\ out' "${ERROR}"; then
+        elif ascii_grep 'Operation[ ]timed[ ]out' "${ERROR}"; then
 
             ERROR='OpenSSL timed out'
             prepend_critical_message "${ERROR}"
@@ -5821,7 +5821,7 @@ ${WARNING}"
             # We clear the cache only on the first run
             IGNORE_SSL_LABS_CACHE=""
 
-            if "${GREP_BIN}" -F -q 'Running\ at\ full\ capacity.\ Please\ try\ again\ later' "${JSON}"; then
+            if "${GREP_BIN}" -F -q 'Running[ ]at[ ]full[ ]capacity.[ ]Please[ ]try[ ]again[ ]later' "${JSON}"; then
                 verboselog '  SSL Labs running at full capacity'
             else
 
@@ -5986,7 +5986,7 @@ ${WARNING}"
 
         debuglog 'Checking if the certificate was self signed'
 
-        if ascii_grep '^verify\ error:num=[0-9][0-9]*:self[ -]signed\ certificate' "${ERROR}"; then
+        if ascii_grep '^verify[ ]error:num=[0-9][0-9]*:self[ -]signed[ ]certificate' "${ERROR}"; then
 
             debuglog 'Self signed certificate'
 
@@ -5996,7 +5996,7 @@ ${WARNING}"
                 SELFSIGNEDCERT="self signed "
             fi
 
-        elif ascii_grep '^verify\ error:num=[0-9][0-9]*:certificate\ has\ expired' "${ERROR}"; then
+        elif ascii_grep '^verify[ ]error:num=[0-9][0-9]*:certificate[ ]has[ ]expired' "${ERROR}"; then
 
             debuglog 'Cannot verify since the certificate has expired.'
 
