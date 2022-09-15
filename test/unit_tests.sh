@@ -385,7 +385,7 @@ testFloatNotOK() {
 testPrecision() {
     # if nothing is specified integers should be used
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --ignore-exp | grep -q -E 'in\ [0-9]*[.]'
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --ignore-exp | grep -q -E 'in [0-9]*[.]'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
@@ -393,7 +393,7 @@ testPrecision() {
 testPrecisionCW() {
     # if critical or warning is not an integer we should switch to floating point
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 | grep -q -E 'in\ [0-9]*[.][0-9]{2}'
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 | grep -q -E 'in [0-9]*[.][0-9]{2}'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
@@ -401,7 +401,7 @@ testPrecisionCW() {
 testPrecision4() {
     # we force a precision of 4
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 4 --critical 1 | grep -q -E 'in\ [0-9]*[.][0-9]{4}'
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 4 --critical 1 | grep -q -E 'in [0-9]*[.][0-9]{4}'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
@@ -409,7 +409,7 @@ testPrecision4() {
 testPrecision0() {
     # we force integers even if critical is a floating point
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in\ [0-9]*[.]'
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --critical 1.5 --precision 0 | grep -q -E 'in [0-9]*[.]'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
@@ -423,32 +423,32 @@ testSignatureAlgorithms() {
 
     # shellcheck disable=SC2086
     ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
-        grep '^Signature\ algorithm' |
-        sed 's/^Signature\ algorithm\ *//' )
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//' )
     assertEquals "wrong signature algorithm" 'rsaEncryption (2048 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
-        grep '^Signature\ algorithm' |
-        sed 's/^Signature\ algorithm\ *//' )
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//' )
     assertEquals "wrong signature algorithm" 'rsaEncryption (4096 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
-        grep '^Signature\ algorithm' |
-        sed 's/^Signature\ algorithm\ *//' )
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//' )
     assertEquals "wrong signature algorithm" 'rsaEncryption (8192 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc256.badssl.com |
-        grep '^Signature\ algorithm' |
-        sed 's/^Signature\ algorithm\ *//' )
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//' )
     assertEquals "wrong signature algorithm" 'id-ecPublicKey (256 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc384.badssl.com |
-        grep '^Signature\ algorithm' |
-        sed 's/^Signature\ algorithm\ *//' )
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//' )
     assertEquals "wrong signature algorithm" 'id-ecPublicKey (384 bit)' "${ALGORITHM}"
 
 }
@@ -1096,7 +1096,7 @@ testFormatShort() {
 
 testMoreErrors() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/\ //g')
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -1105,7 +1105,7 @@ testMoreErrors() {
 
 testMoreErrors2() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/\ //g')
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -1300,7 +1300,7 @@ testResolveIPv6() {
             echo "IPv6 is configured"
             if ping6 -c 3 www.google.com >/dev/null 2>&1; then
                 echo "IPv6 is working"
-                RESOLVED=$( host www.google.com | grep IPv6 | sed 's/.*\ //' )
+                RESOLVED=$( host www.google.com | grep IPv6 | sed 's/.* //' )
                 # shellcheck disable=SC2086
                 ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --resolve "${RESOLVED}" --ignore-exp
                 EXIT_CODE=$?
@@ -1319,9 +1319,9 @@ testResolveIPv6() {
 testCiphersOK() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
-    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 7\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
-    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
 
@@ -1351,10 +1351,10 @@ testCiphersOK() {
 testCiphersNonStandardPort() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
-#    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
+#    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 7\.' /etc/redhat-release; then
 #        echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
 #    el
-    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
 
@@ -1384,9 +1384,9 @@ testCiphersNonStandardPort() {
 testCiphersError() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7w
-    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 7\.' /etc/redhat-release; then
+    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 7\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
-    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release\ 6\.' /etc/redhat-release; then
+    elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
 
@@ -1529,7 +1529,7 @@ testMaxDateOn32BitSystems() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'invalid\ date'
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'invalid date'
     EXIT_CODE=$?
 
     assertEquals "Invalid date" 1 "${EXIT_CODE}"
@@ -1639,7 +1639,7 @@ testOrganizationFail() {
 
 testOrganizationOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub,\ Inc.' --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub, Inc.' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

@@ -1,3 +1,8 @@
+2022-09-15  Matteo Corti  <matteo@corti.li>
+
+        * test/unit_tests.sh: removed stray \ from regexes
+        * check_ssl_cert: removed stray \ from regexes
+
 2022-09-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: added --grep-bin to specify the grep binary to be used

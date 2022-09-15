@@ -670,7 +670,7 @@ create_temporary_file() {
     if [ -n "${MKTEMP}" ]; then
         TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
     else
-        TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | head -n 1 | sed 's/\ *$//' | sed 's/.*\ //')
+        TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | head -n 1 | sed 's/ *$//' | sed 's/.* //')
         touch "${TEMPFILE}"
     fi
 
@@ -702,7 +702,7 @@ hours_until() {
     LONG_BIT_TMP="$(getconf LONG_BIT)"
     if [ "${LONG_BIT_TMP}" -eq 32 ]; then
         debuglog "32 bit system"
-        CERT_YEAR=$(echo "${DATE}" | sed 's/.*\ \(2[0-9][0-9][0-9]\).*/\1/')
+        CERT_YEAR=$(echo "${DATE}" | sed 's/.* \(2[0-9][0-9][0-9]\).*/\1/')
         debuglog "Checking if the year ${CERT_YEAR} is beyond the max date for the system 2038-01-19"
         if [ "${CERT_YEAR}" -gt 2038 ]; then
             verboselog "${DATE} is beyond the maximum date on a 32 bit system: we consider 2038-01-19"
@@ -863,7 +863,7 @@ EOF
         OPENSSL_VERSION=$(${OPENSSL} version)
     fi
     debuglog "openssl version: ${OPENSSL_VERSION}"
-    OPENSSL_VERSION=$(echo "${OPENSSL_VERSION}" | sed -E 's/^(Libre|Open)SSL\ ([^ \-]*).*/\2/')
+    OPENSSL_VERSION=$(echo "${OPENSSL_VERSION}" | sed -E 's/^(Libre|Open)SSL ([^ \-]*).*/\2/')
 
     IFS='.' read -r MAJOR1 MAJOR2 MINOR <<EOF
 ${OPENSSL_VERSION}
@@ -1370,11 +1370,11 @@ parse_subject() {
             if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*=[ ]*\""; then
                 # quotes
                 debuglog "  quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *\"//" -e 's/".*//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD} *= *\"//" -e 's/".*//'
             else
                 # no quotes
                 debuglog "  no quotes"
-                echo "${SUBJECT}" | sed -e "s/.*${FIELD}\\ *=\\ *//" -e 's/\,\ [^,]*$//'
+                echo "${SUBJECT}" | sed -e "s/.*${FIELD} *= *//" -e 's/, [^,]*$//'
             fi
 
         fi
@@ -1435,7 +1435,7 @@ extract_cert_attribute() {
         # see https://unix.stackexchange.com/questions/676776/parse-comma-separated-string-ignoring-commas-between-quotes
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout -nameopt sep_multiline,utf8,esc_ctrl -issuer |
             tail -n +2 |
-            sed 's/^\ *//'
+            sed 's/^ *//'
         ;;
     issuer_uri)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -F "CA Issuers" | "${GREP_BIN}" -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
@@ -1479,7 +1479,7 @@ extract_cert_attribute() {
             sed 's/^.*URI://'
         ;;
     version)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version:\ //'
+        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version: //'
         ;;
 
     sig_algo)
@@ -1489,9 +1489,9 @@ extract_cert_attribute() {
         #
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
-        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*:\ //')
+        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
 
-        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*:\ //' )
+        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //' )
 
         echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
@@ -1512,7 +1512,7 @@ extract_cert_attribute() {
             sed -e "s/DNS://g" |
             sed -e "s/IP Address://g" |
             sed -e "s/,//g" |
-            sed -e 's/^\ *//'
+            sed -e 's/^ *//'
         ;;
     keyUsage)
         KEY_USAGE_TMP=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1 )
@@ -1752,7 +1752,7 @@ check_crl() {
             "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}" "${CERT_ELEMENT}" 2>&1 |
                 "${GREP_BIN}" -F ':' |
                 head -n 1 |
-                sed 's/^.*:\ //'
+                sed 's/^.*: //'
         )
 
         debuglog "  result: ${CRL_RESULT}"
@@ -2679,7 +2679,7 @@ fetch_certificate() {
             critical "it seems that OpenSSL -starttls does not yet support LDAP"
         fi
 
-        NEGOTIATED_PROTOCOL=$("${GREP_BIN}" -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol:\ //')
+        NEGOTIATED_PROTOCOL=$("${GREP_BIN}" -F 'ALPN protocol' "${CERT}" | sed 's/^ALPN protocol: //')
         debuglog "Negotiated protocol: ${NEGOTIATED_PROTOCOL}"
 
         # check if the protocol was really HTTP/2
@@ -3170,7 +3170,7 @@ parse_command_line_options() {
             FILE="$2"
             # remove _HOST_ from the names to be checked as no host was specified
             # we leave the remaining hosts specified with --cn
-            NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__\ *//')
+            NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__ *//')
             ALTNAMES=
             shift 2
             ;;
@@ -3540,7 +3540,7 @@ $2"
             # we try to check for grouped variables
             OPTION="${1}"
             # if the option begins with a single dash and it's longer than one character
-            OPTION_TMP="$(echo "${OPTION}" | wc -c | sed 's/\ //g')"
+            OPTION_TMP="$(echo "${OPTION}" | wc -c | sed 's/ //g')"
             if ! echo "${OPTION}" | "${GREP_BIN}" -q -- '^--' &&
                 [ "${OPTION_TMP}" -gt 3 ]; then
                 if [ "${DEBUG}" -gt 0 ]; then
@@ -4703,13 +4703,13 @@ main() {
 
         DNSSEC_ERROR=
         # check for the presence of the Authenticated Data (ad) flag in the header
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';;\ flags:' | "${GREP_BIN}" -q 'ad[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';; flags:' | "${GREP_BIN}" -q 'ad[; ]' ; then
             prepend_critical_message "DNSSEC: the Authenticated Data (ad) flag is not present"
             DNSSEC_ERROR=1
         fi
 
         # check the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ',\ flags:' | "${GREP_BIN}" -q 'do[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ', flags:' | "${GREP_BIN}" -q 'do[; ]' ; then
             prepend_critical_message "DNSSEC: the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware is not present"
             DNSSEC_ERROR=1
         fi
@@ -5056,7 +5056,7 @@ main() {
 
                 debuglog "  checking ${ca}"
 
-                if ! "${GREP_BIN}" "${ca}" "${CERT}" | "${GREP_BIN}" -q '^C\ =\ ' &&
+                if ! "${GREP_BIN}" "${ca}" "${CERT}" | "${GREP_BIN}" -q '^C = ' &&
                     ! "${GREP_BIN}" "${ca}" "${CERT}" | "${GREP_BIN}" -q '^\/C='; then
                     prepend_critical_message "${ca} is not listed as an acceptable client certificate CA"
                 fi
@@ -5199,9 +5199,9 @@ main() {
 
                     # the purposes are in a 'comma space' separated list
                     if ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose},\\ " &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ",\\ ${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ",\\ ${purpose},\\ " ; then
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}, " &&
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}$" &&
+                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}, " ; then
                         prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
                     fi
 
@@ -5301,7 +5301,7 @@ EOF
 
     fi
 
-    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*:\ //')"
+    SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*: //')"
     info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
     if [ "${DEBUG}" -ge 1 ]; then
@@ -5727,7 +5727,7 @@ EOF
                     critical 'nmap does not deliver cipher strength'
                 fi
 
-                NMAP_GRADE=$("${GREP_BIN}" -F 'least strength' "${NMAP_OUT}" | sed 's/.*\ //')
+                NMAP_GRADE=$("${GREP_BIN}" -F 'least strength' "${NMAP_OUT}" | sed 's/.* //')
                 convert_grade "${NMAP_GRADE}"
                 NMAP_GRADE_NUMERIC="${NUMERIC_SSL_LAB_GRADE}"
 
@@ -5753,7 +5753,7 @@ EOF
                         elif echo "${line}" | "${GREP_BIN}" -q -F ':'; then
                             PARSING_WARNINGS=
                         elif [ -n "${PARSING_WARNINGS}" ]; then
-                            WARNING=$(echo "${line}" | sed 's/|\ *//')
+                            WARNING=$(echo "${line}" | sed 's/| *//')
                             if [ -n "${WARNINGS}" ]; then
                                 debuglog "Cipher warning '${WARNING}'"
                                 WARNINGS="${WARNINGS}
@@ -5765,7 +5765,7 @@ ${WARNING}"
 
                     done <"${NMAP_OUT}"
 
-                    WARNINGS="$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/,\ /g' -e 's/,\ $//')"
+                    WARNINGS="$(echo "${WARNINGS}" | sort | uniq | tr '\n' ',' | sed -e 's/,/, /g' -e 's/, $//')"
                     prepend_critical_message "${HOST_ADDR} offers ciphers with warnings: ${WARNINGS}"
 
                 else
@@ -6006,8 +6006,7 @@ ${WARNING}"
             debuglog "${DEBUG_MESSAGE}"
 
             # Process errors
-            # details=$(${GREP_BIN} '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/, /g')
-            details=$("${GREP_BIN}" '^verify\ error:' "${ERROR}" | sed 's/verify\ error:num=[0-9]*://')
+            details=$("${GREP_BIN}" '^verify error:' "${ERROR}" | sed 's/verify error:num=[0-9]*://')
             prepend_critical_message "Cannot verify certificate: ${details}"
 
         fi
