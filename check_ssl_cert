@@ -2656,6 +2656,12 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
 
+        elif ascii_grep "tlsv1 alert protocol version" "${ERROR}"; then
+
+            ERROR="Unsupported protocol"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
+
         else
 
             # Try to clean up the error message
