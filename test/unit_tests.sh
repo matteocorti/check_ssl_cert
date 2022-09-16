@@ -1776,7 +1776,7 @@ testXFrameOptionsFailed() {
 
 testHTTPHeadersOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-security-headers
+    ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --require-security-headers
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
