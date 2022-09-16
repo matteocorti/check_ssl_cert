@@ -14,15 +14,15 @@ parse_name() {
     if [ "${blanks}" -gt 2 ]; then
         echo "${dash} name: ${name}" >>CITATION.cff
     else
-        first=$(echo "${name}" | sed -e 's/\ .*//')
-        last=$(echo "${name}" | sed -e 's/[^ ]*\ //')
+        first=$(echo "${name}" | sed -e 's/ .*//')
+        last=$(echo "${name}" | sed -e 's/[^ ]* //')
         echo "${dash} family-names: \"${last}\"" >>CITATION.cff
         echo "  given-names: \"${first}\"" >>CITATION.cff
     fi
 }
 
 # get the release date from the spec file
-date=$(grep '^\ *\*\ [0-9]' NEWS.md | head -n 1 | sed -e 's/^\ *\*\ //' -e 's/\ .*//')
+date=$(grep '^ *\* [0-9]' NEWS.md | head -n 1 | sed -e 's/^ *\* //' -e 's/ .*//')
 
 cat <<EOT >CITATION.cff
 cff-version: 1.2.0
@@ -34,7 +34,7 @@ authors:
 EOT
 
 grep '[*] Many thanks to' AUTHORS.md |
-    sed -e 's/^[*] Many thanks to //' -e 's/\ for.*//' |
+    sed -e 's/^[*] Many thanks to //' -e 's/ for.*//' |
     sort |
     uniq |
     while IFS= read -r line; do

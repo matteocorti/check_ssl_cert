@@ -21,12 +21,12 @@ XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs
 # checks if the version is updated in all the files
 version_check: CITATION.cff
 	echo "Checking version $(VERSION)"
-	grep -q "VERSION\ *=\ *[\'\"]*$(VERSION)" $(PLUGIN)
-	grep -q "^%global\ version\ *$(VERSION)" $(PLUGIN).spec
+	grep -q "VERSION *= *[\'\"]*$(VERSION)" $(PLUGIN)
+	grep -q "^%global version *$(VERSION)" $(PLUGIN).spec
 	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q -F "${VERSION}" NEWS.md
-	grep -q  "^version:\ ${VERSION}" CITATION.cff
+	grep -q  "^version: ${VERSION}" CITATION.cff
 	echo "Version check: OK"
 
 # builds the release files
@@ -127,7 +127,7 @@ shellcheck:
 ifndef SHELLCHECK
 	echo "No shellcheck installed: skipping check"
 else
-	if shellcheck --help 2>&1 | grep -q -- '-o\ ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
+	if shellcheck --help 2>&1 | grep -q -- '-o ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
 
 rpm: dist
