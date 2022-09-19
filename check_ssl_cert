@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.44.0
+VERSION=2.45.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -279,6 +279,7 @@ usage() {
     echo "      --ignore-host-cn             Do not complain if the CN does not match"
     echo "                                   the host name"
     echo "      --ignore-incomplete-chain    Do not check chain integrity"
+    echo "      --ignore-maximum-validity    Ignore the certificate maximum validity"
     echo "      --ignore-ocsp                Do not check revocation with OCSP"
     echo "      --ignore-ocsp-errors         Continue if the OCSP status cannot be"
     echo "                                   checked"
@@ -3069,6 +3070,10 @@ parse_command_line_options() {
             ;;
         --ignore-incomplete-chain)
             IGNORE_INCOMPLETE_CHAIN=1
+            shift
+            ;;
+        --ignore-maximum-validity)
+            IGNORE_MAXIMUM_VALIDITY=1
             shift
             ;;
         --ignore-ocsp)
@@ -6043,6 +6048,28 @@ ${WARNING}"
             verboselog 'warning: Skipping SCTs check as not supported by OpenSSL'
         fi
     fi
+
+    ##############################################################################
+    # Check total certificate validity
+    if [ -z "${IGNORE_MAXIMUM_VALIDITY}" ] ; then
+
+        HOURS_UNTIL_END_DATE=$( hours_until "${DATE}" )
+        HOURS_FROM_START_DATE=$( hours_until "${START_DATE}" )
+        TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" )
+
+        debuglog "Total certificate validity: ${TOTAL_CERT_VALIDITY}"
+
+        # a certificate cannot be valid for more than 13 months (397 days)
+        if [ "${TOTAL_CERT_VALIDITY}" -gt 397 ] ; then
+
+            prepend_critical_message "A certificate cannot be valid for more than 397 days (${TOTAL_CERT_VALIDITY})"
+
+        fi
+
+    fi
+
+    ##############################################################################
+    # Criticals and warnings
 
     # if errors exist at this point return
     if [ "${CRITICAL_MSG}" != "" ]; then

@@ -121,6 +121,7 @@ Options:
       --ignore-host-cn             Do not complain if the CN does not match
                                    the host name
       --ignore-incomplete-chain    Do not check chain integrity
+      --ignore-maximum-validity    Ignore the certificate maximum validity
       --ignore-ocsp                Do not check revocation with OCSP
       --ignore-ocsp-errors         Continue if the OCSP status cannot be
                                    checked

@@ -1,3 +1,7 @@
+2022-09-19  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): checking the maximum certificate validity
+
 2022-09-15  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh: removed stray \ from regexes

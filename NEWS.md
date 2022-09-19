@@ -1,3 +1,5 @@
+* 2022-09-19 Version 2.45.0
+  * Checks the maximum certificate validity (397)
 * 2022-09-13 Version 2.44.0
   * Fixed a problem with grep 3.8
   * Added ```--grep-bin``` to specify the grep binary to be used

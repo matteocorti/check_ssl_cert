@@ -1441,7 +1441,7 @@ testGithubComCRL() {
     curl --silent "${GITHUB_CRL_URI}" >"${TEMPFILE_CRL}"
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp --ignore-maximum-validity
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1523,17 +1523,35 @@ testMaxDateOn32BitSystems() {
     CERT=$(createSelfSignedCertificate 7000)
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg --ignore-maximum-validity
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'invalid date'
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning 2 --critical 1 --selfsigned --allow-empty-san --ignore-sig-alg --ignore-maximum-validity 2>&1 | grep -q 'invalid date'
     EXIT_CODE=$?
 
     assertEquals "Invalid date" 1 "${EXIT_CODE}"
 
+}
+
+testMaximumValidityFailed() {
+    # generate a cert expiring in 400 days
+    CERT=$(createSelfSignedCertificate 400)
+   # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testMaximumValidityIgnored() {
+    # generate a cert expiring in 400 days
+    CERT=$(createSelfSignedCertificate 400)
+   # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-maximum-validity
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIgnoreConnectionStateOK() {
