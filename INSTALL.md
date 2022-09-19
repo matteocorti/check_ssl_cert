@@ -2,12 +2,13 @@
 
 ## Requirements
 
-* [OpenSSL](https://www.openssl.org)
+* ```bc```
 * [curl](https://curl.se)
 * ```date```
 * ```file```
-* ```bc```
+* ```host```
 * [nmap](https://nmap.org)
+* [OpenSSL](https://www.openssl.org)
 
 ## Optional dependencies
 
