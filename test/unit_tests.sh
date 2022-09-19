@@ -1618,7 +1618,7 @@ testSubdomainWithUnderscore() {
 
 testChainOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f ./fullchain.pem --allow-empty-san --ignore-sct --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} -f ./fullchain.pem --allow-empty-san --ignore-sct --ignore-exp --ignore-maximum-validity
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
