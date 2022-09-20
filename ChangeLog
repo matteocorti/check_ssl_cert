@@ -1,3 +1,8 @@
+2022-09-20  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): checking the maximum validity only for files or HTTPS
+        * check_ssl_cert (check_attr): added --maximum-validity to force the maximum validity check
+
 2022-09-19  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): checking the maximum certificate validity

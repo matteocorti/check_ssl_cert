@@ -152,6 +152,9 @@ Options:
                                    attributes.
    -m,--match.                     Pattern to match the CN or AltName
                                    (can be specified multiple times)
+      --maximum-validity [days]    The maximum validity of the certificate
+                                   must not exceed 'days' (default 397)
+                                   This check is automatic for HTTPS
       --nmap-bin path              Path of the nmap binary to be used
       --no-perf                    Do not show performance data
       --no-proxy                   Ignore the http_proxy and https_proxy

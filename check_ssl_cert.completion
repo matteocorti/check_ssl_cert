@@ -14,7 +14,7 @@ _check_ssl_cert() {
     #   only the autocompletion with long options is implemented: long options are more readable and quick to enter since we are
     #   using autocompletion.
     #
-    opts="--file --host --noauth --all --all-local --allow-empty-san --clientcert --critical --check-ciphers --check-ciphers-warnings  --check-ssl-labs --check-ssl-labs-warn --clientpass --crl --curl-bin --user-agent --custom-http-header --dane --date --debug-cert --debug-file --debug-headers --debug-time --default-format --dig-bin --dtls --dtls1 --dtls1_2 --ecdsa --element --file-bin --fingerprint --first-element-only --force-dconv-date --force-perl-date --format --grep-bin --http-use-get --ignore-altnames --ignore-connection-problems --ignore-exp --ignore-host-cn --ignore-incomplete-chain --ignore-maximum-validity --ignore-ocsp --ignore-ocsp-errors --ignore-ocsp-timeout --ignore-sct --ignore-sig-alg --ignore-ssl-labs-cache --ignore-tls-renegotiation --inetproto protocol --info --init-host-cache --issuer-cert-cache --long-output --match --nmap-bin --no-perf --no-proxy --no-proxy-curl --no-proxy-s_client --no-ssl2 --no-ssl3 --no-tls1 --no-tls1_1 --no-tls1_2 --no-tls1_3 --not-issued-by --not-valid-longer-than --ocsp-critical --ocsp-warning --openssl --password --precision --prometheus --proxy --require-client-cert --require-dnssec --require-no-ssl2 --require-no-ssl3 --require-no-tls1 --require-no-tls1_1 --require-ocsp-stapling --require-purpose --require-purpose-critical --require-security-header --require-security-headers --require-security-headers-path --resolve  --rootcert-dir --rootcert-file --rsa --serial --skip-element --sni --ssl2 --ssl3 --temp --terse --tls1 --tls1_1 --tls1_2 --tls1_3 --xmpphost -4 -6 --clientkey --protocol --version --debug --email --help --issuer --cn --org  --port port --rootcert --quiet --selfsigned --timeout --url --verbose --warning"
+    opts="--file --host --noauth --all --all-local --allow-empty-san --clientcert --critical --check-ciphers --check-ciphers-warnings  --check-ssl-labs --check-ssl-labs-warn --clientpass --crl --curl-bin --user-agent --custom-http-header --dane --date --debug-cert --debug-file --debug-headers --debug-time --default-format --dig-bin --dtls --dtls1 --dtls1_2 --ecdsa --element --file-bin --fingerprint --first-element-only --force-dconv-date --force-perl-date --format --grep-bin --http-use-get --ignore-altnames --ignore-connection-problems --ignore-exp --ignore-host-cn --ignore-incomplete-chain --ignore-maximum-validity --ignore-ocsp --ignore-ocsp-errors --ignore-ocsp-timeout --ignore-sct --ignore-sig-alg --ignore-ssl-labs-cache --ignore-tls-renegotiation --inetproto protocol --info --init-host-cache --issuer-cert-cache --long-output --match --maximum-validity --nmap-bin --no-perf --no-proxy --no-proxy-curl --no-proxy-s_client --no-ssl2 --no-ssl3 --no-tls1 --no-tls1_1 --no-tls1_2 --no-tls1_3 --not-issued-by --not-valid-longer-than --ocsp-critical --ocsp-warning --openssl --password --precision --prometheus --proxy --require-client-cert --require-dnssec --require-no-ssl2 --require-no-ssl3 --require-no-tls1 --require-no-tls1_1 --require-ocsp-stapling --require-purpose --require-purpose-critical --require-security-header --require-security-headers --require-security-headers-path --resolve  --rootcert-dir --rootcert-file --rsa --serial --skip-element --sni --ssl2 --ssl3 --temp --terse --tls1 --tls1_1 --tls1_2 --tls1_3 --xmpphost -4 -6 --clientkey --protocol --version --debug --email --help --issuer --cn --org  --port port --rootcert --quiet --selfsigned --timeout --url --verbose --warning"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]]; then
         # shellcheck disable=2207
@@ -51,6 +51,11 @@ _check_ssl_cert() {
     --dane)
         # shellcheck disable=2207
         COMPREPLY=($(compgen -W "211 301 302 311 312" -- "${cur}"))
+        ;;
+
+    --maximum-validity)
+        # shellcheck disable=2207
+        COMPREPLY=($(compgen -W "397" -- "${cur}"))
         ;;
 
     --require-purpose)

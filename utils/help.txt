@@ -99,6 +99,9 @@
 --long-output list;modulus, serial, hash, email, ocsp_uri
 --long-output list;output on additional lines
 --long-output list;spaces) list of attributes to the plugin
+--maximum-validity [days];The maximum validity of the certificate
+--maximum-validity [days];must not exceed 'days' (default 397)
+--maximum-validity [days];This check is automatic for HTTPS
 --nmap-bin path;Path of the nmap binary to be used
 --no-perf;Do not show performance data
 --no-proxy-curl;Ignore the http_proxy and https_proxy

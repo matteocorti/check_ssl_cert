@@ -1,3 +1,5 @@
+* 2022-09-20 Version 2.46.0
+  * The maximum validity check is performed only for HTTPS, files or if the ```--maximum-validity``` option is specified.
 * 2022-09-19 Version 2.45.0
   * Checks the maximum certificate validity (397)
 * 2022-09-13 Version 2.44.0

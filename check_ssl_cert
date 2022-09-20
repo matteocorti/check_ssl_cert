@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.45.0
+VERSION=2.46.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -313,6 +313,9 @@ usage() {
     # Delimiter at 78 chars ############################################################
     echo "   -m,--match.                     Pattern to match the CN or AltName"
     echo "                                   (can be specified multiple times)"
+    echo "      --maximum-validity [days]    The maximum validity of the certificate"
+    echo "                                   must not exceed 'days' (default 397)"
+    echo "                                   This check is automatic for HTTPS"
     # Delimiter at 78 chars ############################################################
     echo "      --nmap-bin path              Path of the nmap binary to be used"
     echo "      --no-perf                    Do not show performance data"
@@ -3477,6 +3480,24 @@ $2"
 
             ;;
 
+        --maximum-validity)
+
+            MAXIMUM_VALIDITY=397
+
+            # check the second optional parameter if it exist
+            if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
+                if [ "${2%${2#?}}"x = '-x' ]; then
+                    shift
+                else
+                    MAXIMUM_VALIDITY=$2
+                    shift 2
+                fi
+            else
+                shift
+            fi
+
+            ;;
         --require-client-cert)
 
             REQUIRE_CLIENT_CERT=1
@@ -4761,6 +4782,15 @@ main() {
     else
         HTTP_VERSION="1.1"
     fi
+
+    if [ -n "${IGNORE_MAXIMUM_VALIDITY}" ] && [ -n "${MAXIMUM_VALIDITY}" ] ; then
+        unknown "--ignore-maximum-validity and --maximum-validity cannot be specified at the same time"
+    fi
+    if [ -n "${MAXIMUM_VALIDITY}" ]  && ! echo "${MAXIMUM_VALIDITY}" | "${GREP_BIN}" -E -q '^[0-9][0-9]*$'; then
+        unknown "invalid number of days '${MAXIMUM_VALIDITY}'"
+    fi
+
+    # end of sanity checks
 
     HTTP_REQUEST="${HTTP_METHOD} ${HTTP_REQUEST_URL} HTTP/${HTTP_VERSION}\\nHost: ${HOST_HEADER}\\nUser-Agent: ${HTTP_USER_AGENT}\\n${CUSTOM_HTTP_HEADER}Connection: close\\n\\n"
 
@@ -6053,16 +6083,34 @@ ${WARNING}"
     # Check total certificate validity
     if [ -z "${IGNORE_MAXIMUM_VALIDITY}" ] ; then
 
-        HOURS_UNTIL_END_DATE=$( hours_until "${DATE}" )
-        HOURS_FROM_START_DATE=$( hours_until "${START_DATE}" )
-        TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" )
+        # we check only for HTTP protocols, files or if --maximum-validity was specified
+        if [ -z "${PROTOCOL}" ] ||
+               [ "${PROTOCOL}" = 'https' ] ||
+               [ "${PROTOCOL}" = 'h2' ] ||
+               [ -n "${MAXIMUM_VALIDITY}" ] ||
+               [ -n "${FILE}" ] ; then
 
-        debuglog "Total certificate validity: ${TOTAL_CERT_VALIDITY}"
+            HOURS_UNTIL_END_DATE=$( hours_until "${DATE}" )
+            HOURS_FROM_START_DATE=$( hours_until "${START_DATE}" )
+            TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" )
 
-        # a certificate cannot be valid for more than 13 months (397 days)
-        if [ "${TOTAL_CERT_VALIDITY}" -gt 397 ] ; then
+            debuglog "Total certificate validity: ${TOTAL_CERT_VALIDITY}"
 
-            prepend_critical_message "A certificate cannot be valid for more than 397 days (${TOTAL_CERT_VALIDITY})"
+            LIMIT=397
+            if [ -n "${MAXIMUM_VALIDITY}" ] ; then
+                LIMIT="${MAXIMUM_VALIDITY}"
+            fi
+
+            # a certificate cannot be valid for more than 13 months (397 days)
+            if [ "${TOTAL_CERT_VALIDITY}" -gt "${LIMIT}" ] ; then
+                prepend_critical_message "The certificate cannot be valid for more than ${LIMIT} days (${TOTAL_CERT_VALIDITY})"
+            else
+                verboselog "The certificate validity (${TOTAL_CERT_VALIDITY}) is shorter then the maximum (${LIMIT})"
+            fi
+
+        else
+
+            verboselog "Skipping maximum validity test for non HTTP protocols"
 
         fi
 
