@@ -1556,9 +1556,9 @@ testMaximumValidityShort() {
 
 testMaximumValidityLong() {
     # generate a cert expiring in 400 days
-    CERT=$(createSelfSignedCertificate 10)
+    CERT=$(createSelfSignedCertificate 400)
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --maximum-validity 20
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --maximum-validity 500
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
