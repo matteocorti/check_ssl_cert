@@ -34,6 +34,7 @@
 # - add new options to the completions
 # - tests
 # - look for best practices
+# - warning for deprecated options in verbose mode
 
 ################################################################################
 # Constants
@@ -622,6 +623,13 @@ open_for_writing() {
     # clear / create the file
     true >"${FILE_TO_OPEN}"
 
+}
+
+################################################################################
+# Prints a warning on STDOUT about deprecated command line options
+# $1: command line option
+# $2: comment
+deprecated() {
 }
 
 ################################################################################
@@ -2805,6 +2813,7 @@ parse_command_line_options() {
             ;;
         --altnames)
             ALTNAMES=1
+            deprecated "--altnames" "Enabled by default"
             shift
             ;;
         --check-ciphers-warnings)
@@ -3315,7 +3324,7 @@ $2"
             shift 2
             ;;
         -n | --cn | -m | --match)
-            check_option_argument ' -n|--cn' "$2"
+            check_option_argument ' -n|--cn|-m|--match' "$2"
             if [ -z "${NAMES_TO_BE_CHECKED}" ]; then
                 NAMES_TO_BE_CHECKED="${2}"
             else
