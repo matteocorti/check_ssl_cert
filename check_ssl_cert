@@ -25,6 +25,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# To Do
+#
+# #411
+# - require-http-header
+# - require-no-http-header
+# - remove deprecated options to the completions
+# - add new options to the completions
+# - tests
+# - look for best practices
+
 ################################################################################
 # Constants
 
@@ -192,6 +202,7 @@ usage() {
     echo "      --check-ciphers grade        Check the offered ciphers"
     echo "      --check-ciphers-warnings     Critical if nmap reports a warning for an"
     echo "                                   offered cipher"
+    echo "      --check-http-headers         Checks the HTTP headers for best practices"
     echo "      --check-ssl-labs-warn grade  SSL Labs grade on which to warn"
     echo "      --clientpass phrase          Set passphrase for client certificate."
     echo "      --crl                        Check revocation via CRL (requires"
@@ -371,6 +382,8 @@ usage() {
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
     echo "      --require-dnssec             Require DNSSEC"
+    echo "      --require-no-http-header header require the absence of the specified"
+    echo "                                   HTTP header (e.g., X-Powered-By)"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
@@ -379,8 +392,8 @@ usage() {
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
     echo "      --require-purpose-critical   the key usage must be critical"
-    echo "      --require-security-header header require the specified HTTP"
-    echo "                                   security header (e.g., X-Frame-Options)"
+    echo "      --require-http-header header require the specified HTTP header"
+    echo "                                    (e.g., X-Frame-Options)"
     echo "      --require-security-headers   require all the HTTP security headers:"
     echo "                                     Content-Security-Policy"
     echo "                                     Permissions-Policy"
@@ -467,6 +480,9 @@ usage() {
     echo "      --require-san                Require the presence of a Subject"
     echo "                                   Alternative Name"
     echo "                                   extension"
+    echo "      --require-security-header header require the specified HTTP"
+    echo "                                   security header (e.g., X-Frame-Options)"
+    echo "                                   (deprecated use --require-http-header)"
     echo "      --require-x-frame-options [path] Require the presence of the"
     echo "                                   X-Frame-Options HTTP header"
     echo "                                   'path' is the optional path to be used"
