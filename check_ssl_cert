@@ -34,7 +34,6 @@
 # - add new options to the completions
 # - tests
 # - look for best practices
-# - warning for deprecated options in verbose mode
 
 ################################################################################
 # Constants
@@ -58,11 +57,11 @@ ALL_MSG=""
 CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
-DEFAULT_REQUIRED_SECURITY_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
+DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
 EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
-REQUIRED_SECURITY_HEADERS=""
-REQUIRED_SECURITY_HEADERS_PATH="/"
+REQUIRED_HTTP_HEADERS=""
+REQUIRED_HTTP_HEADERS_PATH="/"
 STATUS_CRITICAL=2
 STATUS_OK=0
 STATUS_UNKNOWN=3
@@ -80,22 +79,22 @@ SCALE=""
 # Functions
 
 ################################################################################
-# Add the specified header to the list of required HTTP security headers
+# Add the specified header to the list of required HTTP headers
 # Usage:
-#   add_required_security_header X-Frame-Options
-add_required_security_header() {
+#   add_required_header X-Frame-Options
+add_required_header() {
     header=$1
-    debuglog "Adding ${header} to the list of required HTTP security headers: ${REQUIRED_SECURITY_HEADERS}"
-    if [ -z "${REQUIRED_SECURITY_HEADERS}" ] ; then
-        REQUIRED_SECURITY_HEADERS="${header}"
+    debuglog "Adding ${header} to the list of required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
+    if [ -z "${REQUIRED_HTTP_HEADERS}" ] ; then
+        REQUIRED_HTTP_HEADERS="${header}"
     else
-        REQUIRED_SECURITY_HEADERS="${REQUIRED_SECURITY_HEADERS},${header}"
+        REQUIRED_HTTP_HEADERS="${REQUIRED_HTTP_HEADERS},${header}"
     fi
 }
 
 CACHED_HEADERS=
 
-check_security_header() {
+check_http_header() {
 
     header=$1
     path=$2
@@ -630,6 +629,9 @@ open_for_writing() {
 # $1: command line option
 # $2: comment
 deprecated() {
+    OPTION="$1"
+    COMMENT="$2"
+    echo "Command line option '${OPTION}' is deprecated: ${COMMENT}" >&2
 }
 
 ################################################################################
@@ -2952,37 +2954,56 @@ parse_command_line_options() {
             shift
             ;;
         --no-ssl2 | --no_ssl2)
+            if [ "$1" = '--no_ssl2' ] ; then
+                deprecated "$1" "Use '--no-ssl2'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl2"
             shift
             ;;
         --no-ssl3 | --no_ssl3)
+            if [ "$1" = '--no_ssl3' ] ; then
+                deprecated "$1" "Use '--no-ssl3'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
             shift
             ;;
         --no-tls1 | --no_tls1)
+            if [ "$1" = '--no_tls1' ] ; then
+                deprecated "$1" "Use '--no-tls1'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1"
             shift
             ;;
         --no-tls1_1 | --no_tls1_1)
+            if [ "$1" = '--no_tls1_1' ] ; then
+                deprecated "$1" "Use '--no-tls1_1'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_1"
             shift
             ;;
         --no-tls1_2 | --no_tls1_2)
+            if [ "$1" = '--no_tls1_2' ] ; then
+                deprecated "$1" "Use '--no-tls1_2'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_2"
             shift
             ;;
         --no-tls1_3 | --no_tls1_3)
+            if [ "$1" = '--no_tls1_3' ] ; then
+                deprecated "$1" "Use '--no-tls1_3'"
+            fi
             # we keep the old variant for compatibility
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_tls1_3"
             shift
             ;;
         # deprecated: this is enabled by default!
         -N | --host-cn)
+            deprecated "$1" 'Enabled by default'
             # __HOST__ is a placeholder for the specified host name which is always checked
             NAMES_TO_BE_CHECKED="__HOST__"
             shift
@@ -3004,8 +3025,8 @@ parse_command_line_options() {
             shift
             ;;
         --require-hsts)
-            # deprecated
-            add_required_security_header 'strict-transport-security'
+            deprecated "--require-hsts" "Use '--require-security-header strict-transport-security'"
+            add_required_header 'strict-transport-security'
             shift
             ;;
         --require-no-ssl2)
@@ -3033,12 +3054,13 @@ parse_command_line_options() {
             shift
             ;;
         --require-san)
+            deprecated "$1" "Enabled by default"
             REQUIRE_SAN=1
             shift
             ;;
 
         --require-security-headers)
-            REQUIRED_SECURITY_HEADERS="${DEFAULT_REQUIRED_SECURITY_HEADERS}"
+            REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
             shift
             ;;
 
@@ -3093,6 +3115,7 @@ parse_command_line_options() {
             shift
             ;;
         --ocsp)
+            deprecated '--ocsp' "Enabled by default"
             # deprecated
             shift
             ;;
@@ -3158,6 +3181,7 @@ parse_command_line_options() {
             shift 2
             ;;
         --curl-user-agent)
+            deprecated '--curl-user-agent' "Use '--user-agent'"
             check_option_argument '--curl-user-agent' "$2"
             HTTP_USER_AGENT="$2"
             shift 2
@@ -3174,6 +3198,7 @@ parse_command_line_options() {
             ;;
         # Deprecated option: used to be as --warning
         --days)
+            deprecated '--days' "Use the '--warning' option"
             check_option_argument '--days' "$2"
             check_integer "$2" "--days: the number of days should be an integer"
             WARNING_DAYS="$2"
@@ -3296,20 +3321,21 @@ $2"
             ;;
 
         --require-security-header)
-
+            deprecated '--require-security-header' "Use '--require-http-header' instead"
             check_option_argument '--require-security-header header' "$2"
+            add_required_header "$2"
+            shift 2
+            ;;
 
-            add_required_security_header "$2"
-
+        --require-http-header)
+            check_option_argument '--require-http-header header' "$2"
+            add_required_header "$2"
             shift 2
             ;;
 
         --require-security-headers-path)
-
             check_option_argument '--require-security-header-path path' "$2"
-
-            REQUIRED_SECURITY_HEADERS_PATH=$2
-
+            REQUIRED_HTTP_HEADERS_PATH=$2
             shift 2
             ;;
 
@@ -3324,6 +3350,12 @@ $2"
             shift 2
             ;;
         -n | --cn | -m | --match)
+            if [ "$1" = '-n' ] ; then
+                deprecated '-n' "Use '-m'"
+            fi
+            if [ "$1" = '--cn' ] ; then
+                deprecated '--cn' "Use '--match'"
+            fi
             check_option_argument ' -n|--cn|-m|--match' "$2"
             if [ -z "${NAMES_TO_BE_CHECKED}" ]; then
                 NAMES_TO_BE_CHECKED="${2}"
@@ -3434,6 +3466,7 @@ $2"
             shift 2
             ;;
         -S | --ssl)
+            deprecated "$1" "Use '--ssl2' or '--ssl3' instead"
             check_option_argument '' "$2"
             if [ "$2" = "2" ] || [ "$2" = "3" ]; then
                 SSL_VERSION="-ssl${2}"
@@ -3544,12 +3577,12 @@ $2"
 
         --require-x-frame-options)
 
-            # deprecated
-            add_required_security_header X-Frame-Options
+            deprecated '--require-x-frame-options' "Use '--require-http-header X-Frame-Options'"
+            add_required_header X-Frame-Options
 
             # default path
-            if [ -z "${REQUIRED_SECURITY_HEADERS_PATH}" ] ; then
-                REQUIRED_SECURITY_HEADERS_PATH='/'
+            if [ -z "${REQUIRED_HTTP_HEADERS_PATH}" ] ; then
+                REQUIRED_HTTP_HEADERS_PATH='/'
             fi
 
             # check the second optional parameter if it exist
@@ -3558,7 +3591,7 @@ $2"
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     shift
                 else
-                    REQUIRED_SECURITY_HEADERS_PATH=$2
+                    REQUIRED_HTTP_HEADERS_PATH=$2
                     shift 2
                 fi
             else
@@ -3822,9 +3855,9 @@ main() {
             SSL_VERSION_DISABLED="${SSL_VERSION_DISABLED} -no_ssl3"
         fi
 
-        # we check security headers only with HTTP/HTTPS
+        # we check HTTP headers only with HTTP/HTTPS
         if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
-            REQUIRED_SECURITY_HEADERS="${DEFAULT_REQUIRED_SECURITY_HEADERS}"
+            REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
         fi
 
     fi
@@ -3846,8 +3879,8 @@ main() {
     # do not split the next line otherwise ShellCheck will fail to parse it
     # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
     if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
-        if [ -n "${REQUIRED_SECURITY_HEADERS}" ] ; then
-            unknown "HTTP security header can only be checked with HTTP[S]"
+        if [ -n "${REQUIRED_HTTP_HEADERS}" ] ; then
+            unknown "HTTP headers can only be checked with HTTP[S]"
         fi
     fi
 
@@ -5054,13 +5087,13 @@ main() {
     fi
 
     # check secuirity headers
-    if [ -n "${REQUIRED_SECURITY_HEADERS}" ] ; then
+    if [ -n "${REQUIRED_HTTP_HEADERS}" ] ; then
 
-        debuglog "Checking HTTP security headers: ${REQUIRED_SECURITY_HEADERS}"
+        debuglog "Checking HTTP headers: ${REQUIRED_HTTP_HEADERS}"
 
-        for header in $( echo "${REQUIRED_SECURITY_HEADERS}" | tr ',' '\n' ) ; do
+        for header in $( echo "${REQUIRED_HTTP_HEADERS}" | tr ',' '\n' ) ; do
 
-            check_security_header "${header}" "${REQUIRED_SECURITY_HEADERS_PATH}"
+            check_http_header "${header}" "${REQUIRED_HTTP_HEADERS_PATH}"
 
         done
 
