@@ -3025,7 +3025,7 @@ parse_command_line_options() {
             shift
             ;;
         --require-hsts)
-            deprecated "--require-hsts" "Use '--require-security-header strict-transport-security'"
+            deprecated "--require-hsts" "Use '--require-http-header strict-transport-security'"
             add_required_header 'strict-transport-security'
             shift
             ;;

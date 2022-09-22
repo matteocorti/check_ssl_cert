@@ -537,7 +537,7 @@ testPrometheus() {
 
 testGitHub() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -551,7 +551,7 @@ testLetsEncrypt() {
 
 testGITHUBCaseInsensitive() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn GITHUB.COM --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match GITHUB.COM --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -565,21 +565,21 @@ testIPOK() {
 
 testIPOKAltName() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --cn pasi.corti.li --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --match pasi.corti.li --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testIPFailAltName() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --cn bogus.corti.li --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --match bogus.corti.li --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testIPCN() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host github.com --cn 1.1.1.1 --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host github.com --match 1.1.1.1 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -588,7 +588,7 @@ testETHZWildCard() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sp.ethz.ch --ignore-altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match sp.ethz.ch --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -597,21 +597,21 @@ testETHZWildCardCaseInsensitive() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
     # we ignore the altnames as sp.ethz.ch is listed
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SP.ETHZ.CH --ignore-altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match SP.ETHZ.CH --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSub() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn sub.sp.ethz.ch --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match sub.sp.ethz.ch --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testETHZWildCardSubCaseInsensitive() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --cn SUB.SP.ETHZ.CH --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match SUB.SP.ETHZ.CH --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -640,7 +640,7 @@ testValidityWithPerl() {
 
 testAltNames() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn www.github.com --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --match www.github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -648,7 +648,7 @@ testAltNames() {
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -657,11 +657,10 @@ testWildcardAltNames1() {
 testWildcardAltNames2() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch \
-        --cn somehost.spapps.ethz.ch \
-        --cn otherhost.sPaPPs.ethz.ch \
-        --cn spapps.ethz.ch \
-        --ignore-exp \
-        --altnames
+        --match somehost.spapps.ethz.ch \
+        --match otherhost.sPaPPs.ethz.ch \
+        --match spapps.ethz.ch \
+        --ignore-exp
 
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -669,14 +668,14 @@ testWildcardAltNames2() {
 
 testAltNamesCaseInsensitive() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn WWW.GITHUB.COM --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --match WWW.GITHUB.COM --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testAltNamesCaseMixed() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --cn WwW.gItHuB.cOm --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --match WwW.gItHuB.cOm --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -684,7 +683,7 @@ testAltNamesCaseMixed() {
 testMultipleAltNamesOK() {
     # Test with multiple CN's
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li -n www.corti.li -n rpm.corti.li --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li -m www.corti.li -m rpm.corti.li --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -692,7 +691,7 @@ testMultipleAltNamesOK() {
 testMultipleAltNamesFailOne() {
     # Test with multiple CN's but last one is wrong
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n www.github.com -n wrong.com --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -m www.github.com -m wrong.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -700,7 +699,7 @@ testMultipleAltNamesFailOne() {
 testMultipleAltNamesFailTwo() {
     # Test with multiple CN's but first one is wrong
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n wrong.ch -n www.github.com --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -m wrong.ch -m www.github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -708,7 +707,7 @@ testMultipleAltNamesFailTwo() {
 testMultipleAltNamesFailIPOne() {
     # Test with multiple CN's but last one is an incorrect IP
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n www.github.com -n 192.168.0.1 --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -m www.github.com -m 192.168.0.1 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -716,7 +715,7 @@ testMultipleAltNamesFailIPOne() {
 testMultipleAltNamesFailIPTwo() {
     # Test with multiple CN's but first one is an incorrect IP
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -n 192.168.0.1 -n www.github.com --altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com -m 192.168.0.1 -m www.github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -1088,7 +1087,7 @@ testIPv6Numeric() {
 
 testFormatShort() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     assertEquals "wrong output" "SSL_CERT OK github.com from 'DigiCert Inc'" "${OUTPUT}"
@@ -1215,14 +1214,14 @@ testDERCertSymbolicLink() {
 
 testCertificateWithoutCN() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -m www.uue.org -f ./cert_with_subject_without_cn.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testCertificateWithEmptySubject() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -n www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -m www.uue.org -f ./cert_with_empty_subject.crt --force-perl-date --ignore-sig-alg --ignore-sct --ignore-exp --ignore-incomplete-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1231,7 +1230,7 @@ testCertificateWithEmptySAN() {
     CERT=$(createSelfSignedCertificate 30)
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n localhost
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -m localhost
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -1242,7 +1241,7 @@ testCertificateWithEmptySANFail() {
     CERT=$(createSelfSignedCertificate 30)
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -n wrong.com
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-exp -m wrong.com
     EXIT_CODE=$?
 
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
@@ -1417,7 +1416,7 @@ testCiphersError() {
 testGitHubWithSSLLabs() {
     # we assume www.github.com gets at least a B
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --cn github.com --check-ssl-labs B --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --check-ssl-labs B --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
@@ -1689,14 +1688,14 @@ testOrganizationOKUmlaut() {
 
 testHSTSOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --require-hsts --host github.com --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG}--require-http-header strict-transport-security --host github.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testHSTSFail() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --require-hsts --host google.com --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG}--require-http-header strict-transport-security --host google.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -1798,14 +1797,14 @@ testDNSSECError() {
 
 testXFrameOptionsOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-x-frame-options
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-http-header X-Frame-Options
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testXFrameOptionsFailed() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-x-frame-options
+    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-http-header X-Frame-Options
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
@@ -1826,14 +1825,14 @@ testHTTPHeadersFailed() {
 
 testHTTPHeaderOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-security-header X-Frame-Options --require-security-header x-xss-protection
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-http-header X-Frame-Options --require-http-header x-xss-protection
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testHTTPHeaderFailed() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-security-header X-Frame-Options --require-security-header x-xss-protection
+    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-http-header X-Frame-Options --require-http-header x-xss-protection
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
