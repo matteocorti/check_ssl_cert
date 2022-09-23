@@ -1,3 +1,4 @@
+  * Fixed a bug in the total certificate validity check if ```--precision``` is specified
 * 2022-09-20 Version 2.46.0
   * The maximum validity check is performed only for HTTPS, files or if the ```--maximum-validity``` option is specified.
 * 2022-09-19 Version 2.45.0
