@@ -34,7 +34,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.46.0
+VERSION=2.47.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -243,6 +243,7 @@ usage() {
     echo "      --check-http-headers         Check the HTTP headers for best practices"
     echo "      --check-ssl-labs-warn grade  SSL Labs grade on which to warn"
     echo "      --clientpass phrase          Set passphrase for client certificate."
+    echo "      --configuration file         Read options from the specified file"
     echo "      --crl                        Check revocation via CRL (requires"
     echo "                                   --rootcert-file)"
     echo "      --curl-bin path              Path of the curl binary to be used"
@@ -689,7 +690,7 @@ verboselog() {
     fi
 
     if [ "${LEVEL}" -le "${VERBOSE}" ]; then
-        echo "${MESSAGE}" >&2
+        echo "${MESSAGE}"
     fi
 
 }
@@ -3230,6 +3231,21 @@ parse_command_line_options() {
             CHECK_CIPHERS="$2"
             shift 2
             ;;
+
+        --configuration)
+            check_option_argument '--configuration' "$2"
+            if [ -r "$2" ] ; then
+                # custom configuration file
+                while IFS= read -r line; do
+                    # shellcheck disable=SC2086
+                    set -- "$@" ${line}
+                done < "$2"
+            else
+                unknown "Cannot read $2"
+            fi
+            shift 2
+            ;;
+
         --curl-bin)
             check_option_argument '--curl-bin' "$2"
             CURL_BIN="$2"

@@ -1858,6 +1858,33 @@ testHTTPHeaders() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testConfigurationOK() {
+    create_temporary_test_file
+    CONFIGURATION=${TEMPFILE}
+    echo "--verbose" >> "${CONFIGURATION}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration "${CONFIGURATION}" | grep -q 'The certificate for this site contains'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
+}
+
+testConfigurationMissingFile() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration MISSING_FILE
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
+testConfigurationWrongOption() {
+    create_temporary_test_file
+    CONFIGURATION=${TEMPFILE}
+    echo "--invalid-option" >> "${CONFIGURATION}"
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration "${CONFIGURATION}"
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

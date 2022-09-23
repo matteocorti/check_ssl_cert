@@ -42,6 +42,7 @@ Options:
       --check-http-headers         Check the HTTP headers for best practices
       --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --clientpass phrase          Set passphrase for client certificate.
+      --configuration file         Read options from the specified file
       --crl                        Check revocation via CRL (requires
                                    --rootcert-file)
       --curl-bin path              Path of the curl binary to be used
@@ -312,6 +313,19 @@ Deprecated options:
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 ```
+
+## Configuration
+
+Command line options can be specified in a configuration file (```${HOME}/.check_ssl_certrc```). For example
+
+```
+$ cat ${HOME}/.check_ssl_certrc
+--verbose
+--critical 20
+--warning 40
+```
+
+Options specified in the configuration file are read before processing the arguments and can be overridden.
 
 ## Expect & timeout
 

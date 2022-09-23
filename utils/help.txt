@@ -13,6 +13,7 @@
 --check-http-headers;Check the HTTP headers for best practices
 --check-ssl-labs-warn grade;SSL Labs grade on which to warn
 --clientpass phrase;Set passphrase for client certificate.
+--configuration file;Read options from the specified file
 --crl;--rootcert-file)
 --crl;Check revocation via CRL (requires
 --curl-bin path;Path of the curl binary to be used
