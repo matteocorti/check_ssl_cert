@@ -25,6 +25,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# To do
+#
+# config file
+# just put arguments in it and process the file as input?
+# Documentation
+
 ################################################################################
 # Constants
 
@@ -44,6 +50,7 @@ TEMPFILE=""
 # Variables
 
 ALL_MSG=""
+CONFIGURATION_FILE="${HOME}/.check_ssl_certrc"
 CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
@@ -3788,6 +3795,14 @@ main() {
     #
     # We do not use getopts since it is unable to process long options and it is
     # Bash specific.
+
+    # read additional options from the configuration file
+    if [ -r "${CONFIGURATION_FILE}" ] ; then
+        while IFS= read -r line; do
+            # shellcheck disable=SC2086
+            set -- "$@" ${line}
+        done < "${CONFIGURATION_FILE}"
+    fi
 
     parse_command_line_options "$@"
 

@@ -1,6 +1,7 @@
 2022-09-23  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): use only integers for the certificate max duration of 13 months
+        * check_ssl_cert (main): read options from a configuration file
 
 2022-09-20  Matteo Corti  <matteo@corti.li>
 
