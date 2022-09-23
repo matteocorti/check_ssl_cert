@@ -10,6 +10,7 @@
 --check-ciphers grade;Check the offered ciphers
 --check-ciphers-warnings;Critical if nmap reports a warning for an
 --check-ciphers-warnings;offered cipher
+--check-http-headers;Check the HTTP headers for best practices
 --check-ssl-labs-warn grade;SSL Labs grade on which to warn
 --clientpass phrase;Set passphrase for client certificate.
 --crl;--rootcert-file)
@@ -63,6 +64,7 @@
 --format FORMAT;Format output template on success, for
 --format FORMAT;example: '%SHORTNAME% OK %CN% from
 --grep-bin path;Path of the grep binary to be used
+--http-headers-path path;The path to be used to fetch HTTP headers
 --http-use-get;HTTP related checks
 --http-use-get;Use GET instead of HEAD (default) for the
 --ignore-altnames;Ignore alternative names when matching
@@ -153,6 +155,10 @@
 --require-client-cert [list];separated list of expected client
 --require-dnssec;Require DNSSEC
 --require-hsts;Require HTTP Strict Transport Security
+--require-http-header header;Require the specified HTTP header
+--require-http-header header;(e.g., X-Frame-Options)
+--require-no-http-header header;Require the absence of the specified
+--require-no-http-header header;HTTP header (e.g., X-Powered-By)
 --require-no-ssl2;Critical if SSL version 2 is offered
 --require-no-ssl3;Critical if SSL version 3 is offered
 --require-no-tls1;Critical if TLS 1 is offered
@@ -160,15 +166,15 @@
 --require-ocsp-stapling;Require OCSP stapling
 --require-purpose usage;Require the specified key usage (can be
 --require-purpose usage;specified more then once)
---require-purpose-critical;the key usage must be critical
+--require-purpose-critical;The key usage must be critical
 --require-san;Alternative Name
 --require-san;Require the presence of a Subject
 --require-san;extension
---require-security-header header;require the specified HTTP
+--require-security-header header;Require the specified HTTP
 --require-security-header header;security header (e.g., X-Frame-Options)
 --require-security-headers-path path;the path to be used to fetch HTTP
 --require-security-headers-path path;security headers
---require-security-headers;require all the HTTP security headers:
+--require-security-headers;Require all the HTTP security headers:
 --require-security-headers;  Content-Security-Policy
 --require-security-headers;  Permissions-Policy
 --require-security-headers;  Referrer-Policy

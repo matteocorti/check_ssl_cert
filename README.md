@@ -11,7 +11,6 @@ A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SS
 ## Usage
 
 ```
-
 Usage: check_ssl_cert -H host [OPTIONS]
        check_ssl_cert -f file [OPTIONS]
 
@@ -40,6 +39,7 @@ Options:
       --check-ciphers grade        Check the offered ciphers
       --check-ciphers-warnings     Critical if nmap reports a warning for an
                                    offered cipher
+      --check-http-headers         Check the HTTP headers for best practices
       --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --clientpass phrase          Set passphrase for client certificate.
       --crl                        Check revocation via CRL (requires
@@ -65,9 +65,9 @@ Options:
                                    specified more than once)
       --debug-cert                 Store the retrieved certificates in the
                                    current directory
-      --debug-file file            Write the debug messages to file
       --debug-headers              Store the retrieved HTLM headers in the
                                    headers.txt file
+      --debug-file file            Write the debug messages to file
       --debug-time                 Write timing information in the
                                    debugging output
       --dig-bin path               Path of the dig binary to be used
@@ -109,6 +109,7 @@ Options:
                                    See --default-format for the default
       --grep-bin path              Path of the grep binary to be used
    -h,--help,-?                    This help message
+      --http-headers-path path     The path to be used to fetch HTTP headers
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks
    -i,--issuer issuer              Pattern to match the issuer of the
@@ -205,6 +206,10 @@ Options:
                                    separated list of expected client
                                    certificate CAs
       --require-dnssec             Require DNSSEC
+      --require-http-header header Require the specified HTTP header
+                                    (e.g., X-Frame-Options)
+      --require-no-http-header header Require the absence of the specified
+                                   HTTP header (e.g., X-Powered-By)
       --require-no-ssl2            Critical if SSL version 2 is offered
       --require-no-ssl3            Critical if SSL version 3 is offered
       --require-no-tls1            Critical if TLS 1 is offered
@@ -212,18 +217,14 @@ Options:
       --require-ocsp-stapling      Require OCSP stapling
       --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)
-      --require-purpose-critical   the key usage must be critical
-      --require-security-header header require the specified HTTP
-                                   security header (e.g., X-Frame-Options)
-      --require-security-headers   require all the HTTP security headers:
+      --require-purpose-critical   The key usage must be critical
+      --require-security-headers   Require all the HTTP security headers:
                                      Content-Security-Policy
                                      Permissions-Policy
                                      Referrer-Policy
                                      strict-transport-security
                                      X-Content-Type-Options
                                      X-Frame-Options
-      --require-security-headers-path path the path to be used to fetch HTTP
-                                   security headers
       --resolve ip                 Provide a custom IP address for the
                                    specified host
       --rootcert-dir path          Root directory to be used for certificate
@@ -268,11 +269,13 @@ Options:
 Deprecated options:
       --altnames                   Match the pattern specified in -n with
                                    alternate names too (enabled by default)
+   -n,--cn name                    Pattern to match the CN or AltName
+                                   (can be specified multiple times)
+      --curl-user-agent string     User agent that curl shall use to obtain
+                                   the issuer cert
       --days days                  Minimum number of days a certificate has
                                    to be valid
                                    (see --critical and --warning)
-   -n,--cn name                    Pattern to match the CN or AltName
-                                   (can be specified multiple times)
    -N,--host-cn                    Match CN with the host name
                                    (enabled by default)
       --no_ssl2                    Disable SSLv2 (deprecated use --no-ssl2)
@@ -292,6 +295,11 @@ Deprecated options:
       --require-san                Require the presence of a Subject
                                    Alternative Name
                                    extension
+      --require-security-header header require the specified HTTP
+                                   security header (e.g., X-Frame-Options)
+                                   (deprecated use --require-http-header)
+      --require-security-headers-path path the path to be used to fetch HTTP
+                                   security headers
       --require-x-frame-options [path] Require the presence of the
                                    X-Frame-Options HTTP header
                                    'path' is the optional path to be used
@@ -301,8 +309,6 @@ Deprecated options:
                                    --require-security-headers-path path)
    -S,--ssl version                Force SSL version (2,3)
                                    (see: --ssl2 or --ssl3)
-      --curl-user-agent string     User agent that curl shall use to obtain
-                                   the issuer cert
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 ```

@@ -25,16 +25,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# To Do
-#
-# #411
-# - require-http-header
-# - require-no-http-header
-# - remove deprecated options to the completions
-# - add new options to the completions
-# - tests
-# - look for best practices
-
 ################################################################################
 # Constants
 
@@ -58,10 +48,12 @@ CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
 DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
+DEFAULT_UNREQUIRED_HTTP_HEADERS="X-Powered-By,X-Aspnet-Version,X-XSS-Protection,X-AspNetMvc-Version"
 EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
 REQUIRED_HTTP_HEADERS=""
-REQUIRED_HTTP_HEADERS_PATH="/"
+UNREQUIRED_HTTP_HEADERS=""
+HTTP_HEADERS_PATH="/"
 STATUS_CRITICAL=2
 STATUS_OK=0
 STATUS_UNKNOWN=3
@@ -92,16 +84,24 @@ add_required_header() {
     fi
 }
 
+################################################################################
+# Add the specified header to the list of unrequired HTTP headers
+# Usage:
+#   add_unrequired_header X-Powered-By
+add_unrequired_header() {
+    header=$1
+    debuglog "Adding ${header} to the list of unrequired HTTP headers: ${UNREQUIRED_HTTP_HEADERS}"
+    if [ -z "${UNREQUIRED_HTTP_HEADERS}" ] ; then
+        UNREQUIRED_HTTP_HEADERS="${header}"
+    else
+        UNREQUIRED_HTTP_HEADERS="${REQUIRED_HTTP_HEADERS},${header}"
+    fi
+}
+
+
 CACHED_HEADERS=
 
-check_http_header() {
-
-    header=$1
-    path=$2
-
-    # we fetch the headers and cache the result
-
-    debuglog "Checking header '${header}' with path '${path}'"
+fetch_http_headers() {
 
     if [ -z "${CACHED_HEADERS}" ] ; then
 
@@ -142,13 +142,44 @@ check_http_header() {
 
     fi
 
+}
+
+check_required_http_header() {
+
+    header=$1
+    path=$2
+
+    fetch_http_headers
+
+    debuglog "Checking required header '${header}' with path '${path}'"
+
     if ! "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}" ; then
-        debuglog "Header '${header}' not found"
-        prepend_critical_message "${header} is not supported"
+        debuglog "Required header '${header}' not found"
+        prepend_critical_message "HTTP header '${header}' is not supported"
     else
         HEADER_VALUE=$( "${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
-        debuglog "Header '${header}' found (${HEADER_VALUE})"
-        verboselog "Header '${header}' is supported  (${HEADER_VALUE})"
+        debuglog "Required header '${header}' found (${HEADER_VALUE})"
+        verboselog "Required header '${header}' is supported  (${HEADER_VALUE})"
+    fi
+
+}
+
+check_unrequired_http_header() {
+
+    header=$1
+    path=$2
+
+    fetch_http_headers
+
+    debuglog "Checking unrequired header '${header}' with path '${path}'"
+
+    if "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}" ; then
+        HEADER_VALUE=$( "${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
+        debuglog "Unwanted header '${header}' found (${HEADER_VALUE})"
+        prepend_critical_message "HTTP header '${header}' is supported (${HEADER_VALUE})"
+    else
+        debuglog "Unwanted header '${header}' not found"
+        verboselog "Unwanted header '${header}' is not supported"
     fi
 
 }
@@ -202,7 +233,7 @@ usage() {
     echo "      --check-ciphers grade        Check the offered ciphers"
     echo "      --check-ciphers-warnings     Critical if nmap reports a warning for an"
     echo "                                   offered cipher"
-    echo "      --check-http-headers         Checks the HTTP headers for best practices"
+    echo "      --check-http-headers         Check the HTTP headers for best practices"
     echo "      --check-ssl-labs-warn grade  SSL Labs grade on which to warn"
     echo "      --clientpass phrase          Set passphrase for client certificate."
     echo "      --crl                        Check revocation via CRL (requires"
@@ -277,6 +308,7 @@ usage() {
     echo "      --grep-bin path              Path of the grep binary to be used"
     # Delimiter at 78 chars ############################################################
     echo "   -h,--help,-?                    This help message"
+    echo "      --http-headers-path path     The path to be used to fetch HTTP headers"
     echo "      --http-use-get               Use GET instead of HEAD (default) for the"
     echo "                                   HTTP related checks"
     # Delimiter at 78 chars ############################################################
@@ -382,7 +414,9 @@ usage() {
     echo "                                   separated list of expected client"
     echo "                                   certificate CAs"
     echo "      --require-dnssec             Require DNSSEC"
-    echo "      --require-no-http-header header require the absence of the specified"
+    echo "      --require-http-header header Require the specified HTTP header"
+    echo "                                    (e.g., X-Frame-Options)"
+    echo "      --require-no-http-header header Require the absence of the specified"
     echo "                                   HTTP header (e.g., X-Powered-By)"
     echo "      --require-no-ssl2            Critical if SSL version 2 is offered"
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
@@ -391,18 +425,7 @@ usage() {
     echo "      --require-ocsp-stapling      Require OCSP stapling"
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
-    echo "      --require-purpose-critical   the key usage must be critical"
-    echo "      --require-http-header header require the specified HTTP header"
-    echo "                                    (e.g., X-Frame-Options)"
-    echo "      --require-security-headers   require all the HTTP security headers:"
-    echo "                                     Content-Security-Policy"
-    echo "                                     Permissions-Policy"
-    echo "                                     Referrer-Policy"
-    echo "                                     strict-transport-security"
-    echo "                                     X-Content-Type-Options"
-    echo "                                     X-Frame-Options"
-    echo "      --require-security-headers-path path the path to be used to fetch HTTP"
-    echo "                                   security headers"
+    echo "      --require-purpose-critical   The key usage must be critical"
     echo "      --resolve ip                 Provide a custom IP address for the"
     echo "                                   specified host"
     echo "      --rootcert-dir path          Root directory to be used for certificate"
@@ -483,6 +506,15 @@ usage() {
     echo "      --require-security-header header require the specified HTTP"
     echo "                                   security header (e.g., X-Frame-Options)"
     echo "                                   (deprecated use --require-http-header)"
+    echo "      --require-security-headers   Require all the HTTP security headers:"
+    echo "                                     Content-Security-Policy"
+    echo "                                     Permissions-Policy"
+    echo "                                     Referrer-Policy"
+    echo "                                     strict-transport-security"
+    echo "                                     X-Content-Type-Options"
+    echo "                                     X-Frame-Options"
+    echo "      --require-security-headers-path path the path to be used to fetch HTTP"
+    echo "                                   security headers"
     echo "      --require-x-frame-options [path] Require the presence of the"
     echo "                                   X-Frame-Options HTTP header"
     echo "                                   'path' is the optional path to be used"
@@ -2830,6 +2862,13 @@ parse_command_line_options() {
             CHECK_CIPHERS_WARNINGS=1
             shift
             ;;
+
+        --check-http-headers)
+            REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
+            UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
+            shift
+            ;;
+
         --crl)
             CRL=1
             shift
@@ -3068,6 +3107,7 @@ parse_command_line_options() {
             ;;
 
         --require-security-headers)
+            deprecated "$1" "Use --check-http-headers"
             REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
             shift
             ;;
@@ -3317,6 +3357,19 @@ parse_command_line_options() {
             fi
             shift 2
             ;;
+
+        --require-http-header)
+            check_option_argument '--require-http-header header' "$2"
+            add_required_header "$2"
+            shift 2
+            ;;
+
+        --require-no-http-header)
+            check_option_argument '--require-no-http-header header' "$2"
+            add_unrequired_header "$2"
+            shift 2
+            ;;
+
         --require-purpose)
             check_option_argument '--require-purpose' "$2"
             if [ -z "${REQUIRE_PURPOSE}" ]; then
@@ -3335,15 +3388,9 @@ $2"
             shift 2
             ;;
 
-        --require-http-header)
-            check_option_argument '--require-http-header header' "$2"
-            add_required_header "$2"
-            shift 2
-            ;;
-
         --require-security-headers-path)
             check_option_argument '--require-security-header-path path' "$2"
-            REQUIRED_HTTP_HEADERS_PATH=$2
+            HTTP_HEADERS_PATH=$2
             shift 2
             ;;
 
@@ -3589,8 +3636,8 @@ $2"
             add_required_header X-Frame-Options
 
             # default path
-            if [ -z "${REQUIRED_HTTP_HEADERS_PATH}" ] ; then
-                REQUIRED_HTTP_HEADERS_PATH='/'
+            if [ -z "${HTTP_HEADERS_PATH}" ] ; then
+                HTTP_HEADERS_PATH='/'
             fi
 
             # check the second optional parameter if it exist
@@ -3599,7 +3646,7 @@ $2"
                 if [ "${2%${2#?}}"x = '-x' ]; then
                     shift
                 else
-                    REQUIRED_HTTP_HEADERS_PATH=$2
+                    HTTP_HEADERS_PATH=$2
                     shift 2
                 fi
             else
@@ -3866,6 +3913,7 @@ main() {
         # we check HTTP headers only with HTTP/HTTPS
         if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
             REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
+            UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
         fi
 
     fi
@@ -3887,7 +3935,7 @@ main() {
     # do not split the next line otherwise ShellCheck will fail to parse it
     # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
     if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
-        if [ -n "${REQUIRED_HTTP_HEADERS}" ] ; then
+        if [ -n "${REQUIRED_HTTP_HEADERS}" ] || [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ; then
             unknown "HTTP headers can only be checked with HTTP[S]"
         fi
     fi
@@ -5094,18 +5142,21 @@ main() {
 
     fi
 
-    # check secuirity headers
+    ####################
+    # check HTTP headers
+
     if [ -n "${REQUIRED_HTTP_HEADERS}" ] ; then
-
-        debuglog "Checking HTTP headers: ${REQUIRED_HTTP_HEADERS}"
-
+        debuglog "Checking required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
         for header in $( echo "${REQUIRED_HTTP_HEADERS}" | tr ',' '\n' ) ; do
-
-            check_http_header "${header}" "${REQUIRED_HTTP_HEADERS_PATH}"
-
+            check_required_http_header "${header}" "${HTTP_HEADERS_PATH}"
         done
+    fi
 
-
+    if [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ; then
+        debuglog "Checking unwanted HTTP headers: ${UNREQUIRED_HTTP_HEADERS}"
+        for header in $( echo "${UNREQUIRED_HTTP_HEADERS}" | tr ',' '\n' ) ; do
+            check_unrequired_http_header "${header}" "${HTTP_HEADERS_PATH}"
+        done
     fi
 
     # check for TLS renegotiation

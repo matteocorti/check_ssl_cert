@@ -44,6 +44,9 @@ Check the offered ciphers
 .BR "   --check-ciphers-warnings"
 Critical if nmap reports a warning for an offered cipher
 .TP
+.BR "   --check-http-headers"
+Check the HTTP headers for best practices
+.TP
 .BR "   --check-ssl-labs-warn grade"
 SSL Labs grade on which to warn
 .TP
@@ -174,6 +177,9 @@ Path of the grep binary to be used
 .TP
 .BR "-h,--help,-?"
 This help message
+.TP
+.BR "   --http-headers-path" " path"
+The path to be used to fetch HTTP headers
 .TP
 .BR "   --http-use-get"
 Use GET instead of HEAD (default) for the HTTP related checks
@@ -331,6 +337,12 @@ The server must accept a client certificate. 'list' is an optional comma separat
 .BR "   --require-dnssec"
 Require DNSSEC
 .TP
+.BR "   --require-http-header" " header"
+Require the specified HTTP header (e.g., X-Frame-Options)
+.TP
+.BR "   --require-no-http-header" " header"
+Require the absence of the specified HTTP header (e.g., X-Powered-By)
+.TP
 .BR "   --require-no-ssl2"
 Critical if SSL version 2 is offered
 .TP
@@ -350,22 +362,19 @@ Require OCSP stapling
 Require the specified key usage (can be specified more then once)
 .TP
 .BR "    --require-purpose-critical"
-the key usage must be critical
+The key usage must be critical
 .TP
 .BR "    --require-security-header" " header"
-require the specified HTTP security header (e.g., X-Frame-Options)
+Require the specified HTTP security header (e.g., X-Frame-Options)
 .TP
 .BR "    --require-security-headers"
-require all the HTTP security headers:
+Require all the HTTP security headers:
   Content-Security-Policy
   Permissions-Policy
   Referrer-Policy
   strict-transport-security
   X-Content-Type-Options
   X-Frame-Options
-.TP
-.BR "    --require-security-headers-path" " path"
-the path to be used to fetch HTTP security headers
 .TP
 .BR "   --resolve" " ip"
 Provide a custom IP address for the specified host
@@ -481,11 +490,14 @@ Disable TLSv1.1 (deprecated use --no-tls1_3)
 .BR "   --ocsp"
 Check revocation via OCSP (enabled by default)
 .TP
-.BR "   --require-san"
-Require the presence of a Subject Alternative Name extension
-.TP
 .BR "   --require-hsts"
 Require HTTP Strict Transport Security (deprecated use --require-security-header strict-transport-security)
+.TP
+.BR "    --require-security-headers-path" " path"
+the path to be used to fetch HTTP security headers
+.TP
+.BR "   --require-san"
+Require the presence of a Subject Alternative Name extension
 .TP
 .BR "   --require-x-frame-options [path]"
 Require the presence of the X-Frame-Options HTTP header. 'path' is the optional path to be used in the URL to check for the header (deprecated use --require-security-header X-Frame-Options and --require-security-headers-path path)
