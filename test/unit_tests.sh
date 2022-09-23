@@ -1095,7 +1095,7 @@ testFormatShort() {
 
 testMoreErrors() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | wc -l | sed 's/ //g')
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --critical 1000 --warning 1001 | grep -A 100 '^SSL_CERT CRITICAL' | wc -l | sed 's/ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
@@ -1104,11 +1104,11 @@ testMoreErrors() {
 
 testMoreErrors2() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --verbose | wc -l | sed 's/ //g')
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -v --email doesnotexist --warning 1000 --warning 1001 --match DOES_NOT_EXIST | grep -A 100 '^SSL_CERT CRITICAL' | wc -l | sed 's/ //g')
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     # we should get three lines: the plugin output and three errors
-    assertEquals "wrong number of errors" 4 "${OUTPUT}"
+    assertEquals "wrong number of errors" 5 "${OUTPUT}"
 }
 
 # dane
