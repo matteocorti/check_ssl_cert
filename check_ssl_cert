@@ -1261,11 +1261,19 @@ compare() {
 #   SCALE has to be set (precision)
 # Params
 #  $1 the expression
+#  $2 scale: total number of decimal digits after the decimal point
 # Returns the result
 compute() {
     expression="$1"
-    debuglog "Computing '${expression}'"
-    result=$(echo "scale=${SCALE};${expression}" | "${BCBIN}" 2>&1)
+    if [ -n "$2" ] ; then
+        # custom scale
+        local_scale=$2
+    else
+        # default scale
+        local_scale="${SCALE}"
+    fi
+    debuglog "Computing '${expression}' (precision ${local_scale})"
+    result=$(echo "scale=${local_scale};${expression}" | "${BCBIN}" 2>&1)
     echo "${result}"
 
 }
@@ -6092,9 +6100,9 @@ ${WARNING}"
 
             HOURS_UNTIL_END_DATE=$( hours_until "${DATE}" )
             HOURS_FROM_START_DATE=$( hours_until "${START_DATE}" )
-            TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" )
 
-            debuglog "Total certificate validity: ${TOTAL_CERT_VALIDITY}"
+            # no decimals even if --precision was specified
+            TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" 0 )
 
             LIMIT=397
             if [ -n "${MAXIMUM_VALIDITY}" ] ; then
