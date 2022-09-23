@@ -1846,7 +1846,7 @@ testHTTPNoHeaderOK() {
 
 testHTTPNoHeaderFailed() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-http-header X-Frame-Options --require-http-header x-xss-protection
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-no-http-header X-Frame-Options
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
