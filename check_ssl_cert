@@ -34,7 +34,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.47.0
+VERSION=2.48.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -101,7 +101,7 @@ add_unrequired_header() {
     if [ -z "${UNREQUIRED_HTTP_HEADERS}" ] ; then
         UNREQUIRED_HTTP_HEADERS="${header}"
     else
-        UNREQUIRED_HTTP_HEADERS="${REQUIRED_HTTP_HEADERS},${header}"
+        UNREQUIRED_HTTP_HEADERS="${UNREQUIRED_HTTP_HEADERS},${header}"
     fi
 }
 
@@ -3947,6 +3947,9 @@ main() {
         fi
 
     fi
+
+    debuglog "Required HTTP headers:   ${REQUIRED_HTTP_HEADERS}"
+    debuglog "Unrequired HTTP headers: ${UNREQUIRED_HTTP_HEADERS}"
 
     ##############################
     # Check options: sanity checks

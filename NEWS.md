@@ -1,3 +1,5 @@
+* 2022-09-24 Version 2.48.0
+  * Fixes the parsing of --require-no-http-header
 * 2022-09-23 Version 2.47.0
   * New options to check HTTP headers (see ```--help```)
   * Options can now be specified in a configuration file (see README.md)

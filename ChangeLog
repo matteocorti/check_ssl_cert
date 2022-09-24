@@ -1,3 +1,7 @@
+2022-09-24  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (add_unrequired_header): Fixing #413
+
 2022-09-23  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): use only integers for the certificate max duration of 13 months
