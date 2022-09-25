@@ -993,7 +993,7 @@ prepend_critical_message() {
 
     verboselog "CRITICAL error: $1"
 
-    debuglog "CRITICAL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    debuglog "CRITICAL ----------------------------------------"
     debuglog "prepend_critical_message: new message    = $1"
     debuglog "prepend_critical_message: CRITICAL_MSG   = ${CRITICAL_MSG}"
     debuglog "prepend_critical_message: ALL_MSG 1      = ${ALL_MSG}"
@@ -1032,7 +1032,7 @@ prepend_critical_message() {
     debuglog "prepend_critical_message: MSG 2          = ${MSG}"
     debuglog "prepend_critical_message: CRITICAL_MSG 2 = ${CRITICAL_MSG}"
     debuglog "prepend_critical_message: ALL_MSG 2      = ${ALL_MSG}"
-    debuglog "CRITICAL <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    debuglog "CRITICAL ----------------------------------------"
 
 }
 
@@ -1187,7 +1187,7 @@ append_warning_message() {
 
     verboselog "Warning: $1"
 
-    debuglog "WARNING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    debuglog "WARNING ----------------------------------------"
     debuglog "append_warning_message: HOST_NAME    = ${HOST_NAME}"
     debuglog "append_warning_message: HOST_ADDR    = ${HOST_ADDR}"
     debuglog "append_warning_message: CN           = ${CN}"
@@ -1229,7 +1229,7 @@ append_warning_message() {
     debuglog "prepend_warning_message: MSG 2          = ${MSG}"
     debuglog "prepend_warning_message: WARNING_MSG 2 = ${WARNING_MSG}"
     debuglog "prepend_warning_message: ALL_MSG 2      = ${ALL_MSG}"
-    debuglog "WARNING <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    debuglog "WARNING ----------------------------------------"
 
 }
 
