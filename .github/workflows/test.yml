@@ -6,6 +6,8 @@ on:
       - $default-branch
       - development
       - master
+   paths-ignore:
+      - 'varia/**'
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
