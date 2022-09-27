@@ -1,1 +1,2 @@
-Fixes the parsing of --require-no-http-header
+ * The plugin is working without nmap (with some limitations)
+ * Fixed a bug in the processing of the --nmap-bin option

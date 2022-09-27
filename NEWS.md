@@ -1,3 +1,6 @@
+* 2022-09-27 Version 2.49.0
+  * The plugin is working without nmap (with some limitations)
+  * Fixed a bug in the processing of the --nmap-bin option
 * 2022-09-24 Version 2.48.0
   * Fixes the parsing of --require-no-http-header
 * 2022-09-23 Version 2.47.0
