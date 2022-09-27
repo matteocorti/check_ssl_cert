@@ -3293,6 +3293,7 @@ parse_command_line_options() {
         --nmap-bin)
             check_option_argument '--nmap-bin' "$2"
             NMAP_BIN="$2"
+            shift 2
             ;;
         -e | --email)
             check_option_argument 'e|--email' "$2"
@@ -4462,10 +4463,20 @@ main() {
     # nmap
     if [ -z "${NMAP_BIN}" ]; then
 
-            debuglog "nmap binary not specified"
-            check_required_prog nmap
-            NMAP_BIN=${PROG}
+        debuglog "nmap binary not specified"
+
+        # we check if nmap is available: if not we continue without connection checks and ciphers
+        NMAP_BIN=$(command -v nmap 2>/dev/null)
+        if [ -z "${NMAP_BIN}" ]; then
+            verboselog "cannot find nmap: disabling connection checks and ciphers checks"
+            debuglog "cannot find nmap: disabling connection checks and ciphers checks"
+            DISABLE_NMAP=1
+        else
+            if [ ! -x "${NMAP_BIN}" ]; then
+                unknown "${NMAP_BIN} is not executable"
+            fi
             debuglog "nmap available: ${NMAP_BIN}"
+        fi
 
     else
 

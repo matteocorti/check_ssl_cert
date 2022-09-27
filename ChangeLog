@@ -1,3 +1,8 @@
+2022-09-27  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): if nmap is not found the plugin continues
+        * check_ssl_cert (parse_command_line_options): fixing an infinite loop (not shifting the command line arguments)
+
 2022-09-24  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (add_unrequired_header): Fixing #413
