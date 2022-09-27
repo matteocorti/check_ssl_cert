@@ -6,7 +6,7 @@ on:
       - $default-branch
       - development
       - master
-   paths-ignore:
+     paths-ignore:
       - varia/***
   # Run tests for any PRs
   pull_request:
