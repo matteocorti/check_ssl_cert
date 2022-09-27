@@ -3293,6 +3293,7 @@ parse_command_line_options() {
         --nmap-bin)
             check_option_argument '--nmap-bin' "$2"
             NMAP_BIN="$2"
+            shift 2
             ;;
         -e | --email)
             check_option_argument 'e|--email' "$2"
