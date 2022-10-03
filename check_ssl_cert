@@ -43,8 +43,6 @@ SIGNALS="HUP INT QUIT TERM ABRT"
 
 LC_ALL=C
 
-# return value for the creation of temporary files
-TEMPFILE=""
 
 ################################################################################
 # Variables
@@ -65,6 +63,7 @@ STATUS_CRITICAL=2
 STATUS_OK=0
 STATUS_UNKNOWN=3
 STATUS_WARNING=1
+TEMPFILE=""
 WARNING_MSG=""
 
 DEFAULT_FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
@@ -3829,7 +3828,7 @@ main() {
         if [ -z "${PROTOCOL}" ]; then
 
             # default is HTTPS
-            PORT='443'
+            PORT=443
 
         else
 
