@@ -1878,6 +1878,27 @@ testConfigurationWrongOption() {
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
 }
 
+testRootCertInChain() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
+}
+
+testRootCertNotInChainGitHub() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H github.com --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
+}
+
+testRootCertNotInChainGoogle() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H google.com --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 

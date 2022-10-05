@@ -43,7 +43,6 @@ SIGNALS="HUP INT QUIT TERM ABRT"
 
 LC_ALL=C
 
-
 ################################################################################
 # Variables
 
@@ -2206,6 +2205,7 @@ check_cert_end_date() {
     add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
 
     if [ "${OPENSSL_COMMAND}" = "x509" ]; then
+
         # x509 certificates (default)
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number} (${element_cn})"
@@ -2262,7 +2262,9 @@ check_cert_end_date() {
                 return 2
             fi
         fi
+
     elif [ "${OPENSSL_COMMAND}" = "crl" ]; then
+
         # CRL certificates
 
         # We always check expired certificates
@@ -5469,6 +5471,28 @@ EOF
                 break
             fi
         done
+
+        # TODO
+
+        # check the certificate chain to see if the root certificate in unnecessarily delivered
+        # and issue a warning if it is the case
+
+        # if issuer of the last element is the same as the element itself we have a root cert
+        #
+        # e.g.
+        # 0 s:C = CH, L = Z\C3\BCrich, O = ETH Z\C3\BCrich, CN = matteo.ethz.ch
+        #   i:C = US, O = DigiCert Inc, CN = DigiCert TLS RSA SHA256 2020 CA1
+        # 1 s:C = US, O = DigiCert Inc, CN = DigiCert TLS RSA SHA256 2020 CA1
+        #   i:C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
+        # 2 s:C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
+        #   i:C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
+
+        matches=$( grep '^ [0-9 ] [si]:' "${CERT}" | tail -n 2 | sed 's/^[ 0-9]* [si]://' | uniq -c | wc -l )
+
+        if [ "${matches}" -eq 1 ] ; then
+            debuglog "The root certificate is present in the chain"
+            verboselog "The root certificate is unnecessarily present in the delivered certificate chain"
+        fi
 
         debuglog "Certificate chain check finished"
 
