@@ -28,7 +28,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.50.0
+VERSION=2.51.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -2213,6 +2213,7 @@ check_cert_end_date() {
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
             debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
+            echo XX 100
             CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
             if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
                 CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
@@ -5940,46 +5941,50 @@ EOF
         # browsers usually do not complain (see #416)
 
         # loop over the criticals
-        while IFS= read -r critical ; do
+        if [ -n "${CN_EXPIRED_CRITICAL}" ] ; then
+            while IFS= read -r critical ; do
 
-            CN_TMP=$( echo "${critical}" | sed 's/:.*//' )
-            REPLACE_CURRENT_MESSAGE=$( echo "${critical}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
-            MESSAGE_TMP=$( echo "${critical}" | sed 's/^[^:]*:[^:]*://' )
+                CN_TMP=$( echo "${critical}" | sed 's/:.*//' )
+                REPLACE_CURRENT_MESSAGE=$( echo "${critical}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
+                MESSAGE_TMP=$( echo "${critical}" | sed 's/^[^:]*:[^:]*://' )
 
-            # check if the warning is overridden by another certificate for the same CN
-            if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
-                verboselog "Both a valid and an expired certificate were found"
-                if [ -n "${CHECK_CHAIN}" ] ; then
-                    prepend_critical_message "Both a valid and an expired certificate were found"
+                # check if the warning is overridden by another certificate for the same CN
+                if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                    verboselog "Both a valid and an expired certificate were found"
+                    if [ -n "${CHECK_CHAIN}" ] ; then
+                        prepend_critical_message "Both a valid and an expired certificate were found"
+                    fi
+                else
+                    prepend_critical_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
                 fi
-            else
-                prepend_critical_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
-            fi
 
-        done <<INPUT
+            done <<INPUT
 ${CN_EXPIRED_CRITICAL}
 INPUT
+        fi
 
         # loop over the warnings
-        while IFS= read -r warning ; do
+        if [ -n "${CN_EXPIRED_WARNING}" ] ; then
+            while IFS= read -r warning ; do
 
-            CN_TMP=$( echo "${warning}" | sed 's/:.*//' )
-            REPLACE_CURRENT_MESSAGE=$( echo "${warning}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
-            MESSAGE_TMP=$( echo "${warning}" | sed 's/^[^:]*:[^:]*://' )
+                CN_TMP=$( echo "${warning}" | sed 's/:.*//' )
+                REPLACE_CURRENT_MESSAGE=$( echo "${warning}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
+                MESSAGE_TMP=$( echo "${warning}" | sed 's/^[^:]*:[^:]*://' )
 
-            # check if the warning is overridden by another certificate for the same CN
-            if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
-                verboselog "Both a valid and an expired certificate were found"
-                if [ -n "${CHECK_CHAIN}" ] ; then
-                    prepend_critical_message "Both a valid and an expired certificate were found"
+                # check if the warning is overridden by another certificate for the same CN
+                if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                    verboselog "Both a valid and an expired certificate were found"
+                    if [ -n "${CHECK_CHAIN}" ] ; then
+                        prepend_critical_message "Both a valid and an expired certificate were found"
+                    fi
+                else
+                    append_warning_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
                 fi
-            else
-                append_warning_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
-            fi
 
-        done <<INPUT
+            done <<INPUT
 ${CN_EXPIRED_WARNING}
 INPUT
+        fi
 
     fi
 
