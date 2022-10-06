@@ -2213,7 +2213,6 @@ check_cert_end_date() {
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
             debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
-            echo XX 100
             CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
             if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
                 CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
