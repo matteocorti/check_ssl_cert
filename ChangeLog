@@ -1,6 +1,7 @@
 2022-10-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: additional chain checks (no root attributes and handling of double certificates
+        * check_ssl_cert (check_attr): fixed a bug in the chain checks
 
 2022-09-27  Matteo Corti  <matteo@corti.li>
 

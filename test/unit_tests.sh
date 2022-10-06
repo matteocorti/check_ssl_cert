@@ -1885,11 +1885,18 @@ testRootCertInChain() {
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
 
-testRootCertInChainEnforce() {
+testRootCertInChainEnforceFail() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --check-chain
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testRootCertInChainEnforceOK() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host www.github.com --check-chain
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRootCertNotInChainGitHub() {

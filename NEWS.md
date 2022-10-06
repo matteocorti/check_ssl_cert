@@ -1,3 +1,5 @@
+* 2022-10-06 Version 2.51.0
+  * Fixed a bug in the chain checks
 * 2022-10-06 Version 2.50.0
   * Additional checks for the certificate chain (see ```--check-chain```)
 * 2022-09-27 Version 2.49.0

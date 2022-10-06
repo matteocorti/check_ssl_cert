@@ -1,1 +1,1 @@
-Additional checks for the certificate chain (see ```--check-chain```)
+Fixed a bug in the chain checks
