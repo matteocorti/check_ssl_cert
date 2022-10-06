@@ -7,6 +7,8 @@
 --allow-empty-san;Alternative Names (SANs)
 --altnames;Match the pattern specified in -n with
 --altnames;alternate names too (enabled by default)
+--check-chain;The certificate chain cannot contain
+--check-chain;double or root certificates
 --check-ciphers grade;Check the offered ciphers
 --check-ciphers-warnings;Critical if nmap reports a warning for an
 --check-ciphers-warnings;offered cipher

@@ -36,6 +36,8 @@ Options:
                                    to be valid to issue a critical status.
                                    Can be a floating point number, e.g., 0.5
                                    Default: 15
+      --check-chain                The certificate chain cannot contain
+                                   double or root certificates
       --check-ciphers grade        Check the offered ciphers
       --check-ciphers-warnings     Critical if nmap reports a warning for an
                                    offered cipher

@@ -25,16 +25,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# To do
-#
-# config file
-# just put arguments in it and process the file as input?
-# Documentation
-
 ################################################################################
 # Constants
 
-VERSION=2.49.0
+VERSION=2.50.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -235,6 +229,8 @@ usage() {
     echo "                                   to be valid to issue a critical status."
     echo "                                   Can be a floating point number, e.g., 0.5"
     echo "                                   Default: ${CRITICAL_DAYS}"
+    echo "      --check-chain                The certificate chain cannot contain"
+    echo "                                   double or root certificates"
     echo "      --check-ciphers grade        Check the offered ciphers"
     echo "      --check-ciphers-warnings     Critical if nmap reports a warning for an"
     echo "                                   offered cipher"
@@ -2909,6 +2905,11 @@ parse_command_line_options() {
             shift
             ;;
 
+        --check-chain)
+            CHECK_CHAIN=1
+            shift
+            ;;
+
         --crl)
             CRL=1
             shift
@@ -4074,7 +4075,7 @@ main() {
 
         HOST_ADDR="${RESOLVE}"
         HOST_NAME="${HOST}"
-<        SNI="${HOST}"
+        SNI="${HOST}"
 
     else
 
@@ -5504,8 +5505,6 @@ EOF
             fi
         done
 
-        # TODO
-
         # check the certificate chain to see if the root certificate in unnecessarily delivered
         # and issue a warning if it is the case
 
@@ -5524,6 +5523,9 @@ EOF
         if [ "${matches}" -eq 1 ] ; then
             debuglog "The root certificate is present in the chain"
             verboselog "The root certificate is unnecessarily present in the delivered certificate chain"
+            if [ -n "${CHECK_CHAIN}" ] ; then
+                prepend_critical_message "The root certificate is unnecessarily present in the delivered certificate chain"
+            fi
         fi
 
         debuglog "Certificate chain check finished"
@@ -5947,6 +5949,9 @@ EOF
             # check if the warning is overridden by another certificate for the same CN
             if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
                 verboselog "Both a valid and an expired certificate were found"
+                if [ -n "${CHECK_CHAIN}" ] ; then
+                    prepend_critical_message "Both a valid and an expired certificate were found"
+                fi
             else
                 prepend_critical_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
             fi
@@ -5965,6 +5970,9 @@ INPUT
             # check if the warning is overridden by another certificate for the same CN
             if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
                 verboselog "Both a valid and an expired certificate were found"
+                if [ -n "${CHECK_CHAIN}" ] ; then
+                    prepend_critical_message "Both a valid and an expired certificate were found"
+                fi
             else
                 append_warning_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
             fi

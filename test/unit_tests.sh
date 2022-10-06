@@ -1885,6 +1885,13 @@ testRootCertInChain() {
     assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
 }
 
+testRootCertInChainEnforce() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --check-chain
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 testRootCertNotInChainGitHub() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
