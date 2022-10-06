@@ -1,1 +1,1 @@
-Fixed a bug in the chain checks
+Removed spurious debugging output
