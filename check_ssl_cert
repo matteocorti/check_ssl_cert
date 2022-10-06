@@ -2209,13 +2209,21 @@ check_cert_end_date() {
         # x509 certificates (default)
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number} (${element_cn})"
+
         if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 >/dev/null; then
             if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
-            prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})" "${replace_current_message}"
+            debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
+            CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
+            if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
+                CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
+            else
+                CN_EXPIRED_CRITICAL="${CN_EXPIRED_CRITICAL}
+${CN_EXPIRED_TMP}"
+            fi
             if [ -z "${CN}" ]; then
                 CN='unavailable'
             fi
@@ -2228,7 +2236,14 @@ check_cert_end_date() {
             debuglog "executing: ${OPENSSL} x509 -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
-                prepend_critical_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
+                CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
+                if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
+                    CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
+                else
+                    CN_EXPIRED_CRITICAL="${CN_EXPIRED_CRITICAL}
+${CN_EXPIRED_TMP}"
+                fi
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
@@ -2243,7 +2258,14 @@ check_cert_end_date() {
             debuglog "executing: ${OPENSSL} x509 -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
-                append_warning_message "${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}" "${replace_current_message}"
+                debuglog "WARNING: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
+                CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
+                if [ -z "${CN_EXPIRED_WARNING}" ] ; then
+                    CN_EXPIRED_WARNING="${CN_EXPIRED_TMP}"
+                else
+                    CN_EXPIRED_WARNING="${CN_EXPIRED_WARNING}
+${CN_EXPIRED_TMP}"
+                fi
                 if [ -z "${CN}" ]; then
                     CN='unavailable'
                 fi
@@ -2252,6 +2274,7 @@ check_cert_end_date() {
             fi
 
         fi
+
         if [ -n "${NOT_VALID_LONGER_THAN}" ]; then
             debuglog "checking if the certificate is valid longer than ${NOT_VALID_LONGER_THAN} days"
             debuglog "  valid for ${DAYS_VALID} days"
@@ -2304,6 +2327,15 @@ check_cert_end_date() {
     if [ -z "${CN}" ]; then
         CN='unavailable'
     fi
+
+    # the element is valid: add to the list of valid CNs
+    if [ -z "${CN_OK}" ] ; then
+        CN_OK="${element_cn}"
+    else
+        CN_OK="${CN_OK}
+${element_cn}"
+    fi
+
     verboselog "Certificate element ${el_number} (${element_cn}) is valid for ${ELEM_DAYS_VALID} days"
     add_prometheus_valid_output_line "cert_valid_chain_elem{cn=\"${CN}\", element=\"${el_number}\"} 0"
 
@@ -4042,7 +4074,7 @@ main() {
 
         HOST_ADDR="${RESOLVE}"
         HOST_NAME="${HOST}"
-        SNI="${HOST}"
+<        SNI="${HOST}"
 
     else
 
@@ -5855,6 +5887,15 @@ EOF
             NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
             debuglog "Number of certificates in CA chain: $((NUM_CERTIFICATES))"
 
+            # a file could contain more than one certificate for the same CN
+            # if both a valid and an expired certificate for the same CN are present
+            # browsers usually do not complain (see #416)
+
+            # list of CNs for which a valid certificate was found
+            CN_OK=''
+            CN_EXPIRED_CRITICAL=''
+            CN_EXPIRED_WARNING=''
+
             CERT_IN_CHAIN=1
             while [ "${CERT_IN_CHAIN}" -le "${NUM_CERTIFICATES}" ]; do
 
@@ -5891,6 +5932,46 @@ EOF
             debuglog '------------------------------------------------------------------------------'
 
         fi
+
+        # a file could contain more than one certificate for the same CN
+        # if both a valid and an expired certificate for the same CN are present
+        # browsers usually do not complain (see #416)
+
+        # loop over the criticals
+        while IFS= read -r critical ; do
+
+            CN_TMP=$( echo "${critical}" | sed 's/:.*//' )
+            REPLACE_CURRENT_MESSAGE=$( echo "${critical}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
+            MESSAGE_TMP=$( echo "${critical}" | sed 's/^[^:]*:[^:]*://' )
+
+            # check if the warning is overridden by another certificate for the same CN
+            if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                verboselog "Both a valid and an expired certificate were found"
+            else
+                prepend_critical_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
+            fi
+
+        done <<INPUT
+${CN_EXPIRED_CRITICAL}
+INPUT
+
+        # loop over the warnings
+        while IFS= read -r warning ; do
+
+            CN_TMP=$( echo "${warning}" | sed 's/:.*//' )
+            REPLACE_CURRENT_MESSAGE=$( echo "${warning}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
+            MESSAGE_TMP=$( echo "${warning}" | sed 's/^[^:]*:[^:]*://' )
+
+            # check if the warning is overridden by another certificate for the same CN
+            if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                verboselog "Both a valid and an expired certificate were found"
+            else
+                append_warning_message "${MESSAGE_TMP}" "${REPLACE_CURRENT_MESSAGE}"
+            fi
+
+        done <<INPUT
+${CN_EXPIRED_WARNING}
+INPUT
 
     fi
 
@@ -6304,11 +6385,11 @@ ${WARNING}"
     # Criticals and warnings
 
     # if errors exist at this point return
-    if [ "${CRITICAL_MSG}" != "" ]; then
+    if [ -n "${CRITICAL_MSG}" ]; then
         critical "${CRITICAL_MSG}"
     fi
 
-    if [ "${WARNING_MSG}" != "" ]; then
+    if [ -n "${WARNING_MSG}" ]; then
         warning "${WARNING_MSG}"
     fi
 
