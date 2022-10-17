@@ -2768,6 +2768,13 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
 
+        elif ascii_grep "unexpected eof while reading" "${ERROR}" ||
+             ascii_grep "ssl handshake failure" "${ERROR}"; then
+
+            ERROR="TLS handshake error"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT_CRITICAL ${HOST_NAME}:${PORT}: ${ERROR}"
+
         else
 
             # Try to clean up the error message
