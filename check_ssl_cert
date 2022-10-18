@@ -3953,6 +3953,8 @@ main() {
         GREP_VERSION=$( ${GREP_BIN} --version)
         echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
+        debuglog "PATH: ${PATH}"
+
     fi
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
