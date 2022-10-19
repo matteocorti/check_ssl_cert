@@ -213,7 +213,7 @@ usage() {
     echo "                                   With -f you can not only pass a x509"
     echo "                                   certificate file but also a certificate"
     echo "                                   revocation list (CRL) to check the"
-    echo "                                   validity period"
+    echo "                                   validity period or a Java KeyStore file"
     echo "   -H,--host host                  Server"
     echo
     echo "Options:"
@@ -344,7 +344,8 @@ usage() {
     echo "      --init-host-cache            Initialize the host cache"
     echo "      --issuer-cert-cache dir      Directory where to store issuer"
     echo "                                   certificates cache"
-    echo "      --jks-alias alias            alias name of the Java KeyStore entry"
+    # Delimiter at 78 chars ############################################################
+    echo "      --jks-alias alias            Alias name of the Java KeyStore entry"
     echo "                                   (requires --file)"
     # Delimiter at 78 chars ############################################################
     echo "   -K,--clientkey path             Use client certificate key to authenticate"

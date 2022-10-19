@@ -14,7 +14,7 @@ A shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS 
 .SH ARGUMENTS
 .TP
 .BR "-f,--file" " file"
-Local file path or URI. With -f you can not only pass a x509 certificate file but also a certificate revocation list (CRL) to check the validity period
+Local file path or URI. With -f you can not only pass a x509 certificate file but also a certificate revocation list (CRL) to check the validity period or a Java KeyStore file
 .TP
 .BR "-H,--host" " host"
 server
@@ -189,6 +189,9 @@ The path to be used to fetch HTTP headers
 .TP
 .BR "   --http-use-get"
 Use GET instead of HEAD (default) for the HTTP related checks
+.TP
+.BR "   --jks-alias" " alias"
+Alias name of the Java KeyStore entry (requires --file)
 .TP
 .BR "-i,--issuer" " issuer"
 Pattern to match the issuer of the certificate

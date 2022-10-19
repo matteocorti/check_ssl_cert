@@ -95,6 +95,8 @@
 --init-host-cache;Initialize the host cache
 --issuer-cert-cache dir;Directory where to store issuer
 --issuer-cert-cache dir;certificates cache
+--jks-alias alias;Alias name of the Java KeyStore entry
+--jks-alias alias;(requires --file)
 --long-output list;'all' will include all the available
 --long-output list;Append the specified comma separated (no
 --long-output list;Valid attributes are:
@@ -251,7 +253,7 @@
 -f,--file file;With -f you can not only pass a x509
 -f,--file file;certificate file but also a certificate
 -f,--file file;revocation list (CRL) to check the
--f,--file file;validity period
+-f,--file file;validity period or a Java KeyStore file
 -h,--help,-?;This help message
 -i,--issuer issuer;Pattern to match the issuer of the
 -i,--issuer issuer;certificate

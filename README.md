@@ -20,7 +20,7 @@ Arguments:
                                    With -f you can not only pass a x509
                                    certificate file but also a certificate
                                    revocation list (CRL) to check the
-                                   validity period
+                                   validity period or a Java KeyStore file
    -H,--host host                  Server
 
 Options:
@@ -116,6 +116,8 @@ Options:
       --http-headers-path path     The path to be used to fetch HTTP headers
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks
+      --jks-alias alias            Alias name of the Java KeyStore entry
+                                   (requires --file)
    -i,--issuer issuer              Pattern to match the issuer of the
                                    certificate
       --ignore-altnames            Ignore alternative names when matching
