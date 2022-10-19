@@ -141,3 +141,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Varac](https://github.com/varac) for the Prometheus fix
 * Many thanks to [PSSGCSim](https://github.com/PSSGCSim) for the Prometheus fix
 * Many thanks to [Dick Visser](https://github.com/dnmvisser) for the user agent fix
+* Many thanks to [claudioth](https://github.com/claudioth) for the Perl date computation fix

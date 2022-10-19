@@ -1,3 +1,4 @@
+  * Fixed a bug in the date computations with Perl
 * 2022-10-06 Version 2.52.0
   * Removed spurious debugging output
 * 2022-10-06 Version 2.51.0
