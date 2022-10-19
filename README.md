@@ -11,6 +11,7 @@ A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SS
 ## Usage
 
 ```
+
 Usage: check_ssl_cert -H host [OPTIONS]
        check_ssl_cert -f file [OPTIONS]
 
@@ -192,7 +193,8 @@ Options:
                                    ftp, ftps, http, https (default),
                                    h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
                                    ldaps, mysql, pop3, pop3s, postgres,
-                                   sieve, smtp, smtps, xmpp, xmpp-server.
+                                   sieve, smtp, smtps, tds, xmpp,
+                                   xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS
       --password source            Password source for a local certificate,
@@ -201,6 +203,7 @@ Options:
       --prometheus                 Generate Prometheus/OpenMetrics output
       --proxy proxy                Set http_proxy and the s_client -proxy
                                    option
+      --python-bin path            Path of the python binary to be used
    -q,--quiet                      Do not produce any output
    -r,--rootcert path              Root certificate or directory to be used
                                    for certificate validation
@@ -221,13 +224,6 @@ Options:
       --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)
       --require-purpose-critical   The key usage must be critical
-      --require-security-headers   Require all the HTTP security headers:
-                                     Content-Security-Policy
-                                     Permissions-Policy
-                                     Referrer-Policy
-                                     strict-transport-security
-                                     X-Content-Type-Options
-                                     X-Frame-Options
       --resolve ip                 Provide a custom IP address for the
                                    specified host
       --rootcert-dir path          Root directory to be used for certificate
@@ -301,6 +297,13 @@ Deprecated options:
       --require-security-header header require the specified HTTP
                                    security header (e.g., X-Frame-Options)
                                    (deprecated use --require-http-header)
+      --require-security-headers   Require all the HTTP security headers:
+                                     Content-Security-Policy
+                                     Permissions-Policy
+                                     Referrer-Policy
+                                     strict-transport-security
+                                     X-Content-Type-Options
+                                     X-Frame-Options
       --require-security-headers-path path the path to be used to fetch HTTP
                                    security headers
       --require-x-frame-options [path] Require the presence of the
