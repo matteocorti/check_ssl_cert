@@ -400,7 +400,8 @@ usage() {
     echo "                                   ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
     echo "                                   ldaps, mysql, pop3, pop3s, postgres,"
-    echo "                                   sieve, smtp, smtps, tds, xmpp, xmpp-server."
+    echo "                                   sieve, smtp, smtps, tds, xmpp,"
+    echo "                                   xmpp-server."
     echo "                                   ftp, imap, irc, ldap, pop3, postgres,"
     echo "                                   sieve, smtp: switch to TLS using StartTLS"
     echo "      --password source            Password source for a local certificate,"
@@ -2457,8 +2458,6 @@ fetch_certificate() {
     # with TDS we run a python script to fetch the certificate and then continue as with --file
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'tds' ]; then
         get_tds_certificate "${HOST}" "${PORT}"
-
-        cp $FILE a
 
         # we switch to a 'file check'
         PROTOCOL=

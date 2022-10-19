@@ -152,6 +152,7 @@
 --prometheus;Generate Prometheus/OpenMetrics output
 --proxy proxy;Set http_proxy and the s_client -proxy
 --proxy proxy;option
+--python-bin path;Path of the python binary to be used
 --require-client-cert [list]; certificate CAs
 --require-client-cert [list];The server must accept a client
 --require-client-cert [list];certificate. 'list' is an optional comma
@@ -232,7 +233,8 @@
 -P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
 -P,--protocol protocol;h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
 -P,--protocol protocol;ldaps, mysql, pop3, pop3s, postgres,
--P,--protocol protocol;sieve, smtp, smtps, xmpp, xmpp-server.
+-P,--protocol protocol;sieve, smtp, smtps, tds, xmpp,
+-P,--protocol protocol;xmpp-server.
 -P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
 -S,--ssl version;(see: --ssl2 or --ssl3)
 -S,--ssl version;Force SSL version (2,3)
