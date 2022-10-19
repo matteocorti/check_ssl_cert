@@ -35,7 +35,7 @@ EOT
 
 grep '[*] Many thanks to' AUTHORS.md |
     sed -e 's/^[*] Many thanks to //' -e 's/ for.*//' |
-    sort |
+    sort -d |
     uniq |
     while IFS= read -r line; do
 

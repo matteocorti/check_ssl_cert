@@ -6669,12 +6669,13 @@ port = int(sys.argv[2])
 
 # Setup SSL
 if hasattr(ssl, 'PROTOCOL_TLS'):
-    sslProto = ssl.PROTOCOL_TLS
+    sslProto = ssl.PROTOCOL_TLS_CLIENT
 else:
     sslProto = ssl.PROTOCOL_SSLv23
 
 sslctx = ssl.SSLContext(sslProto)
 sslctx.check_hostname = False
+sslctx.verify_mode = ssl.CERT_NONE
 tls_in_buf = ssl.MemoryBIO()
 tls_out_buf = ssl.MemoryBIO()
 
