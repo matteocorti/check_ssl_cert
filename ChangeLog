@@ -1,3 +1,7 @@
+2022-10-18  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Print the $PATH in debug mode
+
 2022-10-06  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: additional chain checks (no root attributes and handling of double certificates
