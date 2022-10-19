@@ -3,10 +3,7 @@ on:
   push:
     paths:
       - CITATION.cff
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    workflow_dispatch:
 
 name: CITATION.cff
 jobs:
@@ -19,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       # This is needed for workflows running on
       # ubuntu-20.04 or later
@@ -31,7 +28,7 @@ jobs:
         uses: dieghernan/cff-validator@main
 
       # Upload artifact
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: citation-cff-errors
