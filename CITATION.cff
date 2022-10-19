@@ -197,6 +197,8 @@ authors:
   website: https://github.com/cbiedl
 - name: chornberger-c2c
   website: https://github.com/chornberger-c2c
+- name: claudioth
+  website: https://github.com/claudioth
 - name: d7415
   website: https://github.com/d7415
 - name: dupondje
@@ -236,8 +238,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.52.0
-date-released: 2022-10-06
+version: 2.53.0
+date-released: 2022-10-19
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

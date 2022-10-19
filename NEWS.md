@@ -1,3 +1,5 @@
+* 2022-10-19 Version 2.53.0
+  * Implemented a check for MS SQL (Tabular Data Stream, TDS)
   * Fixed a bug in the date computations with Perl
 * 2022-10-06 Version 2.52.0
   * Removed spurious debugging output

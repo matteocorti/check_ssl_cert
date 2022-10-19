@@ -20,6 +20,7 @@
 * ```tar``` and ```bzip2``` to build release packages
 * ```ip``` or ```ifconfig``` to be able to use the ```-4``` and ```-6``` options
 * [nectcat](https://nc110.sourceforge.io) for ```--ignore-connection-state```
+* Python for the TDS (Tabular Data Stream) protocol check
 
 ## Development
 
