@@ -1913,6 +1913,20 @@ testRootCertNotInChainGoogle() {
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
 }
 
+testJavaKeyStore1() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --file ./keystore.jks --password changeit --jks-alias google-com --ignore-incomplete-chain
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testJavaKeyStore2() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --file ./cacerts.jks --password changeit --jks-alias "verisignuniversalrootca [jdk]" --allow-empty-san --ignore-maximum-validity --selfsigned
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
