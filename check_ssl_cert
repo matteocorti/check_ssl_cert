@@ -849,7 +849,7 @@ hours_until() {
 				                    my $cert_date = str2time( $ARGV[0] );
 				                    my $hours = int (( $cert_date - time ) / 3600 + 0.5);
 				                    print "$hours\n";
-			EOF
+EOF
         ); then
             # something went wrong with the embedded Perl code: check the indentation of EOF
             unknown "Error computing the certificate validity with Perl"
