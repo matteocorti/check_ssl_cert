@@ -25,10 +25,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO
+# - timeout for the python script
+
 ################################################################################
 # Constants
 
-VERSION=2.52.0
+VERSION=2.53.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -397,7 +400,7 @@ usage() {
     echo "                                   ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
     echo "                                   ldaps, mysql, pop3, pop3s, postgres,"
-    echo "                                   sieve, smtp, smtps, xmpp, xmpp-server."
+    echo "                                   sieve, smtp, smtps, tds, xmpp, xmpp-server."
     echo "                                   ftp, imap, irc, ldap, pop3, postgres,"
     echo "                                   sieve, smtp: switch to TLS using StartTLS"
     echo "      --password source            Password source for a local certificate,"
@@ -406,6 +409,7 @@ usage() {
     echo "      --prometheus                 Generate Prometheus/OpenMetrics output"
     echo "      --proxy proxy                Set http_proxy and the s_client -proxy"
     echo "                                   option"
+    echo "      --python-bin path            Path of the python binary to be used"
     # Delimiter at 78 chars ############################################################
     echo "   -q,--quiet                      Do not produce any output"
     # Delimiter at 78 chars ############################################################
@@ -1004,7 +1008,7 @@ prepend_critical_message() {
                 tmp=" ${SNI}"
             elif [ -n "${FILE_URI}" ]; then
                 tmp=" ${FILE_URI}"
-            elif [ -n "${FILE}" ]; then
+            elif [ -n "${FILE}" ] && [ "${HOST}" = 'localhost' ] ; then
                 tmp=" ${FILE}"
             else
                 tmp=" ${HOST_NAME}"
@@ -2450,6 +2454,17 @@ fetch_certificate() {
 
     TIMEOUT_REASON="fetching certificate"
 
+    # with TDS we run a python script to fetch the certificate and then continue as with --file
+    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'tds' ]; then
+        get_tds_certificate "${HOST}" "${PORT}"
+
+        cp $FILE a
+
+        # we switch to a 'file check'
+        PROTOCOL=
+
+    fi
+
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; then
 
@@ -2509,47 +2524,45 @@ fetch_certificate() {
 
     elif [ -n "${FILE}" ]; then
 
-        if [ "${HOST_NAME}" = "localhost" ]; then
+        debuglog "check if we have to convert the file ${FILE} to PEM"
+        TYPE_TMP="$(${FILE_BIN} -L -b "${FILE}" | sed 's/.*://')"
+        debuglog "certificate type (1): ${TYPE_TMP}"
+        create_temporary_file
+        CONVERSION_ERROR=${TEMPFILE}
 
-            debuglog "check if we have to convert the file ${FILE} to PEM"
-            TYPE_TMP="$(${FILE_BIN} -L -b "${FILE}" | sed 's/.*://')"
-            debuglog "certificate type (1): ${TYPE_TMP}"
-            create_temporary_file
-            CONVERSION_ERROR=${TEMPFILE}
+        if echo "${FILE}" | "${GREP_BIN}" -q -E '[.](p12|pkcs12|pfx)$'; then
 
-            if echo "${FILE}" | "${GREP_BIN}" -q -E '[.](p12|pkcs12|pfx)$'; then
+            debuglog 'converting PKCS #12 to PEM'
 
-                debuglog 'converting PKCS #12 to PEM'
+            if [ -n "${PASSWORD_SOURCE}" ]; then
+                debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
+                "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2>"${CONVERSION_ERROR}"
+            else
+                debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
+                "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2>"${CONVERSION_ERROR}"
+            fi
 
-                if [ -n "${PASSWORD_SOURCE}" ]; then
-                    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys -passin ${PASSWORD_SOURCE}"
-                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys -passin "${PASSWORD_SOURCE}" 2>"${CONVERSION_ERROR}"
-                else
-                    debuglog "executing ${OPENSSL} pkcs12 -in ${FILE} -out ${CERT} -nokeys"
-                    "${OPENSSL}" pkcs12 -in "${FILE}" -out "${CERT}" -nokeys 2>"${CONVERSION_ERROR}"
-                fi
+            if [ $? -eq 1 ]; then
+                CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
+            fi
 
-                if [ $? -eq 1 ]; then
-                    CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
-                    unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
-                fi
+        elif "${FILE_BIN}" -L -b "${FILE}" | "${GREP_BIN}" -q -E '(data|Certificate)'; then
 
-            elif "${FILE_BIN}" -L -b "${FILE}" | "${GREP_BIN}" -q -E '(data|Certificate)'; then
+            debuglog 'converting DER to PEM'
+            "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
-                debuglog 'converting DER to PEM'
-                "${OPENSSL}" x509 -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
+            if [ $? -eq 1 ]; then
 
-                if [ $? -eq 1 ]; then
+                CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                debuglog "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
+                debuglog "Checking if ${FILE} is DER encoded CRL"
 
-                    CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
-                    debuglog "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
-                    debuglog "Checking if ${FILE} is DER encoded CRL"
+                if "${OPENSSL}" crl -in "${FILE}" -inform DER 2>/dev/null | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
 
-                    if "${OPENSSL}" crl -in "${FILE}" -inform DER 2>/dev/null | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
+                    debuglog "The input file is a CRL in DER format: converting to PEM"
 
-                        debuglog "The input file is a CRL in DER format: converting to PEM"
-
-                        debuglog "Executing ${OPENSSL} crl -inform der -in ${FILE} -out ${CERT} 2> /dev/null"
+                    debuglog "Executing ${OPENSSL} crl -inform der -in ${FILE} -out ${CERT} 2> /dev/null"
                         "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
                         if [ $? -eq 1 ]; then
@@ -2560,61 +2573,57 @@ fetch_certificate() {
                     else
                         CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
                         unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
-                    fi
-
                 fi
-
-            else
-
-                debuglog "Copying the certificate to ${CERT}"
-                /bin/cat "${FILE}" >"${CERT}"
-                RET=$?
-
-            fi
-
-            debuglog "storing the certificate to ${CERT}"
-            TYPE_TMP="$(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
-            debuglog "certificate type (2): ${TYPE_TMP}"
-
-            if ! "${GREP_BIN}" -q -F 'CRL' "${CERT}"; then
-
-                NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
-
-                if [ "${NUM_CERTIFICATES}" -gt 1 ]; then
-                    debuglog "Certificate seems to be ca ca-bundle, splitting it"
-
-                    create_temporary_file
-                    USER_CERTIFICATE=${TEMPFILE}
-                    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
-                        awk -v n="1" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' >"${USER_CERTIFICATE}"
-
-                    create_temporary_file
-                    INTERMEDIATE_CERTIFICATES=${TEMPFILE}
-                    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
-                        awk -v n="2" '/-BEGIN CERTIFICATE-/{l++} (l>=n) {print}' >"${INTERMEDIATE_CERTIFICATES}"
-                    VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} -untrusted ${INTERMEDIATE_CERTIFICATES} ${USER_CERTIFICATE}"
-                else
-                    debuglog "Certificate does not contain any intermediates, checking the chain will probably fail."
-                    VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} ${CERT}"
-                fi
-
-                # verify the local certificate
-                debuglog "verifying the certificate"
-                debuglog "  ${VERIFY_COMMAND} 2> ${ERROR} 1>&2"
-
-                # on older versions of OpenSSL write the error on standard input
-                # shellcheck disable=SC2086
-                ${VERIFY_COMMAND} 2>"${ERROR}" 1>&2
-                RET=$?
-
-            else
-
-                debuglog "skipping verification on CRL"
 
             fi
 
         else
-            unknown "Error: option 'file' works with -H localhost only"
+
+            debuglog "Copying the certificate to ${CERT}"
+            /bin/cat "${FILE}" >"${CERT}"
+            RET=$?
+
+        fi
+
+        debuglog "storing the certificate to ${CERT}"
+        TYPE_TMP="$(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
+        debuglog "certificate type (2): ${TYPE_TMP}"
+
+        if ! "${GREP_BIN}" -q -F 'CRL' "${CERT}"; then
+
+            NUM_CERTIFICATES=$("${GREP_BIN}" -F -c -- "-BEGIN CERTIFICATE-" "${CERT}")
+
+            if [ "${NUM_CERTIFICATES}" -gt 1 ]; then
+                debuglog "Certificate seems to be ca ca-bundle, splitting it"
+
+                create_temporary_file
+                USER_CERTIFICATE=${TEMPFILE}
+                sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
+                    awk -v n="1" '/-BEGIN CERTIFICATE-/{l++} (l==n) {print}' >"${USER_CERTIFICATE}"
+
+                create_temporary_file
+                INTERMEDIATE_CERTIFICATES=${TEMPFILE}
+                sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' "${CERT}" |
+                    awk -v n="2" '/-BEGIN CERTIFICATE-/{l++} (l>=n) {print}' >"${INTERMEDIATE_CERTIFICATES}"
+                VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} -untrusted ${INTERMEDIATE_CERTIFICATES} ${USER_CERTIFICATE}"
+            else
+                debuglog "Certificate does not contain any intermediates, checking the chain will probably fail."
+                VERIFY_COMMAND="${OPENSSL} verify ${ROOT_CA} ${CERT}"
+            fi
+
+            # verify the local certificate
+            debuglog "verifying the certificate"
+            debuglog "  ${VERIFY_COMMAND} 2> ${ERROR} 1>&2"
+
+            # on older versions of OpenSSL write the error on standard input
+            # shellcheck disable=SC2086
+            ${VERIFY_COMMAND} 2>"${ERROR}" 1>&2
+            RET=$?
+
+        else
+
+            debuglog "skipping verification on CRL"
+
         fi
 
     else
@@ -2689,7 +2698,7 @@ fetch_certificate() {
         elif ascii_grep 'unable to get local issuer certificate' "${ERROR}"; then
 
             if [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
-                prepend_critical_message 'Error verifying the certificate chain'
+                prepend_critical_message 'Error verifying the certificate chain (missing local issuer certificate)'
             fi
 
         elif ascii_grep 'self[ -]signed certificate' "${ERROR}"; then
@@ -2758,9 +2767,16 @@ fetch_certificate() {
 
         elif ascii_grep "Unable to load certificate file" "${ERROR}"; then
 
-            ERROR="Cannot read certificate file"
-            prepend_critical_message "${ERROR}"
-            critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
+            # we handle TDS retried certs differently
+            if [ "${HOST}" = 'localhost' ] ; then
+                ERROR="Cannot read certificate file"
+                prepend_critical_message "${ERROR}"
+                critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
+            else
+                ERROR="Cannot fetch certificate"
+                prepend_critical_message "${ERROR}"
+                critical "SSL_CERT_CRITICAL ${HOST}: ${ERROR}"
+            fi
 
         elif ascii_grep "tlsv1 alert protocol version" "${ERROR}"; then
 
@@ -3402,6 +3418,11 @@ parse_command_line_options() {
             SSL_LAB_WARN_ASSESTMENT="$2"
             shift 2
             ;;
+        --python-bin)
+            check_option_argument '--python-bin' "$2"
+            PYTHON_BIN="$2"
+            shift 2
+            ;;
         --serial)
             check_option_argument '--serial' "$2"
             SERIAL_LOCK="$2"
@@ -3926,6 +3947,9 @@ main() {
             xmpp-server)
                 PORT=5269
                 ;;
+            tds)
+                PORT=1433
+                ;;
             *)
                 unknown "Error: unsupported protocol ${PROTOCOL}"
                 ;;
@@ -4154,6 +4178,16 @@ main() {
     fi
     check_required_prog "${GREP_BIN}"
     GREP_BIN=${PROG}
+
+    ##############################################################################
+    # Python is needed for TDS
+    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'tds' ]; then
+        if [ -z "${PYTHON_BIN}" ]; then
+            PYTHON_BIN='python'
+        fi
+        check_required_prog "${PYTHON_BIN}"
+        PYTHON_BIN="${PROG}"
+    fi
 
     ##############################################################################
     # OpenSSL
@@ -6545,6 +6579,143 @@ ${WARNING}"
     remove_temporary_files
 
     exit "${STATUS_OK}"
+
+}
+
+get_tds_certificate() {
+
+    # The TDS (Tabular Data Stream) protocol used by Microsoft and
+    # Sybase, which is an application layer protocol wrapping all
+    # layers and connections underneath. That means a driver has to
+    # implement this TDS protocol when connecting to Microsoft SQL
+    # server or Sybase (TDS was created by Sybase initially).
+
+    # Python script to retrieve the certificate
+    # https://gist.github.com/lnattrass/a4a91dbf439fc1719d69f7865c1b1791#file-get_tds_cert-py
+
+    debuglog "TDS: executing Python script to fetch the certificate"
+
+    create_temporary_file
+    FILE=${TEMPFILE}
+
+    debuglog "Storing the certificate in ${FILE}"
+
+    ${PYTHON_BIN} - "${HOST}" "${PORT}" > "${FILE}" <<'____PYTHON'
+import sys
+import pprint
+import struct
+import socket
+import ssl
+from time import sleep
+
+# Standard "HELLO" message for TDS
+prelogin_msg = bytearray([      0x12, 0x01, 0x00, 0x2f, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x1a, 0x00, 0x06, 0x01, 0x00, 0x20,
+                                0x00, 0x01, 0x02, 0x00, 0x21, 0x00, 0x01, 0x03, 0x00, 0x22, 0x00, 0x04, 0x04, 0x00, 0x26, 0x00,
+                                0x01, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ])
+
+# Prep Header function
+def prep_header(data):
+        data_len = len(data)
+        prelogin_head = bytearray([ 0x12, 0x01 ])
+        header_len = 8
+        total_len = header_len + data_len
+        data_head = prelogin_head + total_len.to_bytes(2, 'big')
+        data_head += bytearray([ 0x00, 0x00, 0x01, 0x00])
+        return data_head + data
+
+def read_header(data):
+    if len(data) != 8:
+        raise ValueError("prelogin header is > 8-bytes", data)
+
+    format = ">bbhhbb"
+    sct = struct.Struct(format)
+    unpacked = sct.unpack(data)
+    return {    "type": unpacked[0],
+                "status": unpacked[1],
+                "length": unpacked[2],
+                "channel": unpacked[3],
+                "packet": unpacked[4],
+                "window": unpacked[5]
+    }
+
+tdspbuf = bytearray()
+def recv_tdspacket(sock):
+    global tdspbuf
+    tdspacket = tdspbuf
+    header = {}
+
+    for i in range(0,5):
+        tdspacket += sock.recv(4096)
+        if len(tdspacket) >= 8:
+            header = read_header(tdspacket[:8])
+            if len(tdspacket) >= header['length']:
+                tdspbuf = tdspacket[header['length']:]
+                return header, tdspacket[8:header['length']]
+
+        sleep(0.05)
+
+# Ensure we have a commandline
+if len(sys.argv) != 3:
+        print("Usage: {} <hostname> <port>".format(sys.argv[0]))
+        sys.exit(1)
+
+hostname = sys.argv[1]
+port = int(sys.argv[2])
+
+
+# Setup SSL
+if hasattr(ssl, 'PROTOCOL_TLS'):
+    sslProto = ssl.PROTOCOL_TLS
+else:
+    sslProto = ssl.PROTOCOL_SSLv23
+
+sslctx = ssl.SSLContext(sslProto)
+sslctx.check_hostname = False
+tls_in_buf = ssl.MemoryBIO()
+tls_out_buf = ssl.MemoryBIO()
+
+# Create the SSLObj connected to the tls_in_buf and tls_out_buf
+tlssock = sslctx.wrap_bio(tls_in_buf, tls_out_buf)
+
+# create an INET, STREAMing socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setblocking(0)
+s.settimeout(1)
+
+# Connect to the SQL Server
+s.connect(( hostname, port ))
+
+# Send the first TDS PRELOGIN message
+s.send(prelogin_msg)
+
+# Get the response and ignore. We will try to negotiate encryption anyway.
+header, data = recv_tdspacket(s)
+while header['status']==0:
+    header, ext_data = recv_tdspacket(s)
+    data += ext_data
+
+# Craft the packet
+for i in range(0,5):
+    try:
+        tlssock.do_handshake()
+        peercert = ssl.DER_cert_to_PEM_cert(tlssock.getpeercert(True))
+        # do not add a newline
+        print(peercert, end='')
+        sys.exit(0)
+    except ssl.SSLWantReadError as err:
+        pass
+
+    tls_data = tls_out_buf.read()
+    s.sendall(prep_header(tls_data))
+    # TDS Packets can be split over two frames, each with their own headers.
+    # We have to concat these for TLS to handle nego properly
+    header, data = recv_tdspacket(s)
+    while header['status']==0:
+        header, ext_data = recv_tdspacket(s)
+        data += ext_data
+
+    tls_in_buf.write(data)
+____PYTHON
 
 }
 
