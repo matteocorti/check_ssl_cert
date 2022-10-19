@@ -1,3 +1,6 @@
+* 2022-10-19 Version 2.54.0
+  * Java KeyStore checks (thanks to [claudioth](https://github.com/claudioth))
+  * Bug fixes in the TDS checks
 * 2022-10-19 Version 2.53.0
   * Implemented a check for MS SQL (Tabular Data Stream, TDS)
   * Fixed a bug in the date computations with Perl

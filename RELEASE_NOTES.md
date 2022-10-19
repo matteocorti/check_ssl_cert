@@ -1,2 +1,2 @@
- * Implemented a check for MS SQL (Tabular Data Stream, TDS)
- * Fixed a bug in the date computations with Perl
+ * Java KeyStore checks (thanks to [claudioth](https://github.com/claudioth))
+ * Bug fixes in the TDS checks
