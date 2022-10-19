@@ -2553,10 +2553,11 @@ fetch_certificate() {
             debuglog 'converting JKS to PEM'
             check_required_prog 'keytool'
             KEYTOOLBIN=${PROG}
-            "${KEYTOOLBIN}" -exportcert -rfc -keystore "${FILE}" -alias "${JKSALIAS}" -file "${CERT}" -storepass "${PASSWORD_SOURCE}" &>"${CONVERSION_ERROR}"
+            "${KEYTOOLBIN}" -exportcert -rfc -keystore "${FILE}" -alias "${JKSALIAS}" -file "${CERT}" -storepass "${PASSWORD_SOURCE}" 2> "${CONVERSION_ERROR}"
 
             if [ $? -eq 1 ]; then
-                unknown "Error converting JKS to PEM: $(head -n 1 "${CONVERSION_ERROR}") "
+                CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                unknown "Error converting JKS to PEM: ${CONVERSION_ERROR_TMP}"
             fi
 
         elif "${FILE_BIN}" -L -b "${FILE}" | "${GREP_BIN}" -q -E '(data|Certificate)'; then
