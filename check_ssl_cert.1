@@ -190,9 +190,6 @@ The path to be used to fetch HTTP headers
 .BR "   --http-use-get"
 Use GET instead of HEAD (default) for the HTTP related checks
 .TP
-.BR "   --jks-alias" " alias"
-Alias name of the Java KeyStore entry (requires --file)
-.TP
 .BR "-i,--issuer" " issuer"
 Pattern to match the issuer of the certificate
 .TP
@@ -241,11 +238,14 @@ Force IP version 4 or 6
 .BR "   --info"
 Print certificate information
 .TP
-.BR "     --init-host-cache"
+.BR "   --init-host-cache"
 Initialize the host cache
 .TP
 .BR "   --issuer-cert-cache" " dir"
 Directory where to store issuer certificates cache
+.TP
+.BR "   --jks-alias" " alias"
+Alias name of the Java KeyStore entry (requires --file)
 .TP
 .BR "-K,--clientkey" " path"
 Use client certificate key to authenticate

@@ -116,8 +116,6 @@ Options:
       --http-headers-path path     The path to be used to fetch HTTP headers
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks
-      --jks-alias alias            Alias name of the Java KeyStore entry
-                                   (requires --file)
    -i,--issuer issuer              Pattern to match the issuer of the
                                    certificate
       --ignore-altnames            Ignore alternative names when matching
@@ -145,6 +143,8 @@ Options:
       --init-host-cache            Initialize the host cache
       --issuer-cert-cache dir      Directory where to store issuer
                                    certificates cache
+      --jks-alias alias            Alias name of the Java KeyStore entry
+                                   (requires --file)
    -K,--clientkey path             Use client certificate key to authenticate
    -L,--check-ssl-labs grade       SSL Labs assessment (please check
                                    https://www.ssllabs.com/about/terms.html)
