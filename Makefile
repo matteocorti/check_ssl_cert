@@ -96,6 +96,7 @@ endif
 clean:
 	find . -name "*~" -delete
 	find . -name "*.bak" -delete
+	find . -name "#*#" -delete
 	rm -rf rpmroot
 
 distclean: clean
