@@ -4220,6 +4220,12 @@ main() {
         fi
         check_required_prog "${PYTHON_BIN}"
         PYTHON_BIN="${PROG}"
+
+        # check Python major version
+        if "${PYTHON_BIN}" --version 2>&1 | grep -q '^Python 2' ; then
+            unknown "Python 2 is not supported"
+        fi
+
     fi
 
     ##############################################################################
@@ -6634,6 +6640,7 @@ get_tds_certificate() {
     debuglog "Storing the certificate in ${FILE}"
 
     ${PYTHON_BIN} - "${HOST}" "${PORT}" > "${FILE}" <<'____PYTHON'
+from __future__ import print_function
 import sys
 import pprint
 import struct
@@ -6698,7 +6705,7 @@ port = int(sys.argv[2])
 
 # Setup SSL
 if hasattr(ssl, 'PROTOCOL_TLS'):
-    sslProto = ssl.PROTOCOL_TLS_CLIENT
+   sslProto = ssl.PROTOCOL_TLS_CLIENT
 else:
     sslProto = ssl.PROTOCOL_SSLv23
 
