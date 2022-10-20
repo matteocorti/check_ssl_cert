@@ -1,4 +1,4 @@
-* 2022-10-19 Version 2.54.0
+* 2022-10-20 Version 2.54.0
   * Java KeyStore checks (thanks to [claudioth](https://github.com/claudioth))
   * Bug fixes in the TDS checks
 * 2022-10-19 Version 2.53.0
