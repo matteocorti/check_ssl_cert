@@ -103,7 +103,7 @@ jobs:
               apk update &&
               apk upgrade &&
               apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk18
+              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11
 
 
           - distro: 'fedora:35'
