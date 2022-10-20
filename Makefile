@@ -14,7 +14,7 @@ FORMATTED_FILES=test/unit_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGI
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
 
-XATTRS_OPTION := $(shell if tar --help | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
+XATTRS_OPTION := $(shell if tar --help 2>&1 | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
 
 .PHONY: install clean test rpm distclean check version_check codespell
 
