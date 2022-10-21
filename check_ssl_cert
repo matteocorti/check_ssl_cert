@@ -3375,7 +3375,7 @@ parse_command_line_options() {
             JKSALIAS="$2"
             shift 2
             ;;
-       --nmap-bin)
+        --nmap-bin)
             check_option_argument '--nmap-bin' "$2"
             NMAP_BIN="$2"
             shift 2
