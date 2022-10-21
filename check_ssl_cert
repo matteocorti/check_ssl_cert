@@ -4216,7 +4216,7 @@ main() {
     # Python is needed for TDS
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'tds' ]; then
         if [ -z "${PYTHON_BIN}" ]; then
-            PYTHON_BIN='python'
+            PYTHON_BIN='python3'
         fi
         check_required_prog "${PYTHON_BIN}"
         PYTHON_BIN="${PROG}"
