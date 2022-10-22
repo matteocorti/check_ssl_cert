@@ -80,6 +80,9 @@ authors:
   given-names: "Lawren"
 - name: Leynos
   website: https://github.com/leynos
+- family-names: "Tribus"
+  given-names: "Lukas"
+  website: https://github.com/lukastribus
 - family-names: "Fournier"
   given-names: "Marc"
 - family-names: "Burkhalter"
