@@ -8,6 +8,7 @@ on:
       - master
     paths-ignore:
       - varia/**
+      - **.md
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
