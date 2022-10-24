@@ -6639,7 +6639,12 @@ get_tds_certificate() {
 
     debuglog "Storing the certificate in ${FILE}"
 
-    ${PYTHON_BIN} - "${HOST}" "${PORT}" > "${FILE}" <<'____PYTHON'
+    # to be able to use the exec_with_timeout function we store the python script in a file
+
+    create_temporary_file
+    PYTHON_SCRIPT=${TEMPFILE}
+
+    cat << ____PYTHON > "${PYTHON_SCRIPT}"
 from __future__ import print_function
 import sys
 import pprint
@@ -6757,6 +6762,8 @@ for i in range(0,5):
 
     tls_in_buf.write(data)
 ____PYTHON
+
+    exec_with_timeout "${PYTHON_BIN} ${PYTHON_SCRIPT} ${HOST} ${PORT} > ${FILE}"
 
 }
 
