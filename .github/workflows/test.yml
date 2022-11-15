@@ -8,6 +8,9 @@ on:
       - master
     paths-ignore:
       - varia/**
+      - '**.md'
+      - utils/prepare_rpm.sh
+      - .github/workflows/publish.yml
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
@@ -70,7 +73,7 @@ jobs:
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
           - 'alpine:3.13'
-          - 'fedora:35'
+          - 'fedora:37'
           - 'fedora:36'
         include:
 
@@ -106,7 +109,7 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11
 
 
-          - distro: 'fedora:35'
+          - distro: 'fedora:37'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
@@ -148,10 +151,10 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'fedora:35'
+          - 'fedora:37'
           - 'fedora:36'
         include:
-          - distro: 'fedora:35'
+          - distro: 'fedora:37'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -186,10 +189,10 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'fedora:35'
+          - 'fedora:37'
           - 'fedora:36'
         include:
-          - distro: 'fedora:35'
+          - distro: 'fedora:37'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git

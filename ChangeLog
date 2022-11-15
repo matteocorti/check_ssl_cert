@@ -1,3 +1,7 @@
+2022-10-24  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (get_tds_certificate): Adding the timeout check on the TDS checks
+
 2022-10-18  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Print the $PATH in debug mode
