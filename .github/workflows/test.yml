@@ -9,6 +9,8 @@ on:
     paths-ignore:
       - varia/**
       - '**.md'
+      - utils/prepare_rpm.sh
+      - .github/workflows/publish.yml
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
