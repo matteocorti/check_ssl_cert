@@ -2764,6 +2764,12 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
+        elif ascii_grep 'BIO_lookup_ex' "${ERROR}"; then
+
+            ERROR='Unknown host'
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
+
         elif ascii_grep 'write:errno=54' "${ERROR}"; then
 
             ERROR='No certificate returned (SNI required?)'
