@@ -2891,7 +2891,7 @@ var_for_sed() {
 #  $2 file
 #
 ascii_grep() {
-    tr -d '\000' <"$2" | "${GREP_BIN}" -q "$1"
+    LC_ALL=C tr -d '\000' <"$2" | "${GREP_BIN}" -q "$1"
 }
 
 ################################################################################
@@ -5085,9 +5085,9 @@ main() {
 
             # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-            debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | \"${GREP_BIN}\" '^|'"
+            debuglog "Executing ${NMAP_BIN} --unprivileged -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | \"${GREP_BIN}\" '^|'"
 
-            OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" '^|')
+            OFFERED_PROTOCOLS=$(${NMAP_BIN} --unprivileged -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" '^|')
 
             debuglog "offered ciphers and protocols:"
             debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
@@ -5190,9 +5190,9 @@ main() {
 
             debuglog "Testing connection with ${HOST}:${PORT}"
 
-            debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
+            debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} --unprivileged -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open" ; then
+            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open" ; then
 
                 if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
 
@@ -6095,7 +6095,7 @@ INPUT
 
             # -Pn is needed even if we specify a port
             TIMEOUT_REASON="checking ciphers"
-            exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+            exec_with_timeout "${NMAP_BIN} --unprivileged -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
 
             if [ "${DEBUG}" -ge 1 ]; then
                 debuglog 'nmap output:'
