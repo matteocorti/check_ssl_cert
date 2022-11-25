@@ -143,3 +143,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Dick Visser](https://github.com/dnmvisser) for the user agent fix
 * Many thanks to [claudioth](https://github.com/claudioth) for the Perl date computation fix
 * Many thanks to [Lukas Tribus](https://github.com/lukastribus) for the Python 3 patch
+* Many thanks to [Peter[(https://github.com/Peter2121) for the FreeBSD jail patch

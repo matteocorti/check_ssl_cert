@@ -122,6 +122,8 @@ authors:
 - family-names: "Newman"
   given-names: "Peter"
   website: https://github.com/peternewman
+- name: Peter[(https://github.com/Peter2121)
+  website: https://github.com/Peter2121
 - family-names: "Kueck"
   given-names: "Philippe"
 - family-names: "Rupert"
@@ -241,8 +243,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.54.0
-date-released: 2022-10-20
+version: 2.55.0
+date-released: 2022-10-25
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
