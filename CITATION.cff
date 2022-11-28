@@ -4,16 +4,13 @@ authors:
 - family-names: "Corti"
   given-names: "Matteo"
   orcid: "https://orcid.org/0000-0002-1746-1108"
-- family-names: "Палаузов"
-  given-names: "Дилян"
-  website: https://github.com/dilyanpalauzov
 - name: Alexander Aleksandrovič Klimov
   website: https://github.com/Al2Klimov
+- family-names: "Dijkman"
+  given-names: "Andreas"
 - family-names: "Klärner"
   given-names: "Andre"
   website: https://github.com/klaernie
-- family-names: "Dijkman"
-  given-names: "Andreas"
 - family-names: "Miśkiewicz"
   given-names: "Arkadiusz"
   website: https://github.com/arekm
@@ -119,11 +116,11 @@ authors:
 - family-names: "Wąsikowski"
   given-names: "Łukasz"
   website: https://github.com/IdahoPL
-- family-names: "Fournier"
-  given-names: "Marc"
 - family-names: "Burkhalter"
   given-names: "Marcel"
   website: https://github.com/explorer69
+- family-names: "Fournier"
+  given-names: "Marc"
 - family-names: "Rejås"
   given-names: "Marcus"
 - family-names: "Ruys"
@@ -153,11 +150,11 @@ authors:
 - family-names: "Rochnyak"
   given-names: "Pavel"
   website: https://github.com/rpv-tomsk
+- name: Peter[(https://github.com/Peter2121)
+  website: https://github.com/Peter2121
 - family-names: "Newman"
   given-names: "Peter"
   website: https://github.com/peternewman
-- name: Peter[(https://github.com/Peter2121)
-  website: https://github.com/Peter2121
 - family-names: "Kueck"
   given-names: "Philippe"
 - family-names: "Rupert"
@@ -172,8 +169,6 @@ authors:
   website: https://github.com/bb-Ricardo
 - name: Ricardo
   website: https://github.com/bb-Ricardo
-- family-names: "Yamry"
-  given-names: "Rob"
 - name: Robin H. Johnson
 - family-names: "Pronk"
   given-names: "Robin"
@@ -181,6 +176,8 @@ authors:
 - family-names: "Schneider"
   given-names: "Robin"
   website: https://github.com/ypid-geberit
+- family-names: "Yamry"
+  given-names: "Rob"
 - name: Rolf Eike Beer
 - family-names: "Nowakowski"
   given-names: "Ryan"
@@ -242,6 +239,9 @@ authors:
   website: https://github.com/yasirathackersdotmu
 - name: Zadkiel
   website: https://github.com/aslafy-z
+- family-names: "Палаузов"
+  given-names: "Дилян"
+  website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
 version: 2.55.0
 date-released: 2022-10-25

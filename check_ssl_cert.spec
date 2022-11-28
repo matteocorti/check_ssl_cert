@@ -90,7 +90,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Sep  13 2022 Matteo Corti <matteo@corti.li> - 2.44.0-0
 - Updated to 2.44.0
 
-* Tue Sep   9 2022 Matteo Corti <matteo@corti.li> - 2.43.0-0
+* Fri Sep   9 2022 Matteo Corti <matteo@corti.li> - 2.43.0-0
 - Updated to 2.43.0
 
 * Tue Sep   6 2022 Matteo Corti <matteo@corti.li> - 2.42.0-0
@@ -115,7 +115,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Jul  26 2022 Matteo Corti <matteo@corti.li> - 2.36.0-0
 - Updated to 2.36.0
 
-* Wed Jul  15 2022 Matteo Corti <matteo@corti.li> - 2.35.0-0
+* Fri Jul  15 2022 Matteo Corti <matteo@corti.li> - 2.35.0-0
 - Updated to 2.35.0
 
 * Wed Jul   6 2022 Matteo Corti <matteo@corti.li> - 2.34.0-0
@@ -127,7 +127,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Jun  17 2022 Matteo Corti <matteo@corti.li> - 2.32.0-0
 - Updated to 2.32.0
 
-* Wed Jun  11 2022 Matteo Corti <matteo@corti.li> - 2.31.0-0
+* Sat Jun  11 2022 Matteo Corti <matteo@corti.li> - 2.31.0-0
 - Updated to 2.31.0
 
 * Wed Jun   1 2022 Matteo Corti <matteo@corti.li> - 2.30.0-0
@@ -154,7 +154,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Mar  25 2022 Matteo Corti <matteo@corti.li> - 2.23.0-0
 - Updated to 2.23.0
 
-* Thu Mar  11 2022 Matteo Corti <matteo@corti.li> - 2.22.0-0
+* Fri Mar  11 2022 Matteo Corti <matteo@corti.li> - 2.22.0-0
 - Updated to 2.22.0
 
 * Sun Feb  20 2022 Matteo Corti <matteo@corti.li> - 2.21.0-0

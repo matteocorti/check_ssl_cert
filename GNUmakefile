@@ -3,7 +3,7 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 
 # files to be included in the distribution
-DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff check_ssl_cert.completion
+DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile GNUmakefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff check_ssl_cert.completion
 
 # this year
 YEAR=`date +"%Y"`
@@ -133,7 +133,7 @@ else
 	if shellcheck --help 2>&1 | grep -q -- '-o ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
 
-rpm: dist
+rpm:
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
 	cp $(DIST_DIR).tar.gz rpmroot/SOURCES
 	rpmbuild --define "_topdir `pwd`/rpmroot" -ba check_ssl_cert.spec
