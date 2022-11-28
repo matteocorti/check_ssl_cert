@@ -16,6 +16,7 @@
 * ```dig``` for
   * DANE checks
   * DNSSEC checks
+* [gmake](https://www.gnu.org/software/make/) on [FreeBSD](https://www.freebsd.org)
 * ```expand``` for ```--info```
 * ```tar``` and ```bzip2``` to build release packages
 * ```ip``` or ```ifconfig``` to be able to use the ```-4``` and ```-6``` options
