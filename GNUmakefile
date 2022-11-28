@@ -18,6 +18,8 @@ XATTRS_OPTION := $(shell if tar --help 2>&1 | grep -q bsdtar ; then echo '--no-x
 
 .PHONY: install clean test rpm distclean check version_check codespell
 
+all: dist
+
 # checks if the version is updated in all the files
 version_check: CITATION.cff
 	echo "Checking version $(VERSION)"
