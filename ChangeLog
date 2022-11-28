@@ -298,11 +298,11 @@
 
 2021-12-05 Bernd Stroessenreuther <booboo@gluga.de>
 
-	* check_ssl_cert: improve readability of --help by wrapping some very long lines
+        * check_ssl_cert: improve readability of --help by wrapping some very long lines
 
 2021-12-03  Matteo Corti  <corti@ubuntu-2110>
 
-	* check_ssl_cert (main): IPv6 checks fixed if ipconfig is not available
+        * check_ssl_cert (main): IPv6 checks fixed if ipconfig is not available
 
 2021-11-26  Matteo Corti  <matteo@corti.li>
 
@@ -320,8 +320,8 @@
 
 2021-11-11  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (main): Fixed a problem with newlines in variable on some systems (e.g., Fedora)
-    * check_ssl_cert (fetch_certificate): Fixed a problem with OpenSSL 3.0.0 and debug mode with certain servers
+        * check_ssl_cert (main): Fixed a problem with newlines in variable on some systems (e.g., Fedora)
+        * check_ssl_cert (fetch_certificate): Fixed a problem with OpenSSL 3.0.0 and debug mode with certain servers
 
 2021-11-11  Matteo Corti  <matteo@corti.li>
 
@@ -329,8 +329,8 @@
 
 2021-11-09  Matteo Corti  <matteo@corti.li>
 
-	* check_ssl_cert (fetch_certificate): Parsing of OpenSSL 3 messages
-	* check_ssl_cert (fetch_certificate): Ignoring legacy renegotiation if --ignore-tls-renegotiation was specified
+        * check_ssl_cert (fetch_certificate): Parsing of OpenSSL 3 messages
+        * check_ssl_cert (fetch_certificate): Ignoring legacy renegotiation if --ignore-tls-renegotiation was specified
 
 2021-10-25  Matteo Corti  <matteo@corti.li>
 

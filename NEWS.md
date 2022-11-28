@@ -256,7 +256,7 @@
 * 2021-01-18 Version 1.132.0
   * Time-outed sub-processes can now be interrupted
   * Revocation via CRL can be checked with the --crl option
-  *  Better error messages for DH with small keys and handshake failures
+  * Better error messages for DH with small keys and handshake failures
 * 2021-01-15 Version 1.131.0
   * OCSP check on all the chain elements
 * 2021-01-14 Version 1.130.0
@@ -433,7 +433,7 @@
 * 2017-07-17 Version 1.49.0
   * Support for OpenSSL 1.1
 * 2017-06-22 Version 1.48.0
-  * Checks for missing subjectAlternativeName extension (https://support.google.com/chrome/a/answer/7391219?hl=en)
+  * Checks for missing subjectAlternativeName extension
 * 2017-06-15 Version 1.47.0
   * Fixed an issue with OCSP URI with protocols other than HTTP or HTTPS
 * 2017-05-15 Version 1.46.0
@@ -496,7 +496,7 @@
   * Supports SNI even when not checking CN and does not issue a critical when SSL Labs is still checking a host
 * 2016-03-03 Version 1.22.0
   * Initial support for SSL Labs checks
-  *  Support for UTF output (thanks to Konstantin Shalygin)
+  * Support for UTF output (thanks to Konstantin Shalygin)
 * 2016-03-01 Version 1.21.0
   * Fixed a bug which prevented the check on the expiration date
 * 2016-02-26 Version 1.20.0
