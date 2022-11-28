@@ -72,12 +72,14 @@ _check_ssl_cert() {
         local IFS=$'\n'
 
         # Filter our candidates
+        # shellcheck disable=2207
         CANDIDATES=($(compgen -W "${WORD_LIST[*]}" -- "$CWORD"))
 
         # Correctly set our candidates to COMPREPLY
         if [[ ${#CANDIDATES[*]} -eq 0 ]]; then
             COMPREPLY=()
         else
+            # shellcheck disable=2207
             COMPREPLY=($(printf '%q\n' "${CANDIDATES[@]}"))
         fi
         ;;
