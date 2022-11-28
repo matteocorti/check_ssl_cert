@@ -324,7 +324,7 @@ Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
 
 Command line options can be specified in a configuration file (```${HOME}/.check_ssl_certrc```). For example
 
-```
+```text
 $ cat ${HOME}/.check_ssl_certrc
 --verbose
 --critical 20
