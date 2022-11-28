@@ -133,7 +133,7 @@ else
 	if shellcheck --help 2>&1 | grep -q -- '-o ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
 
-rpm:
+rpm: dist
 	mkdir -p rpmroot/SOURCES rpmroot/BUILD
 	cp $(DIST_DIR).tar.gz rpmroot/SOURCES
 	rpmbuild --define "_topdir `pwd`/rpmroot" -ba check_ssl_cert.spec
