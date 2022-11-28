@@ -1,16 +1,15 @@
+# check\_ssl\_cert
 
  &copy; Matteo Corti, ETH Zurich, 2007-2012.
  &copy; Matteo Corti, 2007-2022.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
 
-# check\_ssl\_cert
-
 A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection and certificate
 
 ## Usage
 
-```
+```text
 
 Usage: check_ssl_cert -H host [OPTIONS]
        check_ssl_cert -f file [OPTIONS]
@@ -363,20 +362,20 @@ or a directory for `-CApath`.
 On macOS the root certificates bundle is stored in the Keychain and
 OpenSSL will complain with:
 
-```
+```text
 verification error: unable to get local issuer certificate
 ```
 
 The bundle can be extracted with:
 
-```
+```text
 $ sudo security find-certificate -a \
   -p /System/Library/Keychains/SystemRootCertificates.keychain > cabundle.crt
 ```
 
 and then submitted to `check_ssl_cert` with the `-r,--rootcert path` option
 
-```
+```text
  ./check_ssl_cert -H www.google.com -r ./cabundle.crt
 ```
 
@@ -398,16 +397,16 @@ When using bash completion with the ```--host``` command line option the cache i
 
 To run the test suite you will need [shUnit2](https://github.com/kward/shunit2)
 
- * Manual install: [github](https://github.com/kward/shunit2)
- * macOS with [Homebrew](https://brew.sh): ```brew install shunit2```
- * Debian, Ubuntu: ```apt-get install shunit2```
- * Fedora: ```dnf install shunit2```
+* Manual install: [github](https://github.com/kward/shunit2)
+* macOS with [Homebrew](https://brew.sh): ```brew install shunit2```
+* Debian, Ubuntu: ```apt-get install shunit2```
+* Fedora: ```dnf install shunit2```
 
 Run ```make test``` to execute the whole test suite.
 
 To enable debugging output for the tests set the ```TEST_DEBUG``` environment variable to ```--debug```:
 
-```
+```text
 export TEST_DEBUG=--debug
 make test
 ```
@@ -418,9 +417,9 @@ With ```make codespell``` ypu can perform a spell check on the code and document
 
 To run a single test:
 
- * set the ```SHUNIT2``` environment variable with the location of the shUnit2 binary
- * change the directory to the test suite: ```cd test```
- * execute the test suite with the tests to be run as argument after ```--```. For example ```./unit_tests.sh -- testName```
+* set the ```SHUNIT2``` environment variable with the location of the shUnit2 binary
+* change the directory to the test suite: ```cd test```
+* execute the test suite with the tests to be run as argument after ```--```. For example ```./unit_tests.sh -- testName```
 
 ## Documentation
 

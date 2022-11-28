@@ -1,6 +1,8 @@
+# News
+
 * 2022-10-25 Version 2.55.0
- * Fixes for FreeBSD jails
- * TDS checks now respect the timeout option
+  * Fixes for FreeBSD jails
+  * TDS checks now respect the timeout option
 * 2022-10-20 Version 2.54.0
   * Java KeyStore checks (thanks to [claudioth](https://github.com/claudioth))
   * Bug fixes in the TDS checks
