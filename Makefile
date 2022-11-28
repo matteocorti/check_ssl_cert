@@ -6,4 +6,4 @@ all:
 .DEFAULT:
 	${GNUMAKE} $@
 
-.PHONY: all
+.PHONY: all test
