@@ -2133,7 +2133,11 @@ check_ocsp() {
 
                         debuglog "${OCSP_RESP}"
                         OCSP_ERROR_MESSAGE=$( echo "${OCSP_RESP}" | head -n 1 )
-                        prepend_critical_message "OCSP error (${OCSP_ERROR_MESSAGE})"
+                        if [ -z "${OCSP_IGNORE_ERRORS}" ] ; then
+                            prepend_critical_message "OCSP error (${OCSP_ERROR_MESSAGE})"
+                        else
+                            debuglog "Ignoring OCSP error (${OCSP_ERROR_MESSAGE})"
+                        fi
 
                     fi
 
