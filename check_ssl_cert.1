@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "November, 2022" "2.55.0" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "November, 2022" "2.56.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -322,12 +322,15 @@ Number of decimal places for durations: defaults to 0 if critical or warning are
 .TP
 .BR "-P,--protocol" " protocol"
 Use the specific protocol: ftp, ftps, http, https (default), h2 (HTTP/2), imap, imaps, irc, ircs, ldap, ldaps, mysql, pop3, pop3s, postgres, sieve, smtp, smtps, tds, xmpp, xmpp-server, ftp, imap, irc, ldap, pop3, postgres, sieve, smtp: switch to TLS using StartTLS.
-.br
+.BR
 These protocols switch to TLS using StartTLS: ftp, imap, irc, ldap, mysql, pop3, smtp.
+.TP
+.BR "   --path" " path"
+Set the PATH variable to 'path'
 .TP
 .BR "   --password" " source"
 Password source for a local certificate, see the PASS PHRASE ARGUMENTS section openssl(1)
-TP
+.TP
 .BR "   --prometheus"
 Generate Prometheus/OpenMetrics output
 .TP

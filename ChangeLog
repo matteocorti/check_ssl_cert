@@ -1,6 +1,6 @@
 2022-11-30  Marcel Burkhalter <marcel.burkhalter@weareplanet.com>
 
-        * check_ssl_cert (main): Add command line argument to extend $PATH variable
+        * check_ssl_cert (main): Add command line argument to set the PATH variable
 
 2022-11-30  Matteo Corti  <matteo@corti.li>
 

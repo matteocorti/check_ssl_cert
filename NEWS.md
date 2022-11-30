@@ -1,5 +1,7 @@
 # News
 
+* 2022-11-30 Version 2.56.0
+  * Adds the ```--path``` command line option
 * 2022-10-25 Version 2.55.0
   * Fixes for FreeBSD jails
   * TDS checks now respect the timeout option
