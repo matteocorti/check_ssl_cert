@@ -145,6 +145,7 @@
 --ocsp;Check revocation via OCSP (enabled by
 --ocsp;default)
 --openssl path;Path of the openssl binary to be used
+--path path;Set the PATH variable to 'path'
 --password source;Password source for a local certificate,
 --password source;openssl(1)
 --password source;see the PASS PHRASE ARGUMENTS section
