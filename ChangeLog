@@ -1,3 +1,7 @@
+2022-11-30  Marcel Burkhalter <marcel.burkhalter@weareplanet.com>
+
+        * check_ssl_cert (main): Add command line argument to extend $PATH variable
+
 2022-11-30  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_ocsp): ignoring OCSP errors if specified from the command line
