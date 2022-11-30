@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.55.0
+VERSION=2.56.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -281,6 +281,7 @@ usage() {
     echo "                                   certificate"
     echo "      --element number             Check up to the N cert element from the"
     echo "                                   beginning of the chain"
+    echo "      --extend-path path           Extend PATH variable with supplied path"
     # Delimiter at 78 chars ############################################################
     echo "      --file-bin path              Path of the file binary to be used"
     echo "      --fingerprint SHA1           Pattern to match the SHA1-Fingerprint"
@@ -3375,6 +3376,11 @@ parse_command_line_options() {
             DIG_BIN="$2"
             shift 2
             ;;
+        --extend-path)
+            check_option_argument '--extend-path' "$2"
+            EXTEND_PATH="$2"
+            shift 2
+            ;;
         --inetproto)
             check_option_argument '--inetproto' "$2"
             INETPROTO="-$2"
@@ -3862,6 +3868,7 @@ main() {
     DISALLOWED_PROTOCOLS=""
     ECDSA=""
     ELEMENT=0
+    EXTEND_PATH=""
     FILE_BIN=""
     FORCE_DCONV_DATE=""
     FORCE_PERL_DATE=""
@@ -4024,6 +4031,15 @@ main() {
 
     debuglog "Command line arguments: ${COMMAND_LINE_ARGUMENTS}"
     debuglog "  TMPDIR = ${TMPDIR}"
+
+    # extend $PATH variable if --extend-path is supplied
+    if [ -n "${EXTEND_PATH}" ]; then
+        if [ -d "${EXTEND_PATH}" ]; then
+            export PATH="${EXTEND_PATH}:${PATH}"
+        else
+            unknown "${EXTEND_PATH} is not a directory"
+        fi
+    fi
 
     if [ -n "${ALL}" ]; then
 
