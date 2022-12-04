@@ -232,7 +232,7 @@
 -N,--host-cn;(enabled by default)
 -N,--host-cn;Match CN with the host name
 -P,--protocol protocol;Use the specific protocol:
--P,--protocol protocol;ftp, ftps, http, https (default),
+-P,--protocol protocol;dns, ftp, ftps, http, https (default),
 -P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
 -P,--protocol protocol;h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
 -P,--protocol protocol;ldaps, mysql, pop3, pop3s, postgres,

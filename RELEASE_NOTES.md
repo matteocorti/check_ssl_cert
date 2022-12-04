@@ -1,3 +1,3 @@
 # Release notes
 
-New command line optioon ```--path```
+Support for DNS over TLS

@@ -192,7 +192,7 @@ Options:
                                    defaults to 0 if critical or warning are
                                    integers, 2 otherwise
    -P,--protocol protocol          Use the specific protocol:
-                                   ftp, ftps, http, https (default),
+                                   dns, ftp, ftps, http, https (default),
                                    h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
                                    ldaps, mysql, pop3, pop3s, postgres,
                                    sieve, smtp, smtps, tds, xmpp,

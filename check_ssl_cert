@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.56.0
+VERSION=2.57.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -401,7 +401,7 @@ usage() {
     echo "                                   defaults to 0 if critical or warning are"
     echo "                                   integers, 2 otherwise"
     echo "   -P,--protocol protocol          Use the specific protocol:"
-    echo "                                   ftp, ftps, http, https (default),"
+    echo "                                   dns, ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
     echo "                                   ldaps, mysql, pop3, pop3s, postgres,"
     echo "                                   sieve, smtp, smtps, tds, xmpp,"
@@ -2492,11 +2492,11 @@ fetch_certificate() {
             exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        irc | ldap)
+        irc | ldap )
             exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        ircs | ldaps)
+        ircs | ldaps | dns )
             exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
@@ -3948,6 +3948,9 @@ main() {
                 ;;
             pop3)
                 PORT=110
+                ;;
+            dns)
+                PORT=853
                 ;;
             ftp | ftps)
                 PORT=21

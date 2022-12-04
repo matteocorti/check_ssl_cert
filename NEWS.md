@@ -1,5 +1,7 @@
 # News
 
+* 2022-12-04 Version 2.57.0
+  * Support for DNS over TLS
 * 2022-11-30 Version 2.56.0
   * Adds the ```--path``` command line option
 * 2022-10-25 Version 2.55.0
