@@ -103,7 +103,7 @@ _check_ssl_cert() {
 
     --protocol | -P)
         # shellcheck disable=2207
-        COMPREPLY=($(compgen -W "ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server tds" -- "${cur}"))
+        COMPREPLY=($(compgen -W "dns ftp ftps http https h2 imap imaps irc ircs ldap ldaps mysql pop3 pop3s postgres sieve smtp smtps xmpp xmpp-server tds" -- "${cur}"))
         ;;
 
     *) ;;
