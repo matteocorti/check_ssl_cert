@@ -35,7 +35,7 @@ echo "--------------------------------------------------------------------------
 echo "-- Code"
 echo
 
-make distclean > /dev/null
+make distclean >/dev/null
 cloc --quiet . | grep -v AlDanial
 
 echo

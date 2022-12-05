@@ -135,7 +135,7 @@ oneTimeSetUp() {
     NOT_OK=1
 
     COUNTER=1
-    START_TIME=$( date +%s )
+    START_TIME=$(date +%s)
 
     if [ -z "${TMPDIR}" ]; then
         TMPDIR=/tmp
@@ -164,9 +164,9 @@ oneTimeSetUp() {
     "${OPENSSL}" version
 
     if [ -z "${GREP_BIN}" ]; then
-        GREP_BIN=$( command -v grep) # needed by openssl_version
+        GREP_BIN=$(command -v grep) # needed by openssl_version
     fi
-    if ! "${GREP_BIN}" -V > /dev/null 2>&1 ; then
+    if ! "${GREP_BIN}" -V >/dev/null 2>&1; then
         echo "Cannot determine grep version (Busybox?)"
     else
         "${GREP_BIN}" -V
@@ -176,24 +176,24 @@ oneTimeSetUp() {
 
 seconds2String() {
     seconds=$1
-    if [ "${seconds}" -gt 60 ] ; then
-        minutes=$(( seconds / 60 ))
-        seconds=$(( seconds % 60 ))
-        if [ "${minutes}" -gt 1 ] ; then
+    if [ "${seconds}" -gt 60 ]; then
+        minutes=$((seconds / 60))
+        seconds=$((seconds % 60))
+        if [ "${minutes}" -gt 1 ]; then
             MINUTE_S="minutes"
         else
             MINUTE_S="minute"
         fi
-        if [ "${seconds}" -eq 1 ] ; then
+        if [ "${seconds}" -eq 1 ]; then
             SECOND_S=" and ${seconds} second"
-        elif [ "${seconds}" -eq 0 ] ; then
+        elif [ "${seconds}" -eq 0 ]; then
             SECOND_S=
         else
             SECOND_S=" and ${seconds} seconds"
         fi
         string="${minutes} ${MINUTE_S}${SECOND_S}"
     else
-        if [ "${seconds}" -eq 1 ] ; then
+        if [ "${seconds}" -eq 1 ]; then
             SECOND_S="second"
         else
             SECOND_S="seconds"
@@ -210,10 +210,10 @@ oneTimeTearDown() {
     # shellcheck disable=SC2086
     cleanup_temporary_test_files ${SIGNALS}
 
-    NOW=$( date +%s )
-    ELAPSED=$(( NOW - START_TIME ))
+    NOW=$(date +%s)
+    ELAPSED=$((NOW - START_TIME))
     # shellcheck disable=SC2154
-    ELAPSED_STRING=$( seconds2String "${ELAPSED}" )
+    ELAPSED_STRING=$(seconds2String "${ELAPSED}")
     echo
     echo "Total time: ${ELAPSED_STRING}"
 }
@@ -222,21 +222,21 @@ setUp() {
     echo
 
     # shellcheck disable=SC2154
-    PERCENT=$( echo "scale=2; ${COUNTER} / ${__shunit_testsTotal} * 100" | bc | sed 's/[.].*//' )
+    PERCENT=$(echo "scale=2; ${COUNTER} / ${__shunit_testsTotal} * 100" | bc | sed 's/[.].*//')
 
-    NOW=$( date +%s )
-    ELAPSED=$(( NOW - START_TIME ))
+    NOW=$(date +%s)
+    ELAPSED=$((NOW - START_TIME))
     # shellcheck disable=SC2154
-    REMAINING_S=$( echo "scale=2; ${__shunit_testsTotal} * ( ${ELAPSED} ) / ${COUNTER} - ${ELAPSED}" | bc | sed 's/[.].*//' )
-    if [ -z "${REMAINING_S}" ] ; then
+    REMAINING_S=$(echo "scale=2; ${__shunit_testsTotal} * ( ${ELAPSED} ) / ${COUNTER} - ${ELAPSED}" | bc | sed 's/[.].*//')
+    if [ -z "${REMAINING_S}" ]; then
         REMAINING_S=0
     fi
-    REMAINING=$( seconds2String "${REMAINING_S}" )
+    REMAINING=$(seconds2String "${REMAINING_S}")
 
     # print the test number
     # shellcheck disable=SC2154
     echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed)"
-    COUNTER=$((COUNTER+1))
+    COUNTER=$((COUNTER + 1))
 }
 
 ##############################################################################
@@ -422,33 +422,33 @@ testInfo() {
 testSignatureAlgorithms() {
 
     # shellcheck disable=SC2086
-    ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
+    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
         grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//' )
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'rsaEncryption (2048 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
-    ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
+    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
         grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//' )
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'rsaEncryption (4096 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
-    ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
+    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
         grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//' )
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'rsaEncryption (8192 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
-    ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc256.badssl.com |
+    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc256.badssl.com |
         grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//' )
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'id-ecPublicKey (256 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
-    ALGORITHM=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc384.badssl.com |
+    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc384.badssl.com |
         grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//' )
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'id-ecPublicKey (384 bit)' "${ALGORITHM}"
 
 }
@@ -1299,7 +1299,7 @@ testResolveIPv6() {
             echo "IPv6 is configured"
             if ping6 -c 3 www.google.com >/dev/null 2>&1; then
                 echo "IPv6 is working"
-                RESOLVED=$( host www.google.com | grep IPv6 | sed 's/.* //' )
+                RESOLVED=$(host www.google.com | grep IPv6 | sed 's/.* //')
                 # shellcheck disable=SC2086
                 ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --resolve "${RESOLVED}" --ignore-exp
                 EXIT_CODE=$?
@@ -1350,9 +1350,9 @@ testCiphersOK() {
 testCiphersNonStandardPort() {
 
     # nmap ssl-enum-ciphers dumps core on CentOS 7 and RHEL 7
-#    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 7\.' /etc/redhat-release; then
-#        echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
-#    el
+    #    if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 7\.' /etc/redhat-release; then
+    #        echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
+    #    el
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     else
@@ -1565,7 +1565,7 @@ testMaximumValidityLong() {
 testMaximumValidityIgnored() {
     # generate a cert expiring in 400 days
     CERT=$(createSelfSignedCertificate 400)
-   # shellcheck disable=SC2086
+    # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg --ignore-maximum-validity
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
@@ -1701,7 +1701,7 @@ testHostCache() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
 
-    grep -q '^github.com$'  ~/.check_ssl_cert-cache
+    grep -q '^github.com$' ~/.check_ssl_cert-cache
     EXIT_CODE=$?
     assertEquals "wrong exit code (host not cached)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
@@ -1721,26 +1721,26 @@ testHostCache() {
 
             echo "IPv6 is working"
 
-                # shellcheck disable=SC2086
-                ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
+            # shellcheck disable=SC2086
+            ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp
 
-                grep -c '^github.com$'  ~/.check_ssl_cert-cache | grep -q '^1$'
-                EXIT_CODE=$?
-                assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+            grep -c '^github.com$' ~/.check_ssl_cert-cache | grep -q '^1$'
+            EXIT_CODE=$?
+            assertEquals "wrong exit code (host cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
-                # take the first IPv6 address
-                TEST_IPV6=$( dig -t AAAA google.com +short | head -n 1 )
-                PARAMETER="[${TEST_IPV6}]"
+            # take the first IPv6 address
+            TEST_IPV6=$(dig -t AAAA google.com +short | head -n 1)
+            PARAMETER="[${TEST_IPV6}]"
 
-                # shellcheck disable=SC2086
-                ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+            # shellcheck disable=SC2086
+            ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
 
-                # shellcheck disable=SC2086
-                ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
+            # shellcheck disable=SC2086
+            ${SCRIPT} ${TEST_DEBUG} -H "${PARAMETER}" --ignore-exp
 
-                grep -c "${TEST_IPV6}"  ~/.check_ssl_cert-cache | grep -q '^1$'
-                EXIT_CODE=$?
-                assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
+            grep -c "${TEST_IPV6}" ~/.check_ssl_cert-cache | grep -q '^1$'
+            EXIT_CODE=$?
+            assertEquals "wrong exit code (IPv6 cached more than once)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
         else
             echo "IPv6 is configured but not working: skipping test"
@@ -1749,7 +1749,6 @@ testHostCache() {
     else
         echo "Skipping forcing IPv6: not IPv6 configured locally"
     fi
-
 
 }
 
@@ -1854,7 +1853,7 @@ testHTTPHeaders() {
 testConfigurationOK() {
     create_temporary_test_file
     CONFIGURATION=${TEMPFILE}
-    echo "--verbose" >> "${CONFIGURATION}"
+    echo "--verbose" >>"${CONFIGURATION}"
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration "${CONFIGURATION}" | grep -q 'The certificate for this site contains'
     EXIT_CODE=$?
@@ -1871,7 +1870,7 @@ testConfigurationMissingFile() {
 testConfigurationWrongOption() {
     create_temporary_test_file
     CONFIGURATION=${TEMPFILE}
-    echo "--invalid-option" >> "${CONFIGURATION}"
+    echo "--invalid-option" >>"${CONFIGURATION}"
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration "${CONFIGURATION}"
     EXIT_CODE=$?

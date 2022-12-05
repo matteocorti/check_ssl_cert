@@ -47,7 +47,7 @@ for option in $(grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//'
 
         # check if the option is documented in the man page
 
-        if ! grep -q  -- "${option}" check_ssl_cert.1; then
+        if ! grep -q -- "${option}" check_ssl_cert.1; then
             echo "Error: ${option} is not documented in check_ssl_cert.1"
             ERROR=1
         fi

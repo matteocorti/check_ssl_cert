@@ -79,7 +79,7 @@ SCALE=""
 add_required_header() {
     header=$1
     debuglog "Adding ${header} to the list of required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
-    if [ -z "${REQUIRED_HTTP_HEADERS}" ] ; then
+    if [ -z "${REQUIRED_HTTP_HEADERS}" ]; then
         REQUIRED_HTTP_HEADERS="${header}"
     else
         REQUIRED_HTTP_HEADERS="${REQUIRED_HTTP_HEADERS},${header}"
@@ -93,19 +93,18 @@ add_required_header() {
 add_unrequired_header() {
     header=$1
     debuglog "Adding ${header} to the list of unrequired HTTP headers: ${UNREQUIRED_HTTP_HEADERS}"
-    if [ -z "${UNREQUIRED_HTTP_HEADERS}" ] ; then
+    if [ -z "${UNREQUIRED_HTTP_HEADERS}" ]; then
         UNREQUIRED_HTTP_HEADERS="${header}"
     else
         UNREQUIRED_HTTP_HEADERS="${UNREQUIRED_HTTP_HEADERS},${header}"
     fi
 }
 
-
 CACHED_HEADERS=
 
 fetch_http_headers() {
 
-    if [ -z "${CACHED_HEADERS}" ] ; then
+    if [ -z "${CACHED_HEADERS}" ]; then
 
         debuglog "Fetching headers"
 
@@ -113,7 +112,7 @@ fetch_http_headers() {
         CACHED_HEADERS=${TEMPFILE}
 
         CURL_RESOLVE=''
-        if [ -n "${RESOLVE}" ] ; then
+        if [ -n "${RESOLVE}" ]; then
             CURL_RESOLVE="--resolve ${HOST}:${PORT}:${RESOLVE}"
         fi
 
@@ -127,18 +126,18 @@ fetch_http_headers() {
         exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
         RET=$?
 
-        if [ "${RET}" -ne 0 ] ; then
+        if [ "${RET}" -ne 0 ]; then
             debuglog "Cannot retrieve HTTP headers (curl error code: ${RET})"
             prepend_critical_message "Cannot retrieve HTTP headers"
         fi
 
         if [ "${DEBUG}" -gt 1 ]; then
-            ESCAPED_PATH=$( echo "${path}" | sed 's/\//\\\//g' )
+            ESCAPED_PATH=$(echo "${path}" | sed 's/\//\\\//g')
             # there might be empty lines
             "${GREP_BIN}" '[[:alpha:]]' "${CACHED_HEADERS}" | sed "s/^/[DBG]   HTTP headers for https:\\/\\/${HOST}${ESCAPED_PATH}: /" 1>&2
         fi
 
-        if [ -n "${DEBUG_HEADERS}" ] ; then
+        if [ -n "${DEBUG_HEADERS}" ]; then
             cp "${CACHED_HEADERS}" headers.txt
         fi
 
@@ -155,11 +154,11 @@ check_required_http_header() {
 
     debuglog "Checking required header '${header}' with path '${path}'"
 
-    if ! "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}" ; then
+    if ! "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}"; then
         debuglog "Required header '${header}' not found"
         prepend_critical_message "HTTP header '${header}' is not supported"
     else
-        HEADER_VALUE=$( "${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
+        HEADER_VALUE=$("${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r')
         debuglog "Required header '${header}' found (${HEADER_VALUE})"
         verboselog "Required header '${header}' is supported  (${HEADER_VALUE})"
     fi
@@ -175,8 +174,8 @@ check_unrequired_http_header() {
 
     debuglog "Checking unrequired header '${header}' with path '${path}'"
 
-    if "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}" ; then
-        HEADER_VALUE=$( "${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r' )
+    if "${GREP_BIN}" -q -i "^${header}:" "${CACHED_HEADERS}"; then
+        HEADER_VALUE=$("${GREP_BIN}" -i "^${header}:" "${CACHED_HEADERS}" | sed 's/[^:]*: //' | tr -d '\n' | tr -d '\r')
         debuglog "Unwanted header '${header}' found (${HEADER_VALUE})"
         prepend_critical_message "HTTP header '${header}' is supported (${HEADER_VALUE})"
     else
@@ -1013,7 +1012,7 @@ prepend_critical_message() {
                 tmp=" ${SNI}"
             elif [ -n "${FILE_URI}" ]; then
                 tmp=" ${FILE_URI}"
-            elif [ -n "${FILE}" ] && [ "${HOST}" = 'localhost' ] ; then
+            elif [ -n "${FILE}" ] && [ "${HOST}" = 'localhost' ]; then
                 tmp=" ${FILE}"
             else
                 tmp=" ${HOST_NAME}"
@@ -1333,7 +1332,7 @@ compare() {
 # Returns the result
 compute() {
     expression="$1"
-    if [ -n "$2" ] ; then
+    if [ -n "$2" ]; then
         # custom scale
         local_scale=$2
     else
@@ -1412,7 +1411,6 @@ check_x509_option() {
     return $?
 }
 
-
 ################################################################################
 # Extract specific field from a subject
 # $1 field
@@ -1436,7 +1434,7 @@ parse_subject() {
         # old format
         debuglog "  old format separated by /"
 
-        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}=" ; then
+        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}="; then
             echo "${SUBJECT}" | sed -e "s/.*\\/${FIELD}=//" -e 's/\/.*//'
         fi
 
@@ -1445,7 +1443,7 @@ parse_subject() {
         # new format
         debuglog "  new format separated by ,"
 
-        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*=" ; then
+        if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*="; then
 
             if echo "${SUBJECT}" | "${GREP_BIN}" -q "${FIELD}[ ]*=[ ]*\""; then
                 # quotes
@@ -1462,7 +1460,6 @@ parse_subject() {
     fi
 
 }
-
 
 ################################################################################
 # Extract specific attributes from a certificate
@@ -1569,9 +1566,9 @@ extract_cert_attribute() {
         #
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
-        ALGORITHM=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
+        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
 
-        PUBLIC_KEY=$( echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //' )
+        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //')
 
         echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
@@ -1595,15 +1592,15 @@ extract_cert_attribute() {
             sed -e 's/^ *//'
         ;;
     keyUsage)
-        KEY_USAGE_TMP=$( echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1 )
-        if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q 'No extensions in certificate' ; then
+        KEY_USAGE_TMP=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1)
+        if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q 'No extensions in certificate'; then
             echo
         else
 
-            if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q critical ; then
+            if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q critical; then
                 PURPOSE_CRITICAL=1
             fi
-            PURPOSE=$( echo "${KEY_USAGE_TMP}" | tail -n 1 | sed 's/^[[:blank:]]*//')
+            PURPOSE=$(echo "${KEY_USAGE_TMP}" | tail -n 1 | sed 's/^[[:blank:]]*//')
             echo "${PURPOSE}"
 
         fi
@@ -1643,7 +1640,7 @@ exec_with_timeout() {
     debuglog "exec_with_timeout $1 $2 $3"
     debuglog "  TIMEOUT_REASON = ${TIMEOUT_REASON}"
 
-    if [ -n "${TIMEOUT_REASON}" ] ; then
+    if [ -n "${TIMEOUT_REASON}" ]; then
         if ! echo "${TIMEOUT_REASON}" | "${GREP_BIN}" -q '^ '; then
             # add a blank before the reason in parenthesis
             TIMEOUT_REASON=" (${TIMEOUT_REASON})"
@@ -2133,8 +2130,8 @@ check_ocsp() {
                         fi
 
                         debuglog "${OCSP_RESP}"
-                        OCSP_ERROR_MESSAGE=$( echo "${OCSP_RESP}" | head -n 1 )
-                        if [ -z "${OCSP_IGNORE_ERRORS}" ] ; then
+                        OCSP_ERROR_MESSAGE=$(echo "${OCSP_RESP}" | head -n 1)
+                        if [ -z "${OCSP_IGNORE_ERRORS}" ]; then
                             prepend_critical_message "OCSP error (${OCSP_ERROR_MESSAGE})"
                         else
                             debuglog "Ignoring OCSP error (${OCSP_ERROR_MESSAGE})"
@@ -2227,7 +2224,7 @@ check_cert_end_date() {
             fi
             debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
             CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
-            if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
+            if [ -z "${CN_EXPIRED_CRITICAL}" ]; then
                 CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
             else
                 CN_EXPIRED_CRITICAL="${CN_EXPIRED_CRITICAL}
@@ -2247,7 +2244,7 @@ ${CN_EXPIRED_TMP}"
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
                 debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                if [ -z "${CN_EXPIRED_CRITICAL}" ] ; then
+                if [ -z "${CN_EXPIRED_CRITICAL}" ]; then
                     CN_EXPIRED_CRITICAL="${CN_EXPIRED_TMP}"
                 else
                     CN_EXPIRED_CRITICAL="${CN_EXPIRED_CRITICAL}
@@ -2269,7 +2266,7 @@ ${CN_EXPIRED_TMP}"
             if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
                 debuglog "WARNING: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
-                if [ -z "${CN_EXPIRED_WARNING}" ] ; then
+                if [ -z "${CN_EXPIRED_WARNING}" ]; then
                     CN_EXPIRED_WARNING="${CN_EXPIRED_TMP}"
                 else
                     CN_EXPIRED_WARNING="${CN_EXPIRED_WARNING}
@@ -2338,7 +2335,7 @@ ${CN_EXPIRED_TMP}"
     fi
 
     # the element is valid: add to the list of valid CNs
-    if [ -z "${CN_OK}" ] ; then
+    if [ -z "${CN_OK}" ]; then
         CN_OK="${element_cn}"
     else
         CN_OK="${CN_OK}
@@ -2492,11 +2489,11 @@ fetch_certificate() {
             exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        irc | ldap )
+        irc | ldap)
             exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        ircs | ldaps | dns )
+        ircs | ldaps | dns)
             exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
@@ -2567,11 +2564,11 @@ fetch_certificate() {
 
             debuglog "Executing ${KEYTOOLBIN} -exportcert -rfc -keystore ${FILE} -alias ${JKSALIAS} -file ${CERT} -storepass ${PASSWORD_SOURCE}"
 
-            CONVERSION_ERROR=$( "${KEYTOOLBIN}" -exportcert -rfc -keystore "${FILE}" -alias "${JKSALIAS}" -file "${CERT}" -storepass "${PASSWORD_SOURCE}" 2>&1)
+            CONVERSION_ERROR=$("${KEYTOOLBIN}" -exportcert -rfc -keystore "${FILE}" -alias "${JKSALIAS}" -file "${CERT}" -storepass "${PASSWORD_SOURCE}" 2>&1)
             RET=$?
 
             if [ "${RET}" -eq 1 ]; then
-                CONVERSION_ERROR_TMP="$( echo "${CONVERSION_ERROR}" | head -n 1)"
+                CONVERSION_ERROR_TMP="$(echo "${CONVERSION_ERROR}" | head -n 1)"
                 unknown "Error converting JKS to PEM: ${CONVERSION_ERROR_TMP}"
             fi
 
@@ -2591,16 +2588,16 @@ fetch_certificate() {
                     debuglog "The input file is a CRL in DER format: converting to PEM"
 
                     debuglog "Executing ${OPENSSL} crl -inform der -in ${FILE} -out ${CERT} 2> /dev/null"
-                        "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
+                    "${OPENSSL}" crl -inform der -in "${FILE}" -out "${CERT}" 2>"${CONVERSION_ERROR}"
 
-                        if [ $? -eq 1 ]; then
-                            CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
-                            unknown "Error converting CRL ${FILE}: ${CONVERSION_ERROR_TMP}"
-                        fi
-
-                    else
+                    if [ $? -eq 1 ]; then
                         CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
-                        unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
+                        unknown "Error converting CRL ${FILE}: ${CONVERSION_ERROR_TMP}"
+                    fi
+
+                else
+                    CONVERSION_ERROR_TMP="$(head -n 1 "${CONVERSION_ERROR}")"
+                    unknown "Error converting ${FILE}: ${CONVERSION_ERROR_TMP}"
                 fi
 
             fi
@@ -2802,7 +2799,7 @@ fetch_certificate() {
         elif ascii_grep "Unable to load certificate file" "${ERROR}"; then
 
             # we handle TDS retried certs differently
-            if [ "${HOST}" = 'localhost' ] ; then
+            if [ "${HOST}" = 'localhost' ]; then
                 ERROR="Cannot read certificate file"
                 prepend_critical_message "${ERROR}"
                 critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
@@ -2819,7 +2816,7 @@ fetch_certificate() {
             critical "SSL_CERT_CRITICAL ${FILE}: ${ERROR}"
 
         elif ascii_grep "unexpected eof while reading" "${ERROR}" ||
-             ascii_grep "ssl handshake failure" "${ERROR}"; then
+            ascii_grep "ssl handshake failure" "${ERROR}"; then
 
             ERROR="TLS handshake error"
             prepend_critical_message "${ERROR}"
@@ -2996,7 +2993,7 @@ parse_command_line_options() {
 
         # DTLS
         --dtls)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--dtls: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             require_s_client_option '-dtls'
@@ -3004,7 +3001,7 @@ parse_command_line_options() {
             shift
             ;;
         --dtls1)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--dtls1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             require_s_client_option '-dtls1'
@@ -3012,7 +3009,7 @@ parse_command_line_options() {
             shift
             ;;
         --dtls1_2)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--dtls1_2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             require_s_client_option '-dtls1_2'
@@ -3099,7 +3096,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-ssl2 | --no_ssl2)
-            if [ "$1" = '--no_ssl2' ] ; then
+            if [ "$1" = '--no_ssl2' ]; then
                 deprecated "$1" "Use '--no-ssl2'"
             fi
             # we keep the old variant for compatibility
@@ -3107,7 +3104,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-ssl3 | --no_ssl3)
-            if [ "$1" = '--no_ssl3' ] ; then
+            if [ "$1" = '--no_ssl3' ]; then
                 deprecated "$1" "Use '--no-ssl3'"
             fi
             # we keep the old variant for compatibility
@@ -3115,7 +3112,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-tls1 | --no_tls1)
-            if [ "$1" = '--no_tls1' ] ; then
+            if [ "$1" = '--no_tls1' ]; then
                 deprecated "$1" "Use '--no-tls1'"
             fi
             # we keep the old variant for compatibility
@@ -3123,7 +3120,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-tls1_1 | --no_tls1_1)
-            if [ "$1" = '--no_tls1_1' ] ; then
+            if [ "$1" = '--no_tls1_1' ]; then
                 deprecated "$1" "Use '--no-tls1_1'"
             fi
             # we keep the old variant for compatibility
@@ -3131,7 +3128,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-tls1_2 | --no_tls1_2)
-            if [ "$1" = '--no_tls1_2' ] ; then
+            if [ "$1" = '--no_tls1_2' ]; then
                 deprecated "$1" "Use '--no-tls1_2'"
             fi
             # we keep the old variant for compatibility
@@ -3139,7 +3136,7 @@ parse_command_line_options() {
             shift
             ;;
         --no-tls1_3 | --no_tls1_3)
-            if [ "$1" = '--no_tls1_3' ] ; then
+            if [ "$1" = '--no_tls1_3' ]; then
                 deprecated "$1" "Use '--no-tls1_3'"
             fi
             # we keep the old variant for compatibility
@@ -3219,42 +3216,42 @@ parse_command_line_options() {
             shift
             ;;
         --ssl2)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--ssl2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-ssl2"
             shift
             ;;
         --ssl3)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--ssl3: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-ssl3"
             shift
             ;;
         --tls1)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--tls1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-tls1"
             shift
             ;;
         --tls1_1)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--tls1_1: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-tls1_1"
             shift
             ;;
         --tls1_2)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--tls1_2: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-tls1_2"
             shift
             ;;
         --tls1_3)
-            if [ -n "${SSL_VERSION}" ] ; then
+            if [ -n "${SSL_VERSION}" ]; then
                 unknown "--tls1_3: only one protocol can be specified at the same time (${SSL_VERSION} is already specified)"
             fi
             SSL_VERSION="-tls1_3"
@@ -3324,12 +3321,12 @@ parse_command_line_options() {
 
         --configuration)
             check_option_argument '--configuration' "$2"
-            if [ -r "$2" ] ; then
+            if [ -r "$2" ]; then
                 # custom configuration file
                 while IFS= read -r line; do
                     # shellcheck disable=SC2086
                     set -- "$@" ${line}
-                done < "$2"
+                done <"$2"
             else
                 unknown "Cannot read $2"
             fi
@@ -3534,10 +3531,10 @@ $2"
             shift 2
             ;;
         -n | --cn | -m | --match)
-            if [ "$1" = '-n' ] ; then
+            if [ "$1" = '-n' ]; then
                 deprecated '-n' "Use '-m'"
             fi
-            if [ "$1" = '--cn' ] ; then
+            if [ "$1" = '--cn' ]; then
                 deprecated '--cn' "Use '--match'"
             fi
             check_option_argument ' -n|--cn|-m|--match' "$2"
@@ -3765,7 +3762,7 @@ $2"
             add_required_header X-Frame-Options
 
             # default path
-            if [ -z "${HTTP_HEADERS_PATH}" ] ; then
+            if [ -z "${HTTP_HEADERS_PATH}" ]; then
                 HTTP_HEADERS_PATH='/'
             fi
 
@@ -3919,11 +3916,11 @@ main() {
     # Bash specific.
 
     # read additional options from the configuration file
-    if [ -r "${CONFIGURATION_FILE}" ] ; then
+    if [ -r "${CONFIGURATION_FILE}" ]; then
         while IFS= read -r line; do
             # shellcheck disable=SC2086
             set -- "$@" ${line}
-        done < "${CONFIGURATION_FILE}"
+        done <"${CONFIGURATION_FILE}"
     fi
 
     parse_command_line_options "$@"
@@ -4011,20 +4008,20 @@ main() {
         date >>"${DEBUG_FILE}"
     fi
 
-    if [ "${DEBUG}" -gt 0 ] ; then
+    if [ "${DEBUG}" -gt 0 ]; then
 
         debuglog "Shell: ${SHELL}"
-        SHELL_VERSION=$( "${SHELL}" --version)
+        SHELL_VERSION=$("${SHELL}" --version)
         echo "${SHELL_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
         # should take a look at
         # https://github.com/stephane-chazelas/misc-scripts/blob/master/which_interpreter
 
         debuglog "grep: ${GREP_BIN}"
-        GREP_VERSION=$( ${GREP_BIN} --version)
+        GREP_VERSION=$(${GREP_BIN} --version)
         echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
-        HOSTNAME_BIN=$( command -v hostname )
+        HOSTNAME_BIN=$(command -v hostname)
         debuglog "hostname: ${HOSTNAME_BIN}"
 
         debuglog "\$PATH: ${PATH}"
@@ -4059,7 +4056,7 @@ main() {
         fi
 
         # we check HTTP headers only with HTTP/HTTPS
-        if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ] ; then
+        if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ]; then
             REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
             UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
         fi
@@ -4085,12 +4082,11 @@ main() {
     # HTTP checks do only make sense with HTTP
     # do not split the next line otherwise ShellCheck will fail to parse it
     # see https://www.shellcheck.net/wiki/SC2235 for the { ; } syntax
-    if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; } ; then
-        if [ -n "${REQUIRED_HTTP_HEADERS}" ] || [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ; then
+    if [ -n "${FILE}" ] || { [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; }; then
+        if [ -n "${REQUIRED_HTTP_HEADERS}" ] || [ -n "${UNREQUIRED_HTTP_HEADERS}" ]; then
             unknown "HTTP headers can only be checked with HTTP[S]"
         fi
     fi
-
 
     # we need the FQDN of an host to check the CN
     debuglog "Adding the domain if missing"
@@ -4121,8 +4117,8 @@ main() {
     if [ -r "${HOST_CACHE}" ]; then
         debuglog "Host cache ${HOST_CACHE} is present"
 
-        if echo "${HOST}" | "${GREP_BIN}" -q -F '[' ; then
-            PATTERN=$( echo "${HOST}" | sed -e 's/\[//' -e 's/\]//' )
+        if echo "${HOST}" | "${GREP_BIN}" -q -F '['; then
+            PATTERN=$(echo "${HOST}" | sed -e 's/\[//' -e 's/\]//')
         else
             PATTERN="^${HOST}$"
         fi
@@ -4151,7 +4147,7 @@ main() {
 
         debuglog "Forcing ${HOST} to resolve to ${RESOLVE}"
 
-        if echo "${RESOLVE}" | "${GREP_BIN}" -q '^[a-fA-F0-9].*:' ; then
+        if echo "${RESOLVE}" | "${GREP_BIN}" -q '^[a-fA-F0-9].*:'; then
             debuglog "--resolve with an IPv6 (${RESOLVE}) without brackets: adding ([${RESOLVE}])"
             RESOLVE="[${RESOLVE}]"
         fi
@@ -4241,7 +4237,7 @@ main() {
         PYTHON_BIN="${PROG}"
 
         # check Python major version
-        if "${PYTHON_BIN}" --version 2>&1 | grep -q '^Python 2' ; then
+        if "${PYTHON_BIN}" --version 2>&1 | grep -q '^Python 2'; then
             unknown "Python 2 is not supported"
         fi
 
@@ -4261,7 +4257,7 @@ main() {
 
     ##############################################################################
     # OpenSSL options
-    if [ -n "${REQUIRE_PURPOSE}" ] || [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
+    if [ -n "${REQUIRE_PURPOSE}" ] || [ -n "${REQUIRE_PURPOSE_CRITICAL}" ]; then
         require_x509_option "-ext" " (required for certificate purpose)"
     fi
 
@@ -4620,8 +4616,8 @@ main() {
 
     # nmap does not understand brackets in IPv6 addresses
     NMAP_HOST_ADDR="${HOST_ADDR}"
-    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q '^\[' ; then
-        NMAP_HOST_ADDR=$( echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//' )
+    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q '^\['; then
+        NMAP_HOST_ADDR=$(echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//')
     fi
 
     # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
@@ -4631,7 +4627,7 @@ main() {
         NMAP_INETPROTO='-6'
     fi
 
-    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q ':' ; then
+    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q ':'; then
         debuglog "host specified as an IPv6 address: forcing IPv6 with nmap"
         NMAP_INETPROTO='-6'
     fi
@@ -4892,16 +4888,15 @@ main() {
     # https://security.stackexchange.com/questions/120708/nmap-through-proxy
     #
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ] ||
-           [ -n "${SCLIENT_PROXY}" ] ||
-           [ -n "${CURL_PROXY}" ] ; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ] ||
+        [ -n "${SCLIENT_PROXY}" ] ||
+        [ -n "${CURL_PROXY}" ]; then
         DISABLE_NMAP=1
         debuglog "A proxy is specified: nmap disabled"
         verboselog "A proxy is specified: nmap checks disabled"
     fi
-
 
     ################################################################################
     # Check if openssl s_client supports the -name option
@@ -5002,9 +4997,9 @@ main() {
     # - https://dnsinstitute.com/documentation/dnssec-guide/ch03s02.html
     # - https://serverfault.com/questions/154016/querying-and-verifying-dnssec
     #
-    if [ -n "${REQUIRE_DNSSEC}" ] ; then
+    if [ -n "${REQUIRE_DNSSEC}" ]; then
 
-        if [ -n "${FILE}" ] ; then
+        if [ -n "${FILE}" ]; then
             unknown "--require-dnssec cannot be used with --file"
         fi
 
@@ -5018,7 +5013,7 @@ main() {
 
         # a lot of DNS servers have no support for DNSSEC: we use Google's public DNS
         debuglog "Checking DNSSEC with ${DIG_BIN} +dnssec ${HOST} @8.8.8.8"
-        DIG_OUTPUT=$( ${DIG_BIN} +dnssec "${HOST}" @8.8.8.8 )
+        DIG_OUTPUT=$(${DIG_BIN} +dnssec "${HOST}" @8.8.8.8)
 
         if [ "${DEBUG}" -gt 0 ]; then
             echo "${DIG_OUTPUT}" | sed 's/^/[DBG]     /' 1>&2
@@ -5026,24 +5021,24 @@ main() {
 
         DNSSEC_ERROR=
         # check for the presence of the Authenticated Data (ad) flag in the header
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';; flags:' | "${GREP_BIN}" -q 'ad[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';; flags:' | "${GREP_BIN}" -q 'ad[; ]'; then
             prepend_critical_message "DNSSEC: the Authenticated Data (ad) flag is not present"
             DNSSEC_ERROR=1
         fi
 
         # check the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ', flags:' | "${GREP_BIN}" -q 'do[; ]' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ', flags:' | "${GREP_BIN}" -q 'do[; ]'; then
             prepend_critical_message "DNSSEC: the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware is not present"
             DNSSEC_ERROR=1
         fi
 
         # check for the presence of an additional resource record of type RRSIG, with the same name as the A record.
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -q 'RRSIG' ; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -q 'RRSIG'; then
             prepend_critical_message "DNSSEC: the RRSIG resource record is not present"
             DNSSEC_ERROR=1
         fi
 
-        if [ -z "${DNSSEC_ERROR}" ] ; then
+        if [ -z "${DNSSEC_ERROR}" ]; then
             verboselog "DNSSEC ok"
             info "DNSSEC" "ok"
         else
@@ -5074,10 +5069,10 @@ main() {
         HTTP_VERSION="1.1"
     fi
 
-    if [ -n "${IGNORE_MAXIMUM_VALIDITY}" ] && [ -n "${MAXIMUM_VALIDITY}" ] ; then
+    if [ -n "${IGNORE_MAXIMUM_VALIDITY}" ] && [ -n "${MAXIMUM_VALIDITY}" ]; then
         unknown "--ignore-maximum-validity and --maximum-validity cannot be specified at the same time"
     fi
-    if [ -n "${MAXIMUM_VALIDITY}" ]  && ! echo "${MAXIMUM_VALIDITY}" | "${GREP_BIN}" -E -q '^[0-9][0-9]*$'; then
+    if [ -n "${MAXIMUM_VALIDITY}" ] && ! echo "${MAXIMUM_VALIDITY}" | "${GREP_BIN}" -E -q '^[0-9][0-9]*$'; then
         unknown "invalid number of days '${MAXIMUM_VALIDITY}'"
     fi
 
@@ -5089,7 +5084,7 @@ main() {
     # Check for disallowed protocols
     if [ -n "${DISALLOWED_PROTOCOLS}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ] ; then
+        if [ -n "${DISABLE_NMAP}" ]; then
 
             verboselog "Using a proxy: cannot check for disable protocols"
             debuglog "Using a proxy: cannot check for disable protocols"
@@ -5192,9 +5187,9 @@ main() {
 
     ################################################################################
     # Connection check
-    if [ -z "${FILE}" ] ; then
+    if [ -z "${FILE}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ] ; then
+        if [ -n "${DISABLE_NMAP}" ]; then
 
             verboselog "Using a proxy: cannot test connection"
             debuglog "Using a proxy: cannot test connection"
@@ -5205,29 +5200,29 @@ main() {
 
             debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} --unprivileged -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open" ; then
+            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open"; then
 
-                if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+                if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
 
                     case "${IGNORE_CONNECTION_STATE}" in
-                        "${STATUS_OK}")
-                            echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                            exit "${STATUS_OK}"
-                            ;;
-                        "${STATUS_WARNING}")
-                            echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                            exit "${STATUS_WARNING}"
-                            ;;
-                        "${STATUS_CRITICAL}")
-                            echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                            exit "${STATUS_CRITICAL}"
-                            ;;
-                        "${STATUS_UNKNOWN}")
-                            critical "Cannot connect to ${HOST}:${PORT}"
-                            ;;
-                        *)
-                            debuglog "Ignoring connection test"
-                            ;;
+                    "${STATUS_OK}")
+                        echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_OK}"
+                        ;;
+                    "${STATUS_WARNING}")
+                        echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_WARNING}"
+                        ;;
+                    "${STATUS_CRITICAL}")
+                        echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_CRITICAL}"
+                        ;;
+                    "${STATUS_UNKNOWN}")
+                        critical "Cannot connect to ${HOST}:${PORT}"
+                        ;;
+                    *)
+                        debuglog "Ignoring connection test"
+                        ;;
                     esac
 
                 else
@@ -5322,16 +5317,16 @@ main() {
     ####################
     # check HTTP headers
 
-    if [ -n "${REQUIRED_HTTP_HEADERS}" ] ; then
+    if [ -n "${REQUIRED_HTTP_HEADERS}" ]; then
         debuglog "Checking required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
-        for header in $( echo "${REQUIRED_HTTP_HEADERS}" | tr ',' '\n' ) ; do
+        for header in $(echo "${REQUIRED_HTTP_HEADERS}" | tr ',' '\n'); do
             check_required_http_header "${header}" "${HTTP_HEADERS_PATH}"
         done
     fi
 
-    if [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ; then
+    if [ -n "${UNREQUIRED_HTTP_HEADERS}" ]; then
         debuglog "Checking unwanted HTTP headers: ${UNREQUIRED_HTTP_HEADERS}"
-        for header in $( echo "${UNREQUIRED_HTTP_HEADERS}" | tr ',' '\n' ) ; do
+        for header in $(echo "${UNREQUIRED_HTTP_HEADERS}" | tr ',' '\n'); do
             check_unrequired_http_header "${header}" "${HTTP_HEADERS_PATH}"
         done
     fi
@@ -5507,36 +5502,36 @@ main() {
         info "Fingerprint" "${FINGERPRINT_INFO}"
 
         # only works with -ext
-        if check_x509_option '-ext' ; then
+        if check_x509_option '-ext'; then
 
             KEY_USAGE="$(extract_cert_attribute 'keyUsage' "${CERT}")"
 
             # info
-            if [ -n "${PURPOSE_CRITICAL}" ] ; then
+            if [ -n "${PURPOSE_CRITICAL}" ]; then
                 debuglog "Certificate purpose is defined as critical"
                 PURPOSE_LABEL="Purpose (critical)"
             else
                 debuglog "Certificate purpose is not defined as critical"
                 PURPOSE_LABEL="Purpose"
-                if [ -n "${REQUIRE_PURPOSE_CRITICAL}" ] ; then
+                if [ -n "${REQUIRE_PURPOSE_CRITICAL}" ]; then
                     prepend_critical_message "Certificate purpose is not defined as critical (as required)"
                 fi
             fi
             info "${PURPOSE_LABEL}" "${KEY_USAGE}"
 
             # check the certificate purpose
-            if [ -n "${REQUIRE_PURPOSE}" ] ; then
+            if [ -n "${REQUIRE_PURPOSE}" ]; then
                 debuglog "Checking certificate purpose(s)"
 
-                while IFS= read -r purpose ; do
+                while IFS= read -r purpose; do
 
                     debuglog "  Check if '${purpose}' is defined"
 
                     # the purposes are in a 'comma space' separated list
                     if ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}, " &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}$" &&
-                            ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}, " ; then
+                        ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i "^${purpose}, " &&
+                        ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}$" &&
+                        ! echo "${KEY_USAGE}" | "${GREP_BIN}" -q -i ", ${purpose}, "; then
                         prepend_critical_message "'${purpose}' is not specified as a certificate purpose"
                     fi
 
@@ -5617,12 +5612,12 @@ EOF
         # 2 s:C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
         #   i:C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
 
-        matches=$( grep '^ [0-9 ] [si]:' "${CERT}" | tail -n 2 | sed 's/^[ 0-9]* [si]://' | uniq -c | wc -l )
+        matches=$(grep '^ [0-9 ] [si]:' "${CERT}" | tail -n 2 | sed 's/^[ 0-9]* [si]://' | uniq -c | wc -l)
 
-        if [ "${matches}" -eq 1 ] ; then
+        if [ "${matches}" -eq 1 ]; then
             debuglog "The root certificate is present in the chain"
             verboselog "The root certificate is unnecessarily present in the delivered certificate chain"
-            if [ -n "${CHECK_CHAIN}" ] ; then
+            if [ -n "${CHECK_CHAIN}" ]; then
                 prepend_critical_message "The root certificate is unnecessarily present in the delivered certificate chain"
             fi
         fi
@@ -6039,17 +6034,17 @@ EOF
         # browsers usually do not complain (see #416)
 
         # loop over the criticals
-        if [ -n "${CN_EXPIRED_CRITICAL}" ] ; then
-            while IFS= read -r critical ; do
+        if [ -n "${CN_EXPIRED_CRITICAL}" ]; then
+            while IFS= read -r critical; do
 
-                CN_TMP=$( echo "${critical}" | sed 's/:.*//' )
-                REPLACE_CURRENT_MESSAGE=$( echo "${critical}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
-                MESSAGE_TMP=$( echo "${critical}" | sed 's/^[^:]*:[^:]*://' )
+                CN_TMP=$(echo "${critical}" | sed 's/:.*//')
+                REPLACE_CURRENT_MESSAGE=$(echo "${critical}" | sed -e 's/^[^:]*://' -e 's/:.*//')
+                MESSAGE_TMP=$(echo "${critical}" | sed 's/^[^:]*:[^:]*://')
 
                 # check if the warning is overridden by another certificate for the same CN
-                if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                if echo "${CN_OK}" | grep -q "${CN_TMP}"; then
                     verboselog "Both a valid and an expired certificate were found"
-                    if [ -n "${CHECK_CHAIN}" ] ; then
+                    if [ -n "${CHECK_CHAIN}" ]; then
                         prepend_critical_message "Both a valid and an expired certificate were found"
                     fi
                 else
@@ -6062,17 +6057,17 @@ INPUT
         fi
 
         # loop over the warnings
-        if [ -n "${CN_EXPIRED_WARNING}" ] ; then
-            while IFS= read -r warning ; do
+        if [ -n "${CN_EXPIRED_WARNING}" ]; then
+            while IFS= read -r warning; do
 
-                CN_TMP=$( echo "${warning}" | sed 's/:.*//' )
-                REPLACE_CURRENT_MESSAGE=$( echo "${warning}" | sed -e 's/^[^:]*://' -e 's/:.*//' )
-                MESSAGE_TMP=$( echo "${warning}" | sed 's/^[^:]*:[^:]*://' )
+                CN_TMP=$(echo "${warning}" | sed 's/:.*//')
+                REPLACE_CURRENT_MESSAGE=$(echo "${warning}" | sed -e 's/^[^:]*://' -e 's/:.*//')
+                MESSAGE_TMP=$(echo "${warning}" | sed 's/^[^:]*:[^:]*://')
 
                 # check if the warning is overridden by another certificate for the same CN
-                if echo "${CN_OK}" | grep -q "${CN_TMP}" ; then
+                if echo "${CN_OK}" | grep -q "${CN_TMP}"; then
                     verboselog "Both a valid and an expired certificate were found"
-                    if [ -n "${CHECK_CHAIN}" ] ; then
+                    if [ -n "${CHECK_CHAIN}" ]; then
                         prepend_critical_message "Both a valid and an expired certificate were found"
                     fi
                 else
@@ -6090,7 +6085,7 @@ INPUT
     # Check nmap
     if [ -n "${CHECK_CIPHERS}" ] || [ -n "${CHECK_CIPHERS_WARNINGS}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ] ; then
+        if [ -n "${DISABLE_NMAP}" ]; then
 
             verboselog "Using a proxy: cannot check ciphers"
             debuglog "Using a proxy: cannot check ciphers"
@@ -6350,7 +6345,7 @@ ${WARNING}"
 
     fi
 
-    if [ -n "${INFO}" ] ; then
+    if [ -n "${INFO}" ]; then
 
         # see https://stackoverflow.com/questions/6464129/certificate-subject-x-509 for additional fields that could be implemented
 
@@ -6369,7 +6364,7 @@ ${WARNING}"
         CERT_LOCALITY="$(extract_cert_attribute 'locality' "${CERT}")"
         info "Locality" "${CERT_LOCALITY}"
 
-        KEY_LENGTH="$( extract_cert_attribute 'key_length' "${CERT}" )"
+        KEY_LENGTH="$(extract_cert_attribute 'key_length' "${CERT}")"
         info "Public key length" "${KEY_LENGTH}"
 
     fi
@@ -6457,28 +6452,28 @@ ${WARNING}"
 
     ##############################################################################
     # Check total certificate validity
-    if [ -z "${IGNORE_MAXIMUM_VALIDITY}" ] ; then
+    if [ -z "${IGNORE_MAXIMUM_VALIDITY}" ]; then
 
         # we check only for HTTP protocols, files or if --maximum-validity was specified
         if [ -z "${PROTOCOL}" ] ||
-               [ "${PROTOCOL}" = 'https' ] ||
-               [ "${PROTOCOL}" = 'h2' ] ||
-               [ -n "${MAXIMUM_VALIDITY}" ] ||
-               [ -n "${FILE}" ] ; then
+            [ "${PROTOCOL}" = 'https' ] ||
+            [ "${PROTOCOL}" = 'h2' ] ||
+            [ -n "${MAXIMUM_VALIDITY}" ] ||
+            [ -n "${FILE}" ]; then
 
-            HOURS_UNTIL_END_DATE=$( hours_until "${DATE}" )
-            HOURS_FROM_START_DATE=$( hours_until "${START_DATE}" )
+            HOURS_UNTIL_END_DATE=$(hours_until "${DATE}")
+            HOURS_FROM_START_DATE=$(hours_until "${START_DATE}")
 
             # no decimals even if --precision was specified
-            TOTAL_CERT_VALIDITY=$( compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" 0 )
+            TOTAL_CERT_VALIDITY=$(compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" 0)
 
             LIMIT=397
-            if [ -n "${MAXIMUM_VALIDITY}" ] ; then
+            if [ -n "${MAXIMUM_VALIDITY}" ]; then
                 LIMIT="${MAXIMUM_VALIDITY}"
             fi
 
             # a certificate cannot be valid for more than 13 months (397 days)
-            if [ "${TOTAL_CERT_VALIDITY}" -gt "${LIMIT}" ] ; then
+            if [ "${TOTAL_CERT_VALIDITY}" -gt "${LIMIT}" ]; then
                 prepend_critical_message "The certificate cannot be valid for more than ${LIMIT} days (${TOTAL_CERT_VALIDITY})"
             else
                 verboselog "The certificate validity (${TOTAL_CERT_VALIDITY}) is shorter then the maximum (${LIMIT})"
@@ -6525,7 +6520,7 @@ ${WARNING}"
             elif compare "${DAYS_VALID}" '>=' 0; then
                 DAYS_VALID=" (expires in less than a day)"
             elif compare "${DAYS_VALID}" '>=' '-1'; then
-                DAYS_VALID=$(( -DAYS_VALID ))
+                DAYS_VALID=$((-DAYS_VALID))
                 DAYS_VALID=" (expired ${DAYS_VALID} days ago)"
             fi
         fi
@@ -6663,7 +6658,7 @@ get_tds_certificate() {
     create_temporary_file
     PYTHON_SCRIPT=${TEMPFILE}
 
-    cat << ____PYTHON > "${PYTHON_SCRIPT}"
+    cat <<____PYTHON >"${PYTHON_SCRIPT}"
 from __future__ import print_function
 import sys
 import pprint
