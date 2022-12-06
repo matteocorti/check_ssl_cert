@@ -1927,10 +1927,41 @@ testJavaKeyStore2() {
 }
 
 testDNS() {
+
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --host 1.1.1.1 --protocol dns --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host 8.8.8.8 --protocol dns --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host 129.132.98.12 --protocol dns --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+
+    # test the caching of IPv6 addresses (if IPv6 is available)
+    IPV6=
+    if command -v ifconfig >/dev/null && ifconfig -a | grep -q -F inet6; then
+        IPV6=1
+    elif command -v ip >/dev/null && ip addr | grep -q -F inet6; then
+        IPV6=1
+    fi
+    if [ -n "${IPV6}" ]; then
+        echo "IPv6 is configured"
+        if ping6 -c 3 www.google.com >/dev/null 2>&1; then
+            echo "IPv6 is working"
+
+            # shellcheck disable=SC2086
+            ${SCRIPT} ${TEST_DEBUG} --host 2001:4860:4860::8888 --protocol dns --ignore-exp
+            EXIT_CODE=$?
+            assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+        fi
+    fi
+
 }
 
 # the script will exit without executing main
