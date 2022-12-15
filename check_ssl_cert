@@ -715,7 +715,7 @@ remove_temporary_files() {
     debuglog "cleaning up temporary files"
     # shellcheck disable=SC2086
     if [ -n "${TEMPORARY_FILES}" ]; then
-        TEMPORARY_FILES_TMP="$(echo "${TEMPORARY_FILES}" | tr '\ ' '\n')"
+        TEMPORARY_FILES_TMP="$(echo "${TEMPORARY_FILES}" | tr '\s' '\n')"
         debuglog "${TEMPORARY_FILES_TMP}"
         rm -f ${TEMPORARY_FILES}
     fi
