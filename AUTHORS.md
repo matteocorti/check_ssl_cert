@@ -115,7 +115,8 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Christoph Moench-Tegeder](https://github.com/moench-tegeder) for the [OpenSSL](https://www.openssl.org) version patch
 * Many thanks to [waja](https://github.com/waja) for
   * the [GitHub](https://www.github.com) workflows and
-  * the chain checks with STARTTLS
+  * the chain checks with STARTTLS and
+  * the trailing backslash patch
 * Many thanks to [Tobias Grünewald](https://github.com/tobias-gruenewald) for the client certificate patch
 * Many thanks to [chornberger-c2c](https://github.com/chornberger-c2c) for the critical and warning output fix
 * Many thanks to [Claus-Theodor Riegg](https://github.com/ctriegg-mak) for
