@@ -10,7 +10,7 @@
 # See the INSTALL.md file for installation instructions
 #
 # Copyright (c) 2007-2012 ETH Zurich.
-# Copyright (c) 2007-2022 Matteo Corti <matteo@corti.li>
+# Copyright (c) 2007-2023 Matteo Corti <matteo@corti.li>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -323,6 +323,8 @@ usage() {
     echo "      --ignore-connection-problems [state] In case of connection problems"
     echo "                                   returns OK or the optional state"
     echo "      --ignore-exp                 Ignore expiration date"
+    echo "      --ignore-http-headers        Ignore checks on HTTP headers with --all"
+    echo "                                   and --all-local"
     echo "      --ignore-host-cn             Do not complain if the CN does not match"
     echo "                                   the host name"
     echo "      --ignore-incomplete-chain    Do not check chain integrity"
@@ -3044,6 +3046,10 @@ parse_command_line_options() {
             ALTNAMES=
             shift
             ;;
+        --ignore-http-headers)
+            IGNORE_HTTP_HEADERS=1
+            shift
+            ;;
         --ignore-host-cn)
             NAMES_TO_BE_CHECKED=
             ALTNAMES=
@@ -4056,9 +4062,11 @@ main() {
         fi
 
         # we check HTTP headers only with HTTP/HTTPS
-        if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ]; then
-            REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
-            UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
+        if [ -z "${IGNORE_HTTP_HEADERS}" ] ; then
+            if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ]; then
+                REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
+                UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
+            fi
         fi
 
     fi

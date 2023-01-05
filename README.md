@@ -1,7 +1,7 @@
 # check\_ssl\_cert
 
  &copy; Matteo Corti, ETH Zurich, 2007-2012.
- &copy; Matteo Corti, 2007-2022.
+ &copy; Matteo Corti, 2007-2023.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
 
@@ -122,6 +122,8 @@ Options:
       --ignore-connection-problems [state] In case of connection problems
                                    returns OK or the optional state
       --ignore-exp                 Ignore expiration date
+      --ignore-http-headers        Ignore checks on HTTP headers with --all
+                                   and --all-local
       --ignore-host-cn             Do not complain if the CN does not match
                                    the host name
       --ignore-incomplete-chain    Do not check chain integrity

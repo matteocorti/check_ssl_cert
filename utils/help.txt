@@ -75,6 +75,8 @@
 --ignore-connection-problems [state];In case of connection problems
 --ignore-connection-problems [state];returns OK or the optional state
 --ignore-exp;Ignore expiration date
+--ignore-http-headers;Ignore checks on HTTP headers with --all
+--ignore-http-headers;and --all-local
 --ignore-host-cn;Do not complain if the CN does not match
 --ignore-host-cn;the host name
 --ignore-incomplete-chain;Do not check chain integrity

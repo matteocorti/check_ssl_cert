@@ -1,3 +1,7 @@
+2023-01-05  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (usage): Added an option to ignore header problems with --all and --all-local
+
 2022-11-30  Marcel Burkhalter <marcel.burkhalter@weareplanet.com>
 
         * check_ssl_cert (main): Add command line argument to set the PATH variable
