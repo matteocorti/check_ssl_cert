@@ -4024,7 +4024,11 @@ main() {
         # https://github.com/stephane-chazelas/misc-scripts/blob/master/which_interpreter
 
         debuglog "grep: ${GREP_BIN}"
-        GREP_VERSION=$(${GREP_BIN} --version)
+        GREP_VERSION=$(${GREP_BIN} --version 2>&1)
+        if echo "${GREP_VERSION}" | grep -q BusyBox ; then
+            # BusyBox grep does not have a -version option
+            GREP_VERSION=$( echo $GREP_VERSION | sed -e 's/.*BusyBox/BusyBox/' -e 's/\. Usage.*//' )
+        fi
         echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
         HOSTNAME_BIN=$(command -v hostname)
