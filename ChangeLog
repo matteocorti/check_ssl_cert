@@ -1,3 +1,7 @@
+2023-01-16  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (fetch_certificate): better error handling
+
 2023-01-05  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (usage): Added an option to ignore header problems with --all and --all-local
