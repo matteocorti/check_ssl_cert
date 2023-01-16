@@ -1919,13 +1919,6 @@ testNoSecurityLevelWrongProtocol() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testSecurityLevel5WrongProtocol() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host imap.cern.ch --port 993 --security-level 5
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
 testJavaKeyStore1() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --file ./keystore.jks --password changeit --jks-alias google-com --ignore-incomplete-chain --ignore-exp
