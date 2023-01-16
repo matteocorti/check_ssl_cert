@@ -1919,11 +1919,11 @@ testNoSecurityLevelWrongProtocol() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testSecurityLevel0WrongProtocol() {
+testSecurityLevel5WrongProtocol() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host imap.cern.ch --port 993 --security-level 0
+    ${SCRIPT} ${TEST_DEBUG} --host imap.cern.ch --port 993 --security-level 5
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testJavaKeyStore1() {
