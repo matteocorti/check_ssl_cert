@@ -1,5 +1,6 @@
 2023-01-16  Matteo Corti  <matteo@corti.li>
 
+        * check_ssl_cert: Added an option to set the security level (see help)
         * check_ssl_cert (fetch_certificate): better error handling
 
 2023-01-05  Matteo Corti  <matteo@corti.li>

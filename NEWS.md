@@ -1,5 +1,8 @@
 # News
 
+* 2023-01-16 Version 2.58.0
+  * Added the option ```--security-level```
+  * Added an option to ignore header problems with --all and --all-local (```--ignore-http-headers```)
 * 2022-12-04 Version 2.57.0
   * Support for DNS over TLS
 * 2022-11-30 Version 2.56.0
