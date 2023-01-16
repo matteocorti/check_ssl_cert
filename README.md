@@ -236,6 +236,9 @@ Options:
                                    certificate validation
       --rsa                        Signature algorithm selection: force RSA
                                    certificate
+      --security-level number      Set the security level to specified value
+                                   See SSL_CTX_set_security_level(3) for a
+                                   description of what each level means
    -s,--selfsigned                 Allow self-signed certificates
       --serial serialnum           Pattern to match the serial number
       --skip-element number        Skip checks on the Nth cert element (can
@@ -321,6 +324,7 @@ Deprecated options:
                                    (see: --ssl2 or --ssl3)
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
+
 ```
 
 ## Configuration

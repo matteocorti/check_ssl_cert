@@ -202,6 +202,9 @@
 --rootcert-file path;certificate validation
 --rsa;Signature algorithm selection: force RSA
 --rsa;certificate
+--security-level number;Set the security level to specified value
+--security-level number;See SSL_CTX_set_security_level(3) for a
+--security-level number;description of what each level means
 --serial serialnum;Pattern to match the serial number
 --skip-element number;Skip checks on the Nth cert element (can
 --skip-element number;be specified multiple times)

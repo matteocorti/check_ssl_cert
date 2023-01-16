@@ -447,6 +447,9 @@ usage() {
     echo "      --rsa                        Signature algorithm selection: force RSA"
     echo "                                   certificate"
     # Delimiter at 78 chars ############################################################
+    echo "      --security-level number      Set the security level to specified value"
+    echo "                                   See SSL_CTX_set_security_level(3) for a"
+    echo "                                   description of what each level means"
     echo "   -s,--selfsigned                 Allow self-signed certificates"
     echo "      --serial serialnum           Pattern to match the serial number"
     echo "      --skip-element number        Skip checks on the Nth cert element (can"
@@ -2476,51 +2479,51 @@ fetch_certificate() {
 
         case "${PROTOCOL}" in
         pop3 | ftp)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         pop3s | ftps)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         smtp)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         smtps)
-            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'QUIT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION}  ${S_CLIENT_NAME} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         irc | ldap)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         ircs | ldaps | dns)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         imap)
-            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         imaps)
-            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         postgres | postgresql)
-            exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         sieve)
-            exec_with_timeout "echo 'LOGOUT' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'LOGOUT' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         xmpp | xmpp-server)
-            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${XMPPHOST} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo 'Q' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${XMPPHOST} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         mysql)
-            exec_with_timeout "echo | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            exec_with_timeout "echo | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         *)
@@ -2659,7 +2662,7 @@ fetch_certificate() {
             ALPN="-alpn h2"
         fi
 
-        exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -3476,6 +3479,15 @@ parse_command_line_options() {
             PYTHON_BIN="$2"
             shift 2
             ;;
+        --security-level)
+            check_option_argument '--security-level' "$2"
+            if ! echo "$2" | grep -q '^[0-5]$' ; then
+                unknown 'Invalid secuirity level'
+            fi
+            SECURITY_LEVEL="-cipher DEFAULT@SECLEVEL=$2"
+            shift 2
+            ;;
+
         --serial)
             check_option_argument '--serial' "$2"
             SERIAL_LOCK="$2"
@@ -4033,7 +4045,7 @@ main() {
         GREP_VERSION=$(${GREP_BIN} --version 2>&1)
         if echo "${GREP_VERSION}" | grep -q BusyBox ; then
             # BusyBox grep does not have a -version option
-            GREP_VERSION=$( echo $GREP_VERSION | sed -e 's/.*BusyBox/BusyBox/' -e 's/\. Usage.*//' )
+            GREP_VERSION=$( echo "${GREP_VERSION}" | sed -e 's/.*BusyBox/BusyBox/' -e 's/\. Usage.*//' )
         fi
         echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
@@ -5365,11 +5377,11 @@ main() {
             TIMEOUT_REASON="checking TLS renegotiation"
             case "${PROTOCOL}" in
             pop3 | ftp | smtp | irc | ldap | imap | postgres | postgresql | sieve | xmpp | xmpp-server | mysql)
-                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -starttls ${PROTOCOL} 2>&1 | ${GREP_BIN} -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -starttls ${PROTOCOL} 2>&1 | ${GREP_BIN} -F -q err"
                 RET=$?
                 ;;
             *)
-                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} 2>&1 | ${GREP_BIN} -F -q err"
+                exec_with_timeout "printf 'R\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} -crlf -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} 2>&1 | ${GREP_BIN} -F -q err"
                 RET=$?
                 ;;
             esac

@@ -408,6 +408,9 @@ overrides option -r,--rootcert
 .BR "   --rsa"
 Signature algorithm selection: force RSA certificate
 .TP
+.BR "   --security-level" " number"
+Set the security level to specified value. See SSL_CTX_set_security_level(3) for a description of what each level means
+.TP
 .BR "-s,--selfsigned"
 Allow self-signed certificates
 .TP
