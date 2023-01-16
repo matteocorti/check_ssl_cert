@@ -1,6 +1,6 @@
 # check\_ssl\_cert
 
- &copy; Matteo Corti, ETH Zurich, 2007-2012.
+ &copy; Matteo Corti, ETH Zurich, 2007-2012.  
  &copy; Matteo Corti, 2007-2023.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
