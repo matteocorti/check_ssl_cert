@@ -2826,6 +2826,12 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${HOST}: ${ERROR}"
 
+        elif ascii_grep ":ssl_choose_client_version:unsupported" "${ERROR}"; then
+
+            ERROR="Unsupported TLS protocol version"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT_CRITICAL ${HOST}: ${ERROR}"
+
         elif ascii_grep "unexpected eof while reading" "${ERROR}" ||
             ascii_grep "ssl handshake failure" "${ERROR}"; then
 
