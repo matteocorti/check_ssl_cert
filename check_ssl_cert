@@ -3086,6 +3086,10 @@ parse_command_line_options() {
             IGNORE_TLS_RENEGOTIATION='1'
             shift
             ;;
+            --ignore-root-present)
+            IGNORE_ROOT_PRESENT='1'
+            shift
+            ;;
         --info)
             INFO='1'
             shift
@@ -5653,7 +5657,7 @@ EOF
         if [ "${matches}" -eq 1 ]; then
             debuglog "The root certificate is present in the chain"
             verboselog "The root certificate is unnecessarily present in the delivered certificate chain"
-            if [ -n "${CHECK_CHAIN}" ]; then
+            if [ -n "${CHECK_CHAIN}" ] && ! [ -n "${IGNORE_ROOT_PRESENT}" ] ; then
                 prepend_critical_message "The root certificate is unnecessarily present in the delivered certificate chain"
             fi
         fi
