@@ -86,6 +86,7 @@
 --ignore-ocsp-timeout;Ignore OCSP result when timeout occurs
 --ignore-ocsp-timeout;while checking
 --ignore-ocsp;Do not check revocation with OCSP
+--ignore-root-present;Ignore root certificate in the chain
 --ignore-sct;Do not check for signed certificate
 --ignore-sct;timestamps (SCT)
 --ignore-sig-alg;Do not check if the certificate was signed

@@ -334,6 +334,7 @@ usage() {
     echo "                                   checked"
     echo "      --ignore-ocsp-timeout        Ignore OCSP result when timeout occurs"
     echo "                                   while checking"
+    echo "      --ignore-root-present        Ignore root certificate in the chain"
     echo "      --ignore-sct                 Do not check for signed certificate"
     echo "                                   timestamps (SCT)"
     echo "      --ignore-sig-alg             Do not check if the certificate was signed"
@@ -3086,7 +3087,7 @@ parse_command_line_options() {
             IGNORE_TLS_RENEGOTIATION='1'
             shift
             ;;
-            --ignore-root-present)
+        --ignore-root-present)
             IGNORE_ROOT_PRESENT='1'
             shift
             ;;
