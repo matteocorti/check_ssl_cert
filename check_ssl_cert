@@ -5657,7 +5657,7 @@ EOF
         if [ "${matches}" -eq 1 ]; then
             debuglog "The root certificate is present in the chain"
             verboselog "The root certificate is unnecessarily present in the delivered certificate chain"
-            if [ -n "${CHECK_CHAIN}" ] && ! [ -n "${IGNORE_ROOT_PRESENT}" ] ; then
+            if [ -n "${CHECK_CHAIN}" ] && [ -z "${IGNORE_ROOT_PRESENT}" ] ; then
                 prepend_critical_message "The root certificate is unnecessarily present in the delivered certificate chain"
             fi
         fi
