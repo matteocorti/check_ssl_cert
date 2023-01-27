@@ -3955,6 +3955,31 @@ main() {
 
     parse_command_line_options "$@"
 
+    if [ "${DEBUG}" -ge 1 ]; then
+
+        debuglog "check_ssl_cert version: ${VERSION}"
+
+        UNAME_TMP="$(uname -a)"
+        debuglog "System info: ${UNAME_TMP}"
+
+        if [ -r /etc/os-release ]; then
+            debuglog "/etc/os-release:"
+            sed 's/^/[DBG]   /' /etc/os-release 1>&2
+        fi
+
+        OS="$(uname -s)"
+        if [ "${OS}" = 'Darwin' ]; then
+            debuglog "Darwin info:"
+            sw_vers | sed 's/^/[DBG]   /' 1>&2
+        fi
+
+        USER_TMP="$(whoami)"
+        debuglog "User: ${USER_TMP}"
+
+
+    fi
+
+
     ################################################################################
     # Default ports
     if [ -z "${PORT}" ]; then
@@ -4774,7 +4799,6 @@ main() {
 
     if [ "${DEBUG}" -ge 1 ]; then
 
-        debuglog "check_ssl_cert version: ${VERSION}"
         debuglog "OpenSSL binary: ${OPENSSL}"
         if [ "${DEBUG}" -ge 1 ]; then
             debuglog "OpenSSL info:"
@@ -4792,8 +4816,6 @@ main() {
         fi
         debuglog "${DEFAULT_CA} root certificates installed by default"
 
-        UNAME_TMP="$(uname -a)"
-        debuglog " System info: ${UNAME_TMP}"
         debuglog "Date computation: ${DATETYPE}"
 
     fi
