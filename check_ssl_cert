@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.59.0
+VERSION=2.60.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4271,7 +4271,7 @@ main() {
     esac
     debuglog "NAMES_TO_BE_CHECKED = ${NAMES_TO_BE_CHECKED}"
 
-    if [ -n "${ALTNAMES}" ] && [ -z "${NAMES_TO_BE_CHECKED}" ] && [ "${HOST_IS_IP}" -eq 0 ]; then
+    if [ -n "${ALTNAMES}" ] && [ -z "${IGNORE_HOST_CN}" ] && [ -z "${NAMES_TO_BE_CHECKED}" ] && [ "${HOST_IS_IP}" -eq 0 ]; then
         unknown "--altnames requires a common name to match (--cn or --host-cn)"
     fi
 

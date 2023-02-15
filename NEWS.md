@@ -1,5 +1,7 @@
 # News
 
+* 2023-02-15 Version 2.60.0
+  * Hot fix for version 2.59 (bug fix for ```--ignore-host-name```)
 * 2023-02-15 Version 2.59.0
   * Fixes ```--ignore-host-cn``` behaviour with ```--match```
 * 2023-01-16 Version 2.58.0

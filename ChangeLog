@@ -1,3 +1,7 @@
+2023-02-15  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixes --ignore-host-cn behaviour with --match
+
 2023-01-27  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): System info debugging right at the beginning
