@@ -1926,6 +1926,20 @@ testJavaKeyStore2() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testWrongHost() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
+testWrongHostIgnore() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-host-cn
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testDNS() {
 
     # shellcheck disable=SC2086

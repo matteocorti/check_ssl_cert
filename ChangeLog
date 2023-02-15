@@ -1,5 +1,7 @@
 2023-02-15  Matteo Corti  <matteo@corti.li>
 
+        * test/unit_tests.sh: Two new tests for wrong hostname
+
         * check_ssl_cert (main): Fixes --ignore-host-cn behaviour with --match
 
 2023-01-27  Matteo Corti  <matteo@corti.li>
