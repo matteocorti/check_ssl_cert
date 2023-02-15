@@ -1,5 +1,7 @@
 # News
 
+* 2023-02-15 Version 2.59.0
+  * Fixes ```--ignore-host-cn``` behaviour with ```--match```
 * 2023-01-16 Version 2.58.0
   * Added the option ```--security-level```
   * Added an option to ignore header problems with --all and --all-local (```--ignore-http-headers```)

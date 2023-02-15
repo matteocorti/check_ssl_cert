@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.58.0
+VERSION=2.59.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -3066,8 +3066,7 @@ parse_command_line_options() {
             shift
             ;;
         --ignore-host-cn)
-            NAMES_TO_BE_CHECKED=
-            ALTNAMES=
+            IGNORE_HOST_CN=1
             shift
             ;;
         --ignore-sig-alg)
@@ -3979,6 +3978,10 @@ main() {
 
     fi
 
+    # process the --ignore-host-cn option by removing __HOST__ from the list of checked names
+    if [ -n "${IGNORE_HOST_CN}" ] ; then
+        NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__ *//')
+    fi
 
     ################################################################################
     # Default ports
