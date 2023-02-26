@@ -1,3 +1,7 @@
+2023-02-26  Matteo Corti  <matteo@corti.li>
+
+        * test/unit_tests.sh (testRequireOCSP): Fixed the test (videolan.org certificate was not OK)
+
 2023-02-15  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh: Two new tests for wrong hostname

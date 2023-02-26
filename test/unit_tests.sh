@@ -996,7 +996,7 @@ testBadSSLSHA12017() {
 
 testRequireOCSP() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H videolan.org --require-ocsp-stapling --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H wikipedia.org --require-ocsp-stapling --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
