@@ -24,7 +24,7 @@ jobs:
   # macOS
 
   macos:
-    name: Running tests on ${{ matrix.os }}
+    name: Running unit tests on ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +62,7 @@ jobs:
   linux:
     # The host should always be linux
     runs-on: ubuntu-latest
-    name: Running tests on ${{ matrix.distro }}
+    name: Running unit tests on ${{ matrix.distro }}
     strategy:
       fail-fast: false
       matrix:
