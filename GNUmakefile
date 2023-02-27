@@ -117,7 +117,7 @@ disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
-test: formatting_check shellcheck unit_tests integrations_tests
+test: formatting_check shellcheck unit_tests integration_tests
 
 unit_tests:
 ifndef SHUNIT

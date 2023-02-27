@@ -92,7 +92,7 @@ LIST_LIMIT=10000
 # failure
 
 tests=$(cat test/unit_tests.sh test/integration_tests.sh | grep -c '^test')
-Workflows=$(gh workflow list -L "${LIST_LIMIT}" | wc -l)
+workflows=$(gh workflow list -L "${LIST_LIMIT}" | wc -l)
 
 # cache the result
 
