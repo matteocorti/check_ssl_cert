@@ -11,6 +11,9 @@ on:
       - '**.md'
       - utils/prepare_rpm.sh
       - .github/workflows/publish.yml
+  schedule:
+      # * is a special character in YAML so you have to quote this string
+      - cron:  '42 7 * * *'
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
