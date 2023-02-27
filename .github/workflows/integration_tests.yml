@@ -46,14 +46,14 @@ jobs:
         with:
           install: Date::Parse
 
-      - name: Run the tests
+      - name: Run the integration tests
         run:  |
           uname -a \
-          && make test \
+          && make integration_tests \
           && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && make dist \
           && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
-          && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi
+          && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/*.sh ; fi
 
 
   ##############################################################################
@@ -136,11 +136,11 @@ jobs:
               && curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus \
               && cpanm --sudo install Date::Parse \
               && uname -a \
-              && make test \
+              && make integration_tests \
               && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && make dist \
               && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
-              && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/unit_tests.sh ; fi'
+              && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/*.sh ; fi'
 
   rpm:
     # The host should always be linux

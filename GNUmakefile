@@ -9,7 +9,7 @@ DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile GNUmakefile NEWS.
 YEAR=`date +"%Y"`
 
 # file to be checked for formatting
-FORMATTED_FILES=test/unit_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
+FORMATTED_FILES=test/unit_tests.sh test/integration_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
 
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
@@ -117,7 +117,9 @@ disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
-test: formatting_check shellcheck
+test: formatting_check shellcheck unit_tests integrations_tests
+
+unit_tests:
 ifndef SHUNIT
 	echo "No shUnit2 installed: see README.md"
 	exit 1
@@ -125,6 +127,13 @@ else
 	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./unit_tests.sh )
 endif
 
+integration_tests:
+ifndef SHUNIT
+	echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./integration_tests.sh )
+endif
 
 shellcheck:
 ifndef SHELLCHECK
