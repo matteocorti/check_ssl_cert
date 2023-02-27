@@ -91,8 +91,8 @@ LIST_LIMIT=10000
 # success
 # failure
 
-tests=$(grep -c '^test' test/unit_tests.sh)
-workflows=$(gh workflow list -L "${LIST_LIMIT}" | wc -l)
+tests=$(cat test/unit_tests.sh test/integration_tests.sh | grep -c '^test')
+Workflows=$(gh workflow list -L "${LIST_LIMIT}" | wc -l)
 
 # cache the result
 
