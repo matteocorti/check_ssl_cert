@@ -12,6 +12,9 @@ on:
       - utils/prepare_rpm.sh
       - .github/workflows/publish.yml
   schedule:
+      # We run the integration tests daily. These tests depend on external hosts and certificates
+      # and it's useful to know when something is not working as soon as possible
+      #
       # * is a special character in YAML so you have to quote this string
       - cron:  '42 7 * * *'
   # Run tests for any PRs
