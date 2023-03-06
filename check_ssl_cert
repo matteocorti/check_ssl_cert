@@ -3874,7 +3874,7 @@ main() {
     ##############################################################################
     # we need grep from the beginning (will fix later if --grep-bin is specified)
     if [ -z "${GREP_BIN}" ]; then
-        GREP_BIN='grep'
+        GREP_BIN=$(command -v grep)
     fi
 
     # Default values
@@ -3953,6 +3953,10 @@ main() {
     fi
 
     parse_command_line_options "$@"
+
+    if ! [ -x "${GREP_BIN}" ] ; then
+        unknown "${GREP_BIN} in not executable"
+    fi
 
     if [ "${DEBUG}" -ge 1 ]; then
 
