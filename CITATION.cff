@@ -161,6 +161,8 @@ authors:
 - family-names: "Shmanko"
   given-names: "Sergei"
   website: https://github.com/sshmanko
+- name: Slavko
+  website: https://github.com/slavkoja
 - family-names: "Schlesinger"
   given-names: "Stefan"
 - family-names: "Nierlein"
@@ -246,8 +248,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.60.0
-date-released: 2023-02-15
+version: 2.61.0
+date-released: 2023-03-09
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

@@ -146,3 +146,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Lukas Tribus](https://github.com/lukastribus) for the Python 3 patch
 * Many thanks to [Peter](https://github.com/Peter2121) for the FreeBSD jail patch
 * Many thanks to [Marcel Burkhalter](https://github.com/marcel-burkhalter) for the path check
+* Many thanks to [Slavko](https://github.com/slavkoja) for the RSA algorithms patch

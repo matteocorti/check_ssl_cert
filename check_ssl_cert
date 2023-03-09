@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.60.0
+VERSION=2.61.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4627,7 +4627,8 @@ main() {
             [ -n "${NO_PSS}" ]; then
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
             # see https://github.com/matteocorti/check_ssl_cert/issues/167
-            SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"
+            # see https://github.com/matteocorti/check_ssl_cert/issues/446
+            SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1:RSA-PSS+SHA256"
         else
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
             SSL_AU="RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"

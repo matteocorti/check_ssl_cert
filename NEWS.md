@@ -1,5 +1,7 @@
 # News
 
+* 2023-03-09 Version 2.61.0
+  * Fixed the algorithms used by ```--rsa```
 * 2023-02-15 Version 2.60.0
   * Hot fix for version 2.59 (bug fix for ```--ignore-host-name```)
 * 2023-02-15 Version 2.59.0

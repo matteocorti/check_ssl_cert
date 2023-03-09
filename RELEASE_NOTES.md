@@ -1,3 +1,1 @@
-# Release notes
-
-Hot fix for version 2.59 (bug fix for ```--ignore-host-name```)
+Fixed the algorithms used by ```--rsa```
