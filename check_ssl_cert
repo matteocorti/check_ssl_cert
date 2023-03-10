@@ -3000,6 +3000,10 @@ parse_command_line_options() {
         --debug-time)
             # start time
             DEBUG_TIME=$(date +%s)
+            # --debug-time does not make any sense without -d
+            if [ "${DEBUG}" -le 1 ] ; then
+                DEBUG=1
+            fi
             shift
             ;;
 
@@ -4628,7 +4632,7 @@ main() {
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
             # see https://github.com/matteocorti/check_ssl_cert/issues/167
             # see https://github.com/matteocorti/check_ssl_cert/issues/446
-            SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1:RSA-PSS+SHA256"
+            SSL_AU="RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1:RSA-PSS+SHA256:RSA-PSS+SHA512:RSA-PSS+SHA384"
         else
             # see https://github.com/matteocorti/check_ssl_cert/issues/164#issuecomment-540623344
             SSL_AU="RSA-PSS+SHA512:RSA-PSS+SHA384:RSA-PSS+SHA256:RSA+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA224:RSA+SHA1"
