@@ -1,3 +1,8 @@
+2023-03-16  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: unset TIMEOUT_REASON after the the context it should be used
+        * check_ssl_cert: added some more TIMEOUT_REASON messages
+
 2023-03-09  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixed the RSA algorithms

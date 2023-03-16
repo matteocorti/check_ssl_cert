@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.61.0
+VERSION=2.62.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -106,6 +106,8 @@ fetch_http_headers() {
 
     if [ -z "${CACHED_HEADERS}" ]; then
 
+        TIMEOUT_REASON='Fetching HTTP headers'
+
         debuglog "Fetching headers"
 
         create_temporary_file
@@ -140,6 +142,8 @@ fetch_http_headers() {
         if [ -n "${DEBUG_HEADERS}" ]; then
             cp "${CACHED_HEADERS}" headers.txt
         fi
+
+        unset TIMEOUT_REASON
 
     fi
 
@@ -1819,6 +1823,7 @@ check_crl() {
         else
             exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
         fi
+        unset TIMEOUT_REASON
 
         # convert DER to
         debuglog "Converting ${CRL_TMP_DER} (DER) to ${CRL_TMP_PEM} (PEM)"
@@ -1937,6 +1942,7 @@ check_ocsp() {
                 else
                     exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
+                unset TIMEOUT_REASON
 
                 TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
                 debuglog "OCSP: issuer certificate type (1): ${TYPE_TMP}"
@@ -2614,6 +2620,8 @@ fetch_certificate() {
             RET=$?
 
         fi
+
+        unset TIMEOUT_REASON
 
         debuglog "storing the certificate to ${CERT}"
         TYPE_TMP="$(${FILE_BIN} -L -b "${CERT}" | sed 's/.*://')"
@@ -4479,6 +4487,7 @@ main() {
             else
                 exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
             fi
+            unset TIMEOUT_REASON
 
             if [ ! -r "${FILE}" ]; then
                 critical "Cannot fetch ${FILE_URI}"
@@ -5425,6 +5434,7 @@ main() {
                 RET=$?
                 ;;
             esac
+            unset TIMEOUT_REASON
 
             if [ "${RET}" -eq 1 ]; then
 
@@ -6174,6 +6184,7 @@ INPUT
             # -Pn is needed even if we specify a port
             TIMEOUT_REASON="checking ciphers"
             exec_with_timeout "${NMAP_BIN} --unprivileged -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+            unset TIMEOUT_REASON
 
             if [ "${DEBUG}" -ge 1 ]; then
                 debuglog 'nmap output:'
@@ -6265,6 +6276,8 @@ ${WARNING}"
     ################################################################################
     # Check SSL Labs
     if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ]; then
+
+        TIMEOUT_REASON='SSL Lab assesstment'
 
         create_temporary_file
         JSON=${TEMPFILE}
@@ -6387,6 +6400,8 @@ ${WARNING}"
             exec_with_timeout "sleep ${WAIT_TIME}"
 
         done
+
+        unset TIMEOUT_REASON
 
     fi
 

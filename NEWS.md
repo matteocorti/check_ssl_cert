@@ -1,5 +1,8 @@
 # News
 
+* 2023-03-16 Version 2.62.0
+  * Fixed the output in case of timeout
+  * Fixed the ciphers with ```--rsa```
 * 2023-03-09 Version 2.61.0
   * Fixed the algorithms used by ```--rsa```
 * 2023-02-15 Version 2.60.0
