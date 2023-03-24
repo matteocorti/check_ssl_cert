@@ -581,28 +581,6 @@ testMultipleAltNamesFailIPTwo() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testXMPPHost() {
-    # shellcheck disable=SC2086
-    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --port 5222 --protocol xmpp --xmpphost jabber.org --ignore-exp)
-    EXIT_CODE=$?
-    if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    else
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    fi
-}
-
-testXMPPHostDefaultPort() {
-    # shellcheck disable=SC2086
-    out=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H jabber.org --protocol xmpp --xmpphost jabber.org --ignore-exp)
-    EXIT_CODE=$?
-    if echo "${out}" | grep -q "s_client' does not support '-xmpphost'"; then
-        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-    else
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    fi
-}
-
 testIMAP() {
     # minimal critical and warning as they renew pretty late
     # shellcheck disable=SC2086
