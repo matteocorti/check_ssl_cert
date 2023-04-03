@@ -1536,14 +1536,14 @@ testRootCertNotInChainGoogle() {
 
 testWrongHost() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com
+    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testWrongHostIgnore() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-host-cn
+    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-host-cn --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

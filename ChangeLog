@@ -1,3 +1,7 @@
+2023-04-03  Matteo Corti  <matteo@corti.li>
+
+        * test/integration_tests.sh (testWrongHostIgnore): Ignore expiration on wrong.host.badssl.com
+
 2023-03-16  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: unset TIMEOUT_REASON after the the context it should be used
