@@ -4178,7 +4178,7 @@ main() {
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
-            critical "Cannot resolve ${HOST}"
+            critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
         fi
         debuglog "Adding domain ${DOMAIN} to ${HOST}"
         HOST="${HOST}.${DOMAIN}"
@@ -4186,7 +4186,7 @@ main() {
     else
         # check if the host can be resolved
         if ! nslookup "${HOST}" > /dev/null || nslookup "${HOST}" | grep -q "No answer" ; then
-            critical "Cannot resolve ${HOST}"
+            critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
         fi
     fi
 
