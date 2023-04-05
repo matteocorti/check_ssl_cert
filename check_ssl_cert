@@ -4190,7 +4190,11 @@ main() {
 
     fi
 
-    if ! echo "${HOST}" | grep -q ':' && echo "${HOST}" | grep -q '[a-z]' ; then
+    # we do not check if localhost can be resolved since on some macOS installations
+    # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
+    if ! echo "${HOST}" | grep -q ':' &&
+            echo "${HOST}" | grep -q '[a-z]' &&
+            [ "${HOST}" != 'localhost' ] ; then
         # we have an host name and not an IP address
         debuglog "Checking if the host (${HOST}) exists"
         if [ "${INETPROTO}" = '-4' ] ; then
