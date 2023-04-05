@@ -4169,12 +4169,16 @@ main() {
     fi
 
     # we need the FQDN of an host to check the CN
-    debuglog "Adding the domain if missing"
     # - the domain does not contain a .
     # - we are not checking a file
     # - we are not checking localhost
-    # - we are not checking an IPv6 address (which does not have dots
-    if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' && [ -z "${FILE}" ] && [ "${HOST}" != 'localhost' ] && ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+    # - we are not checking an IPv6 address (which does not have dots)
+
+    if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
+            [ -z "${FILE}" ] &&
+            [ "${HOST}" != 'localhost' ] &&
+            ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+
         debuglog "Domain for ${HOST} missing"
         DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
         if [ -z "${DOMAIN}" ]; then
@@ -4183,10 +4187,24 @@ main() {
         debuglog "Adding domain ${DOMAIN} to ${HOST}"
         HOST="${HOST}.${DOMAIN}"
         debuglog "New host: ${HOST}"
-    else
-        # check if the host can be resolved
-        if ! nslookup "${HOST}" > /dev/null || nslookup "${HOST}" | grep -q "No answer" ; then
-            critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
+
+    fi
+
+    if ! echo "${HOST}" | grep -q ':' && echo "${HOST}" | grep -q '[a-z]' ; then
+        # we have an host name and not an IP address
+        debuglog "Checking if the host (${HOST}) exists"
+        if [ "${INETPROTO}" = '-4' ] ; then
+            if ! host -t a "${HOST}" | grep -q 'has address' ; then
+                critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no A record)"
+            fi
+        elif [ "${INETPROTO}" = '-6' ] ; then
+            if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
+                critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no AAAA record)"
+            fi
+        else
+            if ! host "${HOST}" | grep -q 'has address' ; then
+                critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
+            fi
         fi
     fi
 
