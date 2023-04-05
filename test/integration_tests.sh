@@ -172,6 +172,9 @@ oneTimeSetUp() {
         "${GREP_BIN}" -V
     fi
 
+    echo "localhost:"
+    host localhost
+
 }
 
 seconds2String() {
