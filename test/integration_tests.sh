@@ -1005,6 +1005,30 @@ testCertificateWithEmptySubject() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+# see #449
+testNotExistingHosts() {
+
+    # shellcheck disable=SC2086
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+
+    # shellcheck disable=SC2086
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+
+    # shellcheck disable=SC2086
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host www.ltri.eu )
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+
+}
+
+
 testResolveSameName() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --resolve www.github.com --ignore-exp

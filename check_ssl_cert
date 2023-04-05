@@ -4183,6 +4183,11 @@ main() {
         debuglog "Adding domain ${DOMAIN} to ${HOST}"
         HOST="${HOST}.${DOMAIN}"
         debuglog "New host: ${HOST}"
+    else
+        # check if the host can be resolved
+        if ! nslookup "${HOST}" > /dev/null || nslookup "${HOST}" | grep -q "No answer" ; then
+            critical "Cannot resolve ${HOST}"
+        fi
     fi
 
     # we do quick check if the argument seems an IPv6 address (no validity check)

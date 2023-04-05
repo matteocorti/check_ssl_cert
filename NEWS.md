@@ -1,5 +1,6 @@
 # News
 
+  * Better checks for non-resolvable hosts
 * 2023-03-16 Version 2.62.0
   * Fixed the output in case of timeout
   * Fixed the ciphers with ```--rsa```
