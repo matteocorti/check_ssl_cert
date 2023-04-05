@@ -1,6 +1,6 @@
 # check\_ssl\_cert
 
- &copy; Matteo Corti, ETH Zurich, 2007-2012.  
+ &copy; Matteo Corti, ETH Zurich, 2007-2012.
  &copy; Matteo Corti, 2007-2023.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
@@ -141,6 +141,8 @@ Options:
       --ignore-sig-alg             Do not check if the certificate was signed
                                    with SHA1 or MD5
       --ignore-ssl-labs-cache      Force a new check by SSL Labs (see -L)
+      --ignore-ssl-labs-errors     Ignore errors if SSL Labs is not
+                                   accessible or times out
       --ignore-tls-renegotiation   Ignore the TLS renegotiation check
       --inetproto protocol         Force IP version 4 or 6
       --info                       Print certificate information

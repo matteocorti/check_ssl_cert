@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.62.0
+VERSION=2.63.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -343,6 +343,8 @@ usage() {
     echo "      --ignore-sig-alg             Do not check if the certificate was signed"
     echo "                                   with SHA1 or MD5"
     echo "      --ignore-ssl-labs-cache      Force a new check by SSL Labs (see -L)"
+    echo "      --ignore-ssl-labs-errors     Ignore errors if SSL Labs is not"
+    echo "                                   accessible or times out"
     echo "      --ignore-tls-renegotiation   Ignore the TLS renegotiation check"
     echo "      --inetproto protocol         Force IP version 4 or 6"
     echo "      --info                       Print certificate information"
@@ -3091,6 +3093,10 @@ parse_command_line_options() {
             ;;
         --ignore-ssl-labs-cache)
             IGNORE_SSL_LABS_CACHE="&startNew=on"
+            shift
+            ;;
+        --ignore-ssl-labs-errors)
+            IGNORE_SSL_LABS_ERRORS=1
             shift
             ;;
         --ignore-tls-renegotiation)
@@ -6328,6 +6334,10 @@ ${WARNING}"
 
             if [ "${CURL_RETURN_CODE}" -ne 0 ]; then
 
+                if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                    break
+                fi
+
                 debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
                 critical "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
@@ -6353,6 +6363,11 @@ ${WARNING}"
 
                 case "${SSL_LABS_HOST_STATUS}" in
                 'ERROR')
+
+                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                        break
+                    fi
+
                     SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
                     prepend_critical_message "Error checking SSL Labs: ${SSL_LABS_STATUS_MESSAGE}"
                     break
@@ -6361,6 +6376,11 @@ ${WARNING}"
                     if ! "${GREP_BIN}" -F -q "grade" "${JSON}"; then
 
                         # Something went wrong
+
+                        if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                            break
+                        fi
+
                         SSL_LABS_STATUS_MESSAGE=$(sed 's/.*"statusMessage":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
                         prepend_critical_message "SSL Labs error: ${SSL_LABS_STATUS_MESSAGE}"
                         break
@@ -6409,6 +6429,11 @@ ${WARNING}"
                     ;;
                 *)
                     # Try to extract a message
+
+                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                        break
+                    fi
+
                     SSL_LABS_ERROR_MESSAGE=$(sed 's/.*"message":[ ]*"\([^"]*\)".*/\1/' "${JSON}")
 
                     if [ -z "${SSL_LABS_ERROR_MESSAGE}" ]; then

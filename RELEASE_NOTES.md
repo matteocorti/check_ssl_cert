@@ -1,2 +1,2 @@
-Fixed the output in case of timeout
-Fixed the ciphers with ```--rsa```
+ * Command line option to ignore SSL Labs errors (```-ignore-ssl-labs-errors```)
+ * Better checks for non-resolvable hosts

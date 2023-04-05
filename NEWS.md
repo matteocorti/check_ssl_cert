@@ -1,5 +1,7 @@
 # News
 
+* 2023-04-05 Version 2.63.0
+  * Command line option to ignore SSL Labs errors (```-ignore-ssl-labs-errors```)
   * Better checks for non-resolvable hosts
 * 2023-03-16 Version 2.62.0
   * Fixed the output in case of timeout
