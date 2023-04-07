@@ -1,5 +1,7 @@
 # News
 
+* 2023-04-07 Version 2.64.0
+  * Fixed the resolution of hosts with IPv6 addresses only
 * 2023-04-05 Version 2.63.0
   * Command line option to ignore SSL Labs errors (```-ignore-ssl-labs-errors```)
   * Better checks for non-resolvable hosts

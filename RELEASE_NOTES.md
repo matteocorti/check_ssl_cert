@@ -1,2 +1,1 @@
- * Command line option to ignore SSL Labs errors (```-ignore-ssl-labs-errors```)
- * Better checks for non-resolvable hosts
+Fixed the resolution of hosts with IPv6 addresses only

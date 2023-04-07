@@ -881,6 +881,42 @@ testIPv6() {
     fi
 }
 
+testIPv6Only() {
+    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6; then
+
+        IPV6=
+        if command -v ifconfig >/dev/null && ifconfig -a | grep -q -F inet6; then
+            IPV6=1
+        elif command -v ip >/dev/null && ip addr | grep -q -F inet6; then
+            IPV6=1
+        fi
+
+        if [ -n "${IPV6}" ]; then
+
+            echo "IPv6 is configured"
+
+            if ping6 -c 3 ipv6.corti.li >/dev/null 2>&1; then
+
+                echo "IPv6 is working"
+
+                # shellcheck disable=SC2086
+                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H ipv6.corti.li --ignore-host-cn --ignore-exp
+                EXIT_CODE=$?
+                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+            else
+                echo "IPv6 is configured but not working: skipping test"
+            fi
+
+        else
+            echo "Skipping forcing IPv6: not IPv6 configured locally"
+        fi
+
+    else
+        echo "Skipping forcing IPv6: no OpenSSL support"
+    fi
+}
+
 testIPv6Numeric() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6; then
 

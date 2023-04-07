@@ -1,3 +1,7 @@
+2023-04-07  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed the resolution of hosts with IPv6 addresses only
+
 2023-04-05  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Better (earlier) check for non-existing hosts

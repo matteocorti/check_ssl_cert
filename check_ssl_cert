@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.63.0
+VERSION=2.64.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4212,7 +4212,7 @@ main() {
                 critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no AAAA record)"
             fi
         else
-            if ! host "${HOST}" | grep -q 'has address' ; then
+            if ! host "${HOST}" | grep -q 'has .*address' ; then
                 critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
             fi
         fi
