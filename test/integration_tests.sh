@@ -624,29 +624,6 @@ testSMTPS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-# Disabled as test.rebex.net is currently not working. Should find another public FTP server with TLS
-
-testFTP() {
-
-    # https://sockettools.com/kb/testing-secure-connections-with-openssl/
-
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftp --port 21 --timeout 60
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testFTPS() {
-
-    # https://forum.rebex.net/1343/open-ftps-and-sftp-servers-for-testing-code-and-connectivity?_ga=2.116138566.194752155.1649251930-302064088.1649251930&_gl=1*14ztj2j*_ga*MzAyMDY0MDg4LjE2NDkyNTE5MzA.*_ga_6V4LCG72WC*MTY0OTI1MTkyNi4xLjAuMTY0OTI1MTkyNi4w
-
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H test.rebex.net --protocol ftps --port 990 --timeout 60
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-
-}
-
 ################################################################################
 # From https://badssl.com
 
