@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.65.0
+VERSION=2.66.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -1315,6 +1315,7 @@ unknown() {
 #  $1 the left hand value
 #  $2 the comparison operator
 #  $3 the right hand value
+#  $4 scale: total number of decimal digits after the decimal point
 # Returns the boolean result of the comparison
 compare() {
 
@@ -1322,9 +1323,17 @@ compare() {
     op=$2
     rhv=$3
 
-    debuglog "Executing comparison '${lhv} ${op} ${rhv}'"
+    if [ -n "$4" ]; then
+        # custom scale
+        local_scale=$4
+    else
+        # default scale
+        local_scale="${SCALE}"
+    fi
 
-    comparison="$(echo "${lhv} ${op} ${rhv}" | "${BCBIN}")"
+    debuglog "Executing comparison '${lhv} ${op} ${rhv}' (precision ${local_scale})"
+
+    comparison="$(echo "scale=${local_scale};${lhv} ${op} ${rhv}" | "${BCBIN}")"
     debuglog "  bc result = ${comparison}"
 
     [ 1 -eq "${comparison}" ]
@@ -2233,6 +2242,8 @@ check_cert_end_date() {
             if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
+                # remove decimals
+                ELEM_DAYS_VALID=$( echo "${ELEM_DAYS_VALID}" | sed -e 's/[.].*//' )
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
             debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
@@ -4577,8 +4588,8 @@ main() {
     if [ -n "${CRITICAL_DAYS}" ] && [ -n "${WARNING_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ] && [ -n "${WARNING_SECONDS}" ]; then
 
         # When comparing, always use values in seconds, because values in days might be floating point numbers
-        if compare "${WARNING_SECONDS}" '<=' "${CRITICAL_SECONDS}"; then
-            unknown "--warning (${WARNING_DAYS}) is less than or equal to --critical (${CRITICAL_DAYS})"
+        if compare "${WARNING_SECONDS}" '<' "${CRITICAL_SECONDS}"; then
+            unknown "--warning (${WARNING_DAYS}) is less than --critical (${CRITICAL_DAYS})"
         fi
 
     fi

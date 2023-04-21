@@ -1,6 +1,9 @@
 2023-04-21  Matteo Corti  <matteo@corti.li>
 
+        * test/unit_tests.sh (testFloatingPointThresholdsExpired): Added a test for decimal critical or warning values
+          and expired certificates
         * check_ssl_cert (extract_cert_attribute): Fix CRL output format parsing
+        * check_ssl_cert (compare): Fixed a problem with decimal critical or warning values and expired certificates
 
 2023-04-07  Matteo Corti  <matteo@corti.li>
 

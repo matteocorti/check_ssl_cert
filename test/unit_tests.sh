@@ -444,6 +444,15 @@ testFloatingPointThresholds() {
 
 }
 
+testFloatingPointThresholdsExpired() {
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H expired.badssl.com --warning 2.5 --critical 1.5
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+
+}
+
 testFloatingPointThresholdsWrongUsage() {
 
     # shellcheck disable=SC2086

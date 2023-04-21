@@ -1,5 +1,7 @@
 # News
 
+* 2023-04-21 Version 2.66.0
+  * Fixed a problem with decimal critical or warning values and expired certificates
 * 2023-04-21 Version 2.65.0
   * Fixed CRL output format parsing
 * 2023-04-07 Version 2.64.0
