@@ -245,7 +245,7 @@ setUp() {
 # Tests
 
 testIntegerOK() {
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2154
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --precision 2 --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
