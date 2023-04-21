@@ -14,6 +14,9 @@ authors:
 - family-names: "Miśkiewicz"
   given-names: "Arkadiusz"
   website: https://github.com/arekm
+- family-names: "Byrne"
+  given-names: "Ben"
+  website: https://github.com/benbyr
 - family-names: "Strößenreuther"
   given-names: "Bernd"
   website: https://github.com/booboo-at-gluga-de
@@ -248,8 +251,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.64.0
-date-released: 2023-04-07
+version: 2.65.0
+date-released: 2023-04-21
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

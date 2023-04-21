@@ -1033,12 +1033,6 @@ testNotExistingHosts() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
     assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
-    # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host www.ltri.eu )
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
-
 }
 
 
@@ -1534,20 +1528,6 @@ testConfigurationWrongOption() {
     ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --configuration "${CONFIGURATION}"
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
-}
-
-testRootCertInChain() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${OK}" "${EXIT_CODE}"
-}
-
-testRootCertInChainEnforceFail() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --check-chain
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testRootCertInChainEnforceOK() {

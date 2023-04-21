@@ -147,3 +147,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Peter](https://github.com/Peter2121) for the FreeBSD jail patch
 * Many thanks to [Marcel Burkhalter](https://github.com/marcel-burkhalter) for the path check
 * Many thanks to [Slavko](https://github.com/slavkoja) for the RSA algorithms patch
+* Many thanks to [Ben Byrne](https://github.com/benbyr) for the CRL output format patch

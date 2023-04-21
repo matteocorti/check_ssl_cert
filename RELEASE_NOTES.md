@@ -1,1 +1,1 @@
-Fixed the resolution of hosts with IPv6 addresses only
+Fixed CRL output format parsing
