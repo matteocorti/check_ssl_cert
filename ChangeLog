@@ -1,3 +1,7 @@
+2023-04-24  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Considers /etc/hosts for the existence checks
+
 2023-04-21  Matteo Corti  <matteo@corti.li>
 
         * test/unit_tests.sh (testFloatingPointThresholdsExpired): Added a test for decimal critical or warning values

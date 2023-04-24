@@ -1,5 +1,7 @@
 # News
 
+* 2023-04-24 Version 2.67.0
+  * Considers /etc/hosts for the existence checks
 * 2023-04-21 Version 2.66.0
   * Fixed a problem with decimal critical or warning values and expired certificates
 * 2023-04-21 Version 2.65.0

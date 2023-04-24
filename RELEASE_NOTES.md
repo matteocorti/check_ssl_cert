@@ -1,1 +1,1 @@
-Fixed a problem with decimal critical or warning values and expired certificates
+Considers /etc/hosts for the existence checks
