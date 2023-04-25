@@ -4185,28 +4185,32 @@ main() {
         fi
     fi
 
-    RESOLVED=
+    ETC_HOSTS=
     debuglog "Checking if the host is listed in /etc/hosts"
     if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
 
         debuglog "Host listed in /etc/hosts"
         if [ "${INETPROTO}" = '-4' ] ; then
             if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
-                RESOLVED=1
+                ETC_HOSTS=4
             fi
         elif [ "${INETPROTO}" = '-6' ] ; then
             if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
-                RESOLVED=1
+                ETC_HOSTS=6
+                NMAP_INETPROTO=-6
             fi
+        elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+            ETC_HOSTS=4
         else
-            RESOLVED=1
+            ETC_HOSTS=6
+            NMAP_INETPROTO=-6
         fi
 
     fi
 
     # if the host was not listed in /etc/hosts we check if there is a DNS record
 
-    if [ -z "${RESOLVED}" ] ; then
+    if [ -z "${ETC_HOSTS}" ] ; then
 
         debuglog "Host not found in /etc/hosts: checking DNS"
 
@@ -4775,16 +4779,24 @@ main() {
         NMAP_HOST_ADDR=$(echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//')
     fi
 
-    # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
-    debuglog "Checking IPs: host ${HOST_ADDR}"
-    if echo "${HOST_ADDR}" | "${GREP_BIN}" -q '[a-z]' && ! host "${HOST_ADDR}" | "${GREP_BIN}" -F -q ' has address '; then
-        debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
-        NMAP_INETPROTO='-6'
-    fi
+    if [ -z "${ETC_HOSTS}" ] && [ "${ETC_HOSTS}" != '-4' ] ; then
 
-    if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q ':'; then
-        debuglog "host specified as an IPv6 address: forcing IPv6 with nmap"
-        NMAP_INETPROTO='-6'
+        # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
+        debuglog "Checking IPs: host ${HOST_ADDR}"
+        if echo "${HOST_ADDR}" | "${GREP_BIN}" -q '[a-z]' && ! host "${HOST_ADDR}" | "${GREP_BIN}" -F -q ' has address '; then
+            debuglog "the host does not have an IPv4 address. Trying nmap with -6 to force IPv6 for an IPv6-only host"
+            NMAP_INETPROTO='-6'
+        fi
+
+        if echo "${NMAP_HOST_ADDR}" | "${GREP_BIN}" -q ':'; then
+            debuglog "host specified as an IPv6 address: forcing IPv6 with nmap"
+            NMAP_INETPROTO='-6'
+        fi
+
+    else
+
+        debuglog "Hosts resolved to an IPv4 address with /etc/hosts"
+
     fi
 
     # Expect (optional)
