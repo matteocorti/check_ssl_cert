@@ -1,6 +1,7 @@
 2023-04-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixes the protocol used by nmap if the host is resolved with /etc/hosts
+        * check_ssl_cert (check_crl): Do not convert a CRL if already in the correct format
 
 2023-04-24  Matteo Corti  <matteo@corti.li>
 

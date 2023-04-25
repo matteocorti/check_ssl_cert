@@ -1826,19 +1826,24 @@ check_crl() {
 
         debuglog "Certificate revocation list available (${CRL_URI})."
 
-        debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP_DER}"
+        debuglog "CRL: fetching CRL ${CRL_URI} to ${CRL_TMP}"
 
         TIMEOUT_REASON="fetching CRL"
         if [ -n "${HTTP_USER_AGENT}" ]; then
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         else
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP_DER}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         fi
         unset TIMEOUT_REASON
 
-        # convert DER to
-        debuglog "Converting ${CRL_TMP_DER} (DER) to ${CRL_TMP_PEM} (PEM)"
-        "${OPENSSL}" crl -inform DER -in "${CRL_TMP_DER}" -outform PEM -out "${CRL_TMP_PEM}"
+
+        if "${FILE_BIN}" -L -b "${CRL_TMP}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
+
+            # convert DER to PEM
+            debuglog "Converting ${CRL_TMP} (DER) to ${CRL_TMP_PEM} (PEM)"
+            "${OPENSSL}" crl -inform DER -in "${CRL_TMP}" -outform PEM -out "${CRL_TMP_PEM}"
+
+        fi
 
         # combine the certificate and the CRL
         debuglog "Combining the certificate, the CRL and the root cert"
@@ -5413,7 +5418,7 @@ main() {
     ERROR=${TEMPFILE}
 
     create_temporary_file
-    CRL_TMP_DER=${TEMPFILE}
+    CRL_TMP=${TEMPFILE}
     create_temporary_file
     CRL_TMP_PEM=${TEMPFILE}
     create_temporary_file
