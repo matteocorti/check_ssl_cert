@@ -5370,7 +5370,17 @@ main() {
 
             debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} --unprivileged -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            if ! ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" -q "${PORT}.*open"; then
+            NMAP_OUTPUT=$( ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 )
+
+            if [ "${DEBUG}" -ge 1 ]; then
+                echo "${NMAP_OUTPUT}" | sed -e 's/^/[DBG]   //'
+            fi
+            debuglog "${GREP_BIN} -q \"${PORT}.*open\""
+            if [ "${DEBUG}" -ge 1 ]; then
+                echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "${PORT}.*open" | sed -e 's/^/[DBG]   //'
+            fi
+
+            if ! echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "${PORT}.*open"; then
 
                 if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
 
