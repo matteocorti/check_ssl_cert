@@ -1844,6 +1844,11 @@ check_crl() {
             debuglog "Converting ${CRL_TMP} (DER) to ${CRL_TMP_PEM} (PEM)"
             "${OPENSSL}" crl -inform DER -in "${CRL_TMP}" -outform PEM -out "${CRL_TMP_PEM}"
 
+        else
+
+            # file already in PEM format
+            CRL_TMP_PEM="${CRL_TMP}"
+
         fi
 
         # combine the certificate and the CRL
