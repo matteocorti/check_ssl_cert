@@ -1,5 +1,9 @@
 # News
 
+* 2023-04-28 Version 2.68.0
+  * Fixes the protocol used by nmap if the host is resolved with /etc/hosts
+  * Do not convert a CRL if already in the correct format
+  * Removed a PCRE grep expression (non-standard)
 * 2023-04-24 Version 2.67.0
   * Considers /etc/hosts for the existence checks
 * 2023-04-21 Version 2.66.0
