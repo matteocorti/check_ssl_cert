@@ -149,8 +149,8 @@ oneTimeSetUp() {
     trap_with_arg cleanup ${SIGNALS}
 
     # we trigger a test by Qualy's SSL so that when the last test is run the result will be cached
-    echo 'Starting SSL Lab test (to cache the result)'
-    curl --silent "https://www.ssllabs.com/ssltest/analyze.html?d=${SSL_LABS_HOST}&latest" >/dev/null
+    # echo 'Starting SSL Lab test (to cache the result)'
+    # curl --silent "https://www.ssllabs.com/ssltest/analyze.html?d=${SSL_LABS_HOST}&latest" >/dev/null
 
     # check in OpenSSL supports dane checks
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -dane_tlsa_rrdata || "${OPENSSL}" s_client not_a_real_option 2>&1 | grep -q -- -dane_tlsa_rrdata; then
@@ -1203,14 +1203,15 @@ testCiphersError() {
 }
 
 # SSL Labs (last one as it usually takes a lot of time)
+# disabled as it often gives a timeout
 
-testSSLLabs() {
-    # we assume www.github.com gets at least a B
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host "${SSL_LABS_HOST}" --match "${SSL_LABS_HOST}" --check-ssl-labs A --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
+# testSSLLabs() {
+#     # we assume www.github.com gets at least a B
+#     # shellcheck disable=SC2086
+#     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host "${SSL_LABS_HOST}" --match "${SSL_LABS_HOST}" --check-ssl-labs A --ignore-exp
+#     EXIT_CODE=$?
+#     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+# }
 
 testGithubComCRL() {
 
