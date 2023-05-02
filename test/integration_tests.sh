@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SSL_LABS_HOST=ethz.ch
+# SSL_LABS_HOST=ethz.ch
 
 # $SHUNIT2 should be defined as an environment variable before running the tests
 # shellcheck disable=SC2154
