@@ -274,6 +274,7 @@ usage() {
     echo "      --debug-time                 Write timing information in the"
     echo "                                   debugging output"
     echo "      --dig-bin path               Path of the dig binary to be used"
+    echo "      --do-not-resolve             Do not check if the host can be resolved"
     echo "      --dtls                       Use the DTLS protocol"
     echo "      --dtls1                      Use the DTLS protocol 1.0"
     echo "      --dtls1_2                    Use the DTLS protocol 1.2"
@@ -3044,6 +3045,11 @@ parse_command_line_options() {
             exit
             ;;
 
+        --do-not-resolve)
+            DO_NOT_RESOLVE=1
+            shift
+            ;;
+
         # DTLS
         --dtls)
             if [ -n "${SSL_VERSION}" ]; then
@@ -4196,82 +4202,96 @@ main() {
         fi
     fi
 
-    ETC_HOSTS=
-    debuglog "Checking if the host is listed in /etc/hosts"
-    if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
+    ##############################################################################
+    # Check if the host can be resolved
 
-        debuglog "Host listed in /etc/hosts"
-        if [ "${INETPROTO}" = '-4' ] ; then
-            if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+    if [ -z "${DO_NOT_RESOLVE}" ] ; then
+
+        ETC_HOSTS=
+        debuglog "Checking if the host is listed in /etc/hosts"
+        if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
+
+            debuglog "Host listed in /etc/hosts"
+            if [ "${INETPROTO}" = '-4' ] ; then
+                if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                    ETC_HOSTS=4
+                fi
+            elif [ "${INETPROTO}" = '-6' ] ; then
+                if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                    ETC_HOSTS=6
+                    NMAP_INETPROTO=-6
+                fi
+            elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
                 ETC_HOSTS=4
-            fi
-        elif [ "${INETPROTO}" = '-6' ] ; then
-            if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
+            else
                 ETC_HOSTS=6
                 NMAP_INETPROTO=-6
             fi
-        elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
-            ETC_HOSTS=4
-        else
-            ETC_HOSTS=6
-            NMAP_INETPROTO=-6
-        fi
-
-    fi
-
-    # if the host was not listed in /etc/hosts we check if there is a DNS record
-
-    if [ -z "${ETC_HOSTS}" ] ; then
-
-        debuglog "Host not found in /etc/hosts: checking DNS"
-
-        # we need the FQDN of an host to check the CN
-        # - the domain does not contain a .
-        # - we are not checking a file
-        # - we are not checking localhost
-        # - we are not checking an IPv6 address (which does not have dots)
-
-        if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
-                [ -z "${FILE}" ] &&
-                [ "${HOST}" != 'localhost' ] &&
-                ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
-
-            debuglog "Domain for ${HOST} missing"
-            DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
-            if [ -z "${DOMAIN}" ]; then
-                critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
-            fi
-            debuglog "Adding domain ${DOMAIN} to ${HOST}"
-            HOST="${HOST}.${DOMAIN}"
-            debuglog "New host: ${HOST}"
 
         fi
 
-        # we do not check if localhost can be resolved since on some macOS installations
-        # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
-        if ! echo "${HOST}" | grep -q ':' &&
-                echo "${HOST}" | grep -q '[a-z]' &&
-                [ "${HOST}" != 'localhost' ] ; then
+        # if the host was not listed in /etc/hosts we check if there is a DNS record
 
-            # we have an host name and not an IP address
+        if [ -z "${ETC_HOSTS}" ] ; then
 
-            debuglog "Checking if the host (${HOST}) exists"
-            if [ "${INETPROTO}" = '-4' ] ; then
-                if ! host -t a "${HOST}" | grep -q 'has address' ; then
-                    critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no A record)"
-                fi
-            elif [ "${INETPROTO}" = '-6' ] ; then
-                if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
-                    critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no AAAA record)"
-                fi
-            else
-                if ! host "${HOST}" | grep -q 'has .*address' ; then
+            debuglog "Host not found in /etc/hosts: checking DNS"
+
+            # we need the FQDN of an host to check the CN
+            # - the domain does not contain a .
+            # - we are not checking a file
+            # - we are not checking localhost
+            # - we are not checking an IPv6 address (which does not have dots)
+
+            if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
+                    [ -z "${FILE}" ] &&
+                    [ "${HOST}" != 'localhost' ] &&
+                    ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+
+                debuglog "Domain for ${HOST} missing"
+                DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
+                if [ -z "${DOMAIN}" ]; then
                     critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
                 fi
+                debuglog "Adding domain ${DOMAIN} to ${HOST}"
+                HOST="${HOST}.${DOMAIN}"
+                debuglog "New host: ${HOST}"
+
             fi
+
+            # we do not check if localhost can be resolved since on some macOS installations
+            # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
+            if ! echo "${HOST}" | grep -q ':' &&
+                    echo "${HOST}" | grep -q '[a-z]' &&
+                    [ "${HOST}" != 'localhost' ] ; then
+
+                # we have an host name and not an IP address
+
+                debuglog "Checking if the host (${HOST}) exists"
+                if [ "${INETPROTO}" = '-4' ] ; then
+                    if ! host -t a "${HOST}" | grep -q 'has address' ; then
+                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no A record)"
+                    fi
+                elif [ "${INETPROTO}" = '-6' ] ; then
+                    if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
+                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no AAAA record)"
+                    fi
+                else
+                    if ! host "${HOST}" | grep -q 'has .*address' ; then
+                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
+                    fi
+                fi
+            fi
+
         fi
 
+    else
+
+        debuglog "Skipping the check to see if the host can be resolved"
+
     fi
+
+    ##############################################################################
+    # End of the "resolve" check
 
     # we do quick check if the argument seems an IPv6 address (no validity check)
     if echo "${HOST}" | "${GREP_BIN}" -q "^[0-9a-fA-F:]*$"; then

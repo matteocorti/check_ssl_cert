@@ -48,6 +48,7 @@
 --debug-time;debugging output
 --default-format;Print the default output format and exit
 --dig-bin path;Path of the dig binary to be used
+--do-not-resolve;Do not check if the host can be resolved
 --dtls1;Use the DTLS protocol 1.0
 --dtls1_2;Use the DTLS protocol 1.2
 --dtls;Use the DTLS protocol

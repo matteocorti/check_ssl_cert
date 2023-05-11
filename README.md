@@ -77,6 +77,7 @@ Options:
       --debug-time                 Write timing information in the
                                    debugging output
       --dig-bin path               Path of the dig binary to be used
+      --do-not-resolve             Do not check if the host can be resolved
       --dtls                       Use the DTLS protocol
       --dtls1                      Use the DTLS protocol 1.0
       --dtls1_2                    Use the DTLS protocol 1.2
