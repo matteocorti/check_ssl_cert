@@ -4474,7 +4474,7 @@ main() {
             DNS_OVER_HTTP=${TEMPFILE}
 
             TIMEOUT_REASON="Resolving over HTTP with ${RESOLVE_OVER_HTTP}"
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\&type=A" "${DNS_OVER_HTTP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
 
             if [ "${DEBUG}" -ge 1 ]; then
                 jq < "${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
