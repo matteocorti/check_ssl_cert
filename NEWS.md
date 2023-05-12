@@ -1,6 +1,8 @@
 # News
 
+* 2023-05-12 Version 2.69.0
   * Added an option to skip the test to see if the host can be resolved
+  * Added an option to resolve an host using DNS over HTTP
 * 2023-04-28 Version 2.68.0
   * Fixes the protocol used by nmap if the host is resolved with /etc/hosts
   * Do not convert a CRL if already in the correct format

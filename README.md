@@ -236,6 +236,8 @@ Options:
       --require-purpose-critical   The key usage must be critical
       --resolve ip                 Provide a custom IP address for the
                                    specified host
+      --resolve-over-http [server] Resolve the host over HTTP using Google or
+                                   the specified server
       --rootcert-dir path          Root directory to be used for certificate
                                    validation
       --rootcert-file path         Root certificate to be used for

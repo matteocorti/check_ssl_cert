@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.68.0
+VERSION=2.69.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -445,6 +445,8 @@ usage() {
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
     echo "      --require-purpose-critical   The key usage must be critical"
+    echo "      --resolve-over-http [server] Resolve the host over HTTP using Google or"
+    echo "                                   the specified server"
     echo "      --resolve ip                 Provide a custom IP address for the"
     echo "                                   specified host"
     echo "      --rootcert-dir path          Root directory to be used for certificate"
@@ -1762,6 +1764,8 @@ EOT
     else
 
         debuglog "$(printf '%s\n' eval "${command}")"
+        debuglog "  output: ${OUTFILE}"
+        debuglog "  error:  ${ERRFILE}"
 
         eval "${command}" >"${OUTFILE}" 2>"${ERRFILE}"
         RET=$?
@@ -3767,6 +3771,7 @@ $2"
 
         ##############################
         # Variable number of arguments
+
         --dane)
 
             if [ -n "${DANE}" ]; then
@@ -3812,6 +3817,27 @@ $2"
             fi
 
             ;;
+
+        --resolve-over-http)
+
+            # dns.google.com: we use the IP in case DNS is not directly reachable
+            RESOLVE_OVER_HTTP=8.8.8.8
+
+            # check the second optional parameter if it exist
+            if [ $# -gt 1 ]; then
+                # shellcheck disable=SC2295
+                if [ "${2%${2#?}}"x = '-x' ]; then
+                    shift
+                else
+                    RESOLVE_OVER_HTTP=$2
+                    shift 2
+                fi
+            else
+                shift
+            fi
+
+            ;;
+
         --require-client-cert)
 
             REQUIRE_CLIENT_CERT=1
@@ -3882,6 +3908,7 @@ $2"
             shift
             break
             ;;
+
         -*)
             # we try to check for grouped variables
             OPTION="${1}"
@@ -4203,83 +4230,260 @@ main() {
     fi
 
     ##############################################################################
-    # Check if the host can be resolved
+    # curl
 
-    if [ -z "${DO_NOT_RESOLVE}" ] ; then
+    if [ -z "${CURL_BIN}" ]; then
+        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
+            [ -n "${OCSP}" ] ||
+            [ -n "${CRL}" ] ||
+            [ -n "${IGNORE_CONNECTION_STATE}" ] ||
+            [ -n "${FILE_URI}" ]; then
+            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}"
+            debuglog "curl binary not specified"
 
-        ETC_HOSTS=
-        debuglog "Checking if the host is listed in /etc/hosts"
-        if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
+            check_required_prog curl
+            CURL_BIN=${PROG}
 
-            debuglog "Host listed in /etc/hosts"
-            if [ "${INETPROTO}" = '-4' ] ; then
-                if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
-                    ETC_HOSTS=4
-                fi
-            elif [ "${INETPROTO}" = '-6' ] ; then
-                if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
-                    ETC_HOSTS=6
-                    NMAP_INETPROTO=-6
-                fi
-            elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
-                ETC_HOSTS=4
-            else
-                ETC_HOSTS=6
-                NMAP_INETPROTO=-6
-            fi
+            debuglog "curl available: ${CURL_BIN}"
+            CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
+            debuglog "${CURL_BIN_VERSION_TMP}"
+
+        else
+            debuglog "curl binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
+        fi
+    else
+        # we check if the provided binary actually works
+        check_required_prog "${CURL_BIN}"
+    fi
+
+    ################################################################################
+    # Check if openssl s_client supports the -proxy option
+    #
+
+    SCLIENT_PROXY=
+    SCLIENT_PROXY_ARGUMENT=
+    CURL_PROXY=
+    CURL_PROXY_ARGUMENT=
+    if [ -n "${http_proxy}" ] || [ -n "${HTTP_PROXY}" ]; then
+
+        debuglog "\$http_proxy is set: configuring the proxy settings"
+
+        if [ -n "${http_proxy}" ]; then
+            HTTP_PROXY="${http_proxy}"
+        fi
+
+        if [ -z "${https_proxy}" ]; then
+            # try to set https_proxy
+            https_proxy="${http_proxy}"
+        fi
+
+        if [ -z "${HTTPS_PROXY}" ]; then
+            # try to set HTTPS_proxy
+            HTTPS_PROXY="${HTTP_PROXY}"
+        fi
+
+        if [ -n "${CURL_BIN}" ] && ${CURL_BIN} --manual 2>&1 | "${GREP_BIN}" -F -q -- --proxy; then
+            debuglog "Adding --proxy ${HTTP_PROXY} to the curl options"
+            CURL_PROXY="--proxy"
+            CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
+        fi
+
+        if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -proxy; then
+            SCLIENT_PROXY="-proxy"
+            SCLIENT_PROXY_ARGUMENT="$(echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//')"
+
+            debuglog "Adding -proxy ${SCLIENT_PROXY_ARGUMENT} to the s_client options"
+
+        else
+
+            verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"
 
         fi
 
-        # if the host was not listed in /etc/hosts we check if there is a DNS record
+    fi
 
-        if [ -z "${ETC_HOSTS}" ] ; then
+    if [ -n "${NO_PROXY_CURL}" ]; then
+        CURL_PROXY=''
+        CURL_PROXY_ARGUMENT=''
+    fi
 
-            debuglog "Host not found in /etc/hosts: checking DNS"
+    if [ -n "${NO_PROXY_S_CLIENT}" ]; then
+        SCLIENT_PROXY=''
+        SCLIENT_PROXY_ARGUMENT=''
+    fi
 
-            # we need the FQDN of an host to check the CN
-            # - the domain does not contain a .
-            # - we are not checking a file
-            # - we are not checking localhost
-            # - we are not checking an IPv6 address (which does not have dots)
+    debuglog "Proxy settings (after):"
+    debuglog "  http_proxy  = ${http_proxy}"
+    debuglog "  https_proxy = ${https_proxy}"
+    debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
+    debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
+    debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
+    debuglog "  curl        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
 
-            if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
-                    [ -z "${FILE}" ] &&
-                    [ "${HOST}" != 'localhost' ] &&
-                    ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+    # nmap doesn't work properly behind a proxy.
+    #
+    # See e.g.,
+    # https://subscription.packtpub.com/book/networking-and-servers/9781786467454/2/ch02lvl1sec37/scanning-through-proxies
+    # https://security.stackexchange.com/questions/120708/nmap-through-proxy
+    #
+    if [ -n "${http_proxy}" ] ||
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ] ||
+        [ -n "${SCLIENT_PROXY}" ] ||
+        [ -n "${CURL_PROXY}" ]; then
+        DISABLE_NMAP=1
+        debuglog "A proxy is specified: nmap disabled"
+        verboselog "A proxy is specified: nmap checks disabled"
+    fi
 
-                debuglog "Domain for ${HOST} missing"
-                DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
-                if [ -z "${DOMAIN}" ]; then
-                    critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
+
+    # Expect (optional)
+    EXPECT="$(command -v expect 2>/dev/null)"
+    test -x "${EXPECT}" || EXPECT=""
+    if [ -z "${EXPECT}" ]; then
+        verboselog "expect not available" 2
+    else
+        verboselog "expect available (${EXPECT})" 2
+    fi
+
+    # Timeout (optional)
+    TIMEOUT_BIN="$(command -v timeout 2>/dev/null)"
+    test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
+    if [ -z "${TIMEOUT_BIN}" ]; then
+        verboselog "timeout not available" 2
+    else
+
+        verboselog "timeout available (${TIMEOUT_BIN})" 2
+    fi
+
+    if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ]; then
+        verboselog "disabling timeouts" 2
+    fi
+
+    ##############################################################################
+    # Check if the host can be resolved
+
+    if [ -n "${DO_NOT_RESOLVE}" ] && [ -n "${RESOLVE_OVER_HTTP}" ] ; then
+        unknown "--do-not-resolve and --resolve-over-http cannot be specified at the same time"
+    fi
+
+    if [ -z "${DO_NOT_RESOLVE}" ] ; then
+
+        if [ -z "${RESOLVE_OVER_HTTP}" ] ; then
+
+            ETC_HOSTS=
+            debuglog "Checking if the host is listed in /etc/hosts"
+            if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
+
+                debuglog "Host listed in /etc/hosts"
+                if [ "${INETPROTO}" = '-4' ] ; then
+                    if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                        ETC_HOSTS=4
+                    fi
+                elif [ "${INETPROTO}" = '-6' ] ; then
+                    if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                        ETC_HOSTS=6
+                        NMAP_INETPROTO=-6
+                    fi
+                elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                    ETC_HOSTS=4
+                else
+                    ETC_HOSTS=6
+                    NMAP_INETPROTO=-6
                 fi
-                debuglog "Adding domain ${DOMAIN} to ${HOST}"
-                HOST="${HOST}.${DOMAIN}"
-                debuglog "New host: ${HOST}"
 
             fi
 
-            # we do not check if localhost can be resolved since on some macOS installations
-            # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
-            if ! echo "${HOST}" | grep -q ':' &&
-                    echo "${HOST}" | grep -q '[a-z]' &&
-                    [ "${HOST}" != 'localhost' ] ; then
+            # if the host was not listed in /etc/hosts we check if there is a DNS record
 
-                # we have an host name and not an IP address
+            if [ -z "${ETC_HOSTS}" ] ; then
 
-                debuglog "Checking if the host (${HOST}) exists"
-                if [ "${INETPROTO}" = '-4' ] ; then
-                    if ! host -t a "${HOST}" | grep -q 'has address' ; then
-                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no A record)"
+                debuglog "Host not found in /etc/hosts: checking DNS"
+
+                # we need the FQDN of an host to check the CN
+                # - the domain does not contain a .
+                # - we are not checking a file
+                # - we are not checking localhost
+                # - we are not checking an IPv6 address (which does not have dots)
+
+                RESOLVE_ERROR=
+
+                if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
+                        [ -z "${FILE}" ] &&
+                        [ "${HOST}" != 'localhost' ] &&
+                        ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+
+                    debuglog "Domain for ${HOST} missing"
+                    DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
+                    if [ -z "${DOMAIN}" ]; then
+                        RESOLVE_ERROR="Cannot resolve ${HOST}"
+                    else
+                        debuglog "Adding domain ${DOMAIN} to ${HOST}"
+                        HOST="${HOST}.${DOMAIN}"
+                        debuglog "New host: ${HOST}"
                     fi
-                elif [ "${INETPROTO}" = '-6' ] ; then
-                    if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
-                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} (no AAAA record)"
-                    fi
-                else
-                    if ! host "${HOST}" | grep -q 'has .*address' ; then
-                        critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST}"
-                    fi
+
                 fi
+
+                if [ -z "${RESOLVE_ERROR}" ] ; then
+
+                    # we do not check if localhost can be resolved since on some macOS installations
+                    # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
+                    if ! echo "${HOST}" | grep -q ':' &&
+                            echo "${HOST}" | grep -q '[a-z]' &&
+                            [ "${HOST}" != 'localhost' ] ; then
+
+                        # we have an host name and not an IP address
+
+                        debuglog "Checking if the host (${HOST}) exists"
+                        if [ "${INETPROTO}" = '-4' ] ; then
+                            if ! host -t a "${HOST}" | grep -q 'has address' ; then
+                                RESOLVE_ERROR="Cannot resolve ${HOST} (no A record)"
+                            fi
+                        elif [ "${INETPROTO}" = '-6' ] ; then
+                            if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
+                                RESOLVE_ERROR="Cannot resolve ${HOST} (no AAAA record)"
+                            fi
+                        else
+                            if ! host "${HOST}" | grep -q 'has .*address' ; then
+                                RESOLVE_ERROR="Cannot resolve ${HOST}"
+                            fi
+                        fi
+                    fi
+
+                fi
+
+                if [ -n "${RESOLVE_ERROR}" ] ; then
+
+                    debuglog "${RESOLVE_ERROR}"
+                    critical "${SHORTNAME} CRITICAL: ${RESOLVE_ERROR}"
+
+                fi
+
+            fi
+
+        else
+
+            # from https://superuser.com/questions/1400035/how-to-do-nslookup-or-dns-resolution-using-http-proxy
+            # How to do NSLOOKUP or DNS-resolution using HTTP-PROXY?
+
+            debuglog "Resolving using DNS over HTTP"
+
+            create_temporary_file
+            DNS_OVER_HTTP=${TEMPFILE}
+
+            TIMEOUT_REASON="Resolving over HTTP with ${RESOLVE_OVER_HTTP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\&type=A" "${DNS_OVER_HTTP}"
+
+            if [ "${DEBUG}" -ge 1 ]; then
+                jq < "${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
+            fi
+
+            if grep -q '"Status":0' "${DNS_OVER_HTTP}" ; then
+                debuglog "Reolved via HTTP"
+            else
+                critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} over HTTP using ${RESOLVE_OVER_HTTP}"
             fi
 
         fi
@@ -4554,31 +4758,6 @@ main() {
         debuglog "${FILE} is an URI with an authority"
     fi
 
-    # curl
-    if [ -z "${CURL_BIN}" ]; then
-        if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
-            [ -n "${OCSP}" ] ||
-            [ -n "${CRL}" ] ||
-            [ -n "${IGNORE_CONNECTION_STATE}" ] ||
-            [ -n "${FILE_URI}" ]; then
-            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}"
-            debuglog "curl binary not specified"
-
-            check_required_prog curl
-            CURL_BIN=${PROG}
-
-            debuglog "curl available: ${CURL_BIN}"
-            CURL_BIN_VERSION_TMP="$(${CURL_BIN} --version)"
-            debuglog "${CURL_BIN_VERSION_TMP}"
-
-        else
-            debuglog "curl binary not needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}"
-        fi
-    else
-        # we check if the provided binary actually works
-        check_required_prog "${CURL_BIN}"
-    fi
-
     if [ -n "${FILE}" ]; then
 
         if [ -n "${FILE_URI}" ]; then
@@ -4830,29 +5009,6 @@ main() {
 
     fi
 
-    # Expect (optional)
-    EXPECT="$(command -v expect 2>/dev/null)"
-    test -x "${EXPECT}" || EXPECT=""
-    if [ -z "${EXPECT}" ]; then
-        verboselog "expect not available" 2
-    else
-        verboselog "expect available (${EXPECT})" 2
-    fi
-
-    # Timeout (optional)
-    TIMEOUT_BIN="$(command -v timeout 2>/dev/null)"
-    test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
-    if [ -z "${TIMEOUT_BIN}" ]; then
-        verboselog "timeout not available" 2
-    else
-
-        verboselog "timeout available (${TIMEOUT_BIN})" 2
-    fi
-
-    if [ -z "${TIMEOUT_BIN}" ] && [ -z "${EXPECT}" ]; then
-        verboselog "disabling timeouts" 2
-    fi
-
     PERL="$(command -v perl 2>/dev/null)"
 
     if [ -n "${PERL}" ]; then
@@ -5013,84 +5169,6 @@ main() {
         unset https_proxy
         unset HTTP_PROXY
         unset HTTPS_PROXY
-    fi
-
-    ################################################################################
-    # Check if openssl s_client supports the -proxy option
-    #
-    SCLIENT_PROXY=
-    SCLIENT_PROXY_ARGUMENT=
-    CURL_PROXY=
-    CURL_PROXY_ARGUMENT=
-    if [ -n "${http_proxy}" ] || [ -n "${HTTP_PROXY}" ]; then
-
-        if [ -n "${http_proxy}" ]; then
-            HTTP_PROXY="${http_proxy}"
-        fi
-
-        if [ -z "${https_proxy}" ]; then
-            # try to set https_proxy
-            https_proxy="${http_proxy}"
-        fi
-
-        if [ -z "${HTTPS_PROXY}" ]; then
-            # try to set HTTPS_proxy
-            HTTPS_PROXY="${HTTP_PROXY}"
-        fi
-
-        if [ -n "${CURL_BIN}" ] && ${CURL_BIN} --manual | "${GREP_BIN}" -F -q -- --proxy; then
-            debuglog "Adding --proxy ${HTTP_PROXY} to the curl options"
-            CURL_PROXY="--proxy"
-            CURL_PROXY_ARGUMENT="${HTTP_PROXY}"
-        fi
-
-        if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -proxy || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -proxy; then
-            SCLIENT_PROXY="-proxy"
-            SCLIENT_PROXY_ARGUMENT="$(echo "${HTTP_PROXY}" | sed 's/.*:\/\///' | sed 's/\/$//')"
-
-            debuglog "Adding -proxy ${SCLIENT_PROXY_ARGUMENT} to the s_client options"
-
-        else
-
-            verboselog "'${OPENSSL} s_client' does not support '-proxy': HTTP_PROXY could be ignored"
-
-        fi
-
-    fi
-
-    if [ -n "${NO_PROXY_CURL}" ]; then
-        CURL_PROXY=''
-        CURL_PROXY_ARGUMENT=''
-    fi
-
-    if [ -n "${NO_PROXY_S_CLIENT}" ]; then
-        SCLIENT_PROXY=''
-        SCLIENT_PROXY_ARGUMENT=''
-    fi
-
-    debuglog "Proxy settings (after):"
-    debuglog "  http_proxy  = ${http_proxy}"
-    debuglog "  https_proxy = ${https_proxy}"
-    debuglog "  HTTP_PROXY  = ${HTTP_PROXY}"
-    debuglog "  HTTPS_PROXY = ${HTTPS_PROXY}"
-    debuglog "  s_client    = ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT}"
-    debuglog "  curl        = ${CURL_PROXY} ${CURL_PROXY_ARGUMENT}"
-
-    # nmap doesn't work properly behind a proxy.
-    #
-    # See e.g.,
-    # https://subscription.packtpub.com/book/networking-and-servers/9781786467454/2/ch02lvl1sec37/scanning-through-proxies
-    # https://security.stackexchange.com/questions/120708/nmap-through-proxy
-    #
-    if [ -n "${http_proxy}" ] ||
-        [ -n "${https_proxy}" ] ||
-        [ -n "${HTTP_PROXY}" ] ||
-        [ -n "${HTTPS_PROXY}" ] ||
-        [ -n "${SCLIENT_PROXY}" ] ||
-        [ -n "${CURL_PROXY}" ]; then
-        DISABLE_NMAP=1
-        debuglog "A proxy is specified: nmap disabled"
-        verboselog "A proxy is specified: nmap checks disabled"
     fi
 
     ################################################################################

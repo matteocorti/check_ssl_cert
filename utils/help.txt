@@ -199,6 +199,8 @@
 --require-x-frame-options [path];in the URL to check for the header
 --resolve ip;Provide a custom IP address for the
 --resolve ip;specified host
+--resolve-over-http [server];Resolve the host over HTTP using Google or
+--resolve-over-http [server];the specified server
 --rootcert-dir path;Root directory to be used for
 --rootcert-dir path;certificate validation
 --rootcert-file path;Root certificate to be used for
