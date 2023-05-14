@@ -3,7 +3,7 @@ VERSION=`cat VERSION`
 DIST_DIR=$(PLUGIN)-$(VERSION)
 
 # files to be included in the distribution
-DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile GNUmakefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff check_ssl_cert.completion
+DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile GNUmakefile NEWS.md README.md VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 CITATION.cff check_ssl_cert.completion check_ssl_cert_icinga2.conf
 
 # this year
 YEAR=`date +"%Y"`

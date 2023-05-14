@@ -14,45 +14,66 @@ if [ -n "${LONG_LINES}" ]; then
     ERROR=1
 fi
 
+ALL_OPTIONS=$( cat utils/help.txt utils/deprecated.txt )
+
 # list all the command line options
 
 # shellcheck disable=SC2013
 for option in $(grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//'); do
 
     case "${option}" in
-    '|' | '--' | '-*')
-        continue
-        ;;
-    *)
+        '|' | '--' | '-*')
+            continue
+            ;;
+        *)
 
-        # check if the option is documented in the help.txt file
-        if ! grep -q -- "${option}" utils/help.txt; then
-            echo "Error: ${option} is not documented in help.txt"
-            ERROR=1
-        fi
+            # check if the option is documented in the help.txt file
+            if ! echo "${ALL_OPTIONS}" | grep -q -- "${option}"; then
+                echo "Error: ${option} is not documented in help.txt or deprectaed.txt"
+                ERROR=1
+            fi
 
-        # check if the option is documented in check_ssl_cert
+            # check if the option is documented in check_ssl_cert
+            if ! echo "${HELP}" | grep -q -- "${option}"; then
+                echo "Error: ${option} is not documented in the help (--help)"
+                ERROR=1
+            fi
 
-        if ! echo "${HELP}" | grep -q -- "${option}"; then
-            echo "Error: ${option} is not documented in the help (--help)"
-            ERROR=1
-        fi
+            # check if the option is documented in README.md
+            if ! grep -q -- "${option}" README.md; then
+                echo "Error: ${option} is not documented in README.md"
+                ERROR=1
+            fi
 
-        # check if the option is documented in README.md
+            # check if the option is documented in the man page
+            if ! grep -q -- "${option}" check_ssl_cert.1; then
+                echo "Error: ${option} is not documented in check_ssl_cert.1"
+                ERROR=1
+            fi
 
-        if ! grep -q -- "${option}" README.md; then
-            echo "Error: ${option} is not documented in README.md"
-            ERROR=1
-        fi
+            ;;
 
-        # check if the option is documented in the man page
+    esac
 
-        if ! grep -q -- "${option}" check_ssl_cert.1; then
-            echo "Error: ${option} is not documented in check_ssl_cert.1"
-            ERROR=1
-        fi
+done
 
-        ;;
+# che the Icigna conf file (only long options not deprecated)
+
+# shellcheck disable=SC2013
+for option in $(sed -e 's/;.*//' -e 's/.*,//' -e 's/[ ].*//' utils/help.txt  | sort -u ); do
+
+    case "${option}" in
+        '|' | '--' | '-*' | '--version' | '-?')
+            continue
+            ;;
+        *)
+
+            # check if the option is documented in the check_ssl_cert_icinga2.conf file
+            if ! grep -q -- "${option}" check_ssl_cert_icinga2.conf; then
+                echo "Error: ${option} is not documented in check_ssl_cert_icinga2.conf"
+                ERROR=1
+            fi
+            ;;
 
     esac
 
@@ -88,6 +109,6 @@ while read -r line; do
         fi
     fi
 
-done <utils/help.txt
+done < utils/help.txt
 
 exit "${ERROR}"

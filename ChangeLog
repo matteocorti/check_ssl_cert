@@ -1,3 +1,7 @@
+2023-05-14  Matteo Corti  <matteo@corti.li>
+
+        * Added check_ssl_cert_icinga2.conf to the documentation check and distribution files. Added some missing options
+
 2023-04-25  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixes the protocol used by nmap if the host is resolved with /etc/hosts

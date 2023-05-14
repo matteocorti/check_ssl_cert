@@ -1,0 +1,43 @@
+--altnames;Match the pattern specified in -n with
+--altnames;alternate names too (enabled by default)
+--curl-user-agent string;User agent that curl shall use to obtain
+--curl-user-agent string;the issuer cert
+--days days;(see --critical and --warning)
+--days days;Minimum number of days a certificate has
+--days days;to be valid
+--no_ssl2;Disable SSLv2 (deprecated use --no-ssl2)
+--no_ssl3;Disable SSLv3 (deprecated use --no-ssl3)
+--no_tls1;Disable TLSv1 (deprecated use --no-tls1)
+--no_tls1_1;--no-tls1_1)
+--no_tls1_1;Disable TLSv1.1 (deprecated use
+--no_tls1_2;--no-tls1_2)
+--no_tls1_2;Disable TLSv1.1 (deprecated use
+--no_tls1_3;--no-tls1_3)
+--no_tls1_3;Disable TLSv1.1 (deprecated use
+--ocsp;Check revocation via OCSP (enabled by
+--ocsp;default)
+--require-hsts;Require HTTP Strict Transport Security-
+--require-san;Alternative Name
+--require-san;Require the presence of a Subject
+--require-san;extension
+--require-security-header header;Require the specified HTTP
+--require-security-header header;security header (e.g., X-Frame-Options)
+--require-security-headers-path path;security headers
+--require-security-headers-path path;the path to be used to fetch HTTP
+--require-security-headers;  Content-Security-Policy
+--require-security-headers;  Permissions-Policy
+--require-security-headers;  Referrer-Policy
+--require-security-headers;  X-Content-Type-Options
+--require-security-headers;  X-Frame-Options
+--require-security-headers;  strict-transport-security
+--require-security-headers;Require all the HTTP security headers:
+--require-x-frame-options [path];'path' is the optional path to be used
+--require-x-frame-options [path];Require the presence of the
+--require-x-frame-options [path];X-Frame-Options HTTP header
+--require-x-frame-options [path];in the URL to check for the header
+-N,--host-cn;(enabled by default)
+-N,--host-cn;Match CN with the host name
+-S,--ssl version;(see: --ssl2 or --ssl3)
+-S,--ssl version;Force SSL version (2,3)
+-n,--cn name;(can be specified multiple times)
+-n,--cn name;Pattern to match the CN or AltName
