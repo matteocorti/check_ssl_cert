@@ -76,7 +76,7 @@ echo "--------------------------------------------------------------------------
 echo "-- Features"
 echo
 
-command_line_options=$(sed 's/;.*//' utils/help.txt | sort | uniq | wc -l)
+command_line_options=$(sed 's/;.*//' utils/help.txt utils/deprecated.txt | sort | uniq | wc -l)
 printf "Command line options:\\t%'10d\\n" "${command_line_options}"
 
 echo
