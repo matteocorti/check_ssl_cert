@@ -1583,7 +1583,7 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version: //'
         ;;
 
-    sig_algo)
+    pub_key_algo)
 
         # The Signature Algorithm refers to the signature of the certificate created by the issuer
         # The Public Key Algorithm refers to the public key inside the certificate
@@ -1591,6 +1591,20 @@ extract_cert_attribute() {
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
         ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
+
+        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature' | sed 's/.*: //')
+
+        echo "${ALGORITHM} ${PUBLIC_KEY}"
+        ;;
+
+    sig_algo)
+
+        # The Signature Algorithm refers to the signature of the certificate created by the issuer
+        # The Public Key Algorithm refers to the public key inside the certificate
+        #
+        #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
+
+        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature Algorithm' | sed -e 's/.*: //')
 
         PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //')
 
@@ -5938,6 +5952,9 @@ EOF
 
     fi
 
+    PUB_KEY_ALGORITHM="$(extract_cert_attribute 'pub_key_algo' "${CERT}" | sed 's/.*: //')"
+    info "Public key algorithm" "${PUB_KEY_ALGORITHM}"
+
     SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*: //')"
     info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
@@ -5952,7 +5969,7 @@ EOF
         debuglog "FINGERPRINT= ${FINGERPRINT}"
         debuglog "OCSP_URI   = ${OCSP_URI}"
         debuglog "ISSUER_URI = ${ISSUER_URI}"
-        debuglog "${SIGNATURE_ALGORITHM}"
+        debuglog "${PUB_KEY_ALGORITHM}"
     fi
 
     if [ -n "${ISSUER_URI}" ]; then
@@ -5965,7 +5982,7 @@ EOF
     ISSUER_INFO="$(echo ${ISSUERS})"
     info "Issuers" "${ISSUER_INFO}"
 
-    if echo "${SIGNATURE_ALGORITHM}" | "${GREP_BIN}" -F -q "sha1"; then
+    if echo "${PUB_KEY_ALGORITHM}" | "${GREP_BIN}" -F -q "sha1"; then
 
         if [ -n "${NOSIGALG}" ]; then
 
@@ -5979,7 +5996,7 @@ EOF
 
     fi
 
-    if echo "${SIGNATURE_ALGORITHM}" | "${GREP_BIN}" -F -qi "md5"; then
+    if echo "${PUB_KEY_ALGORITHM}" | "${GREP_BIN}" -F -qi "md5"; then
 
         if [ -n "${NOSIGALG}" ]; then
 
@@ -6908,7 +6925,7 @@ ${WARNING}"
             PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
             SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
             SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
-            SIGALGO_TMP="$(var_for_sed SIGALGO "${SIGNATURE_ALGORITHM}")"
+            SIGALGO_TMP="$(var_for_sed SIGALGO "${PUB_KEY_ALGORITHM}")"
             SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
 
             echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
