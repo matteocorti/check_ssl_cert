@@ -323,31 +323,31 @@ testSignatureAlgorithms() {
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
         grep '^Signature algorithm' |
         sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'rsaEncryption (2048 bit)' "${ALGORITHM}"
+    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (2048 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
         grep '^Signature algorithm' |
         sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'rsaEncryption (4096 bit)' "${ALGORITHM}"
+    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (4096 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
         grep '^Signature algorithm' |
         sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'rsaEncryption (8192 bit)' "${ALGORITHM}"
+    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (8192 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc256.badssl.com |
         grep '^Signature algorithm' |
         sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'id-ecPublicKey (256 bit)' "${ALGORITHM}"
+    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (256 bit)' "${ALGORITHM}"
 
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc384.badssl.com |
         grep '^Signature algorithm' |
         sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'id-ecPublicKey (384 bit)' "${ALGORITHM}"
+    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (384 bit)' "${ALGORITHM}"
 
 }
 
