@@ -1,3 +1,7 @@
+2023-05-23  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: Fixed the initialization order of OPENSSL and GREP_BIN because of the proxy check
+
 2023-05-14  Matteo Corti  <matteo@corti.li>
 
         * Added check_ssl_cert_icinga2.conf to the documentation check and distribution files. Added some missing options

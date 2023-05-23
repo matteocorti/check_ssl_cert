@@ -4270,6 +4270,32 @@ main() {
         check_required_prog "${CURL_BIN}"
     fi
 
+    ##############################################################################
+    # OpenSSL
+    if [ -n "${OPENSSL}" ]; then
+        if [ ! -x "${OPENSSL}" ]; then
+            unknown "${OPENSSL} is not an executable"
+        fi
+    else
+        OPENSSL='openssl'
+    fi
+    check_required_prog "${OPENSSL}"
+    OPENSSL=${PROG}
+
+    ##############################################################################
+    # custom grep
+    if [ -z "${GREP_BIN}" ]; then
+        GREP_BIN='grep'
+    fi
+    check_required_prog "${GREP_BIN}"
+    GREP_BIN=${PROG}
+
+    ##############################################################################
+    # OpenSSL options
+    if [ -n "${REQUIRE_PURPOSE}" ] || [ -n "${REQUIRE_PURPOSE_CRITICAL}" ]; then
+        require_x509_option "-ext" " (required for certificate purpose)"
+    fi
+
     ################################################################################
     # Check if openssl s_client supports the -proxy option
     #
@@ -4626,14 +4652,6 @@ main() {
     FILE_BIN=${PROG}
 
     ##############################################################################
-    # custom grep
-    if [ -z "${GREP_BIN}" ]; then
-        GREP_BIN='grep'
-    fi
-    check_required_prog "${GREP_BIN}"
-    GREP_BIN=${PROG}
-
-    ##############################################################################
     # Python is needed for TDS
     if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" = 'tds' ]; then
         if [ -z "${PYTHON_BIN}" ]; then
@@ -4647,24 +4665,6 @@ main() {
             unknown "Python 2 is not supported"
         fi
 
-    fi
-
-    ##############################################################################
-    # OpenSSL
-    if [ -n "${OPENSSL}" ]; then
-        if [ ! -x "${OPENSSL}" ]; then
-            unknown "${OPENSSL} is not an executable"
-        fi
-    else
-        OPENSSL='openssl'
-    fi
-    check_required_prog "${OPENSSL}"
-    OPENSSL=${PROG}
-
-    ##############################################################################
-    # OpenSSL options
-    if [ -n "${REQUIRE_PURPOSE}" ] || [ -n "${REQUIRE_PURPOSE_CRITICAL}" ]; then
-        require_x509_option "-ext" " (required for certificate purpose)"
     fi
 
     ##############################################################################
