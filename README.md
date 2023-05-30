@@ -11,7 +11,6 @@
 A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection and certificate
 
 ## Usage
-
 ```text
 
 Usage: check_ssl_cert -H host [OPTIONS]
@@ -234,10 +233,10 @@ Options:
       --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)
       --require-purpose-critical   The key usage must be critical
-      --resolve ip                 Provide a custom IP address for the
-                                   specified host
       --resolve-over-http [server] Resolve the host over HTTP using Google or
                                    the specified server
+      --resolve ip                 Provide a custom IP address for the
+                                   specified host
       --rootcert-dir path          Root directory to be used for certificate
                                    validation
       --rootcert-file path         Root certificate to be used for
@@ -332,7 +331,6 @@ Deprecated options:
                                    (see: --ssl2 or --ssl3)
 
 Report bugs to https://github.com/matteocorti/check_ssl_cert/issues
-
 ```
 
 ## Configuration
