@@ -1,3 +1,7 @@
+2023-06-13  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed a bug in the debugging output of the connection check
+
 2023-05-23  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: Fixed the initialization order of OPENSSL and GREP_BIN because of the proxy check
