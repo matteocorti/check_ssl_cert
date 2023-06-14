@@ -69,6 +69,7 @@ jobs:
         distro:
           - 'debian:10'
           - 'debian:11'
+          - 'debian:12'
           - 'debian:testing'
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
@@ -87,6 +88,10 @@ jobs:
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion default-jre
           - distro: 'debian:11'
+            pre: >-
+              apt-get update &&
+              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
+          - distro: 'debian:12'
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
