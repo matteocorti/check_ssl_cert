@@ -75,7 +75,7 @@ jobs:
           - 'ubuntu:20.04'
           - 'alpine:3.13'
           - 'fedora:37'
-          - 'fedora:36'
+          - 'fedora:38'
         include:
 
 
@@ -119,7 +119,7 @@ jobs:
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
-          - distro: 'fedora:36'
+          - distro: 'fedora:38'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
