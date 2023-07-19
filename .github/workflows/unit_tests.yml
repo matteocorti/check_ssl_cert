@@ -157,13 +157,13 @@ jobs:
         distro:
           - 'centos:7'
           - 'fedora:37'
-          - 'fedora:36'
+          - 'fedora:38'
         include:
           - distro: 'fedora:37'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
-          - distro: 'fedora:36'
+          - distro: 'fedora:38'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -195,13 +195,13 @@ jobs:
         distro:
           - 'centos:7'
           - 'fedora:37'
-          - 'fedora:36'
+          - 'fedora:38'
         include:
           - distro: 'fedora:37'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
-          - distro: 'fedora:36'
+          - distro: 'fedora:38'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
