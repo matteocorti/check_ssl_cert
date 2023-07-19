@@ -255,7 +255,7 @@ authors:
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
 version: 2.70.0
-date-released: 2023-05-20
+date-released: 2023-07-19
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

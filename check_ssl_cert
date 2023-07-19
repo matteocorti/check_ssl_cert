@@ -1033,8 +1033,8 @@ prepend_critical_message() {
             fi
         fi
     fi
-    if [ -n "${PROTOCOL}" ]; then
-        tmp="${tmp}:${PROTOCOL}"
+    if [ -n "${PORT}" ]; then
+        tmp="${tmp}:${PORT}"
     fi
 
     MSG="${SHORTNAME} CRITICAL${tmp}: ${1}${LONG_OUTPUT}"
@@ -1232,6 +1232,9 @@ append_warning_message() {
                 tmp=" ${HOST_NAME}"
             fi
         fi
+    fi
+    if [ -n "${PORT}" ]; then
+        tmp="${tmp}:${PORT}"
     fi
 
     MSG="${SHORTNAME} WARN${tmp}: ${1}${LONG_OUTPUT}"

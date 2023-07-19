@@ -1,3 +1,8 @@
+2023-07-19  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (prepend_critical_message): Display the port number in the CRITICAL output (as for OK)
+        * check_ssl_cert (append_warning_message): Display the port number in the WARNING output (as for OK)
+
 2023-06-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixed a bug in the debugging output of the connection check
