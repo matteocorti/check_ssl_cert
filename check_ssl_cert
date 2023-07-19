@@ -62,7 +62,7 @@ STATUS_WARNING=1
 TEMPFILE=""
 WARNING_MSG=""
 
-DEFAULT_FORMAT="%SHORTNAME% OK - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+DEFAULT_FORMAT="%SHORTNAME% %STATUS% - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
 
 # if --critical or --warning are floating point then switch to floating point output, otherwise integer
 
@@ -71,6 +71,64 @@ SCALE=""
 
 ################################################################################
 # Functions
+
+
+# substituted the variables defined by the --format command line option
+format_template() {
+
+    string=$1
+
+    debuglog "output parameters: STATUS                = ${STATUS}"
+    debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
+    debuglog "output parameters: CHECKEDNAMES          = ${CHECKEDNAMES}"
+    debuglog "output parameters: CN                    = ${CN}"
+    debuglog "output parameters: DATE                  = ${DATE}"
+    debuglog "output parameters: DAYS_VALID            = ${DAYS_VALID}"
+    debuglog "output parameters: DYSPLAY_CN            = ${DISPLAY_CN}"
+    debuglog "output parameters: OPENSSL_COMMAND       = ${OPENSSL_COMMAND}"
+    debuglog "output parameters: SELFSIGNEDCERT        = ${SELFSIGNEDCERT}"
+    debuglog "output parameters: SHORTNAME             = ${SHORTNAME}"
+    debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
+    debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
+    debuglog "output parameters: PROTOCOL              = ${PROTOCOL}"
+
+    STATUS_TMP="$(var_for_sed STATUS "${STATUS}")"
+    CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
+    CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
+    CN_TMP="$(var_for_sed CN "${CN}")"
+    DATE_TMP="$(var_for_sed DATE "${DATE}")"
+    DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
+    DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
+    HOST_TMP="$(var_for_sed HOST "${HOST}")"
+    OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
+    OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
+    PORT_TMP="$(var_for_sed PORT "${PORT}")"
+    PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
+    SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
+    SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
+    SIGALGO_TMP="$(var_for_sed SIGALGO "${PUB_KEY_ALGORITHM}")"
+    SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
+
+    echo "${string}" |
+        sed \
+            -e "${STATUS_TMP}" \
+            -e "${CA_ISSUER_MATCHED_TMP}" \
+            -e "${CHECKEDNAMES_TMP}" \
+            -e "${CN_TMP}" \
+            -e "${DATE_TMP}" \
+            -e "${DAYS_VALID_TMP}" \
+            -e "${DISPLAY_CN_TMP}" \
+            -e "${HOST_TMP}" \
+            -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
+            -e "${OPENSSL_COMMAND_TMP}" \
+            -e "${PORT_TMP}" \
+            -e "${PROTOCOL_TMP}" \
+            -e "${SELFSIGNEDCERT_TMP}" \
+            -e "${SHORTNAME_TMP}" \
+            -e "${SIGALGO_TMP}" \
+            -e "${SSL_LABS_HOST_GRADE_TMP}"
+
+}
 
 ################################################################################
 # Add the specified header to the list of required HTTP headers
@@ -6900,53 +6958,12 @@ ${WARNING}"
             PROTOCOL='https'
         fi
 
-        debuglog "output parameters: CA_ISSUER_MATCHED     = ${CA_ISSUER_MATCHED}"
-        debuglog "output parameters: CHECKEDNAMES          = ${CHECKEDNAMES}"
-        debuglog "output parameters: CN                    = ${CN}"
-        debuglog "output parameters: DATE                  = ${DATE}"
-        debuglog "output parameters: DAYS_VALID            = ${DAYS_VALID}"
-        debuglog "output parameters: DYSPLAY_CN            = ${DISPLAY_CN}"
-        debuglog "output parameters: OPENSSL_COMMAND       = ${OPENSSL_COMMAND}"
-        debuglog "output parameters: SELFSIGNEDCERT        = ${SELFSIGNEDCERT}"
-        debuglog "output parameters: SHORTNAME             = ${SHORTNAME}"
-        debuglog "output parameters: OCSP_EXPIRES_IN_HOURS = ${OCSP_EXPIRES_IN_HOURS}"
-        debuglog "output parameters: SSL_LABS_HOST_GRADE   = ${SSL_LABS_HOST_GRADE}"
-        debuglog "output parameters: PROTOCOL              = ${PROTOCOL}"
+        STATUS=OK
+        FORMAT=$( format_template "${FORMAT}" )
 
         if [ -z "${PROMETHEUS}" ]; then
 
-            CA_ISSUER_MATCHED_TMP="$(var_for_sed CA_ISSUER_MATCHED "${CA_ISSUER_MATCHED}")"
-            CHECKEDNAMES_TMP="$(var_for_sed CHECKEDNAMES "${CHECKEDNAMES}")"
-            CN_TMP="$(var_for_sed CN "${CN}")"
-            DATE_TMP="$(var_for_sed DATE "${DATE}")"
-            DAYS_VALID_TMP="$(var_for_sed DAYS_VALID "${DAYS_VALID}")"
-            DISPLAY_CN_TMP="$(var_for_sed DISPLAY_CN "${DISPLAY_CN}")"
-            HOST_TMP="$(var_for_sed HOST "${HOST}")"
-            OCSP_EXPIRES_IN_HOURS_TMP="$(var_for_sed OCSP_EXPIRES_IN_HOURS "${OCSP_EXPIRES_IN_HOURS}")"
-            OPENSSL_COMMAND_TMP="$(var_for_sed OPENSSL_COMMAND "${OPENSSL_COMMAND}")"
-            PORT_TMP="$(var_for_sed PORT "${PORT}")"
-            PROTOCOL_TMP="$(var_for_sed PROTOCOL "${PROTOCOL}")"
-            SELFSIGNEDCERT_TMP="$(var_for_sed SELFSIGNEDCERT "${SELFSIGNEDCERT}")"
-            SHORTNAME_TMP="$(var_for_sed SHORTNAME "${SHORTNAME}")"
-            SIGALGO_TMP="$(var_for_sed SIGALGO "${PUB_KEY_ALGORITHM}")"
-            SSL_LABS_HOST_GRADE_TMP="$(var_for_sed SSL_LABS_HOST_GRADE "${SSL_LABS_HOST_GRADE}")"
-
-            echo "${FORMAT}${EXTRA_OUTPUT}" | sed \
-                -e "${CA_ISSUER_MATCHED_TMP}" \
-                -e "${CHECKEDNAMES_TMP}" \
-                -e "${CN_TMP}" \
-                -e "${DATE_TMP}" \
-                -e "${DAYS_VALID_TMP}" \
-                -e "${DISPLAY_CN_TMP}" \
-                -e "${HOST_TMP}" \
-                -e "${OCSP_EXPIRES_IN_HOURS_TMP}" \
-                -e "${OPENSSL_COMMAND_TMP}" \
-                -e "${PORT_TMP}" \
-                -e "${PROTOCOL_TMP}" \
-                -e "${SELFSIGNEDCERT_TMP}" \
-                -e "${SHORTNAME_TMP}" \
-                -e "${SIGALGO_TMP}" \
-                -e "${SSL_LABS_HOST_GRADE_TMP}"
+            echo "${FORMAT}${EXTRA_OUTPUT}"
 
         else
 
