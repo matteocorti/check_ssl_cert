@@ -1,5 +1,7 @@
 # News
 
+* 2023-07-28 Version 2.72.0
+  * Fixed a bug if the host cannot be resolved and ```--resolve``` is specified
 * 2023-07-19 Version 2.71.0
   * Display the port number in the critical and warning output
 * 2023-05-20 Version 2.70.0

@@ -1,3 +1,1 @@
- * Added an option to skip the test to see if the host can be resolved
- * Added an option to resolve an host using DNS over HTTP
- * Added the Icigna2 configuration file
+Fixed a bug if the host cannot be resolved and ```--resolve``` is specified

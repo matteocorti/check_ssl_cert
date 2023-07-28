@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.70.0
+VERSION=2.71.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4469,7 +4469,10 @@ main() {
         unknown "--do-not-resolve and --resolve-over-http cannot be specified at the same time"
     fi
 
-    if [ -z "${DO_NOT_RESOLVE}" ] ; then
+    # we check only if
+    # --do-not-resolve was not specified
+    # --resolve was not specified (as the IP is supplied on the command line)
+    if [ -z "${DO_NOT_RESOLVE}" ] && [ -z "${RESOLVE}" ] ; then
 
         if [ -z "${RESOLVE_OVER_HTTP}" ] ; then
 
