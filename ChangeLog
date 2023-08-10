@@ -1,3 +1,7 @@
+2023-08-10  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed a bug in the proxy command line options validation
+
 2023-07-28  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixed a bug if the host cannot be resolved and --resolve is specified

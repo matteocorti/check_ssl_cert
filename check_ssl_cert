@@ -31,7 +31,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.71.0
+VERSION=2.72.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -5224,12 +5224,7 @@ main() {
         fi
     fi
 
-    if [ -n "${PROXY}" ] &&
-        {
-            [ -n "${NO_PROXY}" ] ||
-                [ -n "${NO_PROXY_CURL}" ] ||
-                [ -n "${NO_PROXY_S_CLIENT}" ]
-        }; then
+    if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
         unknown "Only one of --proxy or --no_proxy can be specified"
     fi
 

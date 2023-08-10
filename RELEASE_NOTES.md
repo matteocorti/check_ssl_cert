@@ -1,1 +1,1 @@
-Fixed a bug if the host cannot be resolved and ```--resolve``` is specified
+Fixed a bug in the proxy command line options validation
