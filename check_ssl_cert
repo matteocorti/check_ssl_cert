@@ -2804,7 +2804,11 @@ fetch_certificate() {
     if [ "${RET}" -ne 0 ]; then
 
         MESSAGE_TMP="$(sed 's/^/SSL error: /' "${ERROR}")"
-        debuglog "${MESSAGE_TMP}"
+
+        if [ "${DEBUG}" -gt 0 ]; then
+            debuglog "MESSAGE_TMP="
+            echo "${MESSAGE_TMP}" | sed 's/^/[DBG]   /'
+        fi
 
         # s_client could verify the server certificate because the server requires a client certificate
         if ascii_grep '^Client Certificate Types' "${CERT}"; then
@@ -2816,6 +2820,13 @@ fetch_certificate() {
             ascii_grep 'connect[ ]argument[ ]or[ ]target[ ]parameter[ ]malformed[ ]or[ ]ambiguous' "${ERROR}"; then
 
             ERROR="${HOST_ADDR} is not a valid hostname"
+            prepend_critical_message "${ERROR}"
+            critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
+
+        elif ascii_grep '500 Unable to connect' "${ERROR}"; then
+
+            # tinyproxy delivers a different error message: harmonize
+            ERROR="Cannot connect to ${HOST} on port ${PORT}"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT CRITICAL ${HOST_NAME}${protocol_tmp}: ${ERROR}"
 
