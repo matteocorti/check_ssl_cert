@@ -1160,6 +1160,11 @@ testCiphersOK() {
         echo 'Skipping tests on CentOS and RedHat 7 since nmap is crashing (core dump)'
     elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
+    elif [ -n "${http_proxy}" ] ||
+             [ -n "${https_proxy}" ] ||
+             [ -n "${HTTP_PROXY}" ] ||
+             [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
     else
 
         # check if nmap is installed
@@ -1193,6 +1198,11 @@ testCiphersNonStandardPort() {
     #    el
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
+    elif [ -n "${http_proxy}" ] ||
+             [ -n "${https_proxy}" ] ||
+             [ -n "${HTTP_PROXY}" ] ||
+             [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
     else
 
         # check if nmap is installed

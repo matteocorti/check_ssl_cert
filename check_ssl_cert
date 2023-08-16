@@ -4445,6 +4445,7 @@ main() {
         [ -n "${SCLIENT_PROXY}" ] ||
         [ -n "${CURL_PROXY}" ]; then
         DISABLE_NMAP=1
+        USING_A_PROXY=1
         debuglog "A proxy is specified: nmap disabled"
         verboselog "A proxy is specified: nmap checks disabled"
     fi
@@ -6458,8 +6459,12 @@ INPUT
 
         if [ -n "${DISABLE_NMAP}" ]; then
 
-            verboselog "Using a proxy: cannot check ciphers"
-            debuglog "Using a proxy: cannot check ciphers"
+            if [ -n "${USING_A_PROXY}" ]; then
+                prepend_critical_message "Cannot check ciphers when using a proxy"
+            else
+                verboselog "nmap disabled: cannot check ciphers"
+                debuglog "nmap disabled: cannot check ciphers"
+            fi
 
         else
 

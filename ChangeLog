@@ -2,6 +2,7 @@
 
         * check_ssl_cert (check_ocsp): Fixed the proxy settings by OCSP
         * check_ssl_cert (fetch_certificate): Harmonize error messages from tinyproxy
+        * check_ssl_cert (check_attr): Critical if a ciphers check is required and a proxy is used
 
 2023-08-10  Matteo Corti  <matteo@corti.li>
 
