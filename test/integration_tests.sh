@@ -1306,38 +1306,73 @@ testAcceptableClientCertCAMissing() {
 }
 
 testIgnoreConnectionStateOK() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_OK}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
+    else
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_OK}"
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    fi
 }
 
 testIgnoreConnectionStateCRITICAL() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_CRITICAL}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
+    else
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_CRITICAL}"
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    fi
 }
 
 testIgnoreConnectionStateWARNING() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
+    else
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems "${NAGIOS_WARNING}"
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
+    fi
 }
 
 testIgnoreConnectionStateError() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems 4
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
+    else
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H www.google.com --port 444 --timeout 1 --ignore-connection-problems 4
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_UNKNOWN}" "${EXIT_CODE}"
+    fi
 }
 
 testIgnoreConnectionStateHTTP() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H www.github.com --port 443 --ignore-connection-problems 0
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${http_proxy}" ] ||
+           [ -n "${https_proxy}" ] ||
+           [ -n "${HTTP_PROXY}" ] ||
+           [ -n "${HTTPS_PROXY}" ]; then
+        echo 'Using a proxy: skipping tests'
+    else
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H www.github.com --port 443 --ignore-connection-problems 0
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    fi
 }
 
 testSubdomainWithUnderscore() {
