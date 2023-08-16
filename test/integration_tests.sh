@@ -76,6 +76,17 @@ cleanup_temporary_test_files() {
     trap - ${SIGNALS}
 }
 
+startLocalProxy() {
+    tinyproxy -c tinyproxy.conf -d  > /dev/null 2>&1
+    TINYPROXY=$!
+}
+
+stopLocalProxy() {
+    if [ -n "${TINYPROXY}" ] ; then
+        kill "${TINYPROXY}"
+    fi
+}
+
 createSelfSignedCertificate() {
 
     DAYS=$1
