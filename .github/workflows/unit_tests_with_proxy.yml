@@ -1,4 +1,4 @@
-name: Integration tests
+name: Unit tests
 
 on:
   push:
@@ -11,12 +11,6 @@ on:
       - '**.md'
       - utils/prepare_rpm.sh
       - .github/workflows/publish.yml
-  schedule:
-      # We run the integration tests daily. These tests depend on external hosts and certificates
-      # and it's useful to know when something is not working as soon as possible
-      #
-      # * is a special character in YAML so you have to quote this string
-      - cron:  '42 7 * * *'
   # Run tests for any PRs
   pull_request:
   workflow_dispatch:
@@ -30,7 +24,7 @@ jobs:
   # macOS
 
   macos:
-    name: Running integration tests on ${{ matrix.os }}
+    name: Running unit tests on ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -52,10 +46,10 @@ jobs:
         with:
           install: Date::Parse
 
-      - name: Run the integration tests
+      - name: Run the unit tests
         run:  |
           uname -a \
-          && make integration_tests_with_proxy \
+          && make unit_tests_with_proxy \
           && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && make dist \
           && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
@@ -68,7 +62,7 @@ jobs:
   linux:
     # The host should always be linux
     runs-on: ubuntu-latest
-    name: Running integration tests on ${{ matrix.distro }}
+    name: Running unit tests on ${{ matrix.distro }}
     strategy:
       fail-fast: false
       matrix:
@@ -129,7 +123,7 @@ jobs:
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk tinyproxy
 
 
     steps:
@@ -137,7 +131,7 @@ jobs:
       - name: Git clone repository
         uses: actions/checkout@v3
 
-      - name: Run the integration tests on ${{ matrix.distro }}
+      - name: Run the unit tests on ${{ matrix.distro }}
         env:
           PRE: ${{ matrix.pre }}
         run: |
@@ -147,8 +141,84 @@ jobs:
               && curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus \
               && cpanm --sudo install Date::Parse \
               && uname -a \
-              && make integration_tests_with_proxy \
+              && make unit_tests_with_proxy \
               && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && make dist \
               && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/*.sh ; fi'
+
+  rpm:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Running RPM tests on ${{ matrix.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - 'centos:7'
+          - 'fedora:37'
+          - 'fedora:38'
+        include:
+          - distro: 'fedora:37'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
+          - distro: 'fedora:38'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
+          - distro: 'centos:7'
+            pre: >-
+              yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build bash-completion
+    steps:
+
+      - name: Git clone repository
+        uses: actions/checkout@v3
+
+      - name: Build the RPM on ${{ matrix.distro }}
+        env:
+          PRE: ${{ matrix.pre }}
+        run: |
+          echo $PRE > ./prep-cmd.sh
+          docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
+              /bin/sh -c 'sh ./prep-cmd.sh \
+              && uname -a \
+              && make rpm'
+
+  rpm-nocompletion:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Running RPM tests without bash completion on ${{ matrix.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - 'centos:7'
+          - 'fedora:37'
+          - 'fedora:38'
+        include:
+          - distro: 'fedora:37'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:38'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'centos:7'
+            pre: >-
+              yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build
+    steps:
+
+      - name: Git clone repository
+        uses: actions/checkout@v3
+
+      - name: Build the RPM on ${{ matrix.distro }}
+        env:
+          PRE: ${{ matrix.pre }}
+        run: |
+          echo $PRE > ./prep-cmd.sh
+          docker run --network host -w /check_ssl_cert -v ${PWD}:/check_ssl_cert ${{ matrix.distro }} \
+              /bin/sh -c 'sh ./prep-cmd.sh \
+              && uname -a \
+              && make rpm'

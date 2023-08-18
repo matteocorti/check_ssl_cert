@@ -55,7 +55,7 @@ jobs:
       - name: Run the integration tests
         run:  |
           uname -a \
-          && make integration_tests_with_proxy \
+          && make integration_tests \
           && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
           && make dist \
           && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
@@ -129,7 +129,7 @@ jobs:
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk tinyproxy
 
 
     steps:
@@ -147,7 +147,7 @@ jobs:
               && curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus \
               && cpanm --sudo install Date::Parse \
               && uname -a \
-              && make integration_tests_with_proxy \
+              && make integration_tests \
               && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && make dist \
               && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
