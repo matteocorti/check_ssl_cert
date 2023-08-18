@@ -16,7 +16,7 @@ SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
 
 XATTRS_OPTION := $(shell if tar --help 2>&1 | grep -q bsdtar ; then echo '--no-xattrs' ; fi )
 
-.PHONY: install clean test rpm distclean check version_check codespell
+.PHONY: install clean test rpm distclean check version_check codespell integration_tests unit_tests integration_tests_with_proxy unit_tests_with_proxy
 
 all: dist
 
@@ -117,7 +117,7 @@ disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
-test: formatting_check shellcheck unit_tests integration_tests
+test: formatting_check shellcheck unit_tests integration_tests unit_tests_with_proxy integration_tests_with_proxy
 
 unit_tests:
 ifndef SHUNIT
@@ -127,12 +127,32 @@ else
 	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./unit_tests.sh )
 endif
 
+unit_tests_with_proxy:
+ifndef SHUNIT
+	echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	./utils/start_proxy.sh ./test/tinyproxy.conf
+	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./unit_tests.sh )
+	killall tinyproxy
+endif
+
 integration_tests:
 ifndef SHUNIT
 	echo "No shUnit2 installed: see README.md"
 	exit 1
 else
 	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./integration_tests.sh )
+endif
+
+integration_tests_with_proxy:
+ifndef SHUNIT
+	echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	./utils/start_proxy.sh ./test/tinyproxy.conf
+	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./integration_tests.sh )
+	killall tinyproxy
 endif
 
 shellcheck:
