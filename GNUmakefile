@@ -135,6 +135,7 @@ else
 	./utils/start_proxy.sh ./test/tinyproxy.conf
 	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./unit_tests.sh )
 	killall tinyproxy
+	sleep 1
 endif
 
 integration_tests:
@@ -153,6 +154,7 @@ else
 	./utils/start_proxy.sh ./test/tinyproxy.conf
 	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./integration_tests.sh )
 	killall tinyproxy
+	sleep 1
 endif
 
 shellcheck:

@@ -217,9 +217,15 @@ setUp() {
     fi
     REMAINING=$(seconds2String "${REMAINING_S}")
 
-    # print the test number
-    # shellcheck disable=SC2154
-    echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed)"
+    if [ -n "${http_proxy}" ]; then
+        # print the test number
+        # shellcheck disable=SC2154
+        echo "Running test ${COUNTER} (proxy=${http_proxy}) of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed)"
+    else
+        # print the test number
+        # shellcheck disable=SC2154
+        echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed)"
+    fi
     COUNTER=$((COUNTER + 1))
 }
 
