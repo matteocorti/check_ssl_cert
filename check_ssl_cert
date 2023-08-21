@@ -2179,21 +2179,38 @@ check_ocsp() {
 
                         debuglog "OCSP_PROXY_ARGUMENT = ${OCSP_PROXY_ARGUMENT}"
 
+                        OPENSSL_VERSION_SHORT=${OPENSSL_VERSION%%.*}
+                        debuglog "OpenSSL major version = ${OPENSSL_VERSION_SHORT}"
+
                         if [ -n "${KEYVALUE}" ]; then
-                            debuglog "executing (1) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST} -proxy ${OCSP_PROXY_ARGUMENT}"
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" -proxy "${OCSP_PROXY_ARGUMENT}" 2>&1)"
+
+                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
+                                debuglog "executing (1) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -proxy ${http_proxy} -url ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -proxy ${http_proxy} -url ${OCSP_URI} 2>&1)"
+                            else
+                                debuglog "executing (2) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI} 2>&1)"
+                            fi
+
                         else
-                            debuglog "executing (2) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -proxy ${OCSP_PROXY_ARGUMENT}"
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" -proxy "${OCSP_PROXY_ARGUMENT}" 2>&1)"
+
+                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
+                                debuglog "executing (3) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI} 2>&1)"
+                            else
+                                debuglog "executing (4) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI} 2>&1)"
+                            fi
+
                         fi
 
                     else
 
                         if [ -n "${KEYVALUE}" ]; then
-                            debuglog "executing (3) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
+                            debuglog "executing (5) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
                             OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1)"
                         else
-                            debuglog "executing (4) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+                            debuglog "executing (6) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
                             OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1)"
                         fi
 
