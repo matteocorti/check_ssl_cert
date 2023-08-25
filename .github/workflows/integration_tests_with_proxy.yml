@@ -85,7 +85,7 @@ jobs:
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre tinyproxy
-z
+
     steps:
 
       - name: Git clone repository
