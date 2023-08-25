@@ -75,20 +75,8 @@ jobs:
         distro:
           - 'debian:10'
           - 'debian:11'
-          - 'debian:12'
-          - 'debian:testing'
-          - 'ubuntu:18.04'
-          - 'ubuntu:20.04'
-          - 'alpine:3.13'
-          - 'fedora:37'
-          - 'fedora:38'
         include:
 
-
-          - distro: 'debian:testing'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools bc bash-completion default-jre tinyproxy
           - distro: 'debian:10'
             pre: >-
               apt-get update &&
@@ -97,41 +85,7 @@ jobs:
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre tinyproxy
-          - distro: 'debian:12'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre tinyproxy
-
-          - distro: 'ubuntu:18.04'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre tinyproxy
-          - distro: 'ubuntu:20.04'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre tinyproxy
-
-
-          - distro: 'alpine:3.13'
-            pre: >-
-              apk update &&
-              apk upgrade &&
-              apk add -U bash &&
-              apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11 tinyproxy
-
-
-          - distro: 'fedora:37'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk tinyproxy
-          - distro: 'fedora:38'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk tinyproxy
-
-
+z
     steps:
 
       - name: Git clone repository
@@ -152,3 +106,4 @@ jobs:
               && make dist \
               && sudo make install_bash_completion && bash -c "source ./check_ssl_cert.completion && complete -p check_ssl_cert" \
               && if command -v shellcheck > /dev/null 2>&1  ; then shellcheck ./check_ssl_cert test/*.sh ; fi'
+z
