@@ -1,5 +1,7 @@
 # News
 
+* 2023-08-26 Version 2.73.0
+  * Fixed a bug with ocsp checks using a proxy and OpenSSL 1.X
 * 2023-07-28 Version 2.72.0
   * Fixed a bug if the host cannot be resolved and ```--resolve``` is specified
 * 2023-07-19 Version 2.71.0
