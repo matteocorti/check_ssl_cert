@@ -36,7 +36,7 @@ jobs:
     steps:
 
       - name: Git clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install shellcheck
         run: brew install shellcheck shunit2 bash-completion nmap
@@ -129,7 +129,7 @@ jobs:
     steps:
 
       - name: Git clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run the unit tests on ${{ matrix.distro }}
         env:
@@ -173,7 +173,7 @@ jobs:
     steps:
 
       - name: Git clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build the RPM on ${{ matrix.distro }}
         env:
@@ -211,7 +211,7 @@ jobs:
     steps:
 
       - name: Git clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build the RPM on ${{ matrix.distro }}
         env:
