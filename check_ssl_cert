@@ -4523,9 +4523,9 @@ main() {
                         ETC_HOSTS=6
                         NMAP_INETPROTO=-6
                     fi
-                elif  grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                elif grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
                     ETC_HOSTS=4
-                else
+                elif grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
                     ETC_HOSTS=6
                     NMAP_INETPROTO=-6
                 fi
