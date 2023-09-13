@@ -1,5 +1,7 @@
 # News
 
+* 2023-09-13 Version 2.74.0
+  * Fixed an issue in the ```/etc/hosts``` parsing
 * 2023-08-26 Version 2.73.0
   * Fixed a bug with ocsp checks using a proxy and OpenSSL 1.X
 * 2023-07-28 Version 2.72.0
