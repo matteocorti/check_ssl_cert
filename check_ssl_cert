@@ -4507,9 +4507,13 @@ main() {
 
             ETC_HOSTS=
             debuglog "Checking if the host is listed in /etc/hosts"
+
             if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
 
-                debuglog "Host listed in /etc/hosts"
+                debuglog "Host listed in /etc/hosts as"
+                etc_hosts_entry=$( "${GREP_BIN}" "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts )
+                debuglog "${etc_hosts_entry}"
+
                 if [ "${INETPROTO}" = '-4' ] ; then
                     if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
                         ETC_HOSTS=4
