@@ -1,5 +1,7 @@
 # News
 
+* 2023-09-27 Version 2.75.0
+  * Fixed an issue with the timeout
 * 2023-09-13 Version 2.74.0
   * Fixed an issue in the ```/etc/hosts``` parsing
 * 2023-08-26 Version 2.73.0

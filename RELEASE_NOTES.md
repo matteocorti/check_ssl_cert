@@ -1,1 +1,1 @@
-Fixed an issue in the ```/etc/hosts``` parsing
+Fixed an issue with the timeout

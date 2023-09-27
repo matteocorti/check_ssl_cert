@@ -1,3 +1,7 @@
+2023-09-27  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (exec_with_timeout): Global elapsed time considered for the timeout
+
 2023-09-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Fixed an issue in the /etc/hosts parsing

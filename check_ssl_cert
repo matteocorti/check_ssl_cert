@@ -2,14 +2,12 @@
 #
 # check_ssl_cert
 
-# Checks an X.509 certificate:
-# - checks if the server is running and delivers a valid certificate
-# - checks if the CA matches a given pattern
-# - checks the validity
+# Checks an X.509 certificate
+# see https://github.com/matteocorti/check_ssl_cert
 #
 # See the INSTALL.md file for installation instructions
 #
-# Copyright (c) 2007-2012 ETH Zurich.
+# Copyright (c) 2007-2012 ETH Zurich <matteo.corti@ethz.ch>
 # Copyright (c) 2007-2023 Matteo Corti <matteo@corti.li>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.74.0
+VERSION=2.75.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -647,7 +645,7 @@ debuglog() {
     # debuglog is also called during the --debug-file sanity checks: we have
     # to check if the file exists
     if [ -n "${DEBUG_FILE}" ] && [ -e "${DEBUG_FILE}" ] && ! [ -d "${DEBUG_FILE}" ] && [ -w "${DEBUG_FILE}" ]; then
-        if [ -n "${ELAPSED}" ]; then
+        if [ -n "${DEBUG_TIME}" ]; then
             echo "+${ELAPSED}s ${1}" >>"${DEBUG_FILE}"
         else
             echo "${1}" >>"${DEBUG_FILE}"
@@ -1718,7 +1716,24 @@ extract_cert_attribute() {
 # Returns 1 if timed out 0 otherwise
 exec_with_timeout() {
 
-    time=${TIMEOUT}
+    NOW=$(date +%s)
+    ELAPSED=$((NOW - START_TIME))
+    CURRENT_TIMEOUT=$(( TIMEOUT - ELAPSED))
+
+    debuglog "exec_with_timeout: TIMEOUT=${TIMEOUT}, CURRENT_TIMEOUT=${CURRENT_TIMEOUT}, ELAPSED=${ELAPSED}"
+
+    if [ -n "${TIMEOUT_REASON}" ]; then
+        if ! echo "${TIMEOUT_REASON}" | "${GREP_BIN}" -q '^ '; then
+            # add a blank before the reason in parenthesis
+            TIMEOUT_REASON=" (${TIMEOUT_REASON})"
+        fi
+    fi
+
+    if [ "${CURRENT_TIMEOUT}" -lt 1 ]; then
+        # the timeout is already reached (before executing the command)
+        prepend_critical_message "Timeout after ${ELAPSED} seconds"
+        critical "${SHORTNAME} CRITICAL: Timeout after ${ELAPSED} seconds${TIMEOUT_REASON}"
+    fi
 
     # start the command in a subshell to avoid problem with pipes
     # (spawn accepts one command)
@@ -1734,27 +1749,16 @@ exec_with_timeout() {
     fi
 
     debuglog "exec_with_timeout $1 $2 $3"
-    debuglog "  TIMEOUT_REASON = ${TIMEOUT_REASON}"
 
-    if [ -n "${TIMEOUT_REASON}" ]; then
-        if ! echo "${TIMEOUT_REASON}" | "${GREP_BIN}" -q '^ '; then
-            # add a blank before the reason in parenthesis
-            TIMEOUT_REASON=" (${TIMEOUT_REASON})"
-        fi
-    fi
-
-    start_time=$(date +%s)
-
-    debuglog "executing with timeout (${time}s): $1"
-    debuglog "  start time = ${start_time}"
+    debuglog "executing with timeout (${CURRENT_TIMEOUT}s): $1"
 
     if [ -n "${TIMEOUT_BIN}" ]; then
 
-        debuglog "$(printf '%s %s %s\n' "${TIMEOUT_BIN}" "${time}" "${command}")"
+        debuglog "$(printf '%s %s %s\n' "${TIMEOUT_BIN}" "${CURRENT_TIMEOUT}" "${command}")"
 
         # We execute timeout in the background so that it can be relay a signal to 'timeout'
         # https://unix.stackexchange.com/questions/57667/why-cant-i-kill-a-timeout-called-from-a-bash-script-with-a-keystroke/57692#57692
-        eval "${TIMEOUT_BIN} ${time} ${command} &" >"${OUTFILE}" 2>"${ERRFILE}"
+        eval "${TIMEOUT_BIN} ${CURRENT_TIMEOUT} ${command} &" >"${OUTFILE}" 2>"${ERRFILE}"
         TIMEOUT_PID=$!
         wait "${TIMEOUT_PID}" >/dev/null 2>&1
         RET=$?
@@ -1764,8 +1768,8 @@ exec_with_timeout() {
 
         # because of the execution in the background we get a 137 for a timeout
         if [ "${RET}" -eq 137 ] || [ "${RET}" -eq 124 ]; then
-            prepend_critical_message "Timeout after ${time} seconds"
-            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds${TIMEOUT_REASON}"
+            prepend_critical_message "Timeout after ${ELAPSED} seconds"
+            critical "${SHORTNAME} CRITICAL: Timeout after ${ELAPSED} seconds${TIMEOUT_REASON}"
         elif [ "${RET}" -eq 125 ]; then
             prepend_critical_message "execution of ${command} failed"
         elif [ "${RET}" -eq 126 ]; then
@@ -1773,12 +1777,6 @@ exec_with_timeout() {
         elif [ "${RET}" -eq 127 ]; then
             prepend_critical_message "${command} cannot be found"
         fi
-
-        end_time=$(date +%s)
-        TIMEOUT=$((TIMEOUT - end_time + start_time))
-        debuglog "  end time = ${end_time}"
-        debuglog "  new timeout = ${TIMEOUT}"
-        if [ "${TIMEOUT}" -lt 1 ]; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -1792,7 +1790,7 @@ exec_with_timeout() {
         set_variable EXPECT_SCRIPT <<EOT
 
 set echo \"-noecho\"
-set timeout ${time}
+set timeout ${CURRENT_TIMEOUT}
 
 # spawn the process
 spawn -noecho sh -c { ${command} > ${OUTFILE} 2> ${ERRFILE} }
@@ -1821,15 +1819,9 @@ EOT
         debuglog "expect returned ${RET}"
 
         if [ "${RET}" -eq "${TIMEOUT_ERROR_CODE}" ]; then
-            prepend_critical_message "Timeout after ${time} seconds"
-            critical "${SHORTNAME} CRITICAL: Timeout after ${time} seconds${TIMEOUT_REASON}"
+            prepend_critical_message "Timeout after ${ELAPSED} seconds"
+            critical "${SHORTNAME} CRITICAL: Timeout after ${ELAPSED} seconds${TIMEOUT_REASON}"
         fi
-
-        end_time=$(date +%s)
-        TIMEOUT=$((TIMEOUT - end_time + start_time))
-        debuglog "  end time = ${end_time}"
-        debuglog "  new timeout = ${TIMEOUT}"
-        if [ "${TIMEOUT}" -lt 1 ]; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -1841,14 +1833,6 @@ EOT
 
         eval "${command}" >"${OUTFILE}" 2>"${ERRFILE}"
         RET=$?
-
-        end_time=$(date +%s)
-
-        # we deduce the command duration from the total specified timeout
-        TIMEOUT=$((TIMEOUT - end_time + start_time))
-        debuglog "  end time = ${end_time}"
-        debuglog "  new timeout = ${TIMEOUT}"
-        if [ "${TIMEOUT}" -lt 1 ]; then TIMEOUT=1; fi
 
         return "${RET}"
 
@@ -2144,8 +2128,6 @@ check_ocsp() {
             debuglog "OCSP: host = ${OCSP_HOST}"
 
             # ocsp has an own timeout option
-            start_time=$(date +%s)
-
             if [ -n "${OCSP_HOST}" ]; then
 
                 # check if -header is supported
@@ -2185,21 +2167,21 @@ check_ocsp() {
                         if [ -n "${KEYVALUE}" ]; then
 
                             if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
-                                debuglog "executing (1) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -proxy ${http_proxy} -url ${OCSP_URI}"
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -proxy "${http_proxy}" -url "${OCSP_URI}" 2>&1)"
+                                debuglog "executing (1) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -proxy ${http_proxy} -url ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -proxy "${http_proxy}" -url "${OCSP_URI}" 2>&1)"
                             else
-                                debuglog "executing (2) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
+                                debuglog "executing (2) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
                             fi
 
                         else
 
                             if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
-                                debuglog "executing (3) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
+                                debuglog "executing (3) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
                             else
-                                debuglog "executing (4) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
+                                debuglog "executing (4) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
                             fi
 
                         fi
@@ -2207,11 +2189,11 @@ check_ocsp() {
                     else
 
                         if [ -n "${KEYVALUE}" ]; then
-                            debuglog "executing (5) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1)"
+                            debuglog "executing (5) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST=${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header "HOST=${OCSP_HOST}" 2>&1)"
                         else
-                            debuglog "executing (6) ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
-                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1)"
+                            debuglog "executing (6) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  -url ${OCSP_URI} ${OCSP_HEADER} -header HOST ${OCSP_HOST}"
+                            OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" -header HOST "${OCSP_HOST}" 2>&1)"
                         fi
 
                     fi
@@ -2239,22 +2221,22 @@ check_ocsp() {
 
                         if [ -n "${HTTP_PROXY:-}" ]; then
 
-                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}]\" -host \"${HTTP_PROXY#*://}\" -path \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
 
                             if [ -n "${OCSP_HEADER}" ]; then
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1)"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" "${OCSP_HEADER}" 2>&1)"
                             else
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1)"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -host "${HTTP_PROXY#*://}" -path "${OCSP_URI}" 2>&1)"
                             fi
 
                         else
 
-                            debuglog "executing ${OPENSSL} ocsp -timeout \"${TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
+                            debuglog "executing ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer \"${ISSUER_CERT}\" -cert \"${CERT_ELEMENT}\" -url \"${OCSP_URI}\" \"${OCSP_HEADER}\" 2>&1"
 
                             if [ -n "${OCSP_HEADER}" ]; then
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1)"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" "${OCSP_HEADER}" 2>&1)"
                             else
-                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" 2>&1)"
+                                OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -url "${OCSP_URI}" 2>&1)"
                             fi
 
                         fi
@@ -2280,12 +2262,6 @@ check_ocsp() {
                 verboselog "Warning: no OCSP host found: disabling OCSP checks"
 
             fi
-
-            # update the timeout
-            debuglog "Timeout before OCSP check: ${TIMEOUT}"
-            end_time=$(date +%s)
-            TIMEOUT=$((TIMEOUT - end_time + start_time))
-            debuglog "Timeout after OCSP check:  ${TIMEOUT}"
 
         done
 
@@ -4046,6 +4022,8 @@ $2"
 # Main
 ################################################################################
 main() {
+
+    START_TIME=$(date +%s)
 
     ##############################################################################
     # we need grep from the beginning (will fix later if --grep-bin is specified)
