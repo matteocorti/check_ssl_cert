@@ -74,7 +74,7 @@ jobs:
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
           - 'alpine:3.13'
-          - 'fedora:37'
+          - 'fedora:39'
           - 'fedora:38'
         include:
 
@@ -114,7 +114,7 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11
 
 
-          - distro: 'fedora:37'
+          - distro: 'fedora:39'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
@@ -156,10 +156,10 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'fedora:37'
+          - 'fedora:39'
           - 'fedora:38'
         include:
-          - distro: 'fedora:37'
+          - distro: 'fedora:39'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -194,10 +194,10 @@ jobs:
       matrix:
         distro:
           - 'centos:7'
-          - 'fedora:37'
+          - 'fedora:39'
           - 'fedora:38'
         include:
-          - distro: 'fedora:37'
+          - distro: 'fedora:39'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
