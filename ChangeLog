@@ -1,3 +1,7 @@
+2023-10-21  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Added a check if --file is a directory
+
 2023-09-27  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (exec_with_timeout): Global elapsed time considered for the timeout

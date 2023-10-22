@@ -4871,6 +4871,10 @@ main() {
 
         elif [ ! -r "${FILE}" ]; then
             critical "Cannot read file ${FILE}"
+        elif [ -d "${FILE}" ]; then
+            critical "${FILE} is a directory"
+        elif ! [ -f "${FILE}" ]; then
+            critcal "${FILE} is not a regular file"
         fi
 
     fi

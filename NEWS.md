@@ -1,5 +1,6 @@
 # News
 
+* Added a check if ```--file``` is a directory
 * 2023-09-27 Version 2.75.0
   * Fixed an issue with the timeout
 * 2023-09-13 Version 2.74.0

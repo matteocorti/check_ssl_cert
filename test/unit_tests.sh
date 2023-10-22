@@ -570,6 +570,13 @@ testJavaKeyStore2() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testDirectoryAsAFile() {
+   # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --file somedir
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+}
+
 # the script will exit without executing main
 export SOURCE_ONLY='test'
 
