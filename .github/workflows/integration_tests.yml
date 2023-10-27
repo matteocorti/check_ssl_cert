@@ -37,6 +37,7 @@ jobs:
         os:
           - macos-11
           - macos-12
+          - macos-13
           - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -79,6 +80,7 @@ jobs:
           - 'debian:testing'
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
+          - 'ubuntu:22.04'
           - 'alpine:3.13'
           - 'fedora:39'
           - 'fedora:38'
