@@ -1,7 +1,7 @@
 # News
 
 * 2023-10-30 Version 2.76.0
- * ```--info``` output at the endw
+ * ```--info``` output at the end
  * Added a check if ```--file``` is a directory
 * 2023-09-27 Version 2.75.0
   * Fixed an issue with the timeout

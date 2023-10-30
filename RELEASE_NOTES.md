@@ -1,1 +1,1 @@
-```--info``` output at the endw
+```--info``` output at the end
