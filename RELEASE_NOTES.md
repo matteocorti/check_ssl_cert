@@ -1,1 +1,1 @@
-Fixed an issue with the timeout
+```--info``` output at the endw
