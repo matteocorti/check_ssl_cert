@@ -663,13 +663,15 @@ info() {
 
     if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
         if [ -n "${INFO_OUTPUT}" ] ; then
-            INFO_OUTPUT="${INFO_OUTPUT}\\n$( printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32 )"
+            # shellcheck disable=SC1117
+            INFO_OUTPUT="${INFO_OUTPUT}\n$( printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32 )"
         else
             INFO_OUTPUT="$( printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32 )"
         fi
     elif [ -n "${INFO}" ]; then
         if [ -n "${INFO_OUTPUT}" ] ; then
-            INFO_OUTPUT="${INFO_OUTPUT}\\n$( printf '%s\n' "${LABEL}" )"
+            # shellcheck disable=SC1117
+            INFO_OUTPUT="${INFO_OUTPUT}\n$( printf '%s\n' "${LABEL}" )"
         else
             INFO_OUTPUT="$( printf '%s\n' "${LABEL}" )"
         fi
