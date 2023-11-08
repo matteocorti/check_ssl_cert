@@ -5455,8 +5455,10 @@ main() {
 
         if [ -n "${DISABLE_NMAP}" ]; then
 
-            verboselog "Using a proxy: cannot check for disable protocols"
-            debuglog "Using a proxy: cannot check for disable protocols"
+            if [ -n "${USING_A_PROXY}" ] ; then
+                verboselog "Using a proxy: cannot check for disable protocols"
+                debuglog "Using a proxy: cannot check for disable protocols"
+            fi
 
         else
 
@@ -5560,8 +5562,10 @@ main() {
 
         if [ -n "${DISABLE_NMAP}" ]; then
 
-            verboselog "Using a proxy: cannot test connection"
-            debuglog "Using a proxy: cannot test connection"
+            if [ -n "${USING_A_PROXY}" ] ; then
+                verboselog "Using a proxy: cannot test connection"
+                debuglog "Using a proxy: cannot test connection"
+            fi
 
         else
 
