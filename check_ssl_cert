@@ -5243,20 +5243,31 @@ main() {
     #   => We supply an invalid command line option to get the help
     #      on standard error for these intermediate versions.
     #
+
     SERVERNAME=
-    if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -servername; then
 
-        if [ -n "${SNI}" ]; then
-            SERVERNAME="-servername ${SNI}"
-        else
-            SERVERNAME="-servername ${HOST_NAME}"
-        fi
+    if ${OPENSSL} version | grep -q -F 'LibreSSL' &&
+            [ ${HOST_IS_IP} -eq 1 ] ; then
 
-        debuglog "'${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"
+        verboselog 'LibreSSL does not support IP addresses as "servername" disabling virtual server support'
 
     else
 
-        verboselog "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
+        if ${OPENSSL} s_client -help 2>&1 | "${GREP_BIN}" -F -q -- -servername || ${OPENSSL} s_client not_a_real_option 2>&1 | "${GREP_BIN}" -F -q -- -servername; then
+
+            if [ -n "${SNI}" ]; then
+                SERVERNAME="-servername ${SNI}"
+            else
+                SERVERNAME="-servername ${HOST_NAME}"
+            fi
+
+            debuglog "'${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"
+
+        else
+
+            verboselog "'${OPENSSL} s_client' does not support '-servername': disabling virtual server support"
+
+        fi
 
     fi
 
