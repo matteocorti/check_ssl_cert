@@ -1304,7 +1304,7 @@ testGithubComCRL() {
     TEMPFILE_CRL=${TEMPFILE}
 
     echo "${GITHUB_CRL_URI}"
-    curl --silent "${GITHUB_CRL_URI}" >"${TEMPFILE_CRL}"
+    curl --silent --output "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
 
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp --ignore-maximum-validity
