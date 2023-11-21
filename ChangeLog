@@ -1,3 +1,7 @@
+2023-11-21  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (hours_until): do not complain if LONG_BIT is not available (OpenBSD)
+
 2023-10-30  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (info): --info output at the endw
