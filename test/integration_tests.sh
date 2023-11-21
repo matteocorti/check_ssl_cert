@@ -185,6 +185,10 @@ oneTimeSetUp() {
         "${GREP_BIN}" -V
     fi
 
+    DIG_BIN=$(command -v dig)
+    NSLOOKUP_BIN=$( command -v nslookup )
+    true # if the last variable is empty the setup will fail
+
 }
 
 seconds2String() {
@@ -1040,29 +1044,37 @@ testCertificateWithEmptySubject() {
 # see #449
 testNotExistingHosts() {
 
-    # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li )
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+    if [ -n "${NSLOOKUP_BIN}" ] ; then
 
-    # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li --do-not-resolve )
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
+        # shellcheck disable=SC2086
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li )
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
-    # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li )
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+        # shellcheck disable=SC2086
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li --do-not-resolve )
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
 
-    # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li --do-not-resolve )
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
+        # shellcheck disable=SC2086
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li )
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
+
+        # shellcheck disable=SC2086
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li --do-not-resolve )
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+        assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
+
+    else
+
+        echo "nslookup not found: skipping"
+
+    fi
 
 }
 
@@ -1528,17 +1540,25 @@ testPurpose() {
 }
 
 testDNSSECOk() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H switch.ch --ignore-exp --require-dnssec
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${DIG_BIN}" ] ; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H switch.ch --ignore-exp --require-dnssec
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Cannot find dig: skipping DNSSEC tests"
+    fi
 }
 
 testDNSSECError() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H corti.li --ignore-exp --require-dnssec
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if [ -n "${DIG_BIN}" ] ; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H corti.li --ignore-exp --require-dnssec
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Cannot find dig: skipping DNSSEC tests"
+    fi
 }
 
 testXFrameOptionsOK() {
