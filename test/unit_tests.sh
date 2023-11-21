@@ -147,6 +147,8 @@ oneTimeSetUp() {
     fi
     "${OPENSSL}" version
 
+    KEYTOOL=$( command -v keytool) # Java?
+
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN=$(command -v grep) # needed by openssl_version
     fi
@@ -557,17 +559,25 @@ testChainFailIgnored() {
 }
 
 testJavaKeyStore1() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --file ./keystore.jks --password changeit --jks-alias google-com --ignore-incomplete-chain --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${KEYTOOL}" ] ; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --file ./keystore.jks --password changeit --jks-alias google-com --ignore-incomplete-chain --ignore-exp
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Java not installed: skipping key store tests"
+    fi
 }
 
 testJavaKeyStore2() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --file ./cacerts.jks --password changeit --jks-alias "verisignuniversalrootca [jdk]" --allow-empty-san --ignore-maximum-validity --selfsigned
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if [ -n "${KEYTOOL}" ] ; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --file ./cacerts.jks --password changeit --jks-alias "verisignuniversalrootca [jdk]" --allow-empty-san --ignore-maximum-validity --selfsigned
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Java not installed: skipping key store tests"
+    fi
 }
 
 testDirectoryAsAFile() {
