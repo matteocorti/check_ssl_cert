@@ -5251,10 +5251,13 @@ main() {
 
     SERVERNAME=
 
-    if ${OPENSSL} version | grep -q -F 'LibreSSL' &&
-            [ "${HOST_IS_IP}" -eq 1 ] ; then
+    if ${OPENSSL} version | grep -q -F 'LibreSSL' && [ "${HOST_IS_IP}" -eq 1 ] ; then
 
-        verboselog 'LibreSSL does not support IP addresses as "servername" disabling virtual server support'
+        verboselog 'LibreSSL does not support IP addresses as "servername": disabling virtual server support'
+
+    elif ${OPENSSL} version | grep -q -F 'LibreSSL' && echo "${HOST_NAME}" | grep -q '^_' ; then
+
+        verboselog 'LibreSSL does not support a "servername" value beginning with an underscore: disabling virtual server support'
 
     else
 
@@ -5275,6 +5278,8 @@ main() {
         fi
 
     fi
+
+    debuglog "SERVERNAME=${SERVERNAME}"
 
     ################################################################################
     # Check if openssl s_client supports the specified protocol
