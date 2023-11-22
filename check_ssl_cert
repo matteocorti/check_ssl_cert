@@ -5091,6 +5091,11 @@ main() {
             verboselog "cannot find nmap: disabling connection checks and ciphers checks"
             debuglog "cannot find nmap: disabling connection checks and ciphers checks"
             DISABLE_NMAP=1
+
+            if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+                unknown "--ignore-connection-state requires nmap"
+            fi
+
         else
             if [ ! -x "${NMAP_BIN}" ]; then
                 unknown "${NMAP_BIN} is not executable"

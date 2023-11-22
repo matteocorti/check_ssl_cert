@@ -43,15 +43,13 @@ fi
 
 create_temporary_test_file() {
 
-    SUFFIX=$1
-
     if mktemp --help 2>&1 | grep -q 'TEMPLATE must end with XXXXXX'; then
         # no suffix possible
         SUFFIX=
     fi
 
     # create a temporary file
-    TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX${SUFFIX}" 2>/dev/null)"
+    TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
 
     if [ -z "${TEMPFILE}" ] || [ ! -w "${TEMPFILE}" ]; then
         fail 'temporary file creation failure.'
@@ -1300,11 +1298,11 @@ testGithubComCRL() {
 
     GITHUB_CRL_URI=$(${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
 
-    create_temporary_test_file '.crl'
+    create_temporary_test_file
     TEMPFILE_CRL=${TEMPFILE}
 
     echo "${GITHUB_CRL_URI}"
-    curl --silent --output "${TEMPFILE_CRL}" "${GITHUB_CRL_URI}"
+    curl --silent "${GITHUB_CRL_URI}" --output "${TEMPFILE_CRL}"
 
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp --ignore-maximum-validity
