@@ -1512,24 +1512,36 @@ testHostCache() {
 }
 
 testPurposeCriticalFail() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose-critical
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if "${OPENSSL}" x509 -help 2>&1 | "${GREP_BIN}" -q -- "[[:blank:]]-ext[[:blank:]]"; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose-critical
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping as x509 does not support the -ext option"
+    fi
 }
 
 testPurposeFail() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose NOT\ EXISTING
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    if "${OPENSSL}" x509 -help 2>&1 | "${GREP_BIN}" -q -- "[[:blank:]]-ext[[:blank:]]"; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose NOT\ EXISTING
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    else
+        echo "Skipping as x509 does not support the -ext option"
+    fi
 }
 
 testPurpose() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose Digital\ Signature
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    if "${OPENSSL}" x509 -help 2>&1 | "${GREP_BIN}" -q -- "[[:blank:]]-ext[[:blank:]]"; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-purpose Digital\ Signature
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Skipping as x509 does not support the -ext option"
+    fi
 }
 
 testDNSSECOk() {
