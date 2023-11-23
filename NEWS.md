@@ -1,5 +1,6 @@
 # News
 
+ * Added support for MQTTS
 * 2023-10-30 Version 2.76.0
  * ```--info``` output at the end
  * Added a check if ```--file``` is a directory

@@ -464,8 +464,8 @@ usage() {
     echo "   -P,--protocol protocol          Use the specific protocol:"
     echo "                                   dns, ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
-    echo "                                   ldaps, mysql, pop3, pop3s, postgres,"
-    echo "                                   sieve, smtp, smtps, tds, xmpp,"
+    echo "                                   ldaps, mqtts, mysql, pop3, pop3s,"
+    echo "                                   postgres, sieve, smtp, smtps, tds, xmpp,"
     echo "                                   xmpp-server."
     echo "                                   ftp, imap, irc, ldap, pop3, postgres,"
     echo "                                   sieve, smtp: switch to TLS using StartTLS"
@@ -2625,6 +2625,10 @@ fetch_certificate() {
             exec_with_timeout "printf 'A01 LOGOUT\\n' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
+        mqtts)
+            exec_with_timeout "echo -en '\x10\x0d\x00\x04MQTT\x04\x00\x00\x00\x00\x01a' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+            RET=$?
+            ;;
         postgres | postgresql)
             exec_with_timeout "printf 'X\\0\\0\\0\\4' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
@@ -4209,6 +4213,9 @@ main() {
                 ;;
             https | h2)
                 PORT=443
+                ;;
+            mqtts)
+                PORT=8883
                 ;;
             mysql)
                 PORT=3306
