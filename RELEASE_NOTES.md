@@ -1,1 +1,1 @@
-```--info``` output at the end
+Added support for MQTTS

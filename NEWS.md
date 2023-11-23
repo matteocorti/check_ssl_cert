@@ -1,5 +1,6 @@
 # News
 
+* 2023-11-23 Version 2.77.0
  * Added support for MQTTS
 * 2023-10-30 Version 2.76.0
  * ```--info``` output at the end
