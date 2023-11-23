@@ -201,8 +201,8 @@ Options:
    -P,--protocol protocol          Use the specific protocol:
                                    dns, ftp, ftps, http, https (default),
                                    h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
-                                   ldaps, mysql, pop3, pop3s, postgres,
-                                   sieve, smtp, smtps, tds, xmpp,
+                                   ldaps, mqtts, mysql, pop3, pop3s,
+                                   postgres, sieve, smtp, smtps, tds, xmpp,
                                    xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS

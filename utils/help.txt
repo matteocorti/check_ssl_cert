@@ -204,11 +204,9 @@
 -L,--check-ssl-labs grade;https://www.ssllabs.com/about/terms.html)
 -P,--protocol protocol;Use the specific protocol:
 -P,--protocol protocol;dns, ftp, ftps, http, https (default),
--P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
 -P,--protocol protocol;h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
--P,--protocol protocol;ldaps, mysql, pop3, pop3s, postgres,
--P,--protocol protocol;sieve, smtp, smtps, tds, xmpp,
--P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
+-P,--protocol protocol;ldaps, mqtts, mysql, pop3, pop3s,
+-P,--protocol protocol;postgres, sieve, smtp, smtps, tds, xmpp,
 -P,--protocol protocol;xmpp-server.
 -V,--version;version
 -c,--critical days;Can be a floating point number, e.g., 0.5
