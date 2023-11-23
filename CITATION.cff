@@ -4,9 +4,6 @@ authors:
 - family-names: "Corti"
   given-names: "Matteo"
   orcid: "https://orcid.org/0000-0002-1746-1108"
-- family-names: "Палаузов"
-  given-names: "Дилян"
-  website: https://github.com/dilyanpalauzov
 - name: Alexander Aleksandrovič Klimov
   website: https://github.com/Al2Klimov
 - family-names: "Klärner"
@@ -63,6 +60,8 @@ authors:
   website: https://github.com/jalonet
 - family-names: "Gonel"
   given-names: "Javier"
+- family-names: "Lecour"
+  given-names: "Jérémy"
 - family-names: "Hopp"
   given-names: "Jim"
 - family-names: "Meurer"
@@ -74,8 +73,6 @@ authors:
 - family-names: "Thalheim"
   given-names: "Jörg"
   website: https://github.com/Mic92
-- family-names: "Lecour"
-  given-names: "Jérémy"
 - family-names: "McCormack"
   given-names: "Kenny"
 - family-names: "Jahn"
@@ -247,15 +244,18 @@ authors:
   website: https://github.com/sokol-44
 - name: tunnelpr0
   website: https://github.com/tunnelpr0
-- family-names: "Wąsikowski"
-  given-names: "Łukasz"
-  website: https://github.com/IdahoPL
 - name: waja
   website: https://github.com/waja
 - name: xert
   website: https://github.com/xert
 - name: yasirathackersdotmu
   website: https://github.com/yasirathackersdotmu
+- family-names: "Wąsikowski"
+  given-names: "Łukasz"
+  website: https://github.com/IdahoPL
+- family-names: "Палаузов"
+  given-names: "Дилян"
+  website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
 version: 2.76.0
 date-released: 2023-10-30
