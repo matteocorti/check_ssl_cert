@@ -2626,7 +2626,13 @@ fetch_certificate() {
             RET=$?
             ;;
         mqtts)
-            exec_with_timeout "echo -en '\\x10\\x0d\\x00\\x04MQTT\\x04\\x00\\x00\\x00\\x00\\x01a' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+
+            # we create a temporary file with the message content (because of quoting and special characters
+            create_temporary_file
+            MQTT_MESSAGE=${TEMPFILE}
+            echo "\\x10\\x0d\\x00\\x04MQTT\\x04\\x00\\x00\\x00\\x00\\x01a" > "${MQTT_MESSAGE}"
+
+            exec_with_timeout "cat ${MQTT_MESSAGE} | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
         postgres | postgresql)

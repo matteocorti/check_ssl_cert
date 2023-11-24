@@ -1,1 +1,1 @@
-Added support for MQTTS
+OpenSSL 3.2.0 Support
