@@ -1569,8 +1569,8 @@ extract_cert_attribute() {
     # shellcheck disable=SC2086,SC2016
     case $1 in
     cn)
-        if echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject 2>/dev/null | "${GREP_BIN}" -F -q 'CN' >/dev/null; then
-            echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject |
+        if echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout ${OPENSSL_PARAMS} -subject 2>/dev/null | "${GREP_BIN}" -F -q 'CN' >/dev/null; then
+            echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout ${OPENSSL_PARAMS} -subject |
                 sed -e "s/^.*[[:space:]]*CN[[:space:]]=[[:space:]]//" -e 's/\/[[:alpha:]][[:alpha:]]*=.*$//' -e "s/,.*//"
         else
             echo 'CN unavailable'
@@ -1579,76 +1579,76 @@ extract_cert_attribute() {
         ;;
     subject)
         # the Subject could contain UTF-8 characters
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout ${OPENSSL_PARAMS} -subject -nameopt utf8
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout ${OPENSSL_PARAMS} -subject -nameopt utf8
         ;;
     serial)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -serial | sed -e "s/^serial=//"
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -serial | sed -e "s/^serial=//"
         ;;
     fingerprint)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -fingerprint -sha1 | sed -e "s/^SHA1 Fingerprint=//"
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -sha1 | sed -e "s/^SHA1 Fingerprint=//"
         ;;
     oscp_uri)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -ocsp_uri
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -ocsp_uri
         ;;
     oscp_uri_single)
         extract_cert_attribute 'oscp_uri' "${cert_content}" | head -n 1
         ;;
     hash)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -hash
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -hash
         ;;
     modulus)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -modulus
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -modulus
         ;;
     issuer)
         # see https://unix.stackexchange.com/questions/676776/parse-comma-separated-string-ignoring-commas-between-quotes
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout -nameopt sep_multiline,utf8,esc_ctrl -issuer |
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout -nameopt sep_multiline,utf8,esc_ctrl -issuer |
             tail -n +2 |
             sed 's/^ *//'
         ;;
     issuer_uri)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -F "CA Issuers" | "${GREP_BIN}" -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -F "CA Issuers" | "${GREP_BIN}" -F -i "http" | sed -e "s/^.*CA Issuers - URI://" | tr -d '"!|;${}<>`&'
         ;;
     issuer_uri_single)
         extract_cert_attribute 'issuer_uri' "${cert_content}" | head -n 1
         ;;
     issuer_hash)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -issuer_hash
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -issuer_hash
         ;;
     org)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -nameopt utf8 -noout -subject)
         parse_subject "O" "${cert_subject}"
         ;;
     org_unit)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -nameopt utf8 -noout -subject)
         parse_subject "OU" "${cert_subject}"
         ;;
     key_length)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text | "${GREP_BIN}" 'Public-Key:' | sed -e 's/.*(//' | sed -e 's/).*//'
         ;;
     country)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -nameopt utf8 -noout -subject)
         parse_subject "C" "${cert_subject}"
         ;;
     state)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -nameopt utf8 -noout -subject)
         parse_subject "ST" "${cert_subject}"
         ;;
     locality)
-        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -nameopt utf8 -noout -subject)
+        cert_subject=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -nameopt utf8 -noout -subject)
         parse_subject "L" "${cert_subject}"
         ;;
     email)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -email
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -email
         ;;
     crl_uri)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text |
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text |
             "${GREP_BIN}" -A 4 'X509v3 CRL Distribution Points' |
             "${GREP_BIN}" 'URI:' |
             sed 's/.*URI://' |
             head -n 1
         ;;
     version)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version: //'
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version: //'
         ;;
 
     pub_key_algo)
@@ -1658,9 +1658,9 @@ extract_cert_attribute() {
         #
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
-        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
+        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public Key Algorithm' | sed -e 's/.*: //')
 
-        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature' | sed 's/.*: //')
+        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature' | sed 's/.*: //')
 
         echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
@@ -1672,24 +1672,24 @@ extract_cert_attribute() {
         #
         #  see https://security.stackexchange.com/questions/141661/whats-the-difference-between-public-key-algorithm-and-signature-algorithm-i
 
-        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature Algorithm' | sed -e 's/.*: //')
+        ALGORITHM=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Signature Algorithm' | sed -e 's/.*: //')
 
-        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //')
+        PUBLIC_KEY=$(echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -text | "${GREP_BIN}" -m 1 -F 'Public-Key' | sed 's/.*: //')
 
         echo "${ALGORITHM} ${PUBLIC_KEY}"
         ;;
 
     startdate)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} -startdate | sed -e "s/^notBefore=//"
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -startdate | sed -e "s/^notBefore=//"
         ;;
     enddate)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} "${OPENSSL_ENDDATE_OPTION}" | sed -e "s/^notAfter=//" -e "s/^nextUpdate=//"
         ;;
     sct)
-        echo "${cert_content}" | "${OPENSSL}" x509 -noout -text | "${GREP_BIN}" -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text | "${GREP_BIN}" -E -q 'SCTs|1\.3\.6\.1\.4\.1\.11129\.2\.4\.2'
         ;;
     subjectAlternativeName)
-        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -text |
+        echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" ${OPENSSL_PARAMS} -in /dev/stdin -text |
             "${GREP_BIN}" -F -A 1 "509v3 Subject Alternative Name:" |
             tail -n 1 |
             sed -e "s/DNS://g" |
@@ -1698,7 +1698,7 @@ extract_cert_attribute() {
             sed -e 's/^ *//'
         ;;
     keyUsage)
-        KEY_USAGE_TMP=$(echo "${cert_content}" | "${OPENSSL}" x509 -noout -ext keyUsage 2>&1)
+        KEY_USAGE_TMP=$(echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -ext keyUsage 2>&1)
         if echo "${KEY_USAGE_TMP}" | "${GREP_BIN}" -q 'No extensions in certificate'; then
             echo
         else
@@ -2071,7 +2071,7 @@ check_ocsp() {
                         open_for_writing "${ISSUER_CERT_TMP2}"
                         cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
-                        ${OPENSSL} x509 -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+                        ${OPENSSL} x509 -in /dev/stdin -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
                     elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q 'empty'; then
 
@@ -2332,9 +2332,9 @@ check_cert_end_date() {
 
         # x509 certificates (default)
         # We always check expired certificates
-        debuglog "executing: ${OPENSSL} x509 -noout -checkend 0 on cert element ${el_number} (${element_cn})"
+        debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 on cert element ${el_number} (${element_cn})"
 
-        if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend 0 >/dev/null; then
+        if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 >/dev/null; then
             if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
@@ -2359,9 +2359,9 @@ ${CN_EXPIRED_TMP}"
 
         if [ -n "${CRITICAL_DAYS}" ] && [ -n "${CRITICAL_SECONDS}" ]; then
 
-            debuglog "executing: ${OPENSSL} x509 -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
+            debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
+            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
                 debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_CRITICAL}" ]; then
@@ -2381,9 +2381,9 @@ ${CN_EXPIRED_TMP}"
 
         if [ -n "${WARNING_DAYS}" ] && [ -n "${WARNING_SECONDS}" ]; then
 
-            debuglog "executing: ${OPENSSL} x509 -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
+            debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
+            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
                 debuglog "WARNING: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_WARNING}" ]; then
