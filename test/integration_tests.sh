@@ -1686,6 +1686,13 @@ testWrongHostIgnore() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testMQTTS() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host test.mosquitto.org --protocol mqtts --allow-empty-san --rootcert-file mosquitto.org.crt --ignore-sct
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testDNS() {
 
     # shellcheck disable=SC2086

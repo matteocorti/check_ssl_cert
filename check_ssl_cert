@@ -423,7 +423,7 @@ usage() {
     echo "                                   'all' will include all the available"
     echo "                                   attributes."
     # Delimiter at 78 chars ############################################################
-    echo "   -m,--match.                     Pattern to match the CN or AltName"
+    echo "   -m,--match                      Pattern to match the CN or AltName"
     echo "                                   (can be specified multiple times)"
     echo "      --maximum-validity [days]    The maximum validity of the certificate"
     echo "                                   must not exceed 'days' (default 397)"
