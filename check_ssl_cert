@@ -5247,7 +5247,7 @@ main() {
     SERVERNAME=
 
     if ${OPENSSL} version | grep -q -F 'LibreSSL' &&
-            [ ${HOST_IS_IP} -eq 1 ] ; then
+            [ "${HOST_IS_IP}" -eq 1 ] ; then
 
         verboselog 'LibreSSL does not support IP addresses as "servername" disabling virtual server support'
 
