@@ -3775,6 +3775,10 @@ $2"
         -P | --protocol)
             check_option_argument '-P|--protocol' "$2"
             PROTOCOL="$2"
+
+            # set the protocol to lowercase
+            PROTOCOL=$( echo "${PROTOCOL}" | tr '[:upper:]' '[:lower:]' )
+
             shift 2
             ;;
         --proxy)
