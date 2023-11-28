@@ -43,11 +43,6 @@ fi
 
 create_temporary_test_file() {
 
-    if mktemp --help 2>&1 | grep -q 'TEMPLATE must end with XXXXXX'; then
-        # no suffix possible
-        SUFFIX=
-    fi
-
     # create a temporary file
     TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
 
