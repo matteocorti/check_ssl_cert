@@ -438,6 +438,16 @@ To run a single test:
 
 The majority of the documentation files are written using the [GitHub Flavored Markdown](https://github.github.com/gfm/) language.
 
+## Supporters
+
+We are very grateful to our amazing supporters and sponsors!
+
+* [Łukasz Wąsikowski](https://github.com/IdahoPL)
+* [Claus-Theodor Riegg](https://github.com/crigertg)
+* [wols](https://github.com/wols)
+
+If you'd like to support this script, please visit [our sponsorship page](https://github.com/sponsors/matteocorti) on GitHub.
+
 ## Bugs
 
 Report bugs to [https://github.com/matteocorti/check_ssl_cert/issues](https://github.com/matteocorti/check_ssl_cert/issues)
