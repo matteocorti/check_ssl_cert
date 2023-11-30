@@ -1698,6 +1698,26 @@ testMQTTS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testQUIC() {
+
+    if [ -n "${http_proxy}" ] ; then
+
+        echo "Skipping: no proxy support for QUIC"
+
+    elif  "${OPENSSL}" s_client -help 2>&1 | grep -q -- -quic ; then
+
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --host www.google.com --quic
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    else
+
+        echo "Skipping: OpenSSL does not support QUIC"
+
+    fi
+}
+
 testDNS() {
 
     # shellcheck disable=SC2086

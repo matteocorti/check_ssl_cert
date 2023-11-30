@@ -200,10 +200,10 @@ Options:
                                    integers, 2 otherwise
    -P,--protocol protocol          Use the specific protocol:
                                    dns, ftp, ftps, http, https (default),
-                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
-                                   ldaps, mqtts, mysql, pop3, pop3s,
-                                   postgres, sieve, smtp, smtps, tds, xmpp,
-                                   xmpp-server.
+                                   h2 (HTTP/2), h3 (HTTP/3), imap, imaps,
+                                   irc, ircs, ldap, ldaps, mqtts, mysql,
+                                   pop3, pop3s, postgres, sieve, smtp, smtps,
+                                   tds, xmpp, xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS
       --password source            Password source for a local certificate,
@@ -213,6 +213,7 @@ Options:
       --proxy proxy                Set http_proxy and the s_client -proxy
                                    option
       --python-bin path            Path of the python binary to be used
+      --quic                       Use QUIC
    -q,--quiet                      Do not produce any output
    -r,--rootcert path              Root certificate or directory to be used
                                    for certificate validation

@@ -178,7 +178,7 @@ fetch_http_headers() {
         # -L (--location): follow redirects
         # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
         # -o (--output): discard the output (we are only interested in the HTTP headers)
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
+        exec_with_timeout "${CURL_BIN} ${CURL_QUIC} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
         RET=$?
 
         if [ "${RET}" -ne 0 ]; then
@@ -463,10 +463,10 @@ usage() {
     echo "                                   integers, 2 otherwise"
     echo "   -P,--protocol protocol          Use the specific protocol:"
     echo "                                   dns, ftp, ftps, http, https (default),"
-    echo "                                   h2 (HTTP/2), imap, imaps, irc, ircs, ldap,"
-    echo "                                   ldaps, mqtts, mysql, pop3, pop3s,"
-    echo "                                   postgres, sieve, smtp, smtps, tds, xmpp,"
-    echo "                                   xmpp-server."
+    echo "                                   h2 (HTTP/2), h3 (HTTP/3), imap, imaps,"
+    echo "                                   irc, ircs, ldap, ldaps, mqtts, mysql,"
+    echo "                                   pop3, pop3s, postgres, sieve, smtp, smtps,"
+    echo "                                   tds, xmpp, xmpp-server."
     echo "                                   ftp, imap, irc, ldap, pop3, postgres,"
     echo "                                   sieve, smtp: switch to TLS using StartTLS"
     echo "      --password source            Password source for a local certificate,"
@@ -477,6 +477,7 @@ usage() {
     echo "                                   option"
     echo "      --python-bin path            Path of the python binary to be used"
     # Delimiter at 78 chars ############################################################
+    echo "      --quic                       Use QUIC"
     echo "   -q,--quiet                      Do not produce any output"
     # Delimiter at 78 chars ############################################################
     echo "   -r,--rootcert path              Root certificate or directory to be used"
@@ -1904,9 +1905,9 @@ check_crl() {
 
         TIMEOUT_REASON="fetching CRL"
         if [ -n "${HTTP_USER_AGENT}" ]; then
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         else
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC}  ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         fi
         unset TIMEOUT_REASON
 
@@ -2033,9 +2034,9 @@ check_ocsp() {
 
                 TIMEOUT_REASON="OCSP: fetching issuer ${ELEMENT_ISSUER_URI}"
                 if [ -n "${HTTP_USER_AGENT}" ]; then
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 else
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
                 unset TIMEOUT_REASON
 
@@ -2590,7 +2591,11 @@ fetch_certificate() {
     fi
 
     # Check if a protocol was specified (if not HTTP switch to TLS)
-    if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'http' ] && [ "${PROTOCOL}" != 'https' ] && [ "${PROTOCOL}" != 'h2' ]; then
+    if [ -n "${PROTOCOL}" ] &&
+           [ "${PROTOCOL}" != 'http' ] &&
+           [ "${PROTOCOL}" != 'https' ] &&
+           [ "${PROTOCOL}" != 'h2' ] &&
+           [ "${PROTOCOL}" != 'h3' ]; then
 
         case "${PROTOCOL}" in
         pop3 | ftp)
@@ -2787,9 +2792,11 @@ fetch_certificate() {
 
         if [ "${PROTOCOL}" = 'h2' ]; then
             ALPN="-alpn h2"
+        elif [ "${PROTOCOL}" = 'h3' ]; then
+            ALPN="-alpn h3"
         fi
 
-        exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
+        exec_with_timeout "printf '${HTTP_REQUEST}' | ${OPENSSL} s_client ${QUIC} ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -crlf ${ALPN} -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -showcerts -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
         RET=$?
 
     fi
@@ -2876,6 +2883,10 @@ fetch_certificate() {
             if [ -z "${SELFSIGNED}" ]; then
                 prepend_critical_message 'Self signed certificate'
             fi
+
+        elif ascii_grep 'quic_do_handshake' "${ERROR}"; then
+
+            prepend_critical_message 'QUIC not supported'
 
         elif ascii_grep 'dh[ ]key[ ]too[ ]small' "${ERROR}"; then
 
@@ -3007,6 +3018,10 @@ fetch_certificate() {
         if [ "${PROTOCOL}" = 'h2' ]; then
             if ! "${GREP_BIN}" -q -F 'ALPN protocol: h2' "${CERT}"; then
                 prepend_critical_message 'The server does not support HTTP/2'
+            fi
+        elif [ "${PROTOCOL}" = 'h3' ]; then
+            if ! "${GREP_BIN}" -q -F 'ALPN protocol: h3' "${CERT}"; then
+                prepend_critical_message 'The server does not support HTTP/3'
             fi
         fi
 
@@ -3323,6 +3338,10 @@ parse_command_line_options() {
             ;;
         --prometheus)
             PROMETHEUS=1
+            shift
+            ;;
+        --quic)
+            QUIC='-quic'
             shift
             ;;
         -q | --quiet)
@@ -4221,7 +4240,7 @@ main() {
             http)
                 PORT=80
                 ;;
-            https | h2)
+            https | h2 | h3)
                 PORT=443
                 ;;
             mqtts)
@@ -4377,6 +4396,26 @@ main() {
     fi
     check_required_prog "${OPENSSL}"
     OPENSSL=${PROG}
+
+    if [ -n "${QUIC}" ] ; then
+
+        require_s_client_option '-quic'
+
+        # QUIC requires HTTP/2
+        if [ -n "${PROTOCOL}" ] && [ "${PROTOCOL}" != 'h3' ]; then
+            critical 'QUIC only works with HTTP/2'
+        else
+            verboselog '--quic specified enabling HTTP/3'
+            PROTOCOL='h3'
+        fi
+
+        # check if curl supports HTTP/3
+        if curl --help all | grep -q -- --http3 ; then
+            debuglog 'curl supports HTTP/3'
+            CURL_QUIC='--http3'
+        fi
+
+    fi
 
     ##############################################################################
     # custom grep
@@ -4618,7 +4657,7 @@ main() {
             DNS_OVER_HTTP=${TEMPFILE}
 
             TIMEOUT_REASON="Resolving over HTTP with ${RESOLVE_OVER_HTTP}"
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
 
             if [ "${DEBUG}" -ge 1 ]; then
                 jq < "${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
@@ -4888,9 +4927,9 @@ main() {
 
             TIMEOUT_REASON="fetching certificate file"
             if [ -n "${HTTP_USER_AGENT}" ]; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
             else
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
             fi
             unset TIMEOUT_REASON
 
@@ -5366,7 +5405,7 @@ main() {
         # Check if curl is needed and if it supports the -4 and -6 options
         if [ -z "${CURL_BIN}" ]; then
             if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ]; then
-                if ! "${CURL_BIN}" --manual | "${GREP_BIN}" -F -q -- -6 && [ -n "${INETPROTO}" ]; then
+                if ! "${CURL_BIN}" --help all | "${GREP_BIN}" -F -q -- -6 && [ -n "${INETPROTO}" ]; then
                     unknown "curl does not support the ${INETPROTO} option"
                 fi
             fi
@@ -6640,13 +6679,13 @@ ${WARNING}"
 
             debuglog "http_proxy  = ${http_proxy}"
             debuglog "HTTPS_PROXY = ${HTTPS_PROXY}"
-            debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
+            debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
             if [ -n "${SNI}" ]; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             else
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             fi
 
