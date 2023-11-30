@@ -1,5 +1,6 @@
 # News
 
+ * QUIC support
  * OpenSSL 3.2.0 Support
 * 2023-11-23 Version 2.77.0
  * Added support for MQTTS

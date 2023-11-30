@@ -190,6 +190,7 @@
 --tls1_3;Force TLS version 1.3
 --user-agent string;User agent that shall be used for HTTPS
 --user-agent string;connections
+--quic;Use QUIC
 --xmpphost name;Specify the host for the 'to' attribute
 --xmpphost name;of the stream element
 -4;Force IPv4
@@ -204,10 +205,12 @@
 -L,--check-ssl-labs grade;https://www.ssllabs.com/about/terms.html)
 -P,--protocol protocol;Use the specific protocol:
 -P,--protocol protocol;dns, ftp, ftps, http, https (default),
--P,--protocol protocol;h2 (HTTP/2), imap, imaps, irc, ircs, ldap,
--P,--protocol protocol;ldaps, mqtts, mysql, pop3, pop3s,
--P,--protocol protocol;postgres, sieve, smtp, smtps, tds, xmpp,
--P,--protocol protocol;xmpp-server.
+-P,--protocol protocol;h2 (HTTP/2), h3 (HTTP/3), imap, imaps,
+-P,--protocol protocol;irc, ircs, ldap, ldaps, mqtts, mysql,
+-P,--protocol protocol;pop3, pop3s, postgres, sieve, smtp, smtps,
+-P,--protocol protocol;tds, xmpp, xmpp-server.
+-P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
+-P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
 -V,--version;version
 -c,--critical days;Can be a floating point number, e.g., 0.5
 -c,--critical days;Default: ${CRITICAL_DAYS}
