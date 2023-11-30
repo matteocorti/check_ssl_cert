@@ -1700,7 +1700,11 @@ testMQTTS() {
 
 testQUIC() {
 
-    if  "${OPENSSL}" s_client -help 2>&1 | grep -q -- -quic ; then
+    if [ -n "${http_proxy}" ] ; then
+
+        echo "Skipping: no proxy support for QUIC"
+
+    elif  "${OPENSSL}" s_client -help 2>&1 | grep -q -- -quic ; then
 
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} --host www.google.com --quic
