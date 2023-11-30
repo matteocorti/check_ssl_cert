@@ -178,7 +178,7 @@ fetch_http_headers() {
         # -L (--location): follow redirects
         # -k (--insecure): ignore TLS problems (we want to check the headers anyway)
         # -o (--output): discard the output (we are only interested in the HTTP headers)
-        exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
+        exec_with_timeout "${CURL_BIN} ${CURL_QUIC} ${CURL_PROXY} ${CURL_RESOLVE} ${CURL_PROXY_ARGUMENT} ${INETPROTO} -k -s -D- -A '${HTTP_USER_AGENT}' -o /dev/null -L https://${HOST}${path}" "${CACHED_HEADERS}"
         RET=$?
 
         if [ "${RET}" -ne 0 ]; then
@@ -1905,9 +1905,9 @@ check_crl() {
 
         TIMEOUT_REASON="fetching CRL"
         if [ -n "${HTTP_USER_AGENT}" ]; then
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         else
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC}  ${INETPROTO} --silent --location \\\"${CRL_URI}\\\" > ${CRL_TMP}"
         fi
         unset TIMEOUT_REASON
 
@@ -2034,9 +2034,9 @@ check_ocsp() {
 
                 TIMEOUT_REASON="OCSP: fetching issuer ${ELEMENT_ISSUER_URI}"
                 if [ -n "${HTTP_USER_AGENT}" ]; then
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 else
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
                 fi
                 unset TIMEOUT_REASON
 
@@ -4409,6 +4409,12 @@ main() {
             PROTOCOL='h3'
         fi
 
+        # check if curl supports HTTP/3
+        if curl --help all | grep -q -- --http3 ; then
+            debuglog 'curl supports HTTP/3'
+            CURL_QUIC='--http3'
+        fi
+
     fi
 
     ##############################################################################
@@ -4651,7 +4657,7 @@ main() {
             DNS_OVER_HTTP=${TEMPFILE}
 
             TIMEOUT_REASON="Resolving over HTTP with ${RESOLVE_OVER_HTTP}"
-            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
+            exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
 
             if [ "${DEBUG}" -ge 1 ]; then
                 jq < "${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
@@ -4921,9 +4927,9 @@ main() {
 
             TIMEOUT_REASON="fetching certificate file"
             if [ -n "${HTTP_USER_AGENT}" ]; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${FILE_URI}\\\" > ${FILE}"
             else
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${FILE_URI}\\\" > ${FILE}"
             fi
             unset TIMEOUT_REASON
 
@@ -5399,7 +5405,7 @@ main() {
         # Check if curl is needed and if it supports the -4 and -6 options
         if [ -z "${CURL_BIN}" ]; then
             if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] || [ -n "${OCSP}" ]; then
-                if ! "${CURL_BIN}" --manual | "${GREP_BIN}" -F -q -- -6 && [ -n "${INETPROTO}" ]; then
+                if ! "${CURL_BIN}" --help all | "${GREP_BIN}" -F -q -- -6 && [ -n "${INETPROTO}" ]; then
                     unknown "curl does not support the ${INETPROTO} option"
                 fi
             fi
@@ -6673,13 +6679,13 @@ ${WARNING}"
 
             debuglog "http_proxy  = ${http_proxy}"
             debuglog "HTTPS_PROXY = ${HTTPS_PROXY}"
-            debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
+            debuglog "executing ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
             if [ -n "${SNI}" ]; then
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${SNI}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             else
-                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent \\\"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\\\" > ${JSON}"
                 CURL_RETURN_CODE=$?
             fi
 
