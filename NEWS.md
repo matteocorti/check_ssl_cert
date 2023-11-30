@@ -1,5 +1,6 @@
 # News
 
+* 2023-11-30 Version 2.78.0
  * QUIC support
  * OpenSSL 3.2.0 Support
 * 2023-11-23 Version 2.77.0
