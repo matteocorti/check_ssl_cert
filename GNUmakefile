@@ -50,7 +50,7 @@ ifndef DESTDIR
 	@echo "Please define DESTDIR and MANDIR variables with the installation targets"
 	@echo "e.g, make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install"
 	@echo
-	@echo "If you are using 'sudo' please speficy the '-E, --preserve-env' option"
+	@echo "If you are using 'sudo' please specify the '-E, --preserve-env' option"
 else
 	mkdir -p $(DESTDIR)
 	install -m 755 $(PLUGIN) $(DESTDIR)
