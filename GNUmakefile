@@ -22,14 +22,14 @@ all: dist
 
 # checks if the version is updated in all the files
 version_check: CITATION.cff
-	echo "Checking version $(VERSION)"
+	@echo "Checking version $(VERSION)"
 	grep -q "VERSION *= *[\'\"]*$(VERSION)" $(PLUGIN)
 	grep -q "^%global version *$(VERSION)" $(PLUGIN).spec
 	grep -q -F -- "- $(VERSION)-" $(PLUGIN).spec
 	grep -q "\"$(VERSION)\"" $(PLUGIN).1
 	grep -q -F "${VERSION}" NEWS.md
 	grep -q  "^version: ${VERSION}" CITATION.cff
-	echo "Version check: OK"
+	@echo "Version check: OK"
 
 # builds the release files
 dist: version_check CITATION.cff
@@ -43,10 +43,14 @@ dist: version_check CITATION.cff
 	tar $(XATTRS_OPTION) -c -z -f $(DIST_DIR).tar.gz  $(DIST_DIR) && \
 	tar $(XATTRS_OPTION) -c -j -f $(DIST_DIR).tar.bz2 $(DIST_DIR)
 
+
+
 install:
 ifndef DESTDIR
-	echo "Please define DESTDIR and MANDIR variables with the installation targets"
-	echo "e.g, make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install"
+	@echo "Please define DESTDIR and MANDIR variables with the installation targets"
+	@echo "e.g, make DESTDIR=/nagios/plugins/dir MANDIR=/nagios/plugins/man/dir install"
+	@echo
+	@echo "If you are using 'sudo' please speficy the '-E, --preserve-env' option"
 else
 	mkdir -p $(DESTDIR)
 	install -m 755 $(PLUGIN) $(DESTDIR)
@@ -76,7 +80,7 @@ CODESPELL := $(shell command -v codespell 2> /dev/null )
 # spell check
 codespell:
 ifndef CODESPELL
-	echo "no codespell installed"
+	@echo "no codespell installed"
 else
 	codespell \
 	.
@@ -85,7 +89,7 @@ endif
 SHFMT := $(shell command -v shfmt 2> /dev/null)
 format:
 ifndef SHFMT
-	echo "No shfmt installed"
+	@echo "No shfmt installed"
 else
 # -p POSIX
 # -w write to file
@@ -121,7 +125,7 @@ test: formatting_check shellcheck unit_tests integration_tests unit_tests_with_p
 
 unit_tests:
 ifndef SHUNIT
-	echo "No shUnit2 installed: see README.md"
+	@echo "No shUnit2 installed: see README.md"
 	exit 1
 else
 	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./unit_tests.sh )
@@ -129,7 +133,7 @@ endif
 
 unit_tests_with_proxy:
 ifndef SHUNIT
-	echo "No shUnit2 installed: see README.md"
+	@echo "No shUnit2 installed: see README.md"
 	exit 1
 else
 	./utils/start_proxy.sh ./test/tinyproxy.conf
@@ -140,7 +144,7 @@ endif
 
 integration_tests:
 ifndef SHUNIT
-	echo "No shUnit2 installed: see README.md"
+	@echo "No shUnit2 installed: see README.md"
 	exit 1
 else
 	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./integration_tests.sh )
@@ -148,7 +152,7 @@ endif
 
 integration_tests_with_proxy:
 ifndef SHUNIT
-	echo "No shUnit2 installed: see README.md"
+	@echo "No shUnit2 installed: see README.md"
 	exit 1
 else
 	./utils/start_proxy.sh ./test/tinyproxy.conf
@@ -159,7 +163,7 @@ endif
 
 shellcheck:
 ifndef SHELLCHECK
-	echo "No shellcheck installed: skipping check"
+	@echo "No shellcheck installed: skipping check"
 else
 	if shellcheck --help 2>&1 | grep -q -- '-o ' ; then shellcheck -o all $(SCRIPTS) ; else shellcheck $(SCRIPTS) ; fi
 endif
