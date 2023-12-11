@@ -1,3 +1,8 @@
+2023-12-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: Corrected a function name causing a crash with OCSP checks and -verbose
+        * check_ssl_cert: Better error message for curl errors
+
 2023-11-30  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: Added QUIC support

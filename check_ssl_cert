@@ -6697,9 +6697,20 @@ ${WARNING}"
                     break
                 fi
 
-                debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
+                if [ "${CURL_RETURN_CODE}" -eq 35 ]; then
 
-                critical "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
+
+                    debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
+
+                    critical "Error checking SSL Labs: TLS handshake error"
+
+                else
+
+                    debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
+
+                    critical "Error checking SSL Labs: curl returned ${CURL_RETURN_CODE}, see 'man curl' for details"
+
+                fi
 
             fi
 
