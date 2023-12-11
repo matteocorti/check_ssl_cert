@@ -2226,7 +2226,7 @@ check_ocsp() {
 
                     elif echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "internalerror" && [ -n "${OCSP_IGNORE_ERRORS}" ]; then
 
-                        verbose 'warning: the OCSP server returned an internal error'
+                        verboselog 'warning: the OCSP server returned an internal error'
 
                     elif ! echo "${OCSP_RESP}" | "${GREP_BIN}" -F -q -i "good"; then
 
