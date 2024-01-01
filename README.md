@@ -446,6 +446,7 @@ We are very grateful to our amazing supporters and sponsors!
 * [Łukasz Wąsikowski](https://github.com/IdahoPL)
 * [Claus-Theodor Riegg](https://github.com/crigertg)
 * [wols](https://github.com/wols)
+* [Netzkommune](https://github.com/netzkommune)
 
 If you'd like to support this script, please visit [our sponsorship page](https://github.com/sponsors/matteocorti) on GitHub.
 
