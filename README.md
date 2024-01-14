@@ -202,8 +202,8 @@ Options:
                                    dns, ftp, ftps, http, https (default),
                                    h2 (HTTP/2), h3 (HTTP/3), imap, imaps,
                                    irc, ircs, ldap, ldaps, mqtts, mysql,
-                                   pop3, pop3s, postgres, sieve, smtp, smtps,
-                                   tds, xmpp, xmpp-server.
+                                   pop3, pop3s, postgres, sieve, sips, smtp,
+                                   smtps, tds, xmpp, xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS
       --password source            Password source for a local certificate,

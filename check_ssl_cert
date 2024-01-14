@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.78.0
+VERSION=2.79.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -465,8 +465,8 @@ usage() {
     echo "                                   dns, ftp, ftps, http, https (default),"
     echo "                                   h2 (HTTP/2), h3 (HTTP/3), imap, imaps,"
     echo "                                   irc, ircs, ldap, ldaps, mqtts, mysql,"
-    echo "                                   pop3, pop3s, postgres, sieve, smtp, smtps,"
-    echo "                                   tds, xmpp, xmpp-server."
+    echo "                                   pop3, pop3s, postgres, sieve, sips, smtp,"
+    echo "                                   smtps, tds, xmpp, xmpp-server."
     echo "                                   ftp, imap, irc, ldap, pop3, postgres,"
     echo "                                   sieve, smtp: switch to TLS using StartTLS"
     echo "      --password source            Password source for a local certificate,"
@@ -2618,7 +2618,7 @@ fetch_certificate() {
             exec_with_timeout "echo | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -starttls ${PROTOCOL} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
-        ircs | ldaps | dns)
+        ircs | ldaps | dns | sips)
             exec_with_timeout "echo | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
             ;;
@@ -4248,6 +4248,9 @@ main() {
                 ;;
             mysql)
                 PORT=3306
+                ;;
+            sips)
+                PORT=5061
                 ;;
             xmpp)
                 PORT=5222
