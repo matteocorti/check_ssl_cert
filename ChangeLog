@@ -1,3 +1,7 @@
+2024-01-14  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: Added support for SIPS
+
 2023-12-11  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: Corrected a function name causing a crash with OCSP checks and -verbose
