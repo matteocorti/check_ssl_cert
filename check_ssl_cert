@@ -1099,7 +1099,7 @@ prepend_critical_message() {
             fi
         fi
     fi
-    if [ -n "${PORT}" ]; then
+    if [ -z "${FILE}" ] && [ -n "${PORT}" ]; then
         tmp="${tmp}:${PORT}"
     fi
 
@@ -1299,7 +1299,7 @@ append_warning_message() {
             fi
         fi
     fi
-    if [ -n "${PORT}" ]; then
+    if [ -z "${FILE}" ] && [ -n "${PORT}" ]; then
         tmp="${tmp}:${PORT}"
     fi
 
