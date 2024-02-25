@@ -1076,22 +1076,22 @@ testResolveOverHTTP() {
     # shellcheck disable=SC2086
     OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http --host github.com --warning 2 --critical 1 )
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    assertEquals "wrong exit code (1)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
     OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.com --warning 2 --critical 1 )
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    assertEquals "wrong exit code (2)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
     OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.comm --warning 2 --critical 1 )
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertEquals "wrong exit code (3)" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
     OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.9 --host github.com --timeout 2 --warning 2 --critical 1 )
     EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+    assertEquals "wrong exit code (4)" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
 }
 
@@ -1380,7 +1380,7 @@ testIgnoreConnectionStateHTTP() {
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
-        ${SCRIPT} ${TEST_DEBUG} -H www.github.com --port 443 --ignore-connection-problems 0
+        ${SCRIPT} ${TEST_DEBUG} -H www.github.com --port 443 --ignore-connection-problems 0 --ignore-exp
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
     fi
@@ -1658,7 +1658,7 @@ testConfigurationWrongOption() {
 
 testRootCertInChainEnforceOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host www.github.com --check-chain
+    ${SCRIPT} ${TEST_DEBUG} --host www.github.com --check-chain --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
