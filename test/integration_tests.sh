@@ -1074,22 +1074,22 @@ testNotExistingHosts() {
 testResolveOverHTTP() {
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http --host github.com )
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http --host github.com --warning 2 --critical 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.com )
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.com --warning 2 --critical 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.comm )
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.comm --warning 2 --critical 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.9 --host github.com --timeout 2 )
+    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.9 --host github.com --timeout 2 --warning 2 --critical 1 )
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
