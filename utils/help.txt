@@ -207,8 +207,8 @@
 -P,--protocol protocol;dns, ftp, ftps, http, https (default),
 -P,--protocol protocol;h2 (HTTP/2), h3 (HTTP/3), imap, imaps,
 -P,--protocol protocol;irc, ircs, ldap, ldaps, mqtts, mysql,
--P,--protocol protocol;pop3, pop3s, postgres, sieve, smtp, smtps,
--P,--protocol protocol;tds, xmpp, xmpp-server.
+-P,--protocol protocol;pop3, pop3s, postgres, sieve, sips, smtp,
+-P,--protocol protocol;smtps, tds, xmpp, xmpp-server.
 -P,--protocol protocol;ftp, imap, irc, ldap, pop3, postgres,
 -P,--protocol protocol;sieve, smtp: switch to TLS using StartTLS
 -V,--version;version

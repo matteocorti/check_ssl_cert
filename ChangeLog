@@ -1,3 +1,16 @@
+2024-01-17  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (append_warning_message): Removed the port in the error messages if we are checking a file
+
+2024-01-14  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: Added support for SIPS
+
+2023-12-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert: Corrected a function name causing a crash with OCSP checks and -verbose
+        * check_ssl_cert: Better error message for curl errors
+
 2023-11-30  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert: Added QUIC support

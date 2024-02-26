@@ -1,7 +1,7 @@
 # check\_ssl\_cert
 
  &copy; Matteo Corti, ETH Zurich, 2007-2012.
- &copy; Matteo Corti, 2007-2023.
+ &copy; Matteo Corti, 2007-2024.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
 
@@ -202,8 +202,8 @@ Options:
                                    dns, ftp, ftps, http, https (default),
                                    h2 (HTTP/2), h3 (HTTP/3), imap, imaps,
                                    irc, ircs, ldap, ldaps, mqtts, mysql,
-                                   pop3, pop3s, postgres, sieve, smtp, smtps,
-                                   tds, xmpp, xmpp-server.
+                                   pop3, pop3s, postgres, sieve, sips, smtp,
+                                   smtps, tds, xmpp, xmpp-server.
                                    ftp, imap, irc, ldap, pop3, postgres,
                                    sieve, smtp: switch to TLS using StartTLS
       --password source            Password source for a local certificate,
@@ -446,6 +446,7 @@ We are very grateful to our amazing supporters and sponsors!
 * [Łukasz Wąsikowski](https://github.com/IdahoPL)
 * [Claus-Theodor Riegg](https://github.com/crigertg)
 * [wols](https://github.com/wols)
+* [Netzkommune](https://github.com/netzkommune)
 
 If you'd like to support this script, please visit [our sponsorship page](https://github.com/sponsors/matteocorti) on GitHub.
 
