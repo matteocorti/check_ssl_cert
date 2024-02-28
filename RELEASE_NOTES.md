@@ -1,1 +1,1 @@
-SIPS support
+Add support to ignore unclean TLS shutdowns

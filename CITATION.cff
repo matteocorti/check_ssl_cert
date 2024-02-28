@@ -244,6 +244,8 @@ authors:
   website: https://github.com/sokol-44
 - name: tunnelpr0
   website: https://github.com/tunnelpr0
+- name: vanElden
+  website: https://github.com/vanElden
 - name: waja
   website: https://github.com/waja
 - name: xert
@@ -257,8 +259,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.79.0
-date-released: 2024-01-14
+version: 2.80.0
+date-released: 2024-02-28
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

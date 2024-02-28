@@ -1,5 +1,7 @@
 # News
 
+* 2024-02-28 Version 2.80.0
+ * Add support to ignore unclean TLS shutdowns
 * 2024-01-14 Version 2.79.0
  * SIPS support
 * 2023-11-30 Version 2.78.0

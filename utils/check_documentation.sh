@@ -29,25 +29,25 @@ for option in $(grep '^[ ]*-.*)$' check_ssl_cert | sed -e 's/^[ ]*//' -e 's/)//'
 
             # check if the option is documented in the help.txt file
             if ! echo "${ALL_OPTIONS}" | grep -q -- "${option}"; then
-                echo "Error: ${option} is not documented in help.txt or deprecated.txt"
+                echo "Error: '${option}' is not documented in help.txt or deprecated.txt"
                 ERROR=1
             fi
 
             # check if the option is documented in check_ssl_cert
             if ! echo "${HELP}" | grep -q -- "${option}"; then
-                echo "Error: ${option} is not documented in the help (--help)"
+                echo "Error: '${option}' is not documented in the help (--help)"
                 ERROR=1
             fi
 
             # check if the option is documented in README.md
             if ! grep -q -- "${option}" README.md; then
-                echo "Error: ${option} is not documented in README.md"
+                echo "Error: '${option}' is not documented in README.md"
                 ERROR=1
             fi
 
             # check if the option is documented in the man page
             if ! grep -q -- "${option}" check_ssl_cert.1; then
-                echo "Error: ${option} is not documented in check_ssl_cert.1"
+                echo "Error: '${option}' is not documented in check_ssl_cert.1"
                 ERROR=1
             fi
 

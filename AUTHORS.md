@@ -150,3 +150,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Ben Byrne](https://github.com/benbyr) for the CRL output format patch
 * Many thanks to [Tom Geißler](https://github.com/d7031) for the Icinga configuration
 * Many thanks to [Florian Apolloner](https://github.com/apollo13) for the configuration patch
+* Many thanks to [vanElden](https://github.com/vanElden) for the support to ignore unclean TLS shutdowns
