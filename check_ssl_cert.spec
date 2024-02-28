@@ -54,7 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Wen Feb  28 2024 Matteo Corti <matteo@corti.li> - 2.80.0-0
+* Wed Feb  28 2024 Matteo Corti <matteo@corti.li> - 2.80.0-0
 - Updated to 2.80.0
 
 * Sun Jan  14 2024 Matteo Corti <matteo@corti.li> - 2.79.0-0
