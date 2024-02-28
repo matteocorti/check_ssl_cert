@@ -144,6 +144,7 @@ Options:
       --ignore-ssl-labs-errors     Ignore errors if SSL Labs is not
                                    accessible or times out
       --ignore-tls-renegotiation   Ignore the TLS renegotiation check
+      --ignore-unexpected-eof      Ignore unclean TLS shutdowns
       --inetproto protocol         Force IP version 4 or 6
       --info                       Print certificate information
       --init-host-cache            Initialize the host cache
