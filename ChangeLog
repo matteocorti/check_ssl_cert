@@ -1,3 +1,7 @@
+2024-03-08
+        * check_ssl_cert: Fix problem where untrusted cert would still give error even with --ignore-incomplete-chain
+        * check_ssl_cert: Add --fingerprint-alg option to specify what alg to is used to specify with --fingerprint.
+
 2024-02-26
 
 	* check_ssl_cert: Add support to ignore unclean TLS shutdowns
