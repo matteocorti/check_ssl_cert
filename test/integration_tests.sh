@@ -500,7 +500,7 @@ testETHZWildCardSubCaseInsensitive() {
 
 testRootIssuer() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --issuer 'DigiCert Inc' --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --issuer 'Sectigo Limited' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
