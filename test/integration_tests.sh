@@ -1288,21 +1288,23 @@ testCiphersError() {
 
 testGithubComCRL() {
 
+    TEST_HOST=google.com
+
     # get current certificate of github.com, download the CRL named in that certificate
     # and use it for local CRL check
 
     create_temporary_test_file
-    TEMPFILE_GITHUB_CERT=${TEMPFILE}
+    TEMPFILE_TEST_CERT=${TEMPFILE}
 
-    echo Q | "${OPENSSL}" s_client -connect github.com:443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' >"${TEMPFILE_GITHUB_CERT}"
+    echo Q | "${OPENSSL}" s_client -connect "${TEST_HOST}":443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' >"${TEMPFILE_TEST_CERT}"
 
-    GITHUB_CRL_URI=$(${OPENSSL} x509 -in "${TEMPFILE_GITHUB_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
+    TEST_CRL_URI=$(${OPENSSL} x509 -in "${TEMPFILE_TEST_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
 
     create_temporary_test_file
     TEMPFILE_CRL=${TEMPFILE}
 
-    echo "${GITHUB_CRL_URI}"
-    curl --silent "${GITHUB_CRL_URI}" --output "${TEMPFILE_CRL}"
+    echo "${TEST_CRL_URI}"
+    curl --silent "${TEST_CRL_URI}" --output "${TEMPFILE_CRL}"
 
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp --ignore-maximum-validity
