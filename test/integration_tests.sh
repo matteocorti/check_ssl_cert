@@ -956,7 +956,7 @@ testFormatShort() {
     OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK github.com from 'DigiCert Inc'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK github.com from 'Sectigo Limited'" "${OUTPUT}"
 }
 
 testMoreErrors() {
@@ -1433,7 +1433,7 @@ testOrganizationFail() {
 
 testOrganizationOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com -o 'GitHub, Inc.' --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} -H wikipedia.org -o 'Wikimedia Foundation, Inc.' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
