@@ -1,8 +1,12 @@
-2024-03-08
+2024-03-17  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Included the patch from Adam Cécile for SNI support with nmap
+
+2024-03-08  agibson https://github.com/agibson2
         * check_ssl_cert: Fix problem where untrusted cert would still give error even with --ignore-incomplete-chain
         * check_ssl_cert: Add --fingerprint-alg option to specify what alg to is used to specify with --fingerprint.
 
-2024-02-26
+2024-02-26  vanElden https://github.com/vanElden
 
 	* check_ssl_cert: Add support to ignore unclean TLS shutdowns
 

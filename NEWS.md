@@ -1,5 +1,8 @@
 # News
 
+* 2024-03-27 Version 2.81.0
+  * Support for SNI with nmap
+  * Added the ```--fingerprint-alg``` option to specify which algorithm to be used with --fingerprint.
 * 2024-02-28 Version 2.80.0
  * Add support to ignore unclean TLS shutdowns
 * 2024-01-14 Version 2.79.0

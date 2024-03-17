@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.80.0
+VERSION=2.81.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -5560,9 +5560,13 @@ main() {
 
             # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-            debuglog "Executing ${NMAP_BIN} --unprivileged -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers \"${NMAP_HOST_ADDR}\" 2>&1 | \"${GREP_BIN}\" '^|'"
-
-            OFFERED_PROTOCOLS=$(${NMAP_BIN} --unprivileged -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${NMAP_HOST_ADDR}" 2>&1 | "${GREP_BIN}" '^|')
+            if [ -n "${SNI}" ]; then  # https://github.com/matteocorti/check_ssl_cert/issues/505
+                debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers --script-args=tls.servername=\"${SNI}\" \"${HOST_ADDR}\" 2>&1 | grep '^|'"
+                OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers --script-args=tls.servername="${SNI}" "${HOST_ADDR}" 2>&1 | grep '^|')
+            else
+                debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers  \"${HOST_ADDR}\" 2>&1 | grep '^|'"
+                OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers "${HOST_ADDR}" 2>&1 | grep '^|')
+            fi
 
             debuglog "offered ciphers and protocols:"
             debuglog "${OFFERED_PROTOCOLS}" | sed 's/^|/[DBG] /'
@@ -6597,7 +6601,12 @@ INPUT
 
             # -Pn is needed even if we specify a port
             TIMEOUT_REASON="checking ciphers"
-            exec_with_timeout "${NMAP_BIN} --unprivileged -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+            if [ -n "${SNI}" ]; then
+                exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} --script-args=tls.servername=${SNI} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+            else
+                exec_with_timeout "${NMAP_BIN} -Pn --script +ssl-enum-ciphers ${NMAP_INETPROTO} ${HOST_ADDR} -p ${PORT}" "${NMAP_OUT}" "${NMAP_ERR}"
+            fi
+
             unset TIMEOUT_REASON
 
             if [ "${DEBUG}" -ge 1 ]; then
