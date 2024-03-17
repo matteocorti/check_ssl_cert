@@ -1438,7 +1438,7 @@ testOrganizationFail() {
 
 testOrganizationOK() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H wikipedia.org -o 'Wikimedia Foundation, Inc.' --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} -H microsoft.com -o 'Microsoft Corporation' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
