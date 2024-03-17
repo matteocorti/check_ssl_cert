@@ -50,7 +50,8 @@
 --element number;Check up to the N cert element from the
 --element number;beginning of the chain
 --file-bin path;Path of the file binary to be used
---fingerprint SHA1;Pattern to match the SHA1-Fingerprint
+--fingerprint hash;Pattern to match the fingerprint
+--fingerprint-alg algorithm;Algorithm for fingerprint. Default sha1
 --first-element-only;Verify just the first cert element, not
 --first-element-only;the whole chain
 --force-dconv-date;Force the usage of dconv for date

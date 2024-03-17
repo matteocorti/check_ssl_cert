@@ -11,8 +11,8 @@
 A POSIX shell script (that can be used as a Nagios/Icinga plugin) to check an SSL/TLS connection and certificate
 
 ## Usage
-```text
 
+```text
 Usage: check_ssl_cert -H host [OPTIONS]
        check_ssl_cert -f file [OPTIONS]
 
@@ -87,7 +87,8 @@ Options:
       --element number             Check up to the N cert element from the
                                    beginning of the chain
       --file-bin path              Path of the file binary to be used
-      --fingerprint SHA1           Pattern to match the SHA1-Fingerprint
+      --fingerprint hash           Pattern to match the fingerprint
+      --fingerprint-alg algorithm  Algorithm for fingerprint. Default sha1
       --first-element-only         Verify just the first cert element, not
                                    the whole chain
       --force-dconv-date           Force the usage of dconv for date
@@ -164,7 +165,7 @@ Options:
                                      and fingerprint.
                                    'all' will include all the available
                                    attributes.
-   -m,--match.                     Pattern to match the CN or AltName
+   -m,--match                      Pattern to match the CN or AltName
                                    (can be specified multiple times)
       --maximum-validity [days]    The maximum validity of the certificate
                                    must not exceed 'days' (default 397)

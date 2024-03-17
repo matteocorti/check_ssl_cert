@@ -341,8 +341,8 @@ usage() {
     echo "                                   beginning of the chain"
     # Delimiter at 78 chars ############################################################
     echo "      --file-bin path              Path of the file binary to be used"
-    echo "      --fingerprint hash           Pattern to match the Fingerprint"
-    echo "      --fingerprint-alg            Algorithm for Fingerprint. Default sha1"
+    echo "      --fingerprint hash           Pattern to match the fingerprint"
+    echo "      --fingerprint-alg algorithm  Algorithm for fingerprint. Default sha1"
     echo "      --first-element-only         Verify just the first cert element, not"
     echo "                                   the whole chain"
     echo "      --force-dconv-date           Force the usage of dconv for date"

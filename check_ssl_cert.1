@@ -134,8 +134,11 @@ Check up to the N cert element from the beginning of the chain
 .BR "   --file-bin" " path"
 Path of the file binary to be used
 .TP
-.BR "   --fingerprint" " SHA1"
-Pattern to match the SHA1-Fingerprint
+.BR "   --fingerprint" " hash"
+Pattern to match the fingerprint
+.TP
+.BR "   --fingerprint-alg" " algorithm"
+Algorithm for fingerprint. Default sha1
 .TP
 .BR "   --first-element-only"
 Verify just the first cert element, not the whole chain
