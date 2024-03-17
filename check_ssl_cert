@@ -56,6 +56,7 @@ STATUS_UNKNOWN=3
 STATUS_WARNING=1
 TEMPFILE=""
 WARNING_MSG=""
+FINGERPRINT_ALG=sha1
 
 DEFAULT_FORMAT="%SHORTNAME% %STATUS% - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
 
@@ -340,7 +341,8 @@ usage() {
     echo "                                   beginning of the chain"
     # Delimiter at 78 chars ############################################################
     echo "      --file-bin path              Path of the file binary to be used"
-    echo "      --fingerprint SHA1           Pattern to match the SHA1-Fingerprint"
+    echo "      --fingerprint hash           Pattern to match the Fingerprint"
+    echo "      --fingerprint-alg            Algorith for Fingerprint. Default sha1"
     echo "      --first-element-only         Verify just the first cert element, not"
     echo "                                   the whole chain"
     echo "      --force-dconv-date           Force the usage of dconv for date"
@@ -1587,7 +1589,7 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -serial | sed -e "s/^serial=//"
         ;;
     fingerprint)
-        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -sha1 | sed -e "s/^SHA1 Fingerprint=//"
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -$FINGERPRINT_ALG | sed -e "s/^$FINGERPRINT_ALG Fingerprint=//"
         ;;
     oscp_uri)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -ocsp_uri
@@ -3727,6 +3729,11 @@ $2"
         --fingerprint)
             check_option_argument '--fingerprint' "$2"
             FINGERPRINT_LOCK="$2"
+            shift 2
+            ;;
+        --fingerprint-alg)
+            check_option_argument '--fingerprint-alg' "$2"
+            FINGERPRINT_ALG="$2"
             shift 2
             ;;
         --long-output)
@@ -6445,9 +6452,9 @@ EOF
 
         if [ -z "${ok}" ]; then
             FINGERPRINT_LOCK_TMP="$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")"
-            prepend_critical_message "invalid SHA1 Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
+            prepend_critical_message "invalid $FINGERPRINT_ALG Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
         else
-            verboselog "Valid SHA1 fingerprint (${FINGERPRINT})"
+            verboselog "Valid $FINGERPRINT_ALG fingerprint (${FINGERPRINT})"
         fi
 
     fi
@@ -6933,7 +6940,10 @@ ${WARNING}"
         elif ascii_grep '^verify[ ]error:num=[0-9][0-9]*:certificate[ ]has[ ]expired' "${ERROR}"; then
 
             debuglog 'Cannot verify since the certificate has expired.'
-
+        elif ascii_grep '^verify[ ]error:num=[0-9][0-9]*:unable to get local issuer certificate' "${ERROR}"; then
+            if [ -z "${IGNORE_INCOMPLETE_CHAIN}" ]; then
+                prepend_critical_message "Cannot verify certificate, cannot verify certificate chain (local issuer certificate)"
+            fi
         else
 
             DEBUG_MESSAGE="$(sed 's/^/Error: /' "${ERROR}")"
