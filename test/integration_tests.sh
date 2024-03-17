@@ -625,10 +625,15 @@ testPOP3S() {
 }
 
 testSMTP() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    SMTP_HOST=smtp.gmail.com
+    if nc -zw1 "${SMTP_HOST}" 25 ; then
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-exp
+        EXIT_CODE=$?
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+    else
+        echo "Skipping SMTP check since port 25 is blocked"
+    fi
 }
 
 testSMTPSubmbission() {
