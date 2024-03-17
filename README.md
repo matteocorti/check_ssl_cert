@@ -171,6 +171,7 @@ Options:
                                    must not exceed 'days' (default 397)
                                    This check is automatic for HTTPS
       --nmap-bin path              Path of the nmap binary to be used
+      --nmap-with-proxy            Allow nmap to be used with a proxy
       --no-perf                    Do not show performance data
       --no-proxy                   Ignore the http_proxy and https_proxy
                                    environment variables

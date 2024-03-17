@@ -433,6 +433,7 @@ usage() {
     echo "                                   This check is automatic for HTTPS"
     # Delimiter at 78 chars ############################################################
     echo "      --nmap-bin path              Path of the nmap binary to be used"
+    echo "      --nmap-with-proxy            Allow nmap to be used with a proxy"
     echo "      --no-perf                    Do not show performance data"
     echo "      --no-proxy                   Ignore the http_proxy and https_proxy"
     echo "                                   environment variables"
@@ -3272,6 +3273,10 @@ parse_command_line_options() {
             fi
             shift
             ;;
+        --nmap-with-proxy)
+            NMAP_WITH_PROXY=1
+            shift
+            ;;
         --no-perf)
             NO_PERF=1
             shift
@@ -4522,10 +4527,15 @@ main() {
         [ -n "${HTTPS_PROXY}" ] ||
         [ -n "${SCLIENT_PROXY}" ] ||
         [ -n "${CURL_PROXY}" ]; then
-        DISABLE_NMAP=1
-        USING_A_PROXY=1
-        debuglog "A proxy is specified: nmap disabled"
-        verboselog "A proxy is specified: nmap checks disabled"
+        if [ -z "${NMAP_WITH_PROXY}" ] ; then
+            DISABLE_NMAP=1
+            USING_A_PROXY=1
+            debuglog "A proxy is specified: nmap disabled"
+            verboselog "A proxy is specified: nmap checks disabled"
+        else
+            debuglog "A proxy is specified: nmap enabled because of --nmap-with-proxy"
+            verboselog "A proxy is specified: nmap enabled because of --nmap-with-proxy"
+        fi
     fi
 
 
