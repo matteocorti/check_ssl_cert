@@ -1589,7 +1589,7 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -serial | sed -e "s/^serial=//"
         ;;
     fingerprint)
-        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -$FINGERPRINT_ALG | sed -e "s/^$FINGERPRINT_ALG Fingerprint=//"
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -${FINGERPRINT_ALG} | sed -e "s/^${FINGERPRINT_ALG} Fingerprint=//"
         ;;
     oscp_uri)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -ocsp_uri
@@ -6452,9 +6452,9 @@ EOF
 
         if [ -z "${ok}" ]; then
             FINGERPRINT_LOCK_TMP="$(echo "${FINGERPRINT_LOCK}" | sed "s/|/ PIPE /g")"
-            prepend_critical_message "invalid $FINGERPRINT_ALG Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
+            prepend_critical_message "invalid ${FINGERPRINT_ALG} Fingerprint ('${FINGERPRINT_LOCK_TMP}' does not match '${FINGERPRINT}')"
         else
-            verboselog "Valid $FINGERPRINT_ALG fingerprint (${FINGERPRINT})"
+            verboselog "Valid ${FINGERPRINT_ALG} fingerprint (${FINGERPRINT})"
         fi
 
     fi
