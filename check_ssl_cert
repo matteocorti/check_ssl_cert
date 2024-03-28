@@ -841,39 +841,40 @@ create_temporary_file() {
 # Compute the number of hours until a given date
 # Params
 #   $1 date
-# return HOURS_UNTIL
+# sets HOURS_UNTIL
 hours_until() {
 
-    DATE=$1
+    HU_DATE=$1
 
     debuglog "Date computations: ${DATETYPE}"
 
     # we check if we are on a 32 bit system and if the date is beyond the max date
     # we simplify and consider a date invalid after 1.1.2038 instead of 19.1.2038
-    # since date is not able to parse the date we do it manually with a little bit of heuristics ...
+    # since date is not able to parse the date we do it manually with a little bit of
+    # heuristics ...
     LONG_BIT_TMP="$(getconf LONG_BIT 2> /dev/null)"
     if [ -z "${LONG_BIT_TMP}" ] ; then
         debuglog "Cannot detect system architecture: no LONGBIT"
     else
         if [ "${LONG_BIT_TMP}" -eq 32 ]; then
             debuglog "32 bit system"
-            CERT_YEAR=$(echo "${DATE}" | sed 's/.* \(2[0-9][0-9][0-9]\).*/\1/')
+            CERT_YEAR=$(echo "${HU_DATE}" | sed 's/.* \(2[0-9][0-9][0-9]\).*/\1/')
             debuglog "Checking if the year ${CERT_YEAR} is beyond the max date for the system 2038-01-19"
             if [ "${CERT_YEAR}" -gt 2038 ]; then
-                verboselog "${DATE} is beyond the maximum date on a 32 bit system: we consider 2038-01-19"
-                DATE='Jan 19 00:00:00 2038 GMT'
+                verboselog "${HU_DATE} is beyond the maximum date on a 32 bit system: we consider 2038-01-19"
+                HU_DATE='Jan 19 00:00:00 2038 GMT'
             fi
         fi
     fi
 
-    debuglog "Computing number of hours until '${DATE}' with ${DATETYPE}"
+    debuglog "Computing number of hours until '${HU_DATE}' with ${DATETYPE}"
 
     case "${DATETYPE}" in
     "BSD")
 
         # new BSD date
 
-        target_date=$(${DATEBIN} -jf "%b %d %T %Y %Z" "${DATE}" +%s)
+        target_date=$(${DATEBIN} -jf "%b %d %T %Y %Z" "${HU_DATE}" +%s)
         now=$(${DATEBIN} +%s)
         HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
 
@@ -889,9 +890,9 @@ hours_until() {
             # e.g., macOS
 
             debuglog "date -j format [[[mm]dd]HH]MM[[cc]yy][.ss]]"
-            debuglog "executing: echo '${DATE}' | sed 's/  / /g' | ${DCONV_BIN} -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
+            debuglog "executing: echo '${HU_DATE}' | sed 's/  / /g' | ${DCONV_BIN} -f \"%m%d%H%M%Y.%S\" -i \"%b %d %H:%M:%S %Y %Z\""
 
-            CONVERTED_DATE=$(echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z")
+            CONVERTED_DATE=$(echo "${HU_DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%m%d%H%M%Y.%S" -i "%b %d %H:%M:%S %Y %Z")
             debuglog "date converted with dconv: ${CONVERTED_DATE}"
 
             target_date=$(${DATEBIN} -j "${CONVERTED_DATE}" +%s)
@@ -906,7 +907,7 @@ hours_until() {
 
             debuglog "date -j format [[[[[[cc]yy]mm]dd]HH]MM[.SS]]"
 
-            CONVERTED_DATE=$(echo "${DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z")
+            CONVERTED_DATE=$(echo "${HU_DATE}" | sed 's/  / /g' | ${DCONV_BIN} -f "%Y%m%d%H%M.%S" -i "%b %d %H:%M:%S %Y %Z")
             debuglog "date converted with ${DCONV_BIN}: ${CONVERTED_DATE}"
 
             target_date=$(${DATEBIN} -j +%s "${CONVERTED_DATE}")
@@ -920,21 +921,21 @@ hours_until() {
         ;;
 
     "BUSYBOX")
-        BUSYBOX_DATE=$(echo "${DATE}" | sed 's/[ ][^ ]*$//')
+        BUSYBOX_DATE=$(echo "${HU_DATE}" | sed 's/[ ][^ ]*$//')
         debuglog "Computing number of hours until '${BUSYBOX_DATE}' (BusyBox compatible format)"
         target_date=$(${DATEBIN} -d "${BUSYBOX_DATE}" +%s)
         now=$(${DATEBIN} +%s)
         HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
         ;;
     "GNU")
-        target_date=$(${DATEBIN} -d "${DATE}" +%s)
+        target_date=$(${DATEBIN} -d "${HU_DATE}" +%s)
         now=$(${DATEBIN} +%s)
         HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
         ;;
     "PERL")
         # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
         if ! HOURS_UNTIL=$(
-            perl - "${DATE}" <<-"EOF"
+            perl - "${HU_DATE}" <<-"EOF"
                                     use strict;
                                     use warnings;
                                     use Date::Parse;
@@ -952,9 +953,7 @@ EOF
         ;;
     esac
 
-    debuglog "Hours until ${DATE}: ${HOURS_UNTIL}"
-
-    echo "${HOURS_UNTIL}"
+    debuglog "Hours until ${HU_DATE}: ${HOURS_UNTIL}"
 
 }
 
@@ -2312,6 +2311,8 @@ check_cert_end_date() {
     debuglog "Validity date on cert element ${el_number} (${element_cn}) is ${ELEM_END_DATE}"
 
     hours_until "${ELEM_END_DATE}"
+
+    debuglog "HOURS_UNTIL=${HOURS_UNTIL}"
 
     # TO DO: floating point
 
@@ -5958,6 +5959,7 @@ main() {
     ################################################################################
     # Parse the X.509 certificate or crl
     DATE="$(extract_cert_attribute 'enddate' "${CERT}")"
+    debuglog "Valid until ${DATE}"
     info "Valid until" "${DATE}"
 
     if [ "${OPENSSL_COMMAND}" != 'crl' ]; then
@@ -7017,11 +7019,18 @@ ${WARNING}"
 
             hours_until "${DATE}"
             HOURS_UNTIL_END_DATE="${HOURS_UNTIL}"
+
+            debuglog "Total certificate validity: ${HOURS_UNTIL} hours until ${DATE}"
+
             hours_until "${START_DATE}"
             HOURS_FROM_START_DATE="${HOURS_UNTIL}"
 
+            debuglog "Total certificate validity: ${HOURS_UNTIL} hours until ${START_DATE}"
+
             # no decimals even if --precision was specified
             TOTAL_CERT_VALIDITY=$(compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" 0)
+
+            debuglog "Total certificate validity in days: ${TOTAL_CERT_VALIDITY}"
 
             LIMIT=397
             if [ -n "${MAXIMUM_VALIDITY}" ]; then

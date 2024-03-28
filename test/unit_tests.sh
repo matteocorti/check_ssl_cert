@@ -446,7 +446,7 @@ testCertificateWithEmptySANFail() {
 testFloatingPointThresholds() {
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H github.com --warning 2.5 --critical 1.5
+    ${SCRIPT} ${TEST_DEBUG} -H google.com --warning 2.5 --critical 1.5
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 
