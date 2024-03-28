@@ -2311,7 +2311,7 @@ check_cert_end_date() {
     ELEM_END_DATE="$(extract_cert_attribute 'enddate' "$1")"
     debuglog "Validity date on cert element ${el_number} (${element_cn}) is ${ELEM_END_DATE}"
 
-    HOURS_UNTIL=$(hours_until "${ELEM_END_DATE}")
+    hours_until "${ELEM_END_DATE}"
 
     # TO DO: floating point
 
@@ -2635,6 +2635,8 @@ fetch_certificate() {
             RET=$?
             ;;
         mqtts)
+
+            # https://stackoverflow.com/questions/58936653/problem-using-mosquitto-broker-with-netcat
 
             # we create a temporary file with the message content (because of quoting and special characters
             create_temporary_file
@@ -6144,7 +6146,8 @@ EOF
             prepend_critical_message "OCSP stapling not enabled"
         else
             NEXT_UPDATE=$("${GREP_BIN}" -o 'Next Update: .*$' "${OCSP_RESPONSE_TMP}" | cut -b14-)
-            OCSP_EXPIRES_IN_HOURS=$(hours_until "${NEXT_UPDATE}")
+            hours_until "${NEXT_UPDATE}"
+            OCSP_EXPIRES_IN_HOURS="${HOURS_UNTIL}"
             verboselog "OCSP stapling expires in ${OCSP_EXPIRES_IN_HOURS} hours"
             if [ -n "${OCSP_CRITICAL}" ] && compare "${OCSP_CRITICAL}" '>=' "${OCSP_EXPIRES_IN_HOURS}"; then
                 prepend_critical_message "${OPENSSL_COMMAND} OCSP stapling will expire in ${OCSP_EXPIRES_IN_HOURS} hour(s) on ${NEXT_UPDATE}"
@@ -7012,8 +7015,10 @@ ${WARNING}"
             [ -n "${MAXIMUM_VALIDITY}" ] ||
             [ -n "${FILE}" ]; then
 
-            HOURS_UNTIL_END_DATE=$(hours_until "${DATE}")
-            HOURS_FROM_START_DATE=$(hours_until "${START_DATE}")
+            hours_until "${DATE}"
+            HOURS_UNTIL_END_DATE="${HOURS_UNTIL}"
+            hours_until "${START_DATE}"
+            HOURS_FROM_START_DATE="${HOURS_UNTIL}"
 
             # no decimals even if --precision was specified
             TOTAL_CERT_VALIDITY=$(compute "(${HOURS_UNTIL_END_DATE} - ${HOURS_FROM_START_DATE})/24" 0)
