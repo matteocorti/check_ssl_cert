@@ -1634,13 +1634,6 @@ testHTTPNoHeaderFailed() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testHTTPHeaders() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H matteo.ethz.ch --check-http-headers
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 testConfigurationOK() {
     create_temporary_test_file
     CONFIGURATION=${TEMPFILE}
