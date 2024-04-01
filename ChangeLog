@@ -1,3 +1,7 @@
+2024-04-01  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (hours_until): refactored without return value
+
 2024-03-17  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Included the patch from Adam Cécile for SNI support with nmap

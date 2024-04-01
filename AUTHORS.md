@@ -153,3 +153,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [vanElden](https://github.com/vanElden) for the support to ignore unclean TLS shutdowns
 * Many thanks to [agibson2](https://github.com/agibson2) for the fingerprint patch
 * Many thanks to [Adam Cécile](https://github.com/eLvErDe) for the nmap SNI patch
+* Many thanks to [alvar](https://github.com/oxzi) for the configuration patch
