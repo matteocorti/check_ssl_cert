@@ -933,6 +933,11 @@ hours_until() {
         HOURS_UNTIL=$(compute "(${target_date}-${now})/3600")
         ;;
     "PERL")
+
+        if ! perl -MDate::Parse -e '1;' > /dev/null 2>&1 ; then
+            unknown "Error computing the certificate validity with Perl: Date::Parse not installed"
+        fi
+
         # Warning: some shell script formatting tools will indent the EOF! (should be at position 0)
         if ! HOURS_UNTIL=$(
             perl - "${HU_DATE}" <<-"EOF"
