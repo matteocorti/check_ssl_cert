@@ -18,10 +18,10 @@ jobs:
         distro:
           - 'centos:7'
           - 'centos:8'
-          - 'fedora:38'
+          - 'fedora:40'
           - 'fedora:39'
         include:
-          - distro: 'fedora:38'
+          - distro: 'fedora:40'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
