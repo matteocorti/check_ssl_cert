@@ -18,14 +18,14 @@ jobs:
         distro:
           - 'centos:7'
           - 'centos:8'
-          - 'fedora:38'
-          - 'fedora:37'
+          - 'fedora:40'
+          - 'fedora:39'
         include:
-          - distro: 'fedora:38'
+          - distro: 'fedora:40'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
-          - distro: 'fedora:37'
+          - distro: 'fedora:39'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
@@ -41,7 +41,7 @@ jobs:
               scversion="stable"; curl -Ls "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv && cp "shellcheck-${scversion}/shellcheck" /usr/bin/
     steps:
       - name: Git clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Build the RPM on ${{ matrix.distro }}
