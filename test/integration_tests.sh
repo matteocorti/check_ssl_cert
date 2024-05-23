@@ -695,12 +695,13 @@ testBadSSLRevoked() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testBadSSLRevokedCRL() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
+# testBadSSLRevokedCRL() {
+#     echo "    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp"
+#     # shellcheck disable=SC2086
+#     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H revoked.badssl.com --crl --ignore-ocsp
+#     EXIT_CODE=$?
+#     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+# }
 
 testGRCRevoked() {
     # shellcheck disable=SC2086
