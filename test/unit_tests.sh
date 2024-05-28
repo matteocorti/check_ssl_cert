@@ -361,7 +361,8 @@ testMissingArgument2() {
 
 testGroupedVariables() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -vvv >/dev/null 2>&1
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com -vvv
+    # >/dev/null 2>&1
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

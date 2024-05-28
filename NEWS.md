@@ -2,6 +2,8 @@
 
 * Better error handling in subroutines
 
+* 2024-05-28 Version 2.81.1
+  * Fix in the Icinga2 configuration file
 * 2024-03-27 Version 2.81.0
   * Support for SNI with nmap
   * Added the ```--fingerprint-alg``` option to specify which algorithm to be used with --fingerprint.

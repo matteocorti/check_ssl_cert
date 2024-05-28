@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.81.0
+VERSION=2.81.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -4697,7 +4697,7 @@ main() {
             fi
 
             if grep -q '"Status":0' "${DNS_OVER_HTTP}" ; then
-                debuglog "Reolved via HTTP"
+                debuglog "Resolved via HTTP"
             else
                 critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} over HTTP using ${RESOLVE_OVER_HTTP}"
             fi
