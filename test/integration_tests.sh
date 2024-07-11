@@ -1593,6 +1593,12 @@ testXFrameOptionsFailed() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
+testHTTPHeaders() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --debug-headers
+}
+
+
 testHTTPHeadersOK() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --require-security-headers
