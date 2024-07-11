@@ -1051,13 +1051,13 @@ testNotExistingHosts() {
     if [ -n "${NSLOOKUP_BIN}" ] ; then
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li )
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain )
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li --do-not-resolve )
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain --do-not-resolve )
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot connect"

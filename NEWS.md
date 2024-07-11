@@ -1,7 +1,8 @@
 # News
 
-* Better error handling in subroutines
-
+* 2024-07-11, Version 2.82.0
+  * Better error handling in subroutines
+  * Fetch HTTP headers for --debug-headers even if no header check is enabled
 * 2024-05-28 Version 2.81.1
   * Fix in the Icinga2 configuration file
 * 2024-03-27 Version 2.81.0

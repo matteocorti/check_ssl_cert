@@ -1,1 +1,1 @@
-Fix in the Icinga2 configuration file
+Fetch HTTP headers for --debug-headers even if no header check is enabled
