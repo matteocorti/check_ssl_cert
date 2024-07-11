@@ -63,7 +63,6 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'centos:7'
           - 'fedora:39'
           - 'fedora:40'
         include:
@@ -75,9 +74,6 @@ jobs:
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
-          - distro: 'centos:7'
-            pre: >-
-              yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build bash-completion
     steps:
 
       - name: Git clone repository
@@ -101,7 +97,6 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'centos:7'
           - 'fedora:39'
           - 'fedora:40'
         include:
@@ -113,9 +108,6 @@ jobs:
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
-          - distro: 'centos:7'
-            pre: >-
-              yum install -y nmap curl sudo perl make bzip2 file openssl dig perl-ExtUtils-MakeMaker perl-Test-Simple rpm-build
     steps:
 
       - name: Git clone repository
