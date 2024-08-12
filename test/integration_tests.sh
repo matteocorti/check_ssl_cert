@@ -1295,7 +1295,6 @@ testGithubComCRL() {
     create_temporary_test_file
     TEMPFILE_CRL=${TEMPFILE}
 
-    echo "${TEST_CRL_URI}"
     curl --silent "${TEST_CRL_URI}" --output "${TEMPFILE_CRL}"
 
     # shellcheck disable=SC2086
