@@ -1,3 +1,7 @@
+2024-07-11  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): fetch HTTP headers for --debug-headers even if no header check is enabled
+
 2024-04-01  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (hours_until): refactored without return value

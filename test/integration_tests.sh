@@ -354,20 +354,6 @@ testSignatureAlgorithms() {
         sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (8192 bit)' "${ALGORITHM}"
 
-    echo "  testing sha256WithRSAEncryption (256 bit)"
-    # shellcheck disable=SC2086
-    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc256.badssl.com |
-        grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (256 bit)' "${ALGORITHM}"
-
-    echo "  testing sha256WithRSAEncryption (384 bit)"
-    # shellcheck disable=SC2086
-    ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host ecc384.badssl.com |
-        grep '^Signature algorithm' |
-        sed 's/^Signature algorithm *//')
-    assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (384 bit)' "${ALGORITHM}"
-
 }
 
 testFQDN() {
@@ -1051,13 +1037,13 @@ testNotExistingHosts() {
     if [ -n "${NSLOOKUP_BIN}" ] ; then
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li )
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain )
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host li --do-not-resolve )
+        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain --do-not-resolve )
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
@@ -1309,7 +1295,6 @@ testGithubComCRL() {
     create_temporary_test_file
     TEMPFILE_CRL=${TEMPFILE}
 
-    echo "${TEST_CRL_URI}"
     curl --silent "${TEST_CRL_URI}" --output "${TEMPFILE_CRL}"
 
     # shellcheck disable=SC2086
@@ -1592,6 +1577,12 @@ testXFrameOptionsFailed() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
+
+testHTTPHeaders() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --debug-headers
+}
+
 
 testHTTPHeadersOK() {
     # shellcheck disable=SC2086

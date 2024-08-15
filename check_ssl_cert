@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.82.0
+VERSION=2.83.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -5824,6 +5824,12 @@ main() {
 
     ####################
     # check HTTP headers
+
+    if [ -n "${REQUIRED_HTTP_HEADERS}" ] ||
+           [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ||
+           [ -n "${DEBUG_HEADERS}" ] ; then
+        fetch_http_headers
+    fi
 
     if [ -n "${REQUIRED_HTTP_HEADERS}" ]; then
         debuglog "Checking required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
