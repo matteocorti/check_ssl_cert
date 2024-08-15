@@ -1,1 +1,1 @@
-Fix in the Icinga2 configuration file
+Shows ```--info``` event in case of a problem

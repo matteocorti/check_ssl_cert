@@ -1,4 +1,4 @@
-%global version          2.81.1
+%global version          2.82.0
 %global release          0
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
@@ -54,16 +54,19 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Tue May  28 2024 Matteo Corti <matteo@corti.li> - 2.81.1-0
+* Tue August 28 2024 Matteo Corti <matteo@corti.li> - 2.82.0-0
+- Updated to 2.82.0
+
+* Tue May 28 2024 Matteo Corti <matteo@corti.li> - 2.81.1-0
 - Updated to 2.81.1
 
-* Sun Mar  17 2024 Matteo Corti <matteo@corti.li> - 2.81.0-0
+* Sun Mar 17 2024 Matteo Corti <matteo@corti.li> - 2.81.0-0
 - Updated to 2.81.0
 
-* Wed Feb  28 2024 Matteo Corti <matteo@corti.li> - 2.80.0-0
+* Wed Feb 28 2024 Matteo Corti <matteo@corti.li> - 2.80.0-0
 - Updated to 2.80.0
 
-* Sun Jan  14 2024 Matteo Corti <matteo@corti.li> - 2.79.0-0
+* Sun Jan 14 2024 Matteo Corti <matteo@corti.li> - 2.79.0-0
 - Updated to 2.79.0
 
 * Thu Nov  30 2023 Matteo Corti <matteo@corti.li> - 2.78.0-0

@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.81.1
+VERSION=2.82.0
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -7057,6 +7057,10 @@ ${WARNING}"
 
     fi
 
+    if [ -n "${INFO_OUTPUT}" ] ; then
+        echo "${INFO_OUTPUT}"
+    fi
+
     ##############################################################################
     # Criticals and warnings
 
@@ -7154,10 +7158,6 @@ ${WARNING}"
             add_prometheus_status_output_line "cert_valid{cn=\"${CN}\"} 0"
             prometheus_output
 
-        fi
-
-        if [ -n "${INFO_OUTPUT}" ] ; then
-            echo "${INFO_OUTPUT}"
         fi
 
     fi

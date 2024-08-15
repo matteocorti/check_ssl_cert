@@ -2,6 +2,8 @@
 
 * Better error handling in subroutines
 
+* 2024-08-15 Version 2.82.0
+  * Shows ```--info``` event in case of a problem
 * 2024-05-28 Version 2.81.1
   * Fix in the Icinga2 configuration file
 * 2024-03-27 Version 2.81.0
