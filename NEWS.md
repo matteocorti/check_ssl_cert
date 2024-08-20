@@ -1,7 +1,5 @@
 # News
 
-* Better error handling in subroutines
-
 * 2024-08-15 Version 2.83.0
   * Shows ```--info``` event in case of a problem
 * 2024-07-11, Version 2.82.0
