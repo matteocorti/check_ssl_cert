@@ -1,5 +1,7 @@
 # News
 
+* 2024-09-10 Version 2.83.1
+  * Fixes the output of missing arguments on Nagios
 * 2024-08-15 Version 2.83.0
   * Shows ```--info``` event in case of a problem
 * 2024-07-11, Version 2.82.0

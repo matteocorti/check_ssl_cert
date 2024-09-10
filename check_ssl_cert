@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.83.0
+VERSION=2.83.1
 SHORTNAME="SSL_CERT"
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
@@ -3086,9 +3086,13 @@ ascii_grep() {
 #  $2 next command line parameter
 check_option_argument() {
 
+    # the majority of the options is specided as '-s|--long'
+    # but | is a problem for Nagios: we substitute it with ', '
+    option=$( echo "${1}" | sed 's/|/, /' )
+
     # shellcheck disable=SC2295
     if [ -z "$2" ] || [ "${2%${2#?}}"x = '-x' ]; then
-        unknown "'${1}' requires an argument"
+        unknown "'${option}' requires an argument"
     fi
 
 }

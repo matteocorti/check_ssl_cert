@@ -1,1 +1,1 @@
-Shows ```--info``` event in case of a problem
+Fixes the output of missing arguments on Nagios
