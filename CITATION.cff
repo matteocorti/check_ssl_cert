@@ -7,22 +7,34 @@ authors:
 - family-names: "Cécile"
   given-names: "Adam"
   website: https://github.com/eLvErDe
+- name: agibson2
+  website: https://github.com/agibson2
 - name: Alexander Aleksandrovič Klimov
   website: https://github.com/Al2Klimov
+- name: alvar
+  website: https://github.com/oxzi
+- family-names: "Dijkman"
+  given-names: "Andreas"
 - family-names: "Klärner"
   given-names: "Andre"
   website: https://github.com/klaernie
-- family-names: "Dijkman"
-  given-names: "Andreas"
 - family-names: "Miśkiewicz"
   given-names: "Arkadiusz"
   website: https://github.com/arekm
+- name: barakAtSoluto
+  website: https://github.com/barakAtSoluto
 - family-names: "Byrne"
   given-names: "Ben"
   website: https://github.com/benbyr
 - family-names: "Strößenreuther"
   given-names: "Bernd"
   website: https://github.com/booboo-at-gluga-de
+- name: booboo-at-gluga-de
+  website: https://github.com/booboo-at-gluga-de
+- name: cbiedl
+  website: https://github.com/cbiedl
+- name: chornberger-c2c
+  website: https://github.com/chornberger-c2c
 - family-names: "Ruppert"
   given-names: "Christian"
 - family-names: "Moench-Tegeder"
@@ -31,11 +43,15 @@ authors:
 - family-names: "Kuenzler"
   given-names: "Claudio"
   website: https://github.com/Napsty
+- name: claudioth
+  website: https://github.com/claudioth
 - family-names: "Riegg"
   given-names: "Claus-Theodor"
   website: https://github.com/ctriegg-mak
 - family-names: "Smith"
   given-names: "Colin"
+- name: d7415
+  website: https://github.com/d7415
 - family-names: "Pritts"
   given-names: "Dan"
 - family-names: "Wallis"
@@ -43,9 +59,15 @@ authors:
 - family-names: "Visser"
   given-names: "Dick"
   website: https://github.com/dnmvisser
+- name: dupondje
+  website: https://github.com/dupondje
 - family-names: "Sabol"
   given-names: "Ed"
   website: https://github.com/esabol
+- name: eeertel
+  website: https://github.com/eeertel
+- name: eimamagi
+  website: https://github.com/eimamagi
 - family-names: "Ertel"
   given-names: "Emilian"
 - family-names: "Apolloner"
@@ -53,20 +75,30 @@ authors:
   website: https://github.com/apollo13
 - name: Georg
   website: https://github.com/gbotti
+- name: grizzlydev-sarl
+  website: https://github.com/grizzlydev-sarl
+- name: iasdeoupxe
+  website: https://github.com/iasdeoupxe
 - family-names: "Mironov"
   given-names: "Igor"
   website: https://github.com/mcs6502
 - family-names: "Hablutzel"
   given-names: "Jaime"
   website: https://github.com/hablutzel1
+- name: jalbstmeijer
+  website: https://github.com/jalbstmeijer
 - name: Jalonet
   website: https://github.com/jalonet
 - family-names: "Gonel"
   given-names: "Javier"
 - family-names: "Lecour"
   given-names: "Jérémy"
+- name: jf-vf
+  website: https://github.com/jf-vf
 - family-names: "Hopp"
   given-names: "Jim"
+- name: jmuecke
+  website: https://github.com/jmuecke
 - family-names: "Meurer"
   given-names: "Jonas"
   website: https://github.com/mejo-
@@ -76,6 +108,8 @@ authors:
 - family-names: "Thalheim"
   given-names: "Jörg"
   website: https://github.com/Mic92
+- name: juckerf
+  website: https://github.com/juckerf
 - family-names: "McCormack"
   given-names: "Kenny"
 - family-names: "Jahn"
@@ -92,14 +126,17 @@ authors:
 - family-names: "Tribus"
   given-names: "Lukas"
   website: https://github.com/lukastribus
-- family-names: "Fournier"
-  given-names: "Marc"
+- family-names: "Wąsikowski"
+  given-names: "Łukasz"
+  website: https://github.com/IdahoPL
 - family-names: "Burkhalter"
   given-names: "Marcel"
   website: https://github.com/explorer69
 - family-names: "Burkhalter"
   given-names: "Marcel"
   website: https://github.com/marcel-burkhalter
+- family-names: "Fournier"
+  given-names: "Marc"
 - family-names: "Rejås"
   given-names: "Marcus"
 - family-names: "Ruys"
@@ -126,21 +163,21 @@ authors:
 - family-names: "Lafont"
   given-names: "Nicolas"
   website: https://github.com/ManicoW
-- name: PSSGCSim
-  website: https://github.com/PSSGCSim
 - family-names: "Rochnyak"
   given-names: "Pavel"
   website: https://github.com/rpv-tomsk
+- name: Peter
+  website: https://github.com/Peter2121
 - family-names: "Newman"
   given-names: "Peter"
   website: https://github.com/peternewman
-- name: Peter
-  website: https://github.com/Peter2121
 - family-names: "Kueck"
   given-names: "Philippe"
 - family-names: "Rupert"
   given-names: "Pim"
   website: https://github.com/prupert
+- name: PSSGCSim
+  website: https://github.com/PSSGCSim
 - family-names: "Thoma"
   given-names: "Raphael"
 - family-names: "Bartels"
@@ -148,8 +185,6 @@ authors:
   website: https://github.com/bb-Ricardo
 - name: Ricardo
   website: https://github.com/bb-Ricardo
-- family-names: "Yamry"
-  given-names: "Rob"
 - name: Robin H. Johnson
 - family-names: "Pronk"
   given-names: "Robin"
@@ -157,6 +192,8 @@ authors:
 - family-names: "Schneider"
   given-names: "Robin"
   website: https://github.com/ypid-geberit
+- family-names: "Yamry"
+  given-names: "Rob"
 - name: Rolf Eike Beer
 - family-names: "Nowakowski"
   given-names: "Ryan"
@@ -170,8 +207,12 @@ authors:
 - family-names: "Shmanko"
   given-names: "Sergei"
   website: https://github.com/sshmanko
+- name: skanx
+  website: https://github.com/skanx
 - name: Slavko
   website: https://github.com/slavkoja
+- name: sokol-44
+  website: https://github.com/sokol-44
 - family-names: "Schlesinger"
   given-names: "Stefan"
 - family-names: "Nierlein"
@@ -187,6 +228,8 @@ authors:
   website: https://github.com/d7031
 - name: Tone
   website: https://github.com/anthonyhaussman
+- name: tunnelpr0
+  website: https://github.com/tunnelpr0
 - family-names: "Haarala"
   given-names: "Tuomas"
 - family-names: "Heidelberger"
@@ -194,6 +237,8 @@ authors:
   website: https://github.com/va1entin
 - name: Vamp898
   website: https://github.com/Vamp898
+- name: vanElden
+  website: https://github.com/vanElden
 - name: Varac
   website: https://github.com/varac
 - family-names: "Szépe"
@@ -203,65 +248,20 @@ authors:
 - family-names: "Horky"
   given-names: "Vojtech"
   website: https://github.com/vhotspur
+- name: waja
+  website: https://github.com/waja
 - name: Wim van Ravesteijn
   website: https://github.com/wimvr
 - family-names: "Schricker"
   given-names: "Wolfgang"
-- family-names: "Gravel"
-  given-names: "Yannick"
-- name: Zadkiel
-  website: https://github.com/aslafy-z
-- name: agibson2
-  website: https://github.com/agibson2
-- name: alvar
-  website: https://github.com/oxzi
-- name: barakAtSoluto
-  website: https://github.com/barakAtSoluto
-- name: booboo-at-gluga-de
-  website: https://github.com/booboo-at-gluga-de
-- name: cbiedl
-  website: https://github.com/cbiedl
-- name: chornberger-c2c
-  website: https://github.com/chornberger-c2c
-- name: claudioth
-  website: https://github.com/claudioth
-- name: d7415
-  website: https://github.com/d7415
-- name: dupondje
-  website: https://github.com/dupondje
-- name: eeertel
-  website: https://github.com/eeertel
-- name: eimamagi
-  website: https://github.com/eimamagi
-- name: grizzlydev-sarl
-  website: https://github.com/grizzlydev-sarl
-- name: iasdeoupxe
-  website: https://github.com/iasdeoupxe
-- name: jalbstmeijer
-  website: https://github.com/jalbstmeijer
-- name: jf-vf
-  website: https://github.com/jf-vf
-- name: jmuecke
-  website: https://github.com/jmuecke
-- name: juckerf
-  website: https://github.com/juckerf
-- name: skanx
-  website: https://github.com/skanx
-- name: sokol-44
-  website: https://github.com/sokol-44
-- name: tunnelpr0
-  website: https://github.com/tunnelpr0
-- name: vanElden
-  website: https://github.com/vanElden
-- name: waja
-  website: https://github.com/waja
 - name: xert
   website: https://github.com/xert
+- family-names: "Gravel"
+  given-names: "Yannick"
 - name: yasirathackersdotmu
   website: https://github.com/yasirathackersdotmu
-- family-names: "Wąsikowski"
-  given-names: "Łukasz"
-  website: https://github.com/IdahoPL
+- name: Zadkiel
+  website: https://github.com/aslafy-z
 - family-names: "Палаузов"
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
