@@ -229,8 +229,8 @@
 -f,--file file;revocation list (CRL) to check the
 -f,--file file;validity period or a Java KeyStore file
 -h,--help,-?;This help message
--i,--issuer issuer;Pattern to match the issuer of the
--i,--issuer issuer;certificate
+-i,--issuer issuer;Pattern (extended regular expression) to
+-i,--issuer issuer;match the issuer of the certificate
 -m,--match name;(can be specified multiple times)
 -m,--match name;Pattern to match the CN or AltName
 -o,--org org;Pattern to match the organization of the

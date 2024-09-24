@@ -1,6 +1,6 @@
 # check\_ssl\_cert
 
- &copy; Matteo Corti, ETH Zurich, 2007-2012.  
+ &copy; Matteo Corti, ETH Zurich, 2007-2012.
  &copy; Matteo Corti, 2007-2024.
 
  see [AUTHORS.md](AUTHORS.md) for the complete list of contributors
@@ -119,8 +119,8 @@ Options:
       --http-headers-path path     The path to be used to fetch HTTP headers
       --http-use-get               Use GET instead of HEAD (default) for the
                                    HTTP related checks
-   -i,--issuer issuer              Pattern to match the issuer of the
-                                   certificate
+   -i,--issuer issuer              Pattern (extended regular expression) to
+                                   match the issuer of the certificate
       --ignore-altnames            Ignore alternative names when matching
                                    pattern specified in -n (or the host name)
       --ignore-connection-problems [state] In case of connection problems
