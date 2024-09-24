@@ -221,8 +221,11 @@
 -c,--critical days;to be valid to issue a critical status.
 -d,--debug;Produce debugging output (can be
 -d,--debug;specified more than once)
--e,--email address;Pattern to match the email address
--e,--email address;contained in the certificate
+-e,--email address;Pattern (extended regular expression) to
+-e,--email address;match the email address contained in the
+-e,--email address;certificate. You can specify different
+-e,--email address;addresses separated by a pipe
+-e,--email address;(e.g., 'addr1|addr2')
 -f,--file file;Local file path or URI.
 -f,--file file;With -f you can not only pass a x509
 -f,--file file;certificate file but also a certificate
@@ -231,6 +234,8 @@
 -h,--help,-?;This help message
 -i,--issuer issuer;Pattern (extended regular expression) to
 -i,--issuer issuer;match the issuer of the certificate
+-i,--issuer issuer;You can specify different issuers
+-i,--issuer issuer;separated by a pipe
 -m,--match name;(can be specified multiple times)
 -m,--match name;Pattern to match the CN or AltName
 -o,--org org;Pattern to match the organization of the

@@ -1,5 +1,8 @@
 # News
 
+* 2024-09-24 Version 2.84.0
+  * Avoid the repeated specification of certain command line arguments
+  * Improved the documentation of ```--issuer``` and ```--email```
 * 2024-09-10 Version 2.83.1
   * Fixes the output of missing arguments on Nagios
 * 2024-08-15 Version 2.83.0

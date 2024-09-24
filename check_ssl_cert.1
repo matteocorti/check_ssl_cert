@@ -1,7 +1,7 @@
 .\" Process this file with
 .\" groff -man -Tascii check_ssl_cert.1
 .\"
-.TH "check_ssl_cert" 1 "September, 2024" "2.83.1" "USER COMMANDS"
+.TH "check_ssl_cert" 1 "September, 2024" "2.84.0" "USER COMMANDS"
 .SH NAME
 check_ssl_cert \- checks the validity of X.509 certificates
 .SH SYNOPSIS
@@ -123,7 +123,7 @@ Use the DTLS protocol 1.0
 Use the DTLS protocol 1.2
 .TP
 .BR "-e,--email" " address"
-Pattern to match the email address contained in the certificate
+Pattern (extended regular expression) to match the email address contained in the certificate. You can specify different addresses separated by a pipe (e.g., 'addr1|addr2')
 .TP
 .BR "   --ecdsa"
 Signature algorithm selection: force ECDSA certificate
@@ -197,7 +197,7 @@ The path to be used to fetch HTTP headers
 Use GET instead of HEAD (default) for the HTTP related checks
 .TP
 .BR "-i,--issuer" " issuer"
-Pattern (extended regular expression) to match the issuer of the certificate
+Pattern (extended regular expression) to match the issuer of the certificate. You can specify different issuers separated by a pipe (e.g., 'issuer1|issuer2')
 .TP
 .BR "  --ignore-altnames"
 Ignore alternative names when matching pattern specified in -n (or the host name)

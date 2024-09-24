@@ -80,8 +80,11 @@ Options:
       --dtls                       Use the DTLS protocol
       --dtls1                      Use the DTLS protocol 1.0
       --dtls1_2                    Use the DTLS protocol 1.2
-   -e,--email address              Pattern to match the email address
-                                   contained in the certificate
+   -e,--email address              Pattern (extended regular expression) to
+                                   match the email address contained in the
+                                   certificate. You can specify different
+                                   addresses separated by a pipe
+                                   (e.g., 'addr1|addr2')
       --ecdsa                      Signature algorithm selection: force ECDSA
                                    certificate
       --element number             Check up to the N cert element from the
@@ -121,6 +124,9 @@ Options:
                                    HTTP related checks
    -i,--issuer issuer              Pattern (extended regular expression) to
                                    match the issuer of the certificate
+                                   You can specify different issuers
+                                   separated by a pipe
+                                   (e.g., 'issuer1|issuer2')
       --ignore-altnames            Ignore alternative names when matching
                                    pattern specified in -n (or the host name)
       --ignore-connection-problems [state] In case of connection problems
