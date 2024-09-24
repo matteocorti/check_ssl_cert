@@ -1,6 +1,5 @@
 %global version          2.84.0
 %global release          0
->>>>>>> d3d0375a8c3f87d0eefed0d0441ef809913b9367
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
 %global nagiospluginsdir %{_libdir}/nagios/plugins
