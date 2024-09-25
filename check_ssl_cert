@@ -3961,7 +3961,8 @@ $2"
             shift 2
             ;;
         --temp)
-            if [ -n "${TMPDIR}" ] ; then unknown '--temp can be specified only once'; fi
+            if [ -n "${TMPDIR_SPECIFIED}" ] ; then unknown '--temp can be specified only once'; fi
+            TMPDIR_SPECIFIED=1
             check_option_argument '--temp' "$2"
             TMPDIR="$2"
             shift 2
