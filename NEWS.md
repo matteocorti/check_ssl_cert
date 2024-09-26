@@ -1,5 +1,7 @@
 # News
 
+* 2024-09.26 Version 2.84.1
+  * Bug fixes in the handling of command line options
 * 2024-09-24 Version 2.84.0
   * Avoid the repeated specification of certain command line arguments
   * Improved the documentation of ```--issuer``` and ```--email```
