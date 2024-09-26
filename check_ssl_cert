@@ -3568,7 +3568,8 @@ parse_command_line_options() {
             shift 2
             ;;
         --curl-user-agent)
-            if [ -n "${HTTP_USER_AGENT}" ] ; then unknown '--curl-user-agent can be specified only once'; fi
+            if [ -n "${HTTP_USER_AGENT_SPECIFIED}" ] ; then unknown '--curl-user-agent can be specified only once'; fi
+            HTTP_USER_AGENT_SPECIFIED=1
             deprecated '--curl-user-agent' "Use '--user-agent'"
             check_option_argument '--curl-user-agent' "$2"
             HTTP_USER_AGENT="$2"
@@ -3588,7 +3589,8 @@ parse_command_line_options() {
             ;;
         # Deprecated option: used to be as --warning
         --days)
-            if [ -n "${WARNING_DAYS}" ] ; then unknown '--days can be specified only once'; fi
+            if [ -n "${WARNING_DAYS_SPECIFIED}" ] ; then unknown '--days can be specified only once'; fi
+            WARNING_DAYS_SPECIFIED=1
             deprecated '--days' "Use the '--warning' option"
             check_option_argument '--days' "$2"
             check_integer "$2" "--days: the number of days should be an integer"
@@ -3609,7 +3611,8 @@ parse_command_line_options() {
             shift 2
             ;;
         --path)
-            if [ -n "${PATH}" ] ; then unknown '--path can be specified only once'; fi
+            if [ -n "${PATH_SPECIFIED}" ] ; then unknown '--path can be specified only once'; fi
+            PATH_SPECIFIED=1
             check_option_argument '--path' "$2"
             export PATH="$2"
             shift 2
@@ -3633,14 +3636,14 @@ parse_command_line_options() {
             shift 2
             ;;
         -e | --email)
-            if [ -n "${ADDR}" ] ; then unknown '--email can be specified only once'; fi
             check_option_argument 'e|--email' "$2"
+            if [ -n "${ADDR}" ] ; then unknown '--email can be specified only once'; fi
             ADDR="$2"
             shift 2
             ;;
         -f | --file)
-            if [ -n "${FILE}" ] ; then unknown '--file can be specified only once'; fi
             check_option_argument ' -f|--file' "$2"
+            if [ -n "${FILE}" ] ; then unknown '--file can be specified only once'; fi
             FILE="$2"
             # remove _HOST_ from the names to be checked as no host was specified
             # we leave the remaining hosts specified with --cn
@@ -3649,26 +3652,27 @@ parse_command_line_options() {
             shift 2
             ;;
         --file-bin)
-            if [ -n "${FILE_BIN}" ] ; then unknown '--file-bin can be specified only once'; fi
             check_option_argument '--file-bin' "$2"
+            if [ -n "${FILE_BIN}" ] ; then unknown '--file-bin can be specified only once'; fi
             FILE_BIN="$2"
             shift 2
             ;;
         --format)
-            if [ -n "${FORMAT}" ] ; then unknown '--format can be specified only once'; fi
             check_option_argument '--format' "$2"
+            if [ -n "${FORMAT}" ] ; then unknown '--format can be specified only once'; fi
             FORMAT="$2"
             shift 2
             ;;
         --grep-bin)
-            if [ -n "${GREP_BIN}" ] ; then unknown '--grep-bin can be specified only once'; fi
             check_option_argument '--grep-bin' "$2"
+            if [ -n "${GREP_BIN_SPECIFIED}" ] ; then unknown '--grep-bin can be specified only once'; fi
+            GREP_BIN_SPECIFIED=1
             GREP_BIN="$2"
             shift 2
             ;;
         -H | --host)
-            if [ -n "${HOST}" ] ; then unknown '--host can be specified only once'; fi
             check_option_argument '-H|--host' "$2"
+            if [ -n "${HOST}" ] ; then unknown '--host can be specified only once'; fi
             HOST="$2"
 
             # remove http[s] from the input
@@ -3685,38 +3689,38 @@ parse_command_line_options() {
             shift 2
             ;;
         -i | --issuer)
-            if [ -n "${ISSUER}" ] ; then unknown '--issuer can be specified only once'; fi
             check_option_argument '-i|--issuer' "$2"
+            if [ -n "${ISSUER}" ] ; then unknown '--issuer can be specified only once'; fi
             ISSUER="$2"
             shift 2
             ;;
         --issuer-cert-cache)
-            if [ -n "${ISSUER_CERT_CACHE}" ] ; then unknown '--issuer-ceer can be specified only once'; fi
             check_option_argument '--issuer-cert-cache' "$2"
+            if [ -n "${ISSUER_CERT_CACHE}" ] ; then unknown '--issuer-ceer can be specified only once'; fi
             ISSUER_CERT_CACHE="$2"
             shift 2
             ;;
         -L | --check-ssl-labs)
-            if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then unknown '--check-ssl-labs can be specified only once'; fi
             check_option_argument '-L|--check-ssl-labs' "$2"
+            if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then unknown '--check-ssl-labs can be specified only once'; fi
             SSL_LAB_CRIT_ASSESSMENT="$2"
             shift 2
             ;;
         --check-ssl-labs-warn)
-            if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then unknown '--check-ssl-labs-warn can be specified only once'; fi
             check_option_argument '--check-ssl-labs-warn' "$2"
+            if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then unknown '--check-ssl-labs-warn can be specified only once'; fi
             SSL_LAB_WARN_ASSESTMENT="$2"
             shift 2
             ;;
         --python-bin)
-            if [ -n "${PYTHON_BIN}" ] ; then unknown '--python-bin can be specified only once'; fi
             check_option_argument '--python-bin' "$2"
+            if [ -n "${PYTHON_BIN}" ] ; then unknown '--python-bin can be specified only once'; fi
             PYTHON_BIN="$2"
             shift 2
             ;;
         --security-level)
-            if [ -n "${SECURITY_LEVEL}" ] ; then unknown '--security-level can be specified only once'; fi
             check_option_argument '--security-level' "$2"
+            if [ -n "${SECURITY_LEVEL}" ] ; then unknown '--security-level can be specified only once'; fi
             if ! echo "$2" | "${GREP_BIN}" -q '^[0-5]$' ; then
                 unknown 'Invalid secuirity level'
             fi
@@ -3725,14 +3729,15 @@ parse_command_line_options() {
             ;;
 
         --serial)
-            if [ -n "${SERIAL_LOCK}" ] ; then unknown '--serial can be specified only once'; fi
             check_option_argument '--serial' "$2"
+            if [ -n "${SERIAL_LOCK}" ] ; then unknown '--serial can be specified only once'; fi
             SERIAL_LOCK="$2"
             shift 2
             ;;
         --element)
-            if [ -n "${ELEMENT}" ] ; then unknown '--element can be specified only once'; fi
             check_option_argument '--element' "$2"
+            if [ -n "${ELEMENT_SPECIFIED}" ] ; then unknown '--element can be specified only once'; fi
+            ELEMENT_SPECIFIED=1
             ELEMENT="$2"
             shift 2
             ;;
@@ -3784,14 +3789,15 @@ $2"
             ;;
 
         --fingerprint)
-            if [ -n "${FINGERPRINT_LOCK}" ] ; then unknown '--fingerprint can be specified only once'; fi
             check_option_argument '--fingerprint' "$2"
+            if [ -n "${FINGERPRINT_LOCK}" ] ; then unknown '--fingerprint can be specified only once'; fi
             FINGERPRINT_LOCK="$2"
             shift 2
             ;;
         --fingerprint-alg)
-            if [ -n "${FINGERPRINT_ALG}" ] ; then unknown '--fingerprint-alg can be specified only once'; fi
             check_option_argument '--fingerprint-alg' "$2"
+            if [ -n "${FINGERPRINT_ALG_SPECIFIED}" ] ; then unknown '--fingerprint-alg can be specified only once'; fi
+            FINGERPRINT_ALG_SPECIFIED=1
             FINGERPRINT_ALG="$2"
             shift 2
             ;;
@@ -3824,32 +3830,32 @@ $2"
             shift 2
             ;;
         --not-valid-longer-than)
-            if [ -n "${NOT_VALID_LONGER_THAN}" ] ; then unknown '--not-valid-longer-than can be specified only once'; fi
             check_option_argument '--not-valid-longer-than' "$2"
+            if [ -n "${NOT_VALID_LONGER_THAN}" ] ; then unknown '--not-valid-longer-than can be specified only once'; fi
             NOT_VALID_LONGER_THAN=$2
             shift 2
             ;;
         --ocsp-critical)
-            if [ -n "${OCSP_CRITICAL}" ] ; then unknown '--ocsp-critical can be specified only once'; fi
             check_option_argument '--ocsp-critical' "$2"
+            if [ -n "${OCSP_CRITICAL}" ] ; then unknown '--ocsp-critical can be specified only once'; fi
             OCSP_CRITICAL="$2"
             shift 2
             ;;
         --ocsp-warning)
-            if [ -n "${OCSP_WARNING}" ] ; then unknown '--ocsp-warning can be specified only once'; fi
             check_option_argument '--ocsp-warning' "$2"
+            if [ -n "${OCSP_WARNING}" ] ; then unknown '--ocsp-warning can be specified only once'; fi
             OCSP_WARNING="$2"
             shift 2
             ;;
         -o | --org)
-            if [ -n "${ORGANIZATION}" ] ; then unknown '--org can be specified only once'; fi
             check_option_argument '-o|--org' "$2"
+            if [ -n "${ORGANIZATION}" ] ; then unknown '--org can be specified only once'; fi
             ORGANIZATION="$2"
             shift 2
             ;;
         --openssl)
-            if [ -n "${OPENSSL}" ] ; then unknown '--openssl can be specified only once'; fi
             check_option_argument '--openssl' "$2"
+            if [ -n "${OPENSSL}" ] ; then unknown '--openssl can be specified only once'; fi
             OPENSSL="$2"
             shift 2
             ;;
@@ -3990,8 +3996,8 @@ $2"
             shift 2
             ;;
         --xmpphost)
-            if [ -n "${XMPPHOST}" ] ; then unknown '--xmpphost can be specified only once'; fi
             check_option_argument '--xmpphost' "$2"
+            if [ -n "${XMPPHOST}" ] ; then unknown '--xmpphost can be specified only once'; fi
             XMPPHOST="$2"
             shift 2
             ;;
@@ -5033,11 +5039,13 @@ main() {
         # see https://en.wikipedia.org/wiki/Uniform_Resource_Identifier for the syntax
         FILE_URI=$(echo "${FILE}" | "${GREP_BIN}" '^[a-z][a-z+.-]*://')
         debuglog "${FILE} is an URI with an authority"
+        debuglog "  URI: ${FILE_URI}"
     fi
-
     if [ -n "${FILE}" ]; then
 
         if [ -n "${FILE_URI}" ]; then
+
+            debuglog "trying to fetch ${FILE_URI}"
 
             # we try to fetch it with curl
             create_temporary_file
@@ -6011,14 +6019,16 @@ main() {
 
                 if [ -r "${FILE}" ]; then
 
-                    if "${OPENSSL}" crl -in "${CERT}" -inform DER | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
+                    if "${OPENSSL}" crl -in "${CERT}" -inform DER 2>&1 | "${GREP_BIN}" -F -q "BEGIN X509 CRL"; then
                         debuglog "File is DER encoded CRL"
 
                         OPENSSL_COMMAND="crl"
                         OPENSSL_PARAMS="-inform DER -nameopt utf8,oneline,-esc_msb"
                         OPENSSL_ENDDATE_OPTION="-nextupdate"
                     else
-                        prepend_critical_message "'${FILE}' is not a valid certificate file"
+
+                        echo 50
+                        critical "'${FILE}' is not a valid certificate file"
                     fi
 
                 else
