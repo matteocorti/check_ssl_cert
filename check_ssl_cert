@@ -126,6 +126,18 @@ format_template() {
 
 }
 
+check_option() {
+
+    variable=$1
+    text=$2
+
+    if [ -n "${variable}" ] &&
+           [ -z "${OVERRIDE}" ] ; then
+        unknown "${text} can be specified only once"
+    fi
+
+}
+
 ################################################################################
 # Add the specified header to the list of required HTTP headers
 # Usage:
@@ -3532,7 +3544,7 @@ parse_command_line_options() {
 
         -c | --critical)
             # CRITICAL_DAYS has a default
-            if [ -n "${CRITICAL_SPECIFIED}" ] ; then unknown '-c,--critical can be specified only once'; fi
+            check_option "${CRITICAL_SPECIFIED}" '-c,--critical'
             CRITICAL_SPECIFIED=1
             check_option_argument '-c,--critical' "$2"
             check_float "$2" "--critical: the number of days should be an integer or a float"
@@ -3541,7 +3553,7 @@ parse_command_line_options() {
             shift 2
             ;;
         --check-ciphers)
-            if [ -n "${CHECK_CIPHERS}" ] ; then unknown '--check-ciphers can be specified only once'; fi
+            check_option "${CHECK_CIPHERS}" '--check-ciphers'
             check_option_argument '--check-ciphers' "$2"
             CHECK_CIPHERS="$2"
             shift 2
@@ -3558,17 +3570,18 @@ parse_command_line_options() {
             else
                 unknown "Cannot read $2"
             fi
+            OVERRIDE=ok
             shift 2
             ;;
 
         --curl-bin)
-            if [ -n "${CURL_BIN}" ] ; then unknown '--curl-bin can be specified only once'; fi
+            check_option "${CURL_BIN}" '--curl-bin'
             check_option_argument '--curl-bin' "$2"
             CURL_BIN="$2"
             shift 2
             ;;
         --curl-user-agent)
-            if [ -n "${HTTP_USER_AGENT_SPECIFIED}" ] ; then unknown '--curl-user-agent can be specified only once'; fi
+            check_option "${HTTP_USER_AGENT_SPECIFIED}" '--curl-user-agent'
             HTTP_USER_AGENT_SPECIFIED=1
             deprecated '--curl-user-agent' "Use '--user-agent'"
             check_option_argument '--curl-user-agent' "$2"
@@ -3576,20 +3589,20 @@ parse_command_line_options() {
             shift 2
             ;;
         --custom-http-header)
-            if [ -n "${CUSTOM_HTTP_HEADER}" ] ; then unknown '--custom-http-header can be specified only once'; fi
+            check_option "${CUSTOM_HTTP_HEADER}" '--custom-http-header'
             check_option_argument '--custom-http-header' "$2"
             CUSTOM_HTTP_HEADER="$2"
             shift 2
             ;;
         --date)
-            if [ -n "${DATEBIN}" ] ; then unknown '--date can be specified only once'; fi
+            check_option "${DATEBIN}" '--date'
             check_option_argument '--date' "$2"
             DATEBIN="$2"
             shift 2
             ;;
         # Deprecated option: used to be as --warning
         --days)
-            if [ -n "${WARNING_DAYS_SPECIFIED}" ] ; then unknown '--days can be specified only once'; fi
+            check_option "${WARNING_DAYS_SPECIFIED}" '--days'
             WARNING_DAYS_SPECIFIED=1
             deprecated '--days' "Use the '--warning' option"
             check_option_argument '--days' "$2"
@@ -3599,51 +3612,51 @@ parse_command_line_options() {
             shift 2
             ;;
         --debug-file)
-            if [ -n "${DEBUG_FILE}" ] ; then unknown '--debug-file can be specified only once'; fi
+            check_option "${DEBUG_FILE}" '--debug-file'
             check_option_argument '--debug-file' "$2"
             DEBUG_FILE="$2"
             shift 2
             ;;
         --dig-bin)
-            if [ -n "${DIG_BIN}" ] ; then unknown '--dig-bin can be specified only once'; fi
+            check_option "${DIG_BIN}" '--dig-bin'
             check_option_argument '--dig-bin' "$2"
             DIG_BIN="$2"
             shift 2
             ;;
         --path)
-            if [ -n "${PATH_SPECIFIED}" ] ; then unknown '--path can be specified only once'; fi
+            check_option "${PATH_SPECIFIED}" '--path'
             PATH_SPECIFIED=1
             check_option_argument '--path' "$2"
             export PATH="$2"
             shift 2
             ;;
         --inetproto)
-            if [ -n "${INETPROTO}" ] ; then unknown '--inetproto can be specified only once'; fi
+            check_option "${INETPROTO}" '--inetproto'
             check_option_argument '--inetproto' "$2"
             INETPROTO="-$2"
             shift 2
             ;;
         --jks-alias)
-            if [ -n "${JKSALIAS}" ] ; then unknown '--jks-alias can be specified only once'; fi
+            check_option "${JKSALIAS}" '--jks-alias'
             check_option_argument '--jks-alias' "$2"
             JKSALIAS="$2"
             shift 2
             ;;
         --nmap-bin)
-            if [ -n "${NMAP_BIN}" ] ; then unknown '--nmap-bin can be specified only once'; fi
+            check_option "${NMAP_BIN}" '--nmap-bin'
             check_option_argument '--nmap-bin' "$2"
             NMAP_BIN="$2"
             shift 2
             ;;
         -e | --email)
             check_option_argument 'e|--email' "$2"
-            if [ -n "${ADDR}" ] ; then unknown '--email can be specified only once'; fi
+            check_option "${ADDR}" '--email'
             ADDR="$2"
             shift 2
             ;;
         -f | --file)
             check_option_argument ' -f|--file' "$2"
-            if [ -n "${FILE}" ] ; then unknown '--file can be specified only once'; fi
+            check_option "${FILE}" '--file'
             FILE="$2"
             # remove _HOST_ from the names to be checked as no host was specified
             # we leave the remaining hosts specified with --cn
@@ -3653,26 +3666,26 @@ parse_command_line_options() {
             ;;
         --file-bin)
             check_option_argument '--file-bin' "$2"
-            if [ -n "${FILE_BIN}" ] ; then unknown '--file-bin can be specified only once'; fi
+            check_option "${FILE_BIN}" '--file-bin'
             FILE_BIN="$2"
             shift 2
             ;;
         --format)
             check_option_argument '--format' "$2"
-            if [ -n "${FORMAT}" ] ; then unknown '--format can be specified only once'; fi
+            check_option "${FORMAT}" '--format'
             FORMAT="$2"
             shift 2
             ;;
         --grep-bin)
             check_option_argument '--grep-bin' "$2"
-            if [ -n "${GREP_BIN_SPECIFIED}" ] ; then unknown '--grep-bin can be specified only once'; fi
+            check_option "${GREP_BIN_SPECIFIED}" '--grep-bin'
             GREP_BIN_SPECIFIED=1
             GREP_BIN="$2"
             shift 2
             ;;
         -H | --host)
             check_option_argument '-H|--host' "$2"
-            if [ -n "${HOST}" ] ; then unknown '--host can be specified only once'; fi
+            check_option "${HOST}" '--host'
             HOST="$2"
 
             # remove http[s] from the input
@@ -3690,37 +3703,37 @@ parse_command_line_options() {
             ;;
         -i | --issuer)
             check_option_argument '-i|--issuer' "$2"
-            if [ -n "${ISSUER}" ] ; then unknown '--issuer can be specified only once'; fi
+            check_option "${ISSUER}" '--issuer'
             ISSUER="$2"
             shift 2
             ;;
         --issuer-cert-cache)
             check_option_argument '--issuer-cert-cache' "$2"
-            if [ -n "${ISSUER_CERT_CACHE}" ] ; then unknown '--issuer-ceer can be specified only once'; fi
+            check_option "${ISSUER_CERT_CACHE}" '--issuer-ceer'
             ISSUER_CERT_CACHE="$2"
             shift 2
             ;;
         -L | --check-ssl-labs)
             check_option_argument '-L|--check-ssl-labs' "$2"
-            if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ; then unknown '--check-ssl-labs can be specified only once'; fi
+            check_option "${SSL_LAB_CRIT_ASSESSMENT}" '--check-ssl-labs'
             SSL_LAB_CRIT_ASSESSMENT="$2"
             shift 2
             ;;
         --check-ssl-labs-warn)
             check_option_argument '--check-ssl-labs-warn' "$2"
-            if [ -n "${SSL_LAB_WARN_ASSESTMENT}" ] ; then unknown '--check-ssl-labs-warn can be specified only once'; fi
+            check_option "${SSL_LAB_WARN_ASSESTMENT}" '--check-ssl-labs-warn'
             SSL_LAB_WARN_ASSESTMENT="$2"
             shift 2
             ;;
         --python-bin)
             check_option_argument '--python-bin' "$2"
-            if [ -n "${PYTHON_BIN}" ] ; then unknown '--python-bin can be specified only once'; fi
+            check_option "${PYTHON_BIN}" '--python-bin'
             PYTHON_BIN="$2"
             shift 2
             ;;
         --security-level)
             check_option_argument '--security-level' "$2"
-            if [ -n "${SECURITY_LEVEL}" ] ; then unknown '--security-level can be specified only once'; fi
+            check_option "${SECURITY_LEVEL}" '--security-level'
             if ! echo "$2" | "${GREP_BIN}" -q '^[0-5]$' ; then
                 unknown 'Invalid secuirity level'
             fi
@@ -3730,13 +3743,13 @@ parse_command_line_options() {
 
         --serial)
             check_option_argument '--serial' "$2"
-            if [ -n "${SERIAL_LOCK}" ] ; then unknown '--serial can be specified only once'; fi
+            check_option "${SERIAL_LOCK}" '--serial'
             SERIAL_LOCK="$2"
             shift 2
             ;;
         --element)
             check_option_argument '--element' "$2"
-            if [ -n "${ELEMENT_SPECIFIED}" ] ; then unknown '--element can be specified only once'; fi
+            check_option "${ELEMENT_SPECIFIED}" '--element'
             ELEMENT_SPECIFIED=1
             ELEMENT="$2"
             shift 2
@@ -3782,7 +3795,7 @@ $2"
             ;;
 
         --require-security-headers-path)
-            if [ -n "${HTTP_HEADERS_PATH}" ] ; then unknown '--require-security-header-path can be specified only once'; fi
+            check_option "${HTTP_HEADERS_PATH}" '--require-security-header-path'
             check_option_argument '--require-security-header-path path' "$2"
             HTTP_HEADERS_PATH=$2
             shift 2
@@ -3790,19 +3803,19 @@ $2"
 
         --fingerprint)
             check_option_argument '--fingerprint' "$2"
-            if [ -n "${FINGERPRINT_LOCK}" ] ; then unknown '--fingerprint can be specified only once'; fi
+            check_option "${FINGERPRINT_LOCK}" '--fingerprint'
             FINGERPRINT_LOCK="$2"
             shift 2
             ;;
         --fingerprint-alg)
             check_option_argument '--fingerprint-alg' "$2"
-            if [ -n "${FINGERPRINT_ALG_SPECIFIED}" ] ; then unknown '--fingerprint-alg can be specified only once'; fi
+            check_option "${FINGERPRINT_ALG_SPECIFIED}" '--fingerprint-alg'
             FINGERPRINT_ALG_SPECIFIED=1
             FINGERPRINT_ALG="$2"
             shift 2
             ;;
         --long-output)
-            if [ -n "${LONG_OUTPUT_ATTR}" ] ; then unknown '--long-output can be specified only once'; fi
+            check_option "${LONG_OUTPUT_ATTR}" '--long-output'
             check_option_argument '--long-output' "$2"
             LONG_OUTPUT_ATTR="$2"
             shift 2
@@ -3824,62 +3837,62 @@ $2"
             shift 2
             ;;
         --not-issued-by)
-            if [ -n "${NOT_ISSUED_BY}" ] ; then unknown '--not-issued-by can be specified only once'; fi
+            check_option "${NOT_ISSUED_BY}" '--not-issued-by'
             check_option_argument '--not-issued-by' "$2"
             NOT_ISSUED_BY="$2"
             shift 2
             ;;
         --not-valid-longer-than)
             check_option_argument '--not-valid-longer-than' "$2"
-            if [ -n "${NOT_VALID_LONGER_THAN}" ] ; then unknown '--not-valid-longer-than can be specified only once'; fi
+            check_option "${NOT_VALID_LONGER_THAN}" '--not-valid-longer-than'
             NOT_VALID_LONGER_THAN=$2
             shift 2
             ;;
         --ocsp-critical)
             check_option_argument '--ocsp-critical' "$2"
-            if [ -n "${OCSP_CRITICAL}" ] ; then unknown '--ocsp-critical can be specified only once'; fi
+            check_option "${OCSP_CRITICAL}" '--ocsp-critical'
             OCSP_CRITICAL="$2"
             shift 2
             ;;
         --ocsp-warning)
             check_option_argument '--ocsp-warning' "$2"
-            if [ -n "${OCSP_WARNING}" ] ; then unknown '--ocsp-warning can be specified only once'; fi
+            check_option "${OCSP_WARNING}" '--ocsp-warning'
             OCSP_WARNING="$2"
             shift 2
             ;;
         -o | --org)
             check_option_argument '-o|--org' "$2"
-            if [ -n "${ORGANIZATION}" ] ; then unknown '--org can be specified only once'; fi
+            check_option "${ORGANIZATION}" '--org'
             ORGANIZATION="$2"
             shift 2
             ;;
         --openssl)
             check_option_argument '--openssl' "$2"
-            if [ -n "${OPENSSL}" ] ; then unknown '--openssl can be specified only once'; fi
+            check_option "${OPENSSL}" '--openssl'
             OPENSSL="$2"
             shift 2
             ;;
         --password)
-            if [ -n "${PASSWORD_SOURCE}" ] ; then unknown '--password can be specified only once'; fi
+            check_option "${PASSWORD_SOURCE}" '--password'
             check_option_argument '--password' "$2"
             PASSWORD_SOURCE="$2"
             shift 2
             ;;
         -p | --port)
-            if [ -n "${PORT}" ] ; then unknown '--port can be specified only once'; fi
+            check_option "${PORT}" '--port'
             check_option_argument '-p|--port' "$2"
             PORT="$2"
             shift 2
             ;;
         --precision)
-            if [ -n "${SCALE}" ] ; then unknown '--precision can be specified only once'; fi
+            check_option "${SCALE}" '--precision'
             check_option_argument '--precision' "$2"
             check_integer "$2" "--precision: the precision should be an integer"
             SCALE="$2"
             shift 2
             ;;
         -P | --protocol)
-            if [ -n "${PROTOCOL}" ] ; then unknown '--protocol can be specified only once'; fi
+            check_option "${PROTOCOL}" '--protocol'
             check_option_argument '-P|--protocol' "$2"
             PROTOCOL="$2"
 
@@ -3889,50 +3902,50 @@ $2"
             shift 2
             ;;
         --proxy)
-            if [ -n "${PROXY}" ] ; then unknown '--proxy can be specified only once'; fi
+            check_option "${PROXY}" '--proxy'
             check_option_argument '--proxy' "$2"
             PROXY="$2"
             export http_proxy="$2"
             shift 2
             ;;
         --resolve)
-            if [ -n "${RESOLVE}" ] ; then unknown '--resolve can be specified only once'; fi
+            check_option "${RESOLVE}" '--resolve'
             check_option_argument '--resolve' "$2"
             RESOLVE="$2"
             shift 2
             ;;
         -r | --rootcert)
-            if [ -n "${ROOT_CA}" ] ; then unknown '--rootcert can be specified only once'; fi
+            check_option "${ROOT_CA}" '--rootcert'
             check_option_argument '-r|--rootcert' "$2"
             ROOT_CA="$2"
             shift 2
             ;;
         --rootcert-dir)
-            if [ -n "${ROOT_CA_DIR}" ] ; then unknown '--rootcert-dir can be specified only once'; fi
+            check_option "${ROOT_CA_DIR}" '--rootcert-dir'
             check_option_argument '--rootcert-dir' "$2"
             ROOT_CA_DIR="$2"
             shift 2
             ;;
         --rootcert-file)
-            if [ -n "${ROOT_CA_FILE}" ] ; then unknown '--rootcert-file can be specified only once'; fi
+            check_option "${ROOT_CA_FILE}" '--rootcert-file'
             check_option_argument '--rootcert-file' "$2"
             ROOT_CA_FILE="$2"
             shift 2
             ;;
         -C | --clientcert)
-            if [ -n "${CLIENT_CERT}" ] ; then unknown '--clientcert can be specified only once'; fi
+            check_option "${CLIENT_CERT}" '--clientcert'
             check_option_argument '-C|--clientcert' "$2"
             CLIENT_CERT="$2"
             shift 2
             ;;
         -K | --clientkey)
-            if [ -n "${CLIENT_KEY}" ] ; then unknown '--clientkey can be specified only once'; fi
+            check_option "${CLIENT_KEY}" '--clientkey'
             check_option_argument '-K|--clientkey' "$2"
             CLIENT_KEY="$2"
             shift 2
             ;;
         --clientpass)
-            if [ -n "${CLIENT_PASS}" ] ; then unknown '--clientpass can be specified only once'; fi
+            check_option "${CLIENT_PASS}" '--clientpass'
             if [ $# -gt 1 ]; then
                 CLIENT_PASS="$2"
                 shift 2
@@ -3941,13 +3954,13 @@ $2"
             fi
             ;;
         --sni)
-            if [ -n "${SNI}" ] ; then unknown '--sni can be specified only once'; fi
+            check_option "${SNI}" '--sni'
             check_option_argument '--sni' "$2"
             SNI="$2"
             shift 2
             ;;
         -S | --ssl)
-            if [ -n "${SSL_VERSION}" ] ; then unknown '--ssl can be specified only once'; fi
+            check_option "${SSL_VERSION}" '--ssl'
             deprecated "$1" "Use '--ssl2' or '--ssl3' instead"
             check_option_argument '' "$2"
             if [ "$2" = "2" ] || [ "$2" = "3" ]; then
@@ -3959,7 +3972,7 @@ $2"
             ;;
         -t | --timeout)
             # TIMEOUT has a default
-            if [ -n "${TIMEOUT_SPECIFIED}" ] ; then unknown '--timeout can be specified only once'; fi
+            check_option "${TIMEOUT_SPECIFIED}" '--timeout'
             TIMEOUT_SPECIFIED=1
             check_option_argument '-t|--timeout' "$2"
             check_integer "$2" "--timeout: the timeout should be an integer"
@@ -3967,27 +3980,27 @@ $2"
             shift 2
             ;;
         --temp)
-            if [ -n "${TMPDIR_SPECIFIED}" ] ; then unknown '--temp can be specified only once'; fi
+            check_option "${TMPDIR_SPECIFIED}" '--temp'
             TMPDIR_SPECIFIED=1
             check_option_argument '--temp' "$2"
             TMPDIR="$2"
             shift 2
             ;;
         -u | --url)
-            if [ -n "${HTTP_REQUEST_URL}" ] ; then unknown '--url can be specified only once'; fi
+            check_option "${HTTP_REQUEST_URL}" '--url'
             check_option_argument '-u|--url' "$2"
             HTTP_REQUEST_URL="$2"
             shift 2
             ;;
         --user-agent)
-            if [ -n "${HTTP_USER_AGENT}" ] ; then unknown '--user-agent can be specified only once'; fi
+            check_option "${HTTP_USER_AGENT}" '--user-agent'
             check_option_argument '--user-agent' "$2"
             HTTP_USER_AGENT="$2"
             shift 2
             ;;
         -w | --warning)
             # WARNING_DAYS has a default
-            if [ -n "${WARNING_SPECIFIED}" ] ; then unknown '--warning can be specified only once'; fi
+            check_option "${WARNING_SPECIFIED}" '--warning'
             WARNING_SPECIFIED=1
             check_option_argument '-w|--warning' "$2"
             check_float "$2" "--warning: the number of days should be an integer or a float"
@@ -3997,7 +4010,7 @@ $2"
             ;;
         --xmpphost)
             check_option_argument '--xmpphost' "$2"
-            if [ -n "${XMPPHOST}" ] ; then unknown '--xmpphost can be specified only once'; fi
+            check_option "${XMPPHOST}" '--xmpphost'
             XMPPHOST="$2"
             shift 2
             ;;
@@ -4007,9 +4020,7 @@ $2"
 
         --dane)
 
-            if [ -n "${DANE}" ]; then
-                unknown "--dane can be specified only once"
-            fi
+            check_option"${DANE}" "--dane"
 
             # check the second parameter if it exist
             if [ $# -gt 1 ]; then
@@ -4034,7 +4045,7 @@ $2"
 
         --maximum-validity)
 
-            if [ -n "${MAXIMUM_VALIDITY}" ] ; then unknown '--maximum-validity can be specified only once'; fi
+            check_option "${MAXIMUM_VALIDITY}" '--maximum-validity'
 
             MAXIMUM_VALIDITY=397
 
@@ -4055,7 +4066,7 @@ $2"
 
         --resolve-over-http)
 
-            if [ -n "${RESOLVE_OVER_HTTP}" ] ; then unknown '--resolve-over-http can be specified only once'; fi
+            check_option "${RESOLVE_OVER_HTTP}" '--resolve-over-http'
 
             # dns.google.com: we use the IP in case DNS is not directly reachable
             RESOLVE_OVER_HTTP=8.8.8.8
@@ -4077,7 +4088,7 @@ $2"
 
         --require-client-cert)
 
-            if [ -n "${REQUIRE_CLIENT_CERT}" ] ; then unknown '--require-client-cert can be specified only once'; fi
+            check_option "${REQUIRE_CLIENT_CERT}" '--require-client-cert'
 
             REQUIRE_CLIENT_CERT=1
 
@@ -4123,8 +4134,7 @@ $2"
 
         --ignore-connection-problems)
 
-            if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then unknown '--ignore-connection-problems can be specified only once'; fi
-
+            check_option "${IGNORE_CONNECTION_STATE}" '--ignore-connection-problems'
 
             # default OK
             IGNORE_CONNECTION_STATE="${STATUS_OK}"
@@ -4263,6 +4273,7 @@ main() {
 
     # read additional options from the configuration file
     if [ -r "${CONFIGURATION_FILE}" ]; then
+        OVERRIDE=1
         while IFS= read -r line; do
             # shellcheck disable=SC2086
             set -- "$@" ${line}
