@@ -1,5 +1,7 @@
 # News
 
+* 2024-09.27 Version 2.84.2
+  * Minor bug fix removing spurious debugging output
 * 2024-09.26 Version 2.84.1
   * Bug fixes in the handling of command line options
 * 2024-09-24 Version 2.84.0
