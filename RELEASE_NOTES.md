@@ -1,1 +1,1 @@
-Minor bug fix removing spurious debugging output
+Options specified in a configuration file can be overridden again
