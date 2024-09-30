@@ -131,6 +131,8 @@ check_option() {
     variable=$1
     text=$2
 
+    debuglog "Checking if ${text} was already specified (${variable}) (override: ${OVERRIDE})"
+
     if [ -n "${variable}" ] &&
            [ -z "${OVERRIDE}" ] ; then
         unknown "${text} can be specified only once"
@@ -4020,8 +4022,7 @@ $2"
 
         --dane)
 
-            check_option"${DANE}" "--dane"
-
+            check_option "${DANE}" "--dane"
             # check the second parameter if it exist
             if [ $# -gt 1 ]; then
 
