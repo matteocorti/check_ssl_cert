@@ -1618,7 +1618,7 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -serial | sed -e "s/^serial=//"
         ;;
     fingerprint)
-        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -${FINGERPRINT_ALG} | sed -e "s/^${FINGERPRINT_ALG} Fingerprint=//"
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -fingerprint -"${FINGERPRINT_ALG}" | sed -e "s/^${FINGERPRINT_ALG} Fingerprint=//"
         ;;
     oscp_uri)
         echo "${cert_content}" | "${OPENSSL}" "${OPENSSL_COMMAND}" -in /dev/stdin -noout ${OPENSSL_PARAMS} -ocsp_uri
@@ -3687,7 +3687,8 @@ parse_command_line_options() {
             ;;
         -H | --host)
             check_option_argument '-H|--host' "$2"
-            check_option "${HOST}" '--host'
+            check_option "${HOST_DEFINED}" '--host'
+            HOST_DEFINED=1
             HOST="$2"
 
             # remove http[s] from the input
