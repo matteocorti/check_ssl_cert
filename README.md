@@ -456,6 +456,7 @@ We are very grateful to our amazing supporters and sponsors!
 * [Claus-Theodor Riegg](https://github.com/crigertg)
 * [wols](https://github.com/wols)
 * [Netzkommune](https://github.com/netzkommune)
+* [Nicolas Wimmer](https://github.com/naiz0)
 
 If you'd like to support this script, please visit [our sponsorship page](https://github.com/sponsors/matteocorti) on GitHub.
 
