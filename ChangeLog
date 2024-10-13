@@ -1,3 +1,7 @@
+2024-10-13  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (parse_command_line_options): fix the validation of --url and --user-agent
+
 2024-09-10  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_option_argument): fixed a problem with | in the output
