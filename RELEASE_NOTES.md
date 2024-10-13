@@ -1,1 +1,1 @@
-Fixed the command line options checks on openSUSE
+Fixed a in the command line options validation for ```--url``` and ```--user-agent```

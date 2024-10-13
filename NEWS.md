@@ -1,5 +1,7 @@
 # News
 
+* 2024-10-02 Version 2.84.5
+  * Fixed a in the command line options validation for ```--url``` and ```--user-agent```
 * 2024-10-02 Version 2.84.4
   * Fixed a problem on openSUSE
 * 2024-09-27 Version 2.84.3

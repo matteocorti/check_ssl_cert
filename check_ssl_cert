@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.84.4
+VERSION=2.84.5
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -3993,13 +3993,15 @@ $2"
             shift 2
             ;;
         -u | --url)
-            check_option "${HTTP_REQUEST_URL}" '--url'
+            check_option "${HTTP_REQUEST_URL_SPECIFIED}" '--url'
+            HTTP_REQUEST_URL_SPECIFIED=1
             check_option_argument '-u|--url' "$2"
             HTTP_REQUEST_URL="$2"
             shift 2
             ;;
         --user-agent)
-            check_option "${HTTP_USER_AGENT}" '--user-agent'
+            check_option "${HTTP_USER_AGENT_SPECIFIED}" '--user-agent'
+            HTTP_USER_AGENT_SPECIFIED=1
             check_option_argument '--user-agent' "$2"
             HTTP_USER_AGENT="$2"
             shift 2
