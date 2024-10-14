@@ -10,7 +10,7 @@ FAILED=
 
 check_required() {
 
-    printf "Checking %20s:" $1
+    printf "Checking %20s:" "$1"
 
     PROG=$(command -v "$1" 2>/dev/null)
 
@@ -26,7 +26,7 @@ check_required() {
 
 check_optional() {
 
-    printf "Checking %20s:" $1
+    printf "Checking %20s:" "$1"
 
     PROG=$(command -v "$1" 2>/dev/null)
 
@@ -51,24 +51,25 @@ check_required openssl
 
 printf "\nChecking optional dependencies:\n\n"
 
-check_optional expect
-check_optional dig
-check_optional gmake
-check_optional expand
-check_optional tar
 check_optional bzip2
-check_optional ip
+check_optional dig
+check_optional expand
+check_optional expect
+check_optional gmake
 check_optional ifconfig
+check_optional ip
+check_optional java
 check_optional netcat
 check_optional python3
-check_optional java
+check_optional tar
 
 printf "\nChecking optional dependencies for development:\n\n"
 
-check_optional shunit2
-check_optional shfmt
-check_optional shellcheck
 check_optional dig
+check_optional gmake
+check_optional shellcheck
+check_optional shfmt
+check_optional shunit2
 
 
 if [ -n "${FAILED}" ] ; then
