@@ -10,31 +10,31 @@ FAILED=
 
 check_required() {
 
-    printf "Checking %20s:" "$1"
+    printf "Checking %35s:" "$1"
 
     PROG=$(command -v "$1" 2>/dev/null)
 
     if [ -z "${PROG}" ]; then
         ERROR="$1 not found"
-        printf " [${RED}error${NC}: %-20s]\n" "${ERROR}"
+        printf " [${RED}error${NC}: %-35s]\n" "${ERROR}"
         FAILED=1
     else
-        printf " [${GREEN}OK${NC}:    %-20s]\n" "${PROG}"
+        printf " [${GREEN}OK${NC}:    %-35s]\n" "${PROG}"
     fi
 
 }
 
 check_optional() {
 
-    printf "Checking %20s:" "$1"
+    printf "Checking %35s:" "$1"
 
     PROG=$(command -v "$1" 2>/dev/null)
 
     if [ -z "${PROG}" ]; then
         ERROR="$1 not found"
-        printf " [${YELLOW}error${NC}: %-20s]\n" "${ERROR}"
+        printf " [${YELLOW}error${NC}: %-35s]\n" "${ERROR}"
     else
-        printf " [${GREEN}OK${NC}:    %-20s]\n" "${PROG}"
+        printf " [${GREEN}OK${NC}:    %-35s]\n" "${PROG}"
     fi
 
 }
