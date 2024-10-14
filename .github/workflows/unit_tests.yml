@@ -77,6 +77,7 @@ jobs:
           - 'alpine:3.13'
           - 'fedora:39'
           - 'fedora:40'
+          - 'fedora:41'
         include:
 
 
@@ -129,6 +130,11 @@ jobs:
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
+          - distro: 'fedora:41'
+            pre: >-
+              dnf upgrade -y &&
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
 
 
     steps:
@@ -162,12 +168,17 @@ jobs:
         distro:
           - 'fedora:39'
           - 'fedora:40'
+          - 'fedora:41'
         include:
           - distro: 'fedora:39'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
           - distro: 'fedora:40'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
+          - distro: 'fedora:41'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -196,12 +207,17 @@ jobs:
         distro:
           - 'fedora:39'
           - 'fedora:40'
+          - 'fedora:40'
         include:
           - distro: 'fedora:39'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
           - distro: 'fedora:40'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
+          - distro: 'fedora:41'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git

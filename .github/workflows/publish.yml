@@ -16,14 +16,19 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'fedora:40'
           - 'fedora:39'
+          - 'fedora:40'
+          - 'fedora:41'
         include:
+          - distro: 'fedora:39'
+            pre: >-
+              dnf install -y hostname &&
+              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
           - distro: 'fedora:40'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
-          - distro: 'fedora:39'
+          - distro: 'fedora:41'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl rpm-build openssh-clients bc bash-completion
