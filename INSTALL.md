@@ -34,6 +34,8 @@ Following tools are required for development:
 * [codespell](https://github.com/codespell-project/codespell) for the spelling checks
 * ```dig``` for IPv6 tests
 
+You can check the installed dependencies with the ```utils/check_deps.sh``` script.
+
 ## Installation
 
 * You can run the plugin from the shell.
