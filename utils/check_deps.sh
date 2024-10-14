@@ -66,10 +66,10 @@ check_optional tar
 printf "\nChecking optional dependencies for development:\n\n"
 
 check_optional dig
-check_optional gmake
 check_optional shellcheck
 check_optional shfmt
 check_optional shunit2
+check_optional tinyproxy
 
 
 if [ -n "${FAILED}" ] ; then
