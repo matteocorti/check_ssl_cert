@@ -1,1 +1,1 @@
-Fixed a in the command line options validation for ```--url``` and ```--user-agent```
+Removed ```X-Frame-Options``` from the list of the required HTTP headers (is now deprecated)

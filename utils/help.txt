@@ -151,7 +151,7 @@
 --require-client-cert [list];certificate. 'list' is an optional comma
 --require-client-cert [list];separated list of expected client
 --require-dnssec;Require DNSSEC
---require-http-header header;(e.g., X-Frame-Options)
+--require-http-header header;(e.g., strict-transport-security)
 --require-http-header header;Require the specified HTTP header
 --require-no-http-header header;HTTP header (e.g., X-Powered-By)
 --require-no-http-header header;Require the absence of the specified

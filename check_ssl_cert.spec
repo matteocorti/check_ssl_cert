@@ -1,4 +1,4 @@
-%global version          2.84.5
+%global version          2.85.0
 %global release          0
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Oct 15 2024 Matteo Corti <matteo@corti.li> - 2.85.0-0
+- Updated to 2.85.0
+
 * Sun Oct 13 2024 Matteo Corti <matteo@corti.li> - 2.84.5-0
 - Updated to 2.84.5
 

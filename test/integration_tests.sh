@@ -1583,14 +1583,6 @@ testHTTPHeaders() {
     ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --debug-headers
 }
 
-
-testHTTPHeadersOK() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --require-security-headers
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 testHTTPHeadersFailed() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-security-headers

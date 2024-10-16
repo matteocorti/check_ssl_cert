@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.84.5
+VERSION=2.85.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -46,7 +46,7 @@ CONFIGURATION_FILE="${HOME}/.check_ssl_certrc"
 CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
-DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,X-Frame-Options,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
+DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
 DEFAULT_UNREQUIRED_HTTP_HEADERS="X-Powered-By,X-Aspnet-Version,X-XSS-Protection,X-AspNetMvc-Version"
 EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
@@ -146,7 +146,7 @@ check_option() {
 ################################################################################
 # Add the specified header to the list of required HTTP headers
 # Usage:
-#   add_required_header X-Frame-Options
+#   add_required_header strict-transport-security
 add_required_header() {
     header=$1
     debuglog "Adding ${header} to the list of required HTTP headers: ${REQUIRED_HTTP_HEADERS}"
@@ -516,7 +516,7 @@ usage() {
     echo "                                   certificate CAs"
     echo "      --require-dnssec             Require DNSSEC"
     echo "      --require-http-header header Require the specified HTTP header"
-    echo "                                   (e.g., X-Frame-Options)."
+    echo "                                   (e.g., strict-transport-security)."
     echo "                                   Can be specified more than once"
     echo "      --require-no-http-header header Require the absence of the specified"
     echo "                                   HTTP header (e.g., X-Powered-By)"
@@ -612,7 +612,8 @@ usage() {
     echo "                                   Alternative Name"
     echo "                                   extension"
     echo "      --require-security-header header require the specified HTTP"
-    echo "                                   security header (e.g., X-Frame-Options)"
+    echo "                                   security header"
+    echo "                                   (e.g., strict-transport-security)"
     echo "                                   (deprecated use --require-http-header)"
     echo "                                   Can be specified more than once"
     echo "      --require-security-headers   Require all the HTTP security headers:"
@@ -621,7 +622,6 @@ usage() {
     echo "                                     Referrer-Policy"
     echo "                                     strict-transport-security"
     echo "                                     X-Content-Type-Options"
-    echo "                                     X-Frame-Options"
     echo "      --require-security-headers-path path the path to be used to fetch HTTP"
     echo "                                   security headers"
     echo "      --require-x-frame-options [path] Require the presence of the"

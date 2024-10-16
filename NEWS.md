@@ -1,5 +1,7 @@
 # News
 
+* 2024-10-15 Version 2.85.0
+  * Removed ```X-Frame-Options``` from the list of the required HTTP headers (is now deprecated)
 * 2024-10-02 Version 2.84.5
   * Fixed a in the command line options validation for ```--url``` and ```--user-agent```
 * 2024-10-02 Version 2.84.4

@@ -232,7 +232,7 @@ Options:
                                    certificate CAs
       --require-dnssec             Require DNSSEC
       --require-http-header header Require the specified HTTP header
-                                    (e.g., X-Frame-Options)
+                                    (e.g., strict-transport-security)
       --require-no-http-header header Require the absence of the specified
                                    HTTP header (e.g., X-Powered-By)
       --require-no-ssl2            Critical if SSL version 2 is offered
