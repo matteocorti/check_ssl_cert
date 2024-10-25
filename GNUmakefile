@@ -9,7 +9,7 @@ DIST_FILES=AUTHORS.md COPYING.md ChangeLog INSTALL.md Makefile GNUmakefile NEWS.
 YEAR=`date +"%Y"`
 
 # file to be checked for formatting
-FORMATTED_FILES=test/unit_tests.sh test/integration_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
+FORMATTED_FILES=test/unit_tests.sh test/integration_tests.sh test/badssl_tests.sh ChangeLog INSTALL.md Makefile VERSION $(PLUGIN) $(PLUGIN).spec COPYRIGHT.md ${PLUGIN}.1 .github/workflows/* utils/*.sh check_ssl_cert.completion
 
 # shell scripts (to be checked with ShellCheck)
 SCRIPTS=check_ssl_cert test/*.sh utils/*.sh
@@ -121,7 +121,7 @@ disttest: dist formatting_check shellcheck codespell
 	./utils/check_documentation.sh
 	man ./check_ssl_cert.1 > /dev/null
 
-test: formatting_check shellcheck unit_tests integration_tests unit_tests_with_proxy integration_tests_with_proxy
+test: formatting_check shellcheck unit_tests integration_tests badssl_tests badssl_tests_with_proxy unit_tests_with_proxy integration_tests_with_proxy
 
 unit_tests:
 ifndef SHUNIT
@@ -157,6 +157,25 @@ ifndef SHUNIT
 else
 	./utils/start_proxy.sh ./test/tinyproxy.conf
 	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./integration_tests.sh )
+	killall tinyproxy
+	sleep 1
+endif
+
+badssl_tests:
+ifndef SHUNIT
+	@echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	( export SHUNIT2=$(SHUNIT) && export LC_ALL=C && cd test && ./badssl_tests.sh )
+endif
+
+badssl_tests_with_proxy:
+ifndef SHUNIT
+	@echo "No shUnit2 installed: see README.md"
+	exit 1
+else
+	./utils/start_proxy.sh ./test/tinyproxy.conf
+	( export SHUNIT2=$(SHUNIT) && export http_proxy=127.0.0.1:8888 && export LC_ALL=C && cd test && ./badssl_tests.sh )
 	killall tinyproxy
 	sleep 1
 endif

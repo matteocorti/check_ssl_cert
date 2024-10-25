@@ -1,3 +1,7 @@
+2024-10-25  Matteo Corti  <matteo@corti.li>
+
+        * test/integration_tests.sh: Separated the badssl.com tests as they are often failing (no connection)
+
 2024-10-16  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (DEFAULT_REQUIRED_HTTP_HEADERS): removed X-Frame-Options from the list of required headers (is now deprecated)

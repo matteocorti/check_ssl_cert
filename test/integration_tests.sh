@@ -331,56 +331,11 @@ testInfo() {
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com --info --ignore-exp
 }
 
-# testSignatureAlgorithms() {
-
-#     echo "  testing sha256WithRSAEncryption (2048 bit)"
-#     # shellcheck disable=SC2086
-#     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
-#         grep '^Signature algorithm' |
-#         sed 's/^Signature algorithm *//')
-#     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (2048 bit)' "${ALGORITHM}"
-
-#     echo "  testing sha256WithRSAEncryption (4096 bit)"
-#     # shellcheck disable=SC2086
-#     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
-#         grep '^Signature algorithm' |
-#         sed 's/^Signature algorithm *//')
-#     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (4096 bit)' "${ALGORITHM}"
-
-#     echo "  testing sha256WithRSAEncryption (8192 bit)"
-#     # shellcheck disable=SC2086
-#     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
-#         grep '^Signature algorithm' |
-#         sed 's/^Signature algorithm *//')
-#     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (8192 bit)' "${ALGORITHM}"
-
-# }
-
 testFQDN() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com. --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testSCT() {
-    if [ -z "${OPENSSL}" ]; then
-        OPENSSL=$(command -v openssl) # needed by openssl_version
-    fi
-    ${OPENSSL} version
-    if openssl_version '1.1.0'; then
-        echo "OpenSSL >= 1.1.0: SCTs supported"
-        # shellcheck disable=SC2086
-        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-    else
-        echo "OpenSSL < 1.1.0: SCTs not supported"
-        # shellcheck disable=SC2086
-        ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H no-sct.badssl.com --ignore-exp
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    fi
 }
 
 testPrometheus() {
@@ -635,291 +590,6 @@ testSMTPS() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
-
-################################################################################
-# From https://badssl.com
-
-testBadSSLExpired() {
-    host=expired.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLExpiredAndWarnThreshold() {
-    host=expired.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --warning 3000
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLWrongHost() {
-    host=wrong.host.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLSelfSigned() {
-    host=self-signed.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLUntrustedRoot() {
-    host=untrusted-root.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLRevoked() {
-    host=revoked.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testGRCRevoked() {
-    host=revoked.grc.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLIncompleteChain() {
-    host=incomplete-chain.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLDH480() {
-    host=dh480.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLDH512() {
-    host=dh512.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLRC4MD5() {
-    host=rc4-md5.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # older versions of OpenSSL validate RC4-MD5
-    if "${OPENSSL}" ciphers RC4-MD5 >/dev/null 2>&1; then
-        startSkipping
-        echo "Skipping test: OpenSSL too old to test RC4-MD5 ciphers"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-
-testBadSSLRC4() {
-    host=rc4.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # older versions of OpenSSL validate RC4
-    if "${OPENSSL}" ciphers RC4 >/dev/null 2>&1; then
-        startSkipping
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSL3DES() {
-    host=3des.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # older versions of OpenSSL validate RC4
-    if "${OPENSSL}" ciphers 3DES >/dev/null 2>&1; then
-        startSkipping
-        echo "Skipping test: OpenSSL too old to test 3DES ciphers"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLNULL() {
-    host=null.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLSHA256() {
-    host=sha256.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLEcc256() {
-    host=ecc256.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLEcc384() {
-    host=ecc384.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLRSA8192() {
-    host=rsa8192.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLLongSubdomainWithDashes() {
-    host=long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLLongSubdomain() {
-    host=longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testBadSSLSHA12016() {
-    host=sha1-2016.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testBadSSLSHA12017() {
-    host=sha1-2017.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
-        startSkipping
-        echo "Skipping test: cannot connect to ${host}:443"
-    fi
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-##############################################################################
-# End of the badssl.com tests
 
 testRequireOCSP() {
     # shellcheck disable=SC2086
@@ -1681,23 +1351,9 @@ testXFrameOptionsOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testXFrameOptionsFailed() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-http-header X-Frame-Options
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
 testHTTPHeaders() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -H securityheaders.com --ignore-exp --debug-headers
-}
-
-testHTTPHeadersFailed() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-security-headers
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testHTTPHeaderOK() {
@@ -1705,13 +1361,6 @@ testHTTPHeaderOK() {
     ${SCRIPT} ${TEST_DEBUG} -H github.com --ignore-exp --require-http-header X-Frame-Options --require-http-header x-xss-protection
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testHTTPHeaderFailed() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H badssl.com --ignore-exp --require-http-header X-Frame-Options --require-http-header x-xss-protection
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testHTTPNoHeaderOK() {
@@ -1774,20 +1423,6 @@ testRootCertNotInChainGoogle() {
     ${SCRIPT} ${TEST_DEBUG} -H google.com --verbose | grep -q 'The root certificate is unnecessarily present in the delivered certificate chain'
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NOT_OK}" "${EXIT_CODE}"
-}
-
-testWrongHost() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testWrongHostIgnore() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host wrong.host.badssl.com --ignore-host-cn --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testMQTTS() {
