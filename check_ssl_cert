@@ -4033,7 +4033,10 @@ $2"
             if [ $# -gt 1 ]; then
 
                 # shellcheck disable=SC2295
-                if [ "${2%${2#?}}"x = '-x' ]; then
+                if [ -z "$2" ]; then
+                    DANE=1
+                    shift 2
+                elif [ "${2%${2#?}}"x = '-x' ]; then
                     DANE=1
                     shift
                 else
