@@ -1512,6 +1512,18 @@ require_s_client_option() {
 }
 
 ################################################################################
+# Checks if s_client does not support the given option
+#
+# Usage:
+#   check_s_client_option '-no_ssl2'
+#
+check_s_client_option() {
+    debuglog "Checking if s_client supports the $1 option"
+    "${OPENSSL}" s_client -help 2>&1 | "${GREP_BIN}" -q -- "$1"
+    return $?
+}
+
+################################################################################
 # Exits with unknown if x509 does not support the given option
 #
 # Usage:
@@ -5898,7 +5910,11 @@ main() {
 
     CLIENT=""
     if [ -n "${CLIENT_CERT}" ]; then
-        CLIENT="-cert ${CLIENT_CERT}"
+        if check_s_client_option '-chainCAfile'; then
+            CLIENT="-cert ${CLIENT_CERT} -chainCAfile ${CLIENT_CERT}"
+        else
+            CLIENT="-cert ${CLIENT_CERT}"
+        fi
     fi
     if [ -n "${CLIENT_KEY}" ]; then
         CLIENT="${CLIENT} -key ${CLIENT_KEY}"

@@ -35,8 +35,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-12
           - macos-13
+          - macos-14
           - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
