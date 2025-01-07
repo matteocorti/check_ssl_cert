@@ -1,5 +1,7 @@
 # News
 
+* 2025-01-07 Version 2.85.1
+  * Allows an empty argument to the ```--dane``` option
 * 2024-10-15 Version 2.85.0
   * Removed ```X-Frame-Options``` from the list of the required HTTP headers (is now deprecated)
 * 2024-10-02 Version 2.84.5
