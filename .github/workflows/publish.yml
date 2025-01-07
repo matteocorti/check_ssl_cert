@@ -52,7 +52,7 @@ jobs:
               && . ./utils/prepare_rpm.sh \
               && echo "$RPM  --> $RPMDIR" \
               && echo "$SRPM --> $SRPMDIR" \
-              && mkdir /root/.ssh \
+              && mkdir -p /root/.ssh \
               && chmod 700 /root/.ssh \
               && cp id_rsa /root/.ssh \
               && chmod 600 /root/.ssh/id_rsa \
