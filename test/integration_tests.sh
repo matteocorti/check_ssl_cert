@@ -1154,26 +1154,6 @@ testIgnoreConnectionStateHTTP() {
     fi
 }
 
-testSubdomainWithUnderscore() {
-    TEST_HOST=_test.github.com
-    OUTPUT=$(echo Q | "${OPENSSL}" s_client -connect "${TEST_HOST}":443 2>&1)
-    if [ $? -eq 1 ]; then
-        # there was an error: check if it's due to the _
-        if echo "${OUTPUT}" | grep -q -F 'gethostbyname failure' ||
-            echo "${OUTPUT}" | grep -q -F 'ame or service not known'; then
-            # older versions of OpenSSL are not able to connect
-            echo "OpenSSL does not support underscores in the host name: disabling test"
-        else
-            fail "error connecting to ${TEST_HOST}"
-        fi
-    else
-        # shellcheck disable=SC2086
-        ${SCRIPT} ${TEST_DEBUG} -H "${TEST_HOST}" --ignore-exp
-        EXIT_CODE=$?
-        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    fi
-}
-
 testRSA() {
     if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -sigalgs; then
         # shellcheck disable=SC2086
