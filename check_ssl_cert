@@ -4942,7 +4942,7 @@ main() {
     debuglog "NAMES_TO_BE_CHECKED = ${NAMES_TO_BE_CHECKED}"
 
     if [ -n "${ALTNAMES}" ] && [ -z "${IGNORE_HOST_CN}" ] && [ -z "${NAMES_TO_BE_CHECKED}" ] && [ "${HOST_IS_IP}" -eq 0 ]; then
-        unknown "--altnames requires a common name to match (--cn or --host-cn)"
+        unknown "--altnames requires a common name to match (--match)"
     fi
 
     ##############################################################################
