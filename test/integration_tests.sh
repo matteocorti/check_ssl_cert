@@ -598,6 +598,13 @@ testRequireOCSP() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testRequireNoTLS12() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host tls13.1d.pw --require-no-tls1_2 --ignore-exp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 # tests for -4 and -6
 testIPv4() {
     if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- -4; then
@@ -742,6 +749,12 @@ testMoreErrors2() {
 # dane
 
 testDANE211() {
+
+    if [ -z "${DANE}" ]; then
+        startSkipping
+        echo "Skipping DANE tests as there is no DANE support in OpenSSL"
+    fi
+
     # dig is needed for DANE
     if command -v dig >/dev/null; then
 

@@ -239,6 +239,7 @@ Options:
       --require-no-ssl3            Critical if SSL version 3 is offered
       --require-no-tls1            Critical if TLS 1 is offered
       --require-no-tls1_1          Critical if TLS 1.1 is offered
+      --require-no-tls1_2          Critical if TLS 1.2 is offered
       --require-ocsp-stapling      Require OCSP stapling
       --require-purpose usage      Require the specified key usage (can be
                                    specified more then once)

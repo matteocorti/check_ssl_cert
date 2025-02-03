@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.85.1
+VERSION=2.86.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -525,6 +525,7 @@ usage() {
     echo "      --require-no-ssl3            Critical if SSL version 3 is offered"
     echo "      --require-no-tls1            Critical if TLS 1 is offered"
     echo "      --require-no-tls1_1          Critical if TLS 1.1 is offered"
+    echo "      --require-no-tls1_2          Critical if TLS 1.2 is offered"
     echo "      --require-ocsp-stapling      Require OCSP stapling"
     echo "      --require-purpose usage      Require the specified key usage (can be"
     echo "                                   specified more then once)"
@@ -3438,6 +3439,10 @@ parse_command_line_options() {
             ;;
         --require-no-tls1_1)
             DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} TLSv1.1"
+            shift
+            ;;
+        --require-no-tls1_2)
+            DISALLOWED_PROTOCOLS="${DISALLOWED_PROTOCOLS} TLSv1.2"
             shift
             ;;
         --require-ocsp-stapling)
