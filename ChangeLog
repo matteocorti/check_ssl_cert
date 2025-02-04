@@ -1,6 +1,6 @@
 2025-02-03  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert (parse_command_line_options): --require-no-tls1_3 command line option added
+        * check_ssl_cert (parse_command_line_options): --require-no-tls1_2 command line option added
 
 2024-10-25  Matteo Corti  <matteo@corti.li>
 
