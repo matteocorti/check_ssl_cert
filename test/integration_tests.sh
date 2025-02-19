@@ -449,7 +449,7 @@ testRootIssuer() {
 testValidity() {
     # Tests bug #8
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.github.com -w 1000 --critical 1 --ignore-ocsp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_WARNING}" "${EXIT_CODE}"
 }
