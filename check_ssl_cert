@@ -5635,21 +5635,23 @@ main() {
             echo "${DIG_OUTPUT}" | sed 's/^/[DBG]     /' 1>&2
         fi
 
+        # The output of dig on Ubuntu is sometimes interpreted as binary: we are using grep -a
+
         DNSSEC_ERROR=
         # check for the presence of the Authenticated Data (ad) flag in the header
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ';; flags:' | "${GREP_BIN}" -q 'ad[; ]'; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -a ';; flags:' | "${GREP_BIN}" -a -q 'ad[; ]'; then
             prepend_critical_message "DNSSEC: the Authenticated Data (ad) flag is not present"
             DNSSEC_ERROR=1
         fi
 
         # check the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" ', flags:' | "${GREP_BIN}" -q 'do[; ]'; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -a ', flags:' | "${GREP_BIN}" -a -q 'do[; ]'; then
             prepend_critical_message "DNSSEC: the DNSSEC OK (do) flag indicating the recursive server is DNSSEC-aware is not present"
             DNSSEC_ERROR=1
         fi
 
         # check for the presence of an additional resource record of type RRSIG, with the same name as the A record.
-        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -q 'RRSIG'; then
+        if ! echo "${DIG_OUTPUT}" | "${GREP_BIN}" -a -q 'RRSIG'; then
             prepend_critical_message "DNSSEC: the RRSIG resource record is not present"
             DNSSEC_ERROR=1
         fi
