@@ -1,3 +1,7 @@
+2025-02-24  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed a problem with the DNSSEC check with IPv6 on Ubuntu
+
 2025-02-03  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (parse_command_line_options): --require-no-tls1_2 command line option added

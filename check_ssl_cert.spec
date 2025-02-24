@@ -1,4 +1,4 @@
-%global version          2.86.0
+%global version          2.86.1
 %global release          0
 %global sourcename       check_ssl_cert
 %global packagename      nagios-plugins-check_ssl_cert
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Feb 24 2025 Matteo Corti <matteo@corti.li> - 2.86.1-0
+- Updated to 2.86.1
+
 * Mon Feb  3 2025 Matteo Corti <matteo@corti.li> - 2.86.0-0
 - Updated to 2.86.0
 

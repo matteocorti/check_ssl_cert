@@ -266,8 +266,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.86.0
-date-released: 2027-02-03
+version: 2.86.1
+date-released: 2025-02-24
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
