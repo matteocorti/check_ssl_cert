@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.86.1
+VERSION=2.87.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -406,7 +406,7 @@ usage() {
     echo "                                   pattern specified in -n (or the host name)"
     echo "      --ignore-connection-problems [state] In case of connection problems"
     echo "                                   returns OK or the optional state"
-    echo "      --ignore-dh                  Ignore too smal DH for keys"
+    echo "      --ignore-dh                  Ignore too small DH keys"
     echo "      --ignore-exp                 Ignore expiration date"
     echo "      --ignore-http-headers        Ignore checks on HTTP headers with --all"
     echo "                                   and --all-local"

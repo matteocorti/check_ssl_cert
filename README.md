@@ -131,6 +131,7 @@ Options:
                                    pattern specified in -n (or the host name)
       --ignore-connection-problems [state] In case of connection problems
                                    returns OK or the optional state
+      --ignore-dh                  Ignore too small DH keys
       --ignore-exp                 Ignore expiration date
       --ignore-http-headers        Ignore checks on HTTP headers with --all
                                    and --all-local

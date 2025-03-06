@@ -117,6 +117,9 @@ authors:
 - family-names: "Niewiara"
   given-names: "Michael"
   website: https://github.com/mobitux
+- family-names: "Margula"
+  given-names: "Michał"
+  website: https://github.com/alchemyx
 - family-names: "Koudelka"
   given-names: "Milan"
 - name: Naveen
@@ -266,8 +269,8 @@ authors:
   given-names: "Дилян"
   website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.86.1
-date-released: 2025-02-24
+version: 2.87.0
+date-released: 2025-03-06
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
