@@ -406,6 +406,7 @@ usage() {
     echo "                                   pattern specified in -n (or the host name)"
     echo "      --ignore-connection-problems [state] In case of connection problems"
     echo "                                   returns OK or the optional state"
+    echo "      --ignore-dh                  Ignore too smal DH for keys"
     echo "      --ignore-exp                 Ignore expiration date"
     echo "      --ignore-http-headers        Ignore checks on HTTP headers with --all"
     echo "                                   and --all-local"
@@ -2941,8 +2942,9 @@ fetch_certificate() {
             prepend_critical_message 'QUIC not supported'
 
         elif ascii_grep 'dh[ ]key[ ]too[ ]small' "${ERROR}"; then
-
-            prepend_critical_message 'DH with a key too small'
+            if [ -z "${IGNORE_DH}" ]; then
+                prepend_critical_message 'DH with a key too small'
+            fi
 
         elif ascii_grep 'alert[ ]handshake[ ]failure' "${ERROR}"; then
 
@@ -3277,6 +3279,10 @@ parse_command_line_options() {
             ;;
         --ignore-altnames)
             ALTNAMES=
+            shift
+            ;;
+        --ignore-dh)
+            IGNORE_DH=1
             shift
             ;;
         --ignore-http-headers)
