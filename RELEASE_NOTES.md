@@ -1,1 +1,1 @@
-Added an option to ignore DH keys which are too small
+Fixed a syntax error in the Icinga configuration

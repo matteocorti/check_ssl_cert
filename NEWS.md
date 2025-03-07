@@ -1,5 +1,7 @@
 # News
 
+* 2023-03-07 Version 2.87.1
+  * Fixed a syntax error in the Icinga configuration
 * 2025-03-06 Version 2.87.0
   * Added an option to ignore DH keys which are too small
 * 2025-02-24 Version 2.86.1
