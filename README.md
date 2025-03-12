@@ -47,8 +47,6 @@ Options:
       --check-ssl-labs-warn grade  SSL Labs grade on which to warn
       --clientpass phrase          Set passphrase for client certificate.
       --configuration file         Read options from the specified file
-      --crl                        Check revocation via CRL (requires
-                                   --rootcert-file)
       --curl-bin path              Path of the curl binary to be used
       --custom-http-header string  Custom HTTP header sent when getting the
                                    cert example: 'X-Check-Ssl-Cert: Foobar=1'
@@ -131,6 +129,7 @@ Options:
                                    pattern specified in -n (or the host name)
       --ignore-connection-problems [state] In case of connection problems
                                    returns OK or the optional state
+      --ignore-crl                 Ignore CRLs
       --ignore-dh                  Ignore too small DH keys
       --ignore-exp                 Ignore expiration date
       --ignore-http-headers        Ignore checks on HTTP headers with --all
@@ -296,6 +295,8 @@ Deprecated options:
                                    alternate names too (enabled by default)
    -n,--cn name                    Pattern to match the CN or AltName
                                    (can be specified multiple times)
+      --crl                        Check revocation via CRL (enabled by
+                                   default)
       --curl-user-agent string     User agent that curl shall use to obtain
                                    the issuer cert
       --days days                  Minimum number of days a certificate has

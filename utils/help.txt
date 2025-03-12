@@ -14,8 +14,6 @@
 --check-ssl-labs-warn grade;SSL Labs grade on which to warn
 --clientpass phrase;Set passphrase for client certificate.
 --configuration file;Read options from the specified file
---crl;--rootcert-file)
---crl;Check revocation via CRL (requires
 --curl-bin path;Path of the curl binary to be used
 --custom-http-header string;Custom HTTP header sent when getting the
 --custom-http-header string;cert example: 'X-Check-Ssl-Cert: Foobar=1'
@@ -67,6 +65,7 @@
 --http-use-get;Use GET instead of HEAD (default) for the
 --ignore-altnames;Ignore alternative names when matching
 --ignore-altnames;pattern specified in -n (or the host name)
+--ignore-crl;Ignore CRLs
 --ignore-connection-problems [state];In case of connection problems
 --ignore-connection-problems [state];returns OK or the optional state
 --ignore-dh;Ignore too small DH keys

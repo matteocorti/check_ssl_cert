@@ -1,1 +1,1 @@
-Fixed a syntax error in the Icinga configuration
+CRL check is enabled by default

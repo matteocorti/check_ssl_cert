@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.87.1
+VERSION=2.88.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -316,8 +316,6 @@ usage() {
     echo "      --clientpass phrase          Set passphrase for client certificate."
     echo "      --configuration file         Read options from the specified file"
     echo "                                   Can be specified more than once"
-    echo "      --crl                        Check revocation via CRL (requires"
-    echo "                                   --rootcert-file)"
     echo "      --curl-bin path              Path of the curl binary to be used"
     echo "      --custom-http-header string  Custom HTTP header sent when getting the"
     echo "                                   cert example: 'X-Check-Ssl-Cert: Foobar=1'"
@@ -406,6 +404,7 @@ usage() {
     echo "                                   pattern specified in -n (or the host name)"
     echo "      --ignore-connection-problems [state] In case of connection problems"
     echo "                                   returns OK or the optional state"
+    echo "      --ignore-crl                 Ignore CRLs"
     echo "      --ignore-dh                  Ignore too small DH keys"
     echo "      --ignore-exp                 Ignore expiration date"
     echo "      --ignore-http-headers        Ignore checks on HTTP headers with --all"
@@ -589,6 +588,8 @@ usage() {
     echo "                                   alternate names too (enabled by default)"
     echo "   -n,--cn name                    Pattern to match the CN or AltName"
     echo "                                   (can be specified multiple times)"
+    echo "      --crl                        Check revocation via CRL (enabled by"
+    echo "                                   default)"
     echo "      --curl-user-agent string     User agent that curl shall use to obtain"
     echo "                                   the issuer cert"
     echo "      --days days                  Minimum number of days a certificate has"
@@ -1922,15 +1923,169 @@ check_required_prog() {
 }
 
 ################################################################################
+# Fetches the issuer cert for a given certificate element
+# Params
+#   $1 certificate element
+# Stores the fetched  certificate in ISSUER_CERT
+fetch_issuer_cert() {
+
+    ISSUER_CERT=
+    if [ -n "${ISSUER_CERT_CACHE}" ]; then
+
+        if [ -r "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt" ]; then
+
+            debuglog "Found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+            ISSUER_CERT="${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+        else
+
+            debuglog "Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+        fi
+
+    fi
+
+    ELEMENT_ISSUER_URIS="$(extract_cert_attribute 'issuer_uri' "${CERT_ELEMENT}")"
+
+    if [ -z "${ELEMENT_ISSUER_URIS}" ]; then
+        verboselog "Warning cannot find the CA Issuers in the certificate chain element ${el_number}: disabling revokation checks on chain element ${el_number}"
+        return
+    fi
+
+    debuglog "Chain element issuer URIs: ${ELEMENT_ISSUER_URIS}"
+
+    for ELEMENT_ISSUER_URI in ${ELEMENT_ISSUER_URIS}; do
+
+        debuglog "checking issuer URIs: ${ELEMENT_ISSUER_URI}"
+
+        # shellcheck disable=SC2021
+        ELEMENT_ISSUER_URI_WO_SPACES_TMP="$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')"
+        if [ "${ELEMENT_ISSUER_URI}" != "${ELEMENT_ISSUER_URI_WO_SPACES_TMP}" ]; then
+            verboselog "Warning: unable to fetch the CA issuer certificate (spaces in URI): skipping"
+            continue
+        elif ! echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -q -i '^http'; then
+            verboselog "Warning: unable to fetch the CA issuer certificate (unsupported protocol): skipping"
+            continue
+        fi
+
+        if [ -z "${ISSUER_CERT}" ]; then
+
+            debuglog "Fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
+
+            TIMEOUT_REASON="Fetching issuer ${ELEMENT_ISSUER_URI}"
+            if [ -n "${HTTP_USER_AGENT}" ]; then
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+            else
+                exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
+            fi
+            unset TIMEOUT_REASON
+
+            TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+            debuglog "Issuer certificate type (1): ${TYPE_TMP}"
+
+            if echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -F -q 'p7c'; then
+                debuglog "Converting issuer certificate from PKCS #7 to PEM"
+
+                open_for_writing "${ISSUER_CERT_TMP2}"
+                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
+
+                ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+
+            fi
+
+            TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+            debuglog "Issuer certificate type (2): ${TYPE_TMP}"
+
+            # check for errors
+            if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q HTML; then
+                debuglog "HTML page returned instead of a certificate"
+                critical "Unable to fetch a valid certificate issuer certificate (HTML page returned)."
+            fi
+
+            # check the result
+            if ! "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(ASCII|PEM)'; then
+
+                if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
+
+                    debuglog "Converting issuer certificate from DER to PEM"
+
+                    open_for_writing "${ISSUER_CERT_TMP2}"
+                    cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
+
+                    ${OPENSSL} x509 -in /dev/stdin -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+
+                elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q 'empty'; then
+
+                        # empty certs are allowed
+                    debuglog "Empty issuer certificate detected: skipping"
+                    return
+
+                else
+
+                    TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}")"
+                    debuglog "Complete issuer certificate type ${TYPE_TMP}"
+
+                    critical "Unable to fetch a valid certificate issuer certificate."
+
+                fi
+
+            fi
+
+            TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
+            debuglog "Issuer certificate type (3): ${TYPE_TMP}"
+
+            if [ -n "${DEBUG_CERT}" ]; then
+
+                # remove trailing /
+                FILE_NAME=${ELEMENT_ISSUER_URI%/}
+
+                # remove everything up to the last slash
+                FILE_NAME="${FILE_NAME##*/}"
+
+                debuglog "Storing a copy of the retrieved issuer certificate to ${FILE_NAME} for debugging purposes"
+
+                open_for_writing "${FILE_NAME}"
+                cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
+
+            fi
+
+            if [ -n "${ISSUER_CERT_CACHE}" ]; then
+
+                if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
+                    unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writable!"
+                fi
+
+                debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+                open_for_writing "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+                cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
+
+            fi
+
+            ISSUER_CERT=${ISSUER_CERT_TMP}
+
+        fi
+
+    done
+
+}
+
+################################################################################
 # Checks cert revocation via CRL
 # Params
 #   $1 cert
 #   $2 element number
 check_crl() {
+
     el_number=1
     if [ -n "$2" ]; then
         el_number=$2
     fi
+
+    debuglog "Checking CRL for element ${el_number}"
+    subject=$( extract_cert_attribute 'subject' "${CERT_ELEMENT}")
+    debuglog "Checking CRL for element ${el_number} (${subject})"
 
     create_temporary_file
     CERT_ELEMENT=${TEMPFILE}
@@ -1974,22 +2129,11 @@ check_crl() {
 
         fi
 
-        # combine the certificate and the CRL
-        debuglog "Combining the certificate, the CRL and the root cert"
-        debuglog "cat ${CRL_TMP_PEM} ${CERT} ${ROOT_CA_FILE} > ${CRL_TMP_CHAIN}"
-        cat "${CRL_TMP_PEM}" "${CERT}" "${ROOT_CA_FILE}" >"${CRL_TMP_CHAIN}"
 
-        debuglog "${OPENSSL} verify -crl_check -CRLfile ${CRL_TMP_PEM} ${CERT_ELEMENT}"
-        CRL_RESULT=$(
-            "${OPENSSL}" verify -crl_check -CAfile "${CRL_TMP_CHAIN}" -CRLfile "${CRL_TMP_PEM}" "${CERT_ELEMENT}" 2>&1 |
-                "${GREP_BIN}" -F ':' |
-                head -n 1 |
-                sed 's/^.*: //'
-        )
+        SERIAL="$(extract_cert_attribute 'serial' "${CERT_ELEMENT}")"
+        debuglog "Checking if the element serial number (${SERIAL}) is contained in the CRL"
 
-        debuglog "  result: ${CRL_RESULT}"
-
-        if ! [ "${CRL_RESULT}" = 'OK' ]; then
+        if openssl crl -in "${CRL_TMP_PEM}" -text | grep -q "${SERIAL}" ; then
             prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
         fi
 
@@ -2037,145 +2181,12 @@ check_ocsp() {
             critical 'unable to find issuer certificate hash.'
         fi
 
-        ISSUER_CERT=
-        if [ -n "${ISSUER_CERT_CACHE}" ]; then
+        fetch_issuer_cert "${CERT_ELEMENT}"
 
-            if [ -r "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt" ]; then
-
-                debuglog "Found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
-                ISSUER_CERT="${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
-            else
-
-                debuglog "Not found cached Issuer Certificate: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
-            fi
-
-        fi
-
-        ELEMENT_ISSUER_URIS="$(extract_cert_attribute 'issuer_uri' "${CERT_ELEMENT}")"
-
-        if [ -z "${ELEMENT_ISSUER_URIS}" ]; then
-            verboselog "Warning cannot find the CA Issuers in the certificate chain element ${el_number}: disabling OCSP checks on chain element ${el_number}"
+        if ! [ -r "${ISSUER_CERT}" ] ; then
+            verboselog "Unable to fetch the issuer certificate: skipping OCSP check"
             return
         fi
-
-        debuglog "Chain element issuer URIs: ${ELEMENT_ISSUER_URIS}"
-
-        for ELEMENT_ISSUER_URI in ${ELEMENT_ISSUER_URIS}; do
-
-            debuglog "checking issuer URIs: ${ELEMENT_ISSUER_URI}"
-
-            # shellcheck disable=SC2021
-            ELEMENT_ISSUER_URI_WO_SPACES_TMP="$(echo "${ELEMENT_ISSUER_URI}" | tr -d '[[:space:]]')"
-            if [ "${ELEMENT_ISSUER_URI}" != "${ELEMENT_ISSUER_URI_WO_SPACES_TMP}" ]; then
-                verboselog "Warning: unable to fetch the CA issuer certificate (spaces in URI): skipping"
-                continue
-            elif ! echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -q -i '^http'; then
-                verboselog "Warning: unable to fetch the CA issuer certificate (unsupported protocol): skipping"
-                continue
-            fi
-
-            if [ -z "${ISSUER_CERT}" ]; then
-
-                debuglog "OCSP: fetching issuer certificate ${ELEMENT_ISSUER_URI} to ${ISSUER_CERT_TMP}"
-
-                TIMEOUT_REASON="OCSP: fetching issuer ${ELEMENT_ISSUER_URI}"
-                if [ -n "${HTTP_USER_AGENT}" ]; then
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
-                else
-                    exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --location \\\"${ELEMENT_ISSUER_URI}\\\" > ${ISSUER_CERT_TMP}"
-                fi
-                unset TIMEOUT_REASON
-
-                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
-                debuglog "OCSP: issuer certificate type (1): ${TYPE_TMP}"
-
-                if echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -F -q 'p7c'; then
-                    debuglog "OCSP: converting issuer certificate from PKCS #7 to PEM"
-
-                    open_for_writing "${ISSUER_CERT_TMP2}"
-                    cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
-
-                    ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
-
-                fi
-
-                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
-                debuglog "OCSP: issuer certificate type (2): ${TYPE_TMP}"
-
-                # check for errors
-                if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q HTML; then
-                    debuglog "OCSP: HTML page returned instead of a certificate"
-                    critical "Unable to fetch a valid certificate issuer certificate (HTML page returned)."
-                fi
-
-                # check the result
-                if ! "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(ASCII|PEM)'; then
-
-                    if "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
-
-                        debuglog "OCSP: converting issuer certificate from DER to PEM"
-
-                        open_for_writing "${ISSUER_CERT_TMP2}"
-                        cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
-
-                        ${OPENSSL} x509 -in /dev/stdin -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
-
-                    elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q 'empty'; then
-
-                        # empty certs are allowed
-                        debuglog "OCSP empty certificate detected: skipping"
-                        return
-
-                    else
-
-                        TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}")"
-                        debuglog "OCSP: complete issuer certificate type ${TYPE_TMP}"
-
-                        critical "Unable to fetch a valid certificate issuer certificate."
-
-                    fi
-
-                fi
-
-                TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
-                debuglog "OCSP: issuer certificate type (3): ${TYPE_TMP}"
-
-                if [ -n "${DEBUG_CERT}" ]; then
-
-                    # remove trailing /
-                    FILE_NAME=${ELEMENT_ISSUER_URI%/}
-
-                    # remove everything up to the last slash
-                    FILE_NAME="${FILE_NAME##*/}"
-
-                    debuglog "OCSP: storing a copy of the retrieved issuer certificate to ${FILE_NAME} for debugging purposes"
-
-                    open_for_writing "${FILE_NAME}"
-                    cp "${ISSUER_CERT_TMP}" "${FILE_NAME}"
-
-                fi
-
-                if [ -n "${ISSUER_CERT_CACHE}" ]; then
-
-                    if [ ! -w "${ISSUER_CERT_CACHE}" ]; then
-                        unknown "Issuer certificates cache ${ISSUER_CERT_CACHE} is not writable!"
-                    fi
-
-                    debuglog "Storing Issuer Certificate to cache: ${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
-                    open_for_writing "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-                    cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_CACHE}/${ISSUER_HASH}.crt"
-
-                fi
-
-                ISSUER_CERT=${ISSUER_CERT_TMP}
-
-            fi
-
-        done
 
         OCSP_URIS="$(extract_cert_attribute 'oscp_uri' "${CERT_ELEMENT}")"
 
@@ -3281,6 +3292,10 @@ parse_command_line_options() {
             ALTNAMES=
             shift
             ;;
+        --ignore-crl)
+            CRL=""
+            shift
+            ;;
         --ignore-dh)
             IGNORE_DH=1
             shift
@@ -4243,7 +4258,7 @@ main() {
     NAMES_TO_BE_CHECKED="__HOST__" # enabled by default
     CRITICAL_DAYS=15
     CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
-    CRL=""
+    CRL=1
     CURL_BIN=""
     CURL_PROXY=""
     HTTP_USER_AGENT="check_ssl_cert/${VERSION}"
@@ -5180,12 +5195,6 @@ main() {
 
     fi
 
-    if [ -n "${CRL}" ] && [ -z "${ROOT_CA_FILE}" ]; then
-
-        unknown "To be able to check CRL we need the Root Cert. Please specify it with the --rootcert-file option"
-
-    fi
-
     if [ -n "${TMPDIR}" ]; then
 
         if [ ! -d "${TMPDIR}" ]; then
@@ -5901,17 +5910,11 @@ main() {
     CRL_TMP=${TEMPFILE}
     create_temporary_file
     CRL_TMP_PEM=${TEMPFILE}
+
     create_temporary_file
-    CRL_TMP_CHAIN=${TEMPFILE}
-
-    if [ -n "${OCSP}" ]; then
-
-        create_temporary_file
-        ISSUER_CERT_TMP=${TEMPFILE}
-        create_temporary_file
-        ISSUER_CERT_TMP2=${TEMPFILE}
-
-    fi
+    ISSUER_CERT_TMP=${TEMPFILE}
+    create_temporary_file
+    ISSUER_CERT_TMP2=${TEMPFILE}
 
     if [ -n "${REQUIRE_OCSP_STAPLING}" ]; then
         create_temporary_file

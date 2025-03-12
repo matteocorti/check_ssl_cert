@@ -1,5 +1,7 @@
 --altnames;Match the pattern specified in -n with
 --altnames;alternate names too (enabled by default)
+--crl;Check revocation via CRL (enabled by
+--crl;default)
 --curl-user-agent string;User agent that curl shall use to obtain
 --curl-user-agent string;the issuer cert
 --days days;(see --critical and --warning)

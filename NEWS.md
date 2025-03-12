@@ -1,6 +1,8 @@
 # News
 
-* 2023-03-07 Version 2.87.1
+* 2025-03-12 Version 2.88.0
+  * CRL check is enabled by default
+* 2025-03-07 Version 2.87.1
   * Fixed a syntax error in the Icinga configuration
 * 2025-03-06 Version 2.87.0
   * Added an option to ignore DH keys which are too small
