@@ -6680,13 +6680,13 @@ EOF
 
                 check_cert_end_date "${chain_element}" "${elem_number}"
 
-                debuglog '------------------------------------------------------------------------------'
-                check_ocsp "${chain_element}" "${elem_number}"
-
                 if [ -n "${CRL}" ]; then
                     debuglog '------------------------------------------------------------------------------'
                     check_crl "${chain_element}" "${elem_number}"
                 fi
+
+                debuglog '------------------------------------------------------------------------------'
+                check_ocsp "${chain_element}" "${elem_number}"
 
                 CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
                 if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
