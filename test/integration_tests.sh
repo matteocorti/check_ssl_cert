@@ -1054,29 +1054,21 @@ testCiphersError() {
 #     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 # }
 
-testGithubComCRL() {
-
-    TEST_HOST=google.com
-
-    # get current certificate of github.com, download the CRL named in that certificate
-    # and use it for local CRL check
-
-    create_temporary_test_file
-    TEMPFILE_TEST_CERT=${TEMPFILE}
-
-    echo Q | "${OPENSSL}" s_client -connect "${TEST_HOST}":443 2>/dev/null | sed -n '/-----BEGIN/,/-----END/p' >"${TEMPFILE_TEST_CERT}"
-
-    TEST_CRL_URI=$(${OPENSSL} x509 -in "${TEMPFILE_TEST_CERT}" -noout -text | grep -A 6 "X509v3 CRL Distribution Points" | grep "http://" | head -1 | sed -e "s/.*URI://")
-
-    create_temporary_test_file
-    TEMPFILE_CRL=${TEMPFILE}
-
-    curl --silent "${TEST_CRL_URI}" --output "${TEMPFILE_CRL}"
+testCRLOK() {
 
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --file "${TEMPFILE_CRL}" --ignore-exp --ignore-maximum-validity
+    ${SCRIPT} ${TEST_DEBUG} --host github.com --ignore-exp --ignore-maximum-validity --ignore-ocsp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+}
+
+testCRLFail() {
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --host revoked.grc.com --ignore-ocsp
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
 }
 
