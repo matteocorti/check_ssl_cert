@@ -1,3 +1,7 @@
+2025-04-01  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (check_attr): Fixes an issue with oVirt certificates CNames
+
 2025-03-13  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): CRL before OCSP
