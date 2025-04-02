@@ -73,11 +73,8 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'debian:10'
           - 'debian:11'
           - 'debian:12'
-          - 'debian:testing'
-          - 'ubuntu:18.04'
           - 'ubuntu:20.04'
           - 'ubuntu:22.04'
           - 'alpine:3.13'
@@ -86,14 +83,6 @@ jobs:
         include:
 
 
-          - distro: 'debian:testing'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man net-tools bc bash-completion default-jre
-          - distro: 'debian:10'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion default-jre
           - distro: 'debian:11'
             pre: >-
               apt-get update &&
@@ -103,10 +92,6 @@ jobs:
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
 
-          - distro: 'ubuntu:18.04'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre
           - distro: 'ubuntu:20.04'
             pre: >-
               apt-get update &&
