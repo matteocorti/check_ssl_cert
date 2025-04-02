@@ -6712,7 +6712,7 @@ EOF
                 MESSAGE_TMP=$(echo "${critical}" | sed 's/^[^:]*:[^:]*://')
 
                 # check if the warning is overridden by another certificate for the same CN
-                if echo "${CN_OK}" | "${GREP_BIN}" -q "${CN_TMP}"; then
+                if echo "${CN_OK}" | "${GREP_BIN}" -q "^${CN_TMP}$"; then
                     verboselog "Both a valid and an expired certificate were found"
                     if [ -n "${CHECK_CHAIN}" ]; then
                         prepend_critical_message "Both a valid and an expired certificate were found"
