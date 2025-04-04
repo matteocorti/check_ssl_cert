@@ -372,6 +372,13 @@ testLetsEncrypt() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testFileAndAltNames() {
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} --file corti.li.pem --ignore-exp --match corti.li --match matteocorti.ch
+    EXIT_CODE=$?
+    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
 testGITHUBCaseInsensitive() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match GITHUB.COM --ignore-exp
