@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.89.0
+VERSION=2.90.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -2133,7 +2133,7 @@ check_crl() {
         SERIAL="$(extract_cert_attribute 'serial' "${CERT_ELEMENT}")"
         debuglog "Checking if the element serial number (${SERIAL}) is contained in the CRL"
 
-        if openssl crl -in "${CRL_TMP_PEM}" -text 2>/dev/null | grep -q "${SERIAL}" ; then
+        if openssl crl -in "${CRL_TMP_PEM}" -text 2>/dev/null | grep -q "Serial Number: ${SERIAL}" ; then
 
             prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
 
