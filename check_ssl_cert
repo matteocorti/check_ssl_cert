@@ -3707,7 +3707,6 @@ parse_command_line_options() {
             # remove _HOST_ from the names to be checked as no host was specified
             # we leave the remaining hosts specified with --cn
             NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__ *//')
-            ALTNAMES=
             shift 2
             ;;
         --file-bin)

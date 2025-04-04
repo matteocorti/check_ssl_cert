@@ -1,6 +1,7 @@
 2025-04-04  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_crl): Fixes an issue with CRL checks
+        * check_ssl_cert (parse_command_line_options): Checks alterantive names when checking a file
 
 2025-04-01  Matteo Corti  <matteo@corti.li>
 
