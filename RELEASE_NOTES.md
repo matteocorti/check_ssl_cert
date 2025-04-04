@@ -1,2 +1,2 @@
  * Fixes an issue with CRL checks
- * Checks alterantive names when checking a file
+ * Checks alternative names when checking a file
