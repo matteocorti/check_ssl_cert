@@ -1,5 +1,7 @@
 # News
 
+* 2025-04-04 Version 2.91.0
+  * Checks for curl when checking for HTTP headers
 * 2025-04-04 Version 2.90.0
   * Fixes an issue with CRL checks
   * Checks alternative names when checking a file

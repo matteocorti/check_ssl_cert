@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.90.0
+VERSION=2.91.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -157,7 +157,7 @@ add_required_header() {
     fi
 }
 
-################################################################################
+################################################################################551
 # Add the specified header to the list of unrequired HTTP headers
 # Usage:
 #   add_unrequired_header X-Powered-By
@@ -4552,9 +4552,10 @@ main() {
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
             [ -n "${OCSP}" ] ||
             [ -n "${CRL}" ] ||
+            [ -n  "${REQUIRED_HTTP_HEADERS}" ] ||
             [ -n "${IGNORE_CONNECTION_STATE}" ] ||
             [ -n "${FILE_URI}" ]; then
-            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}"
+            debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}, REQUIRED_HTTP_HEADERS=${REQUIRED_HTTP_HEADERS}"
             debuglog "curl binary not specified"
 
             check_required_prog curl

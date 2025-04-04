@@ -2,6 +2,7 @@
 
         * check_ssl_cert (check_crl): Fixes an issue with CRL checks
         * check_ssl_cert (parse_command_line_options): Checks alternative names when checking a file
+        * check_ssl_cert (main): Checks for curl when checking for HTTP headers
 
 2025-04-01  Matteo Corti  <matteo@corti.li>
 
