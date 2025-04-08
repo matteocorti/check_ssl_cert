@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.91.0
+VERSION=2.92.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -5601,11 +5601,11 @@ main() {
         fi
 
         # check if IPv6 is available locally
-        if command -v ifconfig >/dev/null; then
-            ifconfig -a | "${GREP_BIN}" -F -q inet6
-            IPV6_INTERFACE=$?
-        elif command -v ip >/dev/null; then
+        if command -v ip >/dev/null; then
             ip addr | "${GREP_BIN}" -F -q inet6
+            IPV6_INTERFACE=$?
+        elif command -v ifconfig >/dev/null; then
+            ifconfig -a | "${GREP_BIN}" -F -q inet6
             IPV6_INTERFACE=$?
         else
             unknown "cannot determine if a network interface has IPv6 configured"

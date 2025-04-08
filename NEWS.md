@@ -1,5 +1,7 @@
 # News
 
+* 2025-04-08 Version 2.92.0
+  * Prefers ip to ifconfig
 * 2025-04-04 Version 2.91.0
   * Checks for curl when checking for HTTP headers
 * 2025-04-04 Version 2.90.0
