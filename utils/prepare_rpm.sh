@@ -91,6 +91,12 @@ fc41)
     DIST='fedora'
     RELEASE='41'
     ;;
+fc42)
+    RPMDIR="${WEBROOT}/fedora/42/${ARCH}"
+    SRPMDIR="${WEBROOT}/fedora/42/SRPMS"
+    DIST='fedora'
+    RELEASE='42'
+    ;;
 el7)
     RPMDIR="${WEBROOT}/epel/7/${ARCH}"
     SRPMDIR="${WEBROOT}/epel/7/SRPMS"
