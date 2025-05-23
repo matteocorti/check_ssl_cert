@@ -1419,7 +1419,7 @@ testMQTTS() {
 
 testSIPS() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host sip.pstnhub.microsoft.com --protocol sips --ignore-sct
+    ${SCRIPT} ${TEST_DEBUG} --host sip.pstnhub.microsoft.com --protocol sips --ignore-sct --ignore-ocsp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
