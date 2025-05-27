@@ -1,5 +1,7 @@
 # News
 
+* 2025-05-27 Version 2.93.0
+  * No error when checking an expired certificate in a file with ```--ignore-exp```
 * 2025-04-08 Version 2.92.0
   * Prefers ip to ifconfig
 * 2025-04-04 Version 2.91.0

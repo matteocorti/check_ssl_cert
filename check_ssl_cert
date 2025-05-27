@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.92.0
+VERSION=2.93.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -3055,6 +3055,14 @@ fetch_certificate() {
             ERROR="TLS handshake error"
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${HOST_NAME}:${PORT}: ${ERROR}"
+
+        elif ascii_grep "certificate has expired" "${ERROR}" ; then
+
+            if [ -z "${NOEXP}" ] ; then
+                ERROR="Certificate has expired"
+                prepend_critical_message "${ERROR}"
+                critical "SSL_CERT_CRITICAL ${HOST_NAME}:${PORT}: ${ERROR}"
+            fi
 
         else
 
