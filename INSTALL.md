@@ -33,7 +33,7 @@ Following tools are required for development:
 * [ShellCheck](https://www.shellcheck.net) for the code quality checks
 * [codespell](https://github.com/codespell-project/codespell) for the spelling checks
 * ```dig``` for IPv6 tests
-
+* [Tinyproxy](https://tinyproxy.github.io) for the tests with a proxy
 You can check the installed dependencies with the ```utils/check_deps.sh``` script.
 
 ## Installation
