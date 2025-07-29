@@ -1,5 +1,7 @@
 # News
 
+* 2025-07-30 Version 2.94.0
+  * added an option (--assume-online) to skip the open port check with nmap
 * 2025-05-27 Version 2.93.0
   * No error when checking an expired certificate in a file with ```--ignore-exp```
 * 2025-04-08 Version 2.92.0

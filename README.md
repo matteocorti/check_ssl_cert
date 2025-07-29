@@ -33,6 +33,7 @@ Options:
                                    at the maximum level (without SSL-Labs)
       --allow-empty-san            Allow certificates without Subject
                                    Alternative Names (SANs)
+      --assume-online              Do not check if the port is open
    -C,--clientcert path            Use client certificate to authenticate
    -c,--critical days              Minimum number of days a certificate has
                                    to be valid to issue a critical status.

@@ -5,6 +5,7 @@
 --all;at the maximum level
 --allow-empty-san;Allow certificates without Subject
 --allow-empty-san;Alternative Names (SANs)
+--assume-online;Do not check if the port is open
 --check-chain;The certificate chain cannot contain
 --check-chain;double or root certificates
 --check-ciphers grade;Check the offered ciphers

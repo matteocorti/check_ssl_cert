@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.93.0
+VERSION=2.94.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -300,6 +300,7 @@ usage() {
     echo "                                   at the maximum level (without SSL-Labs)"
     echo "      --allow-empty-san            Allow certificates without Subject"
     echo "                                   Alternative Names (SANs)"
+    echo "      --assume-online              Do not check if the port is open"
     # Delimiter at 78 chars ############################################################
     echo "   -C,--clientcert path            Use client certificate to authenticate"
     echo "   -c,--critical days              Minimum number of days a certificate has"
@@ -3198,6 +3199,10 @@ parse_command_line_options() {
             deprecated "--altnames" "Enabled by default"
             shift
             ;;
+        --assume-online)
+            ASSUME_ONLINE=1
+            shift
+            ;;
         --check-ciphers-warnings)
             CHECK_CIPHERS_WARNINGS=1
             shift
@@ -5851,7 +5856,8 @@ main() {
     # Connection check
     if [ -z "${FILE}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ]; then
+        if [ -n "${DISABLE_NMAP}" ] ||
+           [ -n "${ASSUME_ONLINE}" ] ; then
 
             if [ -n "${USING_A_PROXY}" ] ; then
                 verboselog "Using a proxy: cannot test connection"

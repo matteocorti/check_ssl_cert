@@ -1,1 +1,1 @@
-No error when checking an expired certificate in a file with ```--ignore-exp```
+Added an option (--assume-online) to skip the open port check with nmap

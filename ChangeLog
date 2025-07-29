@@ -1,3 +1,7 @@
+2025-07-30  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): added an option (--assume-online) to skip the open port check with nmap
+
 2025-05-27  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (fetch_certificate): no error when checking an expired certificate in a file with --ignore-exp
