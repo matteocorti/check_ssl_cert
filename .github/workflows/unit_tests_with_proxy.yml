@@ -8,6 +8,7 @@ on:
       - master
     paths-ignore:
       - varia/**
+      - check_ssl_cert.1
       - '**.md'
       - utils/prepare_rpm.sh
       - .github/workflows/publish.yml
