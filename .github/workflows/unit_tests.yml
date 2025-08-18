@@ -72,11 +72,11 @@ jobs:
           - 'debian:11'
           - 'debian:12'
           - 'debian:13'
-          - 'ubuntu:20.04'
           - 'ubuntu:22.04'
+          - 'ubuntu:24.04'
           - 'alpine:3.13'
-          - 'fedora:40'
-          - 'fedora:41'
+          - 'fedora:42'
+          - 'fedora:43'
         include:
 
           - distro: 'debian:11'
@@ -102,7 +102,7 @@ jobs:
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre
 
 
-          - distro: 'alpine:3.13'
+          - distro: 'alpine-latest'
             pre: >-
               apk update &&
               apk upgrade &&
@@ -110,12 +110,12 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11
 
 
-          - distro: 'fedora:40'
+          - distro: 'fedora:43'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
-          - distro: 'fedora:41'
+          - distro: 'fedora:42'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
