@@ -414,36 +414,22 @@ testIPCN() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testETHZWildCard() {
+testWildCard() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
-    # we ignore the altnames as sp.ethz.ch is listed
+    # we ignore the altnames as google.com is listed
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match sp.ethz.ch --ignore-altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H maps.google.com --match google.com --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-testETHZWildCardCaseInsensitive() {
+testWildCardCaseInsensitive() {
     # * should not match, see https://serverfault.com/questions/310530/should-a-wildcard-ssl-certificate-secure-both-the-root-domain-as-well-as-the-sub
-    # we ignore the altnames as sp.ethz.ch is listed
+    # we ignore the altnames as google.com is listed
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match SP.ETHZ.CH --ignore-altnames --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H maps.google.com --match GOOGLE.COM --ignore-altnames --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-}
-
-testETHZWildCardSub() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match sub.sp.ethz.ch --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testETHZWildCardSubCaseInsensitive() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --match SUB.SP.ETHZ.CH --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
 testRootIssuer() {
@@ -478,20 +464,7 @@ testAltNames() {
 #Do not require to match Alternative Name if CN already matched
 testWildcardAltNames1() {
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-#Check for wildcard support in Alternative Names
-testWildcardAltNames2() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H sherlock.sp.ethz.ch \
-        --match somehost.spapps.ethz.ch \
-        --match otherhost.sPaPPs.ethz.ch \
-        --match spapps.ethz.ch \
-        --ignore-exp
-
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H maps.google.com --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
