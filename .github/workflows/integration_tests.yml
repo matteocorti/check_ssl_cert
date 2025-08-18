@@ -38,6 +38,7 @@ jobs:
         os:
           - macos-13
           - macos-14
+          - macos-15
           - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
