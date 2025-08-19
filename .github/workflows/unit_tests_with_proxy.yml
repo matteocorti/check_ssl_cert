@@ -30,9 +30,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-13
-          - macos-14
-          - macos-15
           - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -65,14 +62,9 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'fedora:40'
-          - 'fedora:41'
+          - 'fedora:latest'
         include:
-          - distro: 'fedora:40'
-            pre: >-
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
-          - distro: 'fedora:41'
+          - distro: 'fedora:latest'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git bash-completion
@@ -99,19 +91,9 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'fedora:39'
-          - 'fedora:40'
-          - 'fedora:41'
+          - 'fedora:latest'
         include:
-          - distro: 'fedora:39'
-            pre: >-
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
-          - distro: 'fedora:40'
-            pre: >-
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
-          - distro: 'fedora:41'
+          - distro: 'fedora:latest'
             pre: >-
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils rpm-build git
