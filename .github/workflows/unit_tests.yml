@@ -30,9 +30,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-13
-          - macos-14
-          - macos-15
           - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -69,40 +66,23 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - 'debian:11'
-          - 'debian:12'
-          - 'debian:13'
-          - 'ubuntu:22.04'
-          - 'ubuntu:24.04'
-          - 'alpine:3.13'
-          - 'fedora:42'
-          - 'fedora:43'
+          - 'debian:latest'
+          - 'ubuntu:latest'
+          - 'alpine:latest'
+          - 'fedora:latest'
         include:
 
-          - distro: 'debian:11'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
-          - distro: 'debian:12'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
-          - distro: 'debian:13'
+          - distro: 'debian:latest'
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc bash-completion iproute2 default-jre
 
-          - distro: 'ubuntu:20.04'
-            pre: >-
-              apt-get update &&
-              DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre
-          - distro: 'ubuntu:22.04'
+          - distro: 'ubuntu:latest'
             pre: >-
               apt-get update &&
               DEBIAN_FRONTEND=noninteractive apt-get -y install nmap shellcheck curl sudo perl make bzip2 file openssl dnsutils shunit2 man bc net-tools bash-completion default-jre
 
-
-          - distro: 'alpine-latest'
+          - distro: 'alpine:latest'
             pre: >-
               apk update &&
               apk upgrade &&
@@ -110,17 +90,11 @@ jobs:
               apk add nmap shellcheck curl sudo perl make wget bzip2 file openssl bind-tools git shunit2 mandoc bc bash-completion openjdk11
 
 
-          - distro: 'fedora:43'
+          - distro: 'fedora:latest'
             pre: >-
               dnf upgrade -y &&
               dnf install -y hostname &&
               dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
-          - distro: 'fedora:42'
-            pre: >-
-              dnf upgrade -y &&
-              dnf install -y hostname &&
-              dnf install -y nmap ShellCheck curl sudo perl make bzip2 file openssl bind-utils git shunit2 man bc net-tools bash-completion java-latest-openjdk
-
 
     steps:
 
