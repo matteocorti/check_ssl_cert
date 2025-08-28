@@ -5875,12 +5875,12 @@ main() {
             if [ "${DEBUG}" -ge 1 ]; then
                 echo "${NMAP_OUTPUT}" | sed -e 's/^/[DBG]   /'
             fi
-            debuglog "${GREP_BIN} -q \"${PORT}.*open\""
+            debuglog "${GREP_BIN} -q \"open.*${PORT}\""
             if [ "${DEBUG}" -ge 1 ]; then
-                echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "${PORT}.*open" | sed -e 's/^/[DBG]   /'
+                echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "open.*${PORT}" | sed -e 's/^/[DBG]   /'
             fi
 
-            if ! echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "${PORT}.*open"; then
+            if ! echo "${NMAP_OUTPUT}" | "${GREP_BIN}" -q "open.*${PORT}"; then
 
                 if [ -n "${IGNORE_CONNECTION_STATE}" ]; then
 
