@@ -6281,7 +6281,7 @@ EOF
             debuglog "${MESSAGE}"
 
             CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
-            if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
+            if [ "${ELEMENT}" -ne 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
                 break
             fi
         done
@@ -6710,7 +6710,7 @@ EOF
                 check_ocsp "${chain_element}" "${elem_number}"
 
                 CERT_IN_CHAIN=$((CERT_IN_CHAIN + 1))
-                if ! [ "${ELEMENT}" -eq 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
+                if [ "${ELEMENT}" -ne 0 ] && [ $((ELEMENT - CERT_IN_CHAIN)) -lt 0 ]; then
                     break
                 fi
 
