@@ -242,7 +242,7 @@
 -m,--match name;Pattern to match the CN or AltName
 -o,--org org;Pattern to match the organization of the
 -o,--org org;certificate
--p,--port port;TCP port (default 443)
+-p,--port port;TCP port number (default 443)
 -q,--quiet;Do not produce any output
 -r,--rootcert path;Root certificate or directory to be used
 -r,--rootcert path;for certificate validation

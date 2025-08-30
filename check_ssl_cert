@@ -486,7 +486,7 @@ usage() {
     echo "      --openssl path               Path of the openssl binary to be used"
     # Delimiter at 78 chars ############################################################
     echo "      --path path                  Set the PATH variable to 'path'"
-    echo "   -p,--port port                  TCP port (default 443)"
+    echo "   -p,--port port                  TCP port number (default 443)"
     echo "      --precision digits           Number of decimal places for durations:"
     echo "                                   defaults to 0 if critical or warning are"
     echo "                                   integers, 2 otherwise"

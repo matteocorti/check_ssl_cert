@@ -204,7 +204,7 @@ Options:
                                    has to be valid to issue a warning status
       --openssl path               Path of the openssl binary to be used
       --path path                  Set the PATH variable to 'path'
-   -p,--port port                  TCP port (default 443)
+   -p,--port port                  TCP port number (default 443)
       --precision digits           Number of decimal places for durations:
                                    defaults to 0 if critical or warning are
                                    integers, 2 otherwise
