@@ -1,5 +1,6 @@
 # News
 
+  * Ensure that the port number is a number
 * 2025-07-30 Version 2.94.0
   * added an option (--assume-online) to skip the open port check with nmap
 * 2025-05-27 Version 2.93.0

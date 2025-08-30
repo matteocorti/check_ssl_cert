@@ -3945,6 +3945,7 @@ $2"
         -p | --port)
             check_option "${PORT}" '--port'
             check_option_argument '-p|--port' "$2"
+            check_integer "$2" "--port: the port number should be an integer"
             PORT="$2"
             shift 2
             ;;
