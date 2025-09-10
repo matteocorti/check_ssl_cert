@@ -62,6 +62,7 @@ check_optional java
 check_optional netcat
 check_optional python3
 check_optional tar
+check_optional timeout
 
 printf "\nChecking optional dependencies for development:\n\n"
 
