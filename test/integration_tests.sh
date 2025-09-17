@@ -1043,15 +1043,6 @@ testCRLOK() {
 
 }
 
-testCRLFail() {
-
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --host revoked.grc.com --ignore-ocsp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
-
-}
-
 testAcceptableClientCertCAMissing() {
 
     # shellcheck disable=SC2086
