@@ -8,6 +8,18 @@ NC='\033[0m' # No Color
 
 FAILED=
 
+check_perl_module() {
+
+    printf "Checking %35s:" "$1"
+
+    if perl -M"$1" -e1 2>/dev/null ; then
+        printf " [${GREEN}OK${NC}:    %-35s]\n" "$1"
+    else
+        ERROR="$1 not found"
+        printf " [${RED}error${NC}: %-35s]\n" "${ERROR}"
+    fi
+}
+
 check_required() {
 
     printf "Checking %35s:" "$1"
@@ -37,6 +49,24 @@ check_optional() {
         printf " [${GREEN}OK${NC}:    %-35s]\n" "${PROG}"
     fi
 
+}
+
+check_shunit2() {
+
+    printf "Checking %35s:" shunit2
+
+    PROG=$(command -v shunit2 2> /dev/null)
+    if [ -z "${PROG}" ] ; then
+        if [ -x /usr/share/shunit2/shunit2 ] ; then
+            PROG=/usr/share/shuni2/shunit2
+        fi
+    fi
+    if [ -z "${PROG}" ]; then
+        ERROR="shunit2 not found"
+        printf " [${YELLOW}error${NC}: %-35s]\n" "${ERROR}"
+    else
+        printf " [${GREEN}OK${NC}:    %-35s]\n" "${PROG}"
+    fi
 }
 
 printf "\nChecking required dependencies:\n\n"
@@ -69,8 +99,9 @@ printf "\nChecking optional dependencies for development:\n\n"
 check_optional dig
 check_optional shellcheck
 check_optional shfmt
-check_optional shunit2
+check_shunit2
 check_optional tinyproxy
+check_perl_module Date::Parse
 
 
 if [ -n "${FAILED}" ] ; then
