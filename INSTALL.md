@@ -1,5 +1,7 @@
 # check\_ssl\_check
 
+The script ```utils/check_deps.sh``` checks for mandatory and optional dependencies.
+
 ## Requirements
 
 * ```bc```
@@ -12,7 +14,7 @@
 
 ## Optional dependencies
 
-* check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system timeouts will be disabled.
+* check\_ssl\_cert requires [```expect```](http://en.wikipedia.org/wiki/Expect) or [```timeout```](https://man7.org/linux/man-pages/man1/timeout.1.html) (usually installed with ```coreutils```) to enable timeouts. If ```expect``` or ```timeout``` are not present on your system timeouts will be disabled.
 * ```dig``` for
   * DANE checks
   * DNSSEC checks

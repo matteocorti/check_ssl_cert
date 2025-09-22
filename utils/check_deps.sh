@@ -69,7 +69,8 @@ check_shunit2() {
     fi
 }
 
-printf "\nChecking required dependencies:\n\n"
+printf "\nChecking required dependencies:\n"
+printf "===============================\n\n"
 
 check_required bc
 check_required curl
@@ -79,7 +80,8 @@ check_required host
 check_required nmap
 check_required openssl
 
-printf "\nChecking optional dependencies:\n\n"
+printf "\nChecking optional dependencies:\n"
+printf "===============================\n\n"
 
 check_optional bzip2
 check_optional dig
@@ -87,14 +89,20 @@ check_optional expand
 check_optional expect
 check_optional gmake
 check_optional ifconfig
-check_optional ip
 check_optional java
 check_optional netcat
 check_optional python3
 check_optional tar
 check_optional timeout
 
-printf "\nChecking optional dependencies for development:\n\n"
+# linux tools
+os=$(uname -s)
+if [ "${os}" = "Linux" ]; then
+    check_optional ip
+fi
+
+printf "\nChecking optional dependencies for development:\n"
+printf "===============================================\n\n"
 
 check_optional dig
 check_optional shellcheck
@@ -103,6 +111,7 @@ check_shunit2
 check_optional tinyproxy
 check_perl_module Date::Parse
 
+echo
 
 if [ -n "${FAILED}" ] ; then
     exit 1
