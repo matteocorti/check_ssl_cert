@@ -155,3 +155,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Adam Cécile](https://github.com/eLvErDe) for the nmap SNI patch
 * Many thanks to [alvar](https://github.com/oxzi) for the configuration patch and the ```--dane``` option patch
 * Many thanks to [Michał Margula](https://github.com/alchemyx) for the ```--ignore-dh``` patch
+* Many thanks to [Derek Schrock](https://github.com/derekschrock) for the BuildRequires patch
