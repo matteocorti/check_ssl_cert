@@ -659,10 +659,12 @@ debuglog() {
     MESSAGE=$1
     LEVEL=$2
 
+    DBG_ELAPSED=
+
     if [ -n "${DEBUG_TIME}" ]; then
         NOW=$(date +%s)
-        ELAPSED=$((NOW - DEBUG_TIME))
-        ELAPSED=$(printf "%04d" "${ELAPSED}")
+        DBG_ELAPSED=$((NOW - DEBUG_TIME))
+        DBG_ELAPSED=$(printf "%04d" "${DBG_ELAPSED}")
     fi
 
     if [ -z "${LEVEL}" ]; then
@@ -671,8 +673,8 @@ debuglog() {
     fi
 
     if [ "${LEVEL}" -le "${DEBUG}" ]; then
-        if [ -n "${ELAPSED}" ]; then
-            echo "${1}" | sed "s/^/[DBG ${ELAPSED}s] /" >&2
+        if [ -n "${DBG_ELAPSED}" ]; then
+            echo "${1}" | sed "s/^/[DBG ${DBG_ELAPSED}s] /" >&2
         else
             echo "${1}" | sed "s/^/[DBG] /" >&2
         fi
