@@ -1,3 +1,7 @@
+2025-10-27  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (checkend): Workaround for buggy openssl x509 -checkend implementations
+
 2025-10-23  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (debuglog): Fixed the debug output without duration

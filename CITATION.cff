@@ -269,8 +269,8 @@ authors:
 - name: Zadkiel
   website: https://github.com/aslafy-z
 title: "check_ssl_cert"
-version: 2.94.0
-date-released: 2025-07-30
+version: 2.95.0
+date-released: 2025-10-27
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
