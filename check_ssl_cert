@@ -2470,7 +2470,6 @@ check_cert_end_date() {
 
         checkend "${1}" 0
 
-#        if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 >/dev/null; then
         if ! checkend "${1}" 0 ; then
 
             if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
