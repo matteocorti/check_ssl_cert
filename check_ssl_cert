@@ -2405,9 +2405,13 @@ checkend() {
 
         debuglog "Checking validity with x509 -checkend"
 
-        echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" >/dev/null
-        debuglog "  RES=$?"
-        return $?
+        if echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" >/dev/null ; then
+            debuglog "  RES=0"
+            return 0
+        else
+            debuglog "  RES=1"
+            return 1
+        fi
 
     fi
 
@@ -2454,10 +2458,12 @@ check_cert_end_date() {
     if [ -z "${EARLIEST_VALIDITY_HOURS}" ] || compare "${HOURS_UNTIL}" "<" "${EARLIEST_VALIDITY_HOURS}"; then
         EARLIEST_VALIDITY_HOURS="${HOURS_UNTIL}"
         replace_current_message='yes'
+        debuglog "    EARLIEST_VALIDITY_HOURS=${EARLIEST_VALIDITY_HOURS}"
     fi
 
     if [ -z "${DAYS_VALID}" ] || compare "${ELEM_DAYS_VALID}" "<" "${DAYS_VALID}"; then
         DAYS_VALID="${ELEM_DAYS_VALID}"
+        debuglog "    DAYS_VALID=${DAYS_VALID}"
     fi
 
     add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
@@ -2467,8 +2473,6 @@ check_cert_end_date() {
         # x509 certificates (default)
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 on cert element ${el_number} (${element_cn})"
-
-        checkend "${1}" 0
 
         if ! checkend "${1}" 0 ; then
 
@@ -2498,7 +2502,6 @@ ${CN_EXPIRED_TMP}"
 
             debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-#            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
             if ! checkend "${1}" "${CRITICAL_SECONDS}" ; then
                 debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
