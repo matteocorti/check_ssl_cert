@@ -44,7 +44,7 @@ jobs:
     steps:
 
       - name: Git clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install shellcheck
         run: brew install shellcheck shunit2 bash-completion nmap tinyproxy
