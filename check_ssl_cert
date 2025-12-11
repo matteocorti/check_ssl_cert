@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.94.0
+VERSION=2.95.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -659,10 +659,12 @@ debuglog() {
     MESSAGE=$1
     LEVEL=$2
 
+    DBG_ELAPSED=
+
     if [ -n "${DEBUG_TIME}" ]; then
         NOW=$(date +%s)
-        ELAPSED=$((NOW - DEBUG_TIME))
-        ELAPSED=$(printf "%04d" "${ELAPSED}")
+        DBG_ELAPSED=$((NOW - DEBUG_TIME))
+        DBG_ELAPSED=$(printf "%04d" "${DBG_ELAPSED}")
     fi
 
     if [ -z "${LEVEL}" ]; then
@@ -671,8 +673,8 @@ debuglog() {
     fi
 
     if [ "${LEVEL}" -le "${DEBUG}" ]; then
-        if [ -n "${ELAPSED}" ]; then
-            echo "${1}" | sed "s/^/[DBG ${ELAPSED}s] /" >&2
+        if [ -n "${DBG_ELAPSED}" ]; then
+            echo "${1}" | sed "s/^/[DBG ${DBG_ELAPSED}s] /" >&2
         else
             echo "${1}" | sed "s/^/[DBG] /" >&2
         fi
@@ -2349,6 +2351,75 @@ check_ocsp() {
 }
 
 ################################################################################
+# Checks if a certificate expires within the next $2 seconds
+#   $1 cert
+#   $2 number of seconds
+# Returns
+#   1 if it expires (false)
+#   0 if not (true)
+checkend() {
+
+    # check if OpenSSL is buggy (see https://github.com/openssl/openssl/issues/28928)
+    # the result is cached to check only once
+    if [ -z "${CHECKEND_BUGGY_CHECKED}" ] ; then
+
+        debuglog "Checking if OpenSSL checkend is buggy"
+
+        CHECKEND_BUGGY_CHECKED=1
+
+        if echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend 2147483647 >/dev/null  ; then
+
+            # exit status 0 but should be 1
+
+            debuglog "  OpenSSL checkend is *buggy*"
+            debuglog "    fallback to parsing the text output"
+
+            CHECKEND_BUGGY=1
+
+        else
+
+            debuglog "  OpenSSL checkend is not buggy"
+
+        fi
+
+    fi
+
+    debuglog "${OPENSSL} x509 -in /dev/stdin -noout -checkend ${2}"
+
+    if [ -n "${CHECKEND_BUGGY}" ] ; then
+
+        debuglog "Checking validity parsing the output of x509 -checkend (buggy)"
+
+        #   we fall back to parse the text output
+        if echo "${1}" |
+                ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" |
+                grep -q 'Certificate will not expire' ; then
+            debuglog "  Certificate will not expire"
+            return 0
+        else
+            debuglog "  Certificate will expire"
+            return 1
+        fi
+
+    else
+
+        debuglog "Checking validity with x509 -checkend"
+
+        if echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" >/dev/null ; then
+            debuglog "  RES=0"
+            return 0
+        else
+            debuglog "  RES=1"
+            return 1
+        fi
+
+    fi
+
+}
+
+
+
+################################################################################
 # Checks cert end date validity
 # Params
 #   $1 cert
@@ -2387,10 +2458,12 @@ check_cert_end_date() {
     if [ -z "${EARLIEST_VALIDITY_HOURS}" ] || compare "${HOURS_UNTIL}" "<" "${EARLIEST_VALIDITY_HOURS}"; then
         EARLIEST_VALIDITY_HOURS="${HOURS_UNTIL}"
         replace_current_message='yes'
+        debuglog "    EARLIEST_VALIDITY_HOURS=${EARLIEST_VALIDITY_HOURS}"
     fi
 
     if [ -z "${DAYS_VALID}" ] || compare "${ELEM_DAYS_VALID}" "<" "${DAYS_VALID}"; then
         DAYS_VALID="${ELEM_DAYS_VALID}"
+        debuglog "    DAYS_VALID=${DAYS_VALID}"
     fi
 
     add_performance_data "days_chain_elem${el_number}=${ELEM_DAYS_VALID};${WARNING_DAYS};${CRITICAL_DAYS};;"
@@ -2401,7 +2474,8 @@ check_cert_end_date() {
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 on cert element ${el_number} (${element_cn})"
 
-        if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 >/dev/null; then
+        if ! checkend "${1}" 0 ; then
+
             if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
@@ -2428,7 +2502,7 @@ ${CN_EXPIRED_TMP}"
 
             debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${CRITICAL_SECONDS}" >/dev/null; then
+            if ! checkend "${1}" "${CRITICAL_SECONDS}" ; then
                 debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_CRITICAL}" ]; then
@@ -2450,7 +2524,8 @@ ${CN_EXPIRED_TMP}"
 
             debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
-            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
+#            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
+            if ! checkend "${1}" "${WARNING_SECONDS}" ; then
                 debuglog "WARNING: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_WARNING}" ]; then

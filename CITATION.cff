@@ -4,9 +4,6 @@ authors:
 - family-names: "Corti"
   given-names: "Matteo"
   orcid: "https://orcid.org/0000-0002-1746-1108"
-- family-names: "Палаузов"
-  given-names: "Дилян"
-  website: https://github.com/dilyanpalauzov
 - family-names: "Cécile"
   given-names: "Adam"
   website: https://github.com/eLvErDe
@@ -16,11 +13,11 @@ authors:
   website: https://github.com/Al2Klimov
 - name: alvar
   website: https://github.com/oxzi
+- family-names: "Dijkman"
+  given-names: "Andreas"
 - family-names: "Klärner"
   given-names: "Andre"
   website: https://github.com/klaernie
-- family-names: "Dijkman"
-  given-names: "Andreas"
 - family-names: "Miśkiewicz"
   given-names: "Arkadiusz"
   website: https://github.com/arekm
@@ -59,6 +56,9 @@ authors:
   given-names: "Dan"
 - family-names: "Wallis"
   given-names: "Dan"
+- family-names: "Schrock"
+  given-names: "Derek"
+  website: https://github.com/derekschrock
 - family-names: "Visser"
   given-names: "Dick"
   website: https://github.com/dnmvisser
@@ -132,14 +132,14 @@ authors:
 - family-names: "Wąsikowski"
   given-names: "Łukasz"
   website: https://github.com/IdahoPL
-- family-names: "Fournier"
-  given-names: "Marc"
 - family-names: "Burkhalter"
   given-names: "Marcel"
   website: https://github.com/explorer69
 - family-names: "Burkhalter"
   given-names: "Marcel"
   website: https://github.com/marcel-burkhalter
+- family-names: "Fournier"
+  given-names: "Marc"
 - family-names: "Rejås"
   given-names: "Marcus"
 - family-names: "Ruys"
@@ -172,11 +172,11 @@ authors:
 - family-names: "Rochnyak"
   given-names: "Pavel"
   website: https://github.com/rpv-tomsk
+- name: Peter
+  website: https://github.com/Peter2121
 - family-names: "Newman"
   given-names: "Peter"
   website: https://github.com/peternewman
-- name: Peter
-  website: https://github.com/Peter2121
 - family-names: "Kueck"
   given-names: "Philippe"
 - family-names: "Rupert"
@@ -191,8 +191,6 @@ authors:
   website: https://github.com/bb-Ricardo
 - name: Ricardo
   website: https://github.com/bb-Ricardo
-- family-names: "Yamry"
-  given-names: "Rob"
 - name: Robin H. Johnson
 - family-names: "Pronk"
   given-names: "Robin"
@@ -200,6 +198,8 @@ authors:
 - family-names: "Schneider"
   given-names: "Robin"
   website: https://github.com/ypid-geberit
+- family-names: "Yamry"
+  given-names: "Rob"
 - name: Rolf Eike Beer
 - family-names: "Nowakowski"
   given-names: "Ryan"
@@ -268,9 +268,12 @@ authors:
   website: https://github.com/yasirathackersdotmu
 - name: Zadkiel
   website: https://github.com/aslafy-z
+- family-names: "Палаузов"
+  given-names: "Дилян"
+  website: https://github.com/dilyanpalauzov
 title: "check_ssl_cert"
-version: 2.94.0
-date-released: 2025-07-30
+version: 2.95.0
+date-released: 2025-11-10
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:

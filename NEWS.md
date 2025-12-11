@@ -1,5 +1,7 @@
 # News
 
+* 2025-11-10 Version 2.95.0
+  * Workaround for buggy openssl x509 -checkend implementations
   * Ensure that the port number is a number
 * 2025-07-30 Version 2.94.0
   * added an option (--assume-online) to skip the open port check with nmap
