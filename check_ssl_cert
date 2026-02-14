@@ -8,7 +8,7 @@
 # See the INSTALL.md file for installation instructions
 #
 # Copyright (c) 2007-2012 ETH Zurich <matteo.corti@ethz.ch>
-# Copyright (c) 2007-2025 Matteo Corti <matteo@corti.li>
+# Copyright (c) 2007-2026 Matteo Corti <matteo@corti.li>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.95.0
+VERSION=2.96.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables

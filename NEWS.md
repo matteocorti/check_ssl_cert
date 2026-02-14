@@ -1,5 +1,6 @@
 # News
 
+* 2026-02-14 Version 2.96.0
   * Add EXIT to the list of signals to be caught
   * Fixes the PostgreSQL connection
 * 2025-11-10 Version 2.95.0
