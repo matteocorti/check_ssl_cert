@@ -34,7 +34,7 @@ unset HOST
 
 VALID_ATTRIBUTES=",startdate,enddate,subject,issuer,modulus,serial,hash,email,ocsp_uri,fingerprint,"
 
-SIGNALS="HUP INT QUIT TERM ABRT"
+SIGNALS="HUP INT QUIT TERM ABRT EXIT"
 
 LC_ALL=C
 
@@ -1820,6 +1820,7 @@ exec_with_timeout() {
 
     if [ -n "${TIMEOUT_BIN}" ]; then
 
+        debuglog "using ${TIMEOUT_BIN}"
         debuglog "$(printf '%s %s %s\n' "${TIMEOUT_BIN}" "${CURRENT_TIMEOUT}" "${command}")"
 
         # We execute timeout in the background so that it can be relay a signal to 'timeout'
@@ -1847,6 +1848,8 @@ exec_with_timeout() {
         return "${RET}"
 
     elif [ -n "${EXPECT}" ]; then
+
+        debuglog "using ${EXPECT}"
 
         # just to tell shellcheck that the variable is assigned
         # (in fact the value is assigned with the function set_value)
@@ -1892,6 +1895,8 @@ EOT
         return "${RET}"
 
     else
+
+        debuglog "expect or timeout not available: disabling timeouts"
 
         debuglog "$(printf '%s\n' eval "${command}")"
         debuglog "  output: ${OUTFILE}"
@@ -4808,6 +4813,13 @@ main() {
     # Timeout (optional)
     TIMEOUT_BIN="$(command -v timeout 2>/dev/null)"
     test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
+
+    if [ -z "${TIMEOUT_BIN}" ]; then
+        # timeout not available: try with gtimeout
+        TIMEOUT_BIN="$(command -v gtimeout 2>/dev/null)"
+        test -x "${TIMEOUT_BIN}" || TIMEOUT_BIN=""
+    fi
+
     if [ -z "${TIMEOUT_BIN}" ]; then
         verboselog "timeout not available" 2
     else

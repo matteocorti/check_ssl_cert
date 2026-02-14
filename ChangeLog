@@ -1,3 +1,11 @@
+2026-02-14  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (SIGNALS): Add EXIT to the list of signals for the cleanup
+
+2025-11-28  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): trying with gtimeout if timeout is not available
+
 2025-10-27  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (checkend): Workaround for buggy openssl x509 -checkend implementations

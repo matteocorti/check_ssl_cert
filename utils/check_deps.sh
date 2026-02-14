@@ -90,7 +90,6 @@ check_optional expect
 check_optional gmake
 check_optional ifconfig
 check_optional java
-check_optional netcat
 check_optional python3
 check_optional tar
 check_optional timeout
