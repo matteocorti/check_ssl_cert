@@ -1,6 +1,7 @@
 2026-02-14  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (SIGNALS): Add EXIT to the list of signals for the cleanup
+        * check_ssl_cert (fetch_certificate): Fixes the PostgreSQL connection
 
 2025-11-28  Matteo Corti  <matteo@corti.li>
 

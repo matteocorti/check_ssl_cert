@@ -1,6 +1,7 @@
 # News
 
   * Add EXIT to the list of signals to be caught
+  * Fixes the PostgreSQL connection
 * 2025-11-10 Version 2.95.0
   * Workaround for buggy openssl x509 -checkend implementations
   * Ensure that the port number is a number
