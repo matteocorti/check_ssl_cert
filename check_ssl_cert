@@ -5505,7 +5505,7 @@ main() {
 
         debuglog 'checking date version'
 
-        if "${DATEBIN}" --version 2>&1 | "${GREP_BIN}" -F -q GNU; then
+        if "${DATEBIN}" --version 2>&1 | "${GREP_BIN}" -E -q '(GNU|uutils)'; then
             DATETYPE='GNU'
         elif "${DATEBIN}" --version 2>&1 | "${GREP_BIN}" -F -q BusyBox; then
             DATETYPE='BUSYBOX'
