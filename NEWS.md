@@ -1,5 +1,7 @@
 # News
 
+* 2026-03-15 Version 2.97.0
+  * Added support for uutils date
 * 2026-02-14 Version 2.96.0
   * Add EXIT to the list of signals to be caught
   * Fixes the PostgreSQL connection
