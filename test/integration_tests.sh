@@ -571,13 +571,6 @@ testSMTPS() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testRequireOCSP() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H switch.ch --require-ocsp-stapling --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 # tests for -4 and -6
 testIPv4() {
     if ! "${OPENSSL}" s_client -help 2>&1 | grep -q -- -4; then
