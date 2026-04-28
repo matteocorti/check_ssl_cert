@@ -1,3 +1,7 @@
+2026-04-28  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Does not require host if --no-not-resolve was specified
+
 2026-03-15  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): Added support for uutils date

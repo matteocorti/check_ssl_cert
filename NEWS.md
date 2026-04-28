@@ -1,5 +1,7 @@
 # News
 
+* 2026-04-28 Version 2.98.0
+  * Does not require host if ```--no-not-resolve``` was specified
 * 2026-03-15 Version 2.97.0
   * Added support for uutils date
 * 2026-02-14 Version 2.96.0

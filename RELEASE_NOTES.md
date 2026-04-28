@@ -1,1 +1,1 @@
-Added support for uutils date
+Does not require host if ```--no-not-resolve``` was specified
