@@ -5418,22 +5418,26 @@ main() {
 
         debuglog "nmap binary not specified"
 
-        # we check if nmap is available: if not we continue without connection checks and ciphers
-        NMAP_BIN=$(command -v nmap 2>/dev/null)
-        if [ -z "${NMAP_BIN}" ]; then
-            verboselog "cannot find nmap: disabling connection checks and ciphers checks"
-            debuglog "cannot find nmap: disabling connection checks and ciphers checks"
+        if [ -n "${ASSUME_ONLINE}" ]; then
+
+            debuglog "Not determining nmap binary, commanded not to use it"
             DISABLE_NMAP=1
 
-            if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
-                unknown "--ignore-connection-state requires nmap"
-            fi
-
         else
-            if [ ! -x "${NMAP_BIN}" ]; then
-                unknown "${NMAP_BIN} is not executable"
+
+            # we check if nmap is available: if not we continue without connection checks and ciphers
+            NMAP_BIN=$(command -v nmap 2>/dev/null)
+            if [ -z "${NMAP_BIN}" ]; then
+                verboselog "cannot find nmap: disabling connection checks and ciphers checks"
+                debuglog "cannot find nmap: disabling connection checks and ciphers checks"
+                DISABLE_NMAP=1
+
+            else
+                if [ ! -x "${NMAP_BIN}" ]; then
+                    unknown "${NMAP_BIN} is not executable"
+                fi
+                debuglog "nmap available: ${NMAP_BIN}"
             fi
-            debuglog "nmap available: ${NMAP_BIN}"
         fi
 
     else
@@ -5441,6 +5445,12 @@ main() {
         # we check if the provided binary actually works
         check_required_prog "${NMAP_BIN}"
 
+    fi
+
+    if [ -n "${DISABLE_NMAP}" ]; then
+        if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
+            unknown "--ignore-connection-state requires nmap"
+        fi
     fi
 
     # nmap does not understand brackets in IPv6 addresses
@@ -5948,8 +5958,7 @@ main() {
     # Connection check
     if [ -z "${FILE}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ] ||
-           [ -n "${ASSUME_ONLINE}" ] ; then
+        if [ -n "${DISABLE_NMAP}" ] ; then
 
             if [ -n "${USING_A_PROXY}" ] ; then
                 verboselog "Using a proxy: cannot test connection"
