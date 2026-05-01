@@ -1,5 +1,7 @@
 # News
 
+* 2026-05-01 Version 2.99.0
+  * Move the ```ASSUME_ONLINE``` assertion earlier in the script to avoid lookup of nmap
 * 2026-04-28 Version 2.98.0
   * Does not require host if ```--no-not-resolve``` was specified
 * 2026-03-15 Version 2.97.0

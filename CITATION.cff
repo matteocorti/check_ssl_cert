@@ -79,6 +79,8 @@ authors:
 - family-names: "Apolloner"
   given-names: "Florian"
   website: https://github.com/apollo13
+- name: gcoxmoz
+  website: https://github.com/gcoxmoz
 - name: Georg
   website: https://github.com/gbotti
 - name: grizzlydev-sarl
@@ -275,8 +277,8 @@ authors:
 - name: Zadkiel
   website: https://github.com/aslafy-z
 title: "check_ssl_cert"
-version: 2.98.0
-date-released: 2026-04-28
+version: 2.99.0
+date-released: 2026-05-01
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
