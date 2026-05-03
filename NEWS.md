@@ -1,5 +1,7 @@
 # News
 
+* 2025-05-03 Version 2.100.0
+  * Fixed a bug checking for the ```host``` binary
 * 2026-05-01 Version 2.99.0
   * Move the ```ASSUME_ONLINE``` assertion earlier in the script to avoid lookup of nmap
 * 2026-04-28 Version 2.98.0

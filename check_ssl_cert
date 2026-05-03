@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.99.0
+VERSION=2.100.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -5282,7 +5282,8 @@ main() {
     check_required_prog 'bc'
     BCBIN=${PROG}
 
-    if [ -n "${DO_NOT_RESOLVE}" ] ; then
+    if [ -z "${DO_NOT_RESOLVE}" ] &&
+           [ -z "${RESOLVE}" ] ; then
         check_required_prog 'host'
     fi
 

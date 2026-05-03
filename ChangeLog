@@ -1,3 +1,7 @@
+2026-05-03  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed a bug checking for the ```host``` binary
+
 2026-05-01  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main) Applied the ASSUME_ONLINE patch
