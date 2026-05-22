@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.100.0
+VERSION=2.101.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -5449,8 +5449,9 @@ main() {
     fi
 
     if [ -n "${DISABLE_NMAP}" ]; then
-        if [ -n "${IGNORE_CONNECTION_STATE}" ] ; then
-            unknown "--ignore-connection-state requires nmap"
+        if [ -n "${IGNORE_CONNECTION_STATE}" ] &&
+           [ -z "${ASSUME_ONLINE}" ] ; then
+            unknown "--ignore-connection-problems requires nmap"
         fi
     fi
 
@@ -5964,6 +5965,29 @@ main() {
             if [ -n "${USING_A_PROXY}" ] ; then
                 verboselog "Using a proxy: cannot test connection"
                 debuglog "Using a proxy: cannot test connection"
+            elif [ -n "${IGNORE_CONNECTION_STATE}" ]; then
+
+                case "${IGNORE_CONNECTION_STATE}" in
+                    "${STATUS_OK}")
+                        echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_OK}"
+                        ;;
+                    "${STATUS_WARNING}")
+                        echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_WARNING}"
+                        ;;
+                    "${STATUS_CRITICAL}")
+                        echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                        exit "${STATUS_CRITICAL}"
+                        ;;
+                    "${STATUS_UNKNOWN}")
+                        critical "Cannot connect to ${HOST}:${PORT}"
+                        ;;
+                    *)
+                        debuglog "Ignoring connection test"
+                        ;;
+                esac
+
             fi
 
         else

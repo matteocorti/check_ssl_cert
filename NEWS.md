@@ -1,6 +1,8 @@
 # News
 
-* 2025-05-03 Version 2.100.0
+* 2026-05-22 Version 2.101.0
+  * Fixed an issue when ```--assume-online``` is specified (no nmap) and ```--ignore-connection-state``` are used at the same time
+* 2026-05-03 Version 2.100.0
   * Fixed a bug checking for the ```host``` binary
 * 2026-05-01 Version 2.99.0
   * Move the ```ASSUME_ONLINE``` assertion earlier in the script to avoid lookup of nmap
