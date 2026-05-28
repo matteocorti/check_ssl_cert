@@ -2,6 +2,7 @@
 
 * 2026-05-29 Version 2.102.0
   * Does not specify an SNI if we are checking an IP address
+  * Checks if a specified IP address is present in the certificate
 * 2026-05-22 Version 2.101.0
   * Fixed an issue when ```--assume-online``` is specified (no nmap) and ```--ignore-connection-state``` are used at the same time
 * 2026-05-03 Version 2.100.0

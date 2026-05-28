@@ -1,6 +1,7 @@
 2026-05-28  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): disabling -servername for IP addresses
+        * check_ssl_cert (main): adding the specified IP to the names to be checked
 
 2026-05-22  Matteo Corti  <matteo@corti.li>
 

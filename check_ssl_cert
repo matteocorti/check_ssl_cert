@@ -5063,12 +5063,11 @@ main() {
     case ${NAMES_TO_BE_CHECKED} in
     *__HOST__*)
         # localhost is used for files to be checked: we ignore it
-        IS_IP_TMP="$(is_ip "${HOST_NAME}")"
-        if [ "${HOST_NAME}" != 'localhost' ] && [ "${IS_IP_TMP}" -eq 0 ]; then
+        if [ "${HOST_NAME}" != 'localhost' ] ; then
             debuglog "Adding ${HOST_NAME} to NAMES_TO_BE_CHECKED"
             NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__/${HOST_NAME}/")
         else
-            debuglog "Removing __HOST__ to the names to be checked as the host is 'localhost' or an IP address"
+            debuglog "Removing __HOST__ to the names to be checked as the host is 'localhost'"
             NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__//")
         fi
         ;;
@@ -6479,6 +6478,7 @@ EOF
     SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*: //')"
     info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
+
     if [ "${DEBUG}" -ge 1 ]; then
         debuglog "${SUBJECT}"
         debuglog "CN         = ${CN}"
@@ -6576,6 +6576,7 @@ EOF
     for san in ${SUBJECT_ALTERNATIVE_NAME}; do
         info "Subject Alternative Name" "${san}"
     done
+
 
     ################################################################################
     # Check the names in the certificate
