@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.101.0
+VERSION=2.102.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -5611,7 +5611,13 @@ main() {
             if [ -n "${SNI}" ]; then
                 SERVERNAME="-servername ${SNI}"
             else
-                SERVERNAME="-servername ${HOST_NAME}"
+
+                if [ "${HOST_IS_IP}" = 0 ] ; then
+                    SERVERNAME="-servername ${HOST_NAME}"
+                else
+                    debuglog "disabling -servername (SNI) for IP addresses"
+                fi
+
             fi
 
             debuglog "'${OPENSSL} s_client' supports '-servername': using ${SERVERNAME}"
