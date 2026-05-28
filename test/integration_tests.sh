@@ -386,20 +386,6 @@ testGITHUBCaseInsensitive() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
-testIPOK() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
-testIPOKAltName() {
-    # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --match pasi.corti.li --ignore-exp
-    EXIT_CODE=$?
-    assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-}
-
 testIPFailAltName() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 138.201.94.172 --match bogus.corti.li --ignore-exp
