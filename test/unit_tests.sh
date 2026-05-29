@@ -234,6 +234,24 @@ setUp() {
 ##############################################################################
 # Tests
 
+testNumericCheck() {
+
+    export UNIT_TEST=1
+
+    for argument in 0 1 01 10 100 0.1 1.1 11.1 0% 10% 100% 0.1% 3.3% 100.1%; do
+        echo "Checking numeric argument: ${argument}"
+        check_numeric_argument "${argument}"
+        assertEquals " check_numeric_argument ${argument}" 1 $?
+    done
+
+    for argument in a % %1 1.1.1 1%1 120% ; do
+        echo "Checking numeric argument: ${argument}"
+        check_numeric_argument "${argument}"
+        assertEquals " check_numeric_argument ${argument}" 0 $?
+    done
+
+}
+
 testHoursUntilNow() {
     # testing with perl
     if perl -e 'use Date::Parse;' >/dev/null 2>&1; then

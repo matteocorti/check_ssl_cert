@@ -1492,15 +1492,33 @@ check_integer() {
 }
 
 ##############################################################################
-# Check if the parameter is a float
+# Check if the parameter is an integer, a float or a percentage
 # Params
 #  $1 the value to check
 #  $2 error message
-check_float() {
+check_numeric_argument() {
     value=$1
     message=$2
-    if ! echo "$1" | "${GREP_BIN}" -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?$'; then
-        unknown "${message}"
+    if ! echo "${value}" | "${GREP_BIN}" -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?[%]*$'; then
+        if [ -n "${UNIT_TEST}" ] ; then
+            return 0
+        else
+            unknown "${message}"
+        fi
+    else
+        if  echo "${value}" | "${GREP_BIN}" -q -E '%$'; then
+            number=$( echo "${value}" | sed -e 's/%$//' ) # remove the % sign at the end
+            number=$( echo "${number}" | sed -e 's/[.].*//' ) # remove the decimal part
+            if [ "${number}" -gt 100 ] ; then
+                if [ -n "${UNIT_TEST}" ] ; then
+                    return 0
+                else
+                    unknown "${message}"
+                fi
+            fi
+        fi
+
+        return 1
     fi
 }
 
@@ -3686,7 +3704,7 @@ parse_command_line_options() {
             check_option "${CRITICAL_SPECIFIED}" '-c,--critical'
             CRITICAL_SPECIFIED=1
             check_option_argument '-c,--critical' "$2"
-            check_float "$2" "--critical: the number of days should be an integer or a float"
+            check_numeric_argument "$2" "--critical: the number of days should be an integer or a float"
             CRITICAL_DAYS="$2"
             CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
             shift 2
@@ -4150,7 +4168,7 @@ $2"
             check_option "${WARNING_SPECIFIED}" '--warning'
             WARNING_SPECIFIED=1
             check_option_argument '-w|--warning' "$2"
-            check_float "$2" "--warning: the number of days should be an integer or a float"
+            check_numeric_argument "$2" "--warning: the number of days should be an integer or a float"
             WARNING_DAYS="$2"
             WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
             shift 2
