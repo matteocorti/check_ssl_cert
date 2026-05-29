@@ -6660,9 +6660,11 @@ EOF
 
                 for alt_name in ${SUBJECT_ALTERNATIVE_NAME}; do
 
-                    debuglog "      check altname: ${alt_name}"
+                    debuglog "      check altname: ${alt_name} = ${name}?"
 
                     if echo "${alt_name}" | "${GREP_BIN}" -q -i '^\*\.'; then
+
+                        debuglog "      wildcard certificate"
 
                         # Match the domain
                         debuglog "        the altname ${alt_name} begins with a '*'"
@@ -6696,6 +6698,60 @@ EOF
                         if echo "${name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
                             debuglog "      ${name} matches ^${alt_name}\$"
                             ok="true"
+                        elif echo "${name}" | "${GREP_BIN}" -q  "^\["; then
+
+                            debuglog "      ${name} is an IPv6"
+
+                            # LetsEncrypt appears to be following these rules
+                            #
+                            # 1. do not surround IPs with square brackets
+                            # 2. use all caps
+                            # 3. do not use :: to collapse empty groups, but do render empty groups as
+                            #    :0: so therefore 2001:bc8:1640:111:: becomes 2001:BC8:1640:111:0:0:0:0
+                            # 4. do drop 0's at the start of a group, i.e. :aa: instead of :00aa:
+
+                            # remove the brackets (see 1.)
+                            tmp_name=$( echo "${name}" | sed -e 's/^\[//' | sed -e 's/\]$//' )
+
+                            if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
+                                debuglog "      ${name} as ${tmp_name} matches ^${alt_name}\$"
+                                ok="true"
+                            else
+
+                                # remove 0s at the beginning of a group (see 4.)
+                                tmp_name=$( echo "${tmp_name}" | sed -e 's/::/:0:/' | sed -e 's/:$/:0/' )
+
+                                if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
+
+                                    debuglog "      ${name} as ${tmp_name} matches ^${alt_name} as ${alt_name}\$"
+                                    ok="true"
+
+                                else
+
+                                    tmp_alt_name=$(
+                                        echo "${alt_name}" |
+                                            sed -e 's/:0:/::/g' |
+                                            sed -e 's/:0:/::/g' |
+                                            sed 's/:::*/::/g' |
+                                            sed -e 's/:0$/:/'
+                                                )
+                                    tmp_name=$(
+                                        echo "${tmp_name}" |
+                                            sed -e 's/:0:/::/g' |
+                                            sed -e 's/:0:/::/g' |
+                                            sed 's/:::*/::/g' |
+                                            sed -e 's/:0$/:/'
+                                            )
+                                    if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${tmp_alt_name}$"; then
+                                        debuglog "      ${name} as ${tmp_name} matches ^${alt_name} as ${tmp_alt_name}\$"
+                                        ok="true"
+                                    fi
+
+                                fi
+
+                            fi
+
+
                         fi
 
                     fi

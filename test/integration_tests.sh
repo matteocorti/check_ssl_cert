@@ -636,42 +636,6 @@ testIPv6Only() {
     fi
 }
 
-testIPv6Numeric() {
-    if "${OPENSSL}" s_client -help 2>&1 | grep -q -- -6; then
-
-        IPV6=
-        if command -v ifconfig >/dev/null && ifconfig -a | grep -q -F inet6; then
-            IPV6=1
-        elif command -v ip >/dev/null && ip addr | grep -q -F inet6; then
-            IPV6=1
-        fi
-
-        if [ -n "${IPV6}" ]; then
-
-            echo "IPv6 is configured"
-
-            if ping6 -c 3 ipv6.google.com >/dev/null 2>&1; then
-
-                echo "IPv6 is working"
-
-                # shellcheck disable=SC2086
-                ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H 2a00:1450:4001:803::200e --ignore-exp
-                EXIT_CODE=$?
-                assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-
-            else
-                echo "IPv6 is configured but not working: skipping test"
-            fi
-
-        else
-            echo "Skipping forcing IPv6: not IPv6 configured locally"
-        fi
-
-    else
-        echo "Skipping forcing IPv6: no OpenSSL support"
-    fi
-}
-
 testFormatShort() {
     # shellcheck disable=SC2086
     OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
@@ -880,7 +844,12 @@ testResolveIPv6() {
             echo "IPv6 is configured"
             if ping6 -c 3 www.google.com >/dev/null 2>&1; then
                 echo "IPv6 is working"
-                RESOLVED=$(host www.google.com | grep IPv6 | sed 's/.* //')
+                RESOLVED=$(
+                    host www.google.com |
+                        grep IPv6 |
+                        head -n 1 |
+                        sed 's/.* //'
+                        )
                 # shellcheck disable=SC2086
                 ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --resolve "${RESOLVED}" --ignore-exp
                 EXIT_CODE=$?
