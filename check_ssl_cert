@@ -293,7 +293,8 @@ usage() {
     echo "Options:"
     # Delimiter at 78 chars ############################################################
     echo "   -A,--noauth                     Ignore authority warnings (expiration"
-    echo "                                   only)"
+    echo "                                   only) to skip requirements for client"
+    echo "                                   certs"
     echo "      --all                        Enable all the possible optional checks"
     echo "                                   at the maximum level"
     echo "      --all-local                  Enable all the possible optional checks"
