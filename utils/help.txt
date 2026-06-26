@@ -201,7 +201,8 @@
 -4;Force IPv4
 -6;Force IPv6
 -A,--noauth;Ignore authority warnings (expiration
--A,--noauth;only)
+-A,--noauth;only) to skip requirements for client
+-A,--noauth;certs
 -C,--clientcert path;Use client certificate to authenticate
 -H,--host host;Server
 -K,--clientkey path;Use client certificate key to authenticate

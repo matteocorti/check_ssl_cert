@@ -26,7 +26,8 @@ Arguments:
 
 Options:
    -A,--noauth                     Ignore authority warnings (expiration
-                                   only)
+                                   only) to skip requirements for client
+                                   certs
       --all                        Enable all the possible optional checks
                                    at the maximum level
       --all-local                  Enable all the possible optional checks
