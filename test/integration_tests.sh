@@ -638,10 +638,11 @@ testIPv6Only() {
 
 testFormatShort() {
     # shellcheck disable=SC2086
+
     OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK github.com from 'Sectigo Limited'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK *.github.com from 'Sectigo Limited'" "${OUTPUT}"
 }
 
 testMoreErrors() {
