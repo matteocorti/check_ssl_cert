@@ -340,7 +340,7 @@ testFQDN() {
 
 testPrometheus() {
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --prometheus --critical 1000 --warning 1100)
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li --prometheus --critical 1000 --warning 1100)
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
@@ -348,13 +348,13 @@ testPrometheus() {
     EXIT_CODE=$?
     assertEquals "output does not contain '# HELP cert_valid'" "${OK}" "${EXIT_CODE}"
 
-    echo "${OUTPUT}" | grep -q 'cert_valid_chain_elem{cn="\*.github.com", element="1"} 2'
+    echo "${OUTPUT}" | grep -q 'cert_valid_chain_elem{cn="corti.li", element="1"} 2'
     EXIT_CODE=$?
-    assertEquals "output does not contain 'cert_valid_chain_elem{cn=\"*.github.com\", element=\"1\"} 2'" "${OK}" "${EXIT_CODE}"
+    assertEquals "output does not contain 'cert_valid_chain_elem{cn=\"corti.li\", element=\"1\"} 2'" "${OK}" "${EXIT_CODE}"
 
-    echo "${OUTPUT}" | grep -q 'cert_days_chain_elem{cn="\*.github.com", element="1"}'
+    echo "${OUTPUT}" | grep -q 'cert_days_chain_elem{cn="corti.li", element="1"}'
     EXIT_CODE=$?
-    assertEquals "output does not contain 'cert_days_chain_elem{cn=\"*.github.com\", element=\"1\"}'" "${OK}" "${EXIT_CODE}"
+    assertEquals "output does not contain 'cert_days_chain_elem{cn=\"corti.li\", element=\"1\"}'" "${OK}" "${EXIT_CODE}"
 
 }
 
@@ -639,10 +639,11 @@ testIPv6Only() {
 testFormatShort() {
     # shellcheck disable=SC2086
 
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H github.com --match github.com --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H corti.li --match corti.li --ignore-exp --format "%SHORTNAME% OK %CN% from '%CA_ISSUER_MATCHED%'" | cut '-d|' -f 1)
     EXIT_CODE=$?
+
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
-    assertEquals "wrong output" "SSL_CERT OK *.github.com from 'Sectigo Limited'" "${OUTPUT}"
+    assertEquals "wrong output" "SSL_CERT OK corti.li from 'Let's Encrypt'" "${OUTPUT}"
 }
 
 testMoreErrors() {
