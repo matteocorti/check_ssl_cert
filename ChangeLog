@@ -1,3 +1,10 @@
+2026-07-16  Joey@macstudio  <4296411@qq.com>
+
+        * check_ssl_cert (check_cert_end_date): Handle decimal day values for
+                                                 certificates expired less than a day
+        * test/unit_tests.sh (testFloatingPointThresholdsRecentlyExpired): Add
+                                                                          a regression test
+
 2026-05-28  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (main): disabling -servername for IP addresses

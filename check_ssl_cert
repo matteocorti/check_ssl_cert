@@ -2500,7 +2500,7 @@ check_cert_end_date() {
 
         if ! checkend "${1}" 0 ; then
 
-            if compare "${ELEM_DAYS_VALID}" ">=" 0 && compare "${ELEM_DAYS_VALID}" "<" 1; then
+            if compare "${ELEM_DAYS_VALID}" ">" -1 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
                 # remove decimals

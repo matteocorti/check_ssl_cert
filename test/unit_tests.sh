@@ -480,6 +480,44 @@ testFloatingPointThresholdsExpired() {
 
 }
 
+testFloatingPointThresholdsRecentlyExpired() {
+
+    create_temporary_test_file
+    FAKE_DATE=${TEMPFILE}
+
+    cat <<'EOT' >"${FAKE_DATE}"
+#!/bin/sh
+
+case "$1" in
+    --version)
+        echo 'date (GNU coreutils) 9.0'
+        ;;
+    +%s)
+        echo 1428886799
+        ;;
+    -d)
+        echo 1428883199
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+EOT
+    chmod +x "${FAKE_DATE}"
+
+    # The fake date reports one hour after the certificate's expiry.
+    # shellcheck disable=SC2086
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -H expired.badssl.com --warning 1.0 --critical 0 --date "${FAKE_DATE}" --first-element-only 2>&1)
+    EXIT_CODE=$?
+    echo "${OUTPUT}"
+
+    assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
+
+    echo "${OUTPUT}" | grep -q 'less than a day ago'
+    assertEquals "wrong expiry description" 0 $?
+
+}
+
 testFloatingPointThresholdsWrongUsage() {
 
     # shellcheck disable=SC2086
