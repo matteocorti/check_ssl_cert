@@ -158,3 +158,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [Derek Schrock](https://github.com/derekschrock) for the BuildRequires patch
 * Many thanks to [Sylvestre Ledru](https://github.com/sylvestre) for the date patch
 * Many thanks to [gcoxmoz](https://github.com/gcoxmoz) for the ```ASSUME_ONLINE``` patch
+* Many thanks to [onice](https://github.com/oiahoon) for the decimal thresholds patch

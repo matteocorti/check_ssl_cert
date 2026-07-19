@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.102.0
+VERSION=2.103.0
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables

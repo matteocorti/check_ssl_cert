@@ -1,5 +1,7 @@
 # News
 
+* 2026-07-19 Version 2.103.0
+  * Handle decimal day values
 * 2026-05-29 Version 2.102.0
   * Does not specify an SNI if we are checking an IP address
   * Checks if a specified IP address is present in the certificate
