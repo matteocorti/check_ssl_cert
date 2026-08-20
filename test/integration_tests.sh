@@ -1110,7 +1110,7 @@ testOrganizationOKUmlaut() {
         echo "Skipping test: cannot connect to ${host}:443"
     fi
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} -H "${host}" -o 'ETH Zürich' --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} -H "${host}" -o 'Organisation und Informatik der Stadt Zürich (OIZ)' --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }

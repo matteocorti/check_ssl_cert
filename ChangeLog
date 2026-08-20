@@ -1,5 +1,7 @@
 2026-08-20  Matteo Corti  <matteo@corti.li>
 
+        * check_ssl_cert (check_attr): Fixed the organization check ignoring special characters
+
         * test/integration_tests.sh (testOrganizationOKUmlaut): Fixed the umlaut test (ETH Zurich is not delivering the organisation name anymore)
 
         * check_ssl_cert (check_attr): Ignore namp warning about more then one IP address while checking for the ciphers

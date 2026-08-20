@@ -2,6 +2,7 @@
 
 * 2026-08-20 Version 2.103.1
   * Ignore namp warning about more then one IP address while checking for the ciphers
+  * Fixed the organization check when the string contains special characters
 * 2026-07-19 Version 2.103.0
   * Handle decimal day values
 * 2026-05-29 Version 2.102.0

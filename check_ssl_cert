@@ -7274,7 +7274,8 @@ ${WARNING}"
         debuglog "  ORG          = ${ORG}"
         debuglog "  ORGANIZATION = ${ORGANIZATION}"
 
-        if ! echo "${ORG}" | "${GREP_BIN}" -q -E "^${ORGANIZATION}"; then
+        if [ "${ORG}" != "${ORGANIZATION}" ]; then
+
             ORGANIZATION_TMP="$(echo "${ORGANIZATION}" | sed "s/|/ PIPE /g")"
             prepend_critical_message "invalid organization ('${ORGANIZATION_TMP}' does not match '${ORG}')"
         fi
