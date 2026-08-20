@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.103.0
+VERSION=2.103.1
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -7031,7 +7031,9 @@ INPUT
                 NMAP_ERROR=$(head -n 1 "${NMAP_ERR}")
 
                 # check for -Pn warning
-                if ! "${GREP_BIN}" -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}"; then
+                if
+                    ! "${GREP_BIN}" -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}" &&
+                        ! "${GREP_BIN}" -q "Warning:.*resolves to.*IPs" "${NMAP_ERR}" ; then
                     critical "nmap exited with error: ${NMAP_ERROR}"
                 fi
 

@@ -1,3 +1,9 @@
+2026-08-20  Matteo Corti  <matteo@corti.li>
+
+        * test/integration_tests.sh (testOrganizationOKUmlaut): Fixed the umlaut test (ETH Zurich is not delivering the organisation name anymore)
+
+        * check_ssl_cert (check_attr): Ignore namp warning about more then one IP address while checking for the ciphers
+
 2026-07-16  Joey@macstudio  <4296411@qq.com>
 
         * check_ssl_cert (check_cert_end_date): Handle decimal day values for

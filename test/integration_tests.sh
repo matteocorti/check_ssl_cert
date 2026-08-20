@@ -1104,7 +1104,7 @@ testOrganizationOK() {
 }
 
 testOrganizationOKUmlaut() {
-    host=ethz.ch
+    host=zuerich.ch
     if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
