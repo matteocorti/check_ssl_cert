@@ -39,4 +39,4 @@ if ! [ -f "${conf}" ]; then
     error "Configuration file ${conf} is not readable"
 fi
 
-tinyproxy -c "${conf}" > /dev/null 2>&1
+tinyproxy -c "${conf}" >/dev/null 2>&1

@@ -42,12 +42,12 @@ fi
 # Utilities
 
 startLocalProxy() {
-    tinyproxy -c tinyproxy.conf -d  > /dev/null 2>&1
+    tinyproxy -c tinyproxy.conf -d >/dev/null 2>&1
     TINYPROXY=$!
 }
 
 stopLocalProxy() {
-    if [ -n "${TINYPROXY}" ] ; then
+    if [ -n "${TINYPROXY}" ]; then
         kill "${TINYPROXY}"
     fi
 }
@@ -157,7 +157,7 @@ setUp() {
         # print the test number
         # shellcheck disable=SC2154
         echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed, ${__shunit_assertsSkipped} skipped)"
-     fi
+    fi
     COUNTER=$((COUNTER + 1))
 }
 
@@ -169,25 +169,25 @@ testSignatureAlgorithms() {
     echo "  testing sha256WithRSAEncryption (2048 bit)"
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa2048.badssl.com |
-                    grep '^Signature algorithm' |
-                    sed 's/^Signature algorithm *//')
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (2048 bit)' "${ALGORITHM}"
 
     echo "  testing sha256WithRSAEncryption (4096 bit)"
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa4096.badssl.com |
-                    grep '^Signature algorithm' |
-                    sed 's/^Signature algorithm *//')
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (4096 bit)' "${ALGORITHM}"
 
     echo "  testing sha256WithRSAEncryption (8192 bit)"
     # shellcheck disable=SC2086
     ALGORITHM=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --info --ignore-exp --host rsa8192.badssl.com |
-                    grep '^Signature algorithm' |
-                    sed 's/^Signature algorithm *//')
+        grep '^Signature algorithm' |
+        sed 's/^Signature algorithm *//')
     assertEquals "wrong signature algorithm" 'sha256WithRSAEncryption (8192 bit)' "${ALGORITHM}"
 
- }
+}
 
 testSCT() {
     if [ -z "${OPENSSL}" ]; then
@@ -211,7 +211,7 @@ testSCT() {
 
 testBadSSLExpired() {
     host=expired.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -223,7 +223,7 @@ testBadSSLExpired() {
 
 testBadSSLExpiredAndWarnThreshold() {
     host=expired.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -235,19 +235,19 @@ testBadSSLExpiredAndWarnThreshold() {
 
 testBadSSLWrongHost() {
     host=wrong.host.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLSelfSigned() {
     host=self-signed.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -259,19 +259,19 @@ testBadSSLSelfSigned() {
 
 testBadSSLUntrustedRoot() {
     host=untrusted-root.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLRevoked() {
     host=revoked.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -283,7 +283,7 @@ testBadSSLRevoked() {
 
 testGRCRevoked() {
     host=revoked.grc.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -295,7 +295,7 @@ testGRCRevoked() {
 
 testBadSSLIncompleteChain() {
     host=incomplete-chain.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -307,19 +307,19 @@ testBadSSLIncompleteChain() {
 
 testBadSSLDH480() {
     host=dh480.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
     # shellcheck disable=SC2086
-    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}"  --ignore-exp
+    ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H "${host}" --ignore-exp
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
 testBadSSLDH512() {
     host=dh512.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -331,7 +331,7 @@ testBadSSLDH512() {
 
 testBadSSLRC4MD5() {
     host=rc4-md5.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -346,10 +346,9 @@ testBadSSLRC4MD5() {
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
 
-
 testBadSSLRC4() {
     host=rc4.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -365,7 +364,7 @@ testBadSSLRC4() {
 
 testBadSSL3DES() {
     host=3des.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -382,7 +381,7 @@ testBadSSL3DES() {
 
 testBadSSLNULL() {
     host=null.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -394,7 +393,7 @@ testBadSSLNULL() {
 
 testBadSSLSHA256() {
     host=sha256.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -406,7 +405,7 @@ testBadSSLSHA256() {
 
 testBadSSLEcc256() {
     host=ecc256.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -418,7 +417,7 @@ testBadSSLEcc256() {
 
 testBadSSLEcc384() {
     host=ecc384.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -430,7 +429,7 @@ testBadSSLEcc384() {
 
 testBadSSLRSA8192() {
     host=rsa8192.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -442,7 +441,7 @@ testBadSSLRSA8192() {
 
 testBadSSLLongSubdomainWithDashes() {
     host=long-extended-subdomain-name-containing-many-letters-and-dashes.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -454,7 +453,7 @@ testBadSSLLongSubdomainWithDashes() {
 
 testBadSSLLongSubdomain() {
     host=longextendedsubdomainnamewithoutdashesinordertotestwordwrapping.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -466,7 +465,7 @@ testBadSSLLongSubdomain() {
 
 testBadSSLSHA12016() {
     host=sha1-2016.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -478,7 +477,7 @@ testBadSSLSHA12016() {
 
 testBadSSLSHA12017() {
     host=sha1-2017.badssl.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi

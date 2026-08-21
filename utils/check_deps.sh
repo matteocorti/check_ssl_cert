@@ -12,7 +12,7 @@ check_perl_module() {
 
     printf "Checking %35s:" "$1"
 
-    if perl -M"$1" -e1 2>/dev/null ; then
+    if perl -M"$1" -e1 2>/dev/null; then
         printf " [${GREEN}OK${NC}:    %-35s]\n" "$1"
     else
         ERROR="$1 not found"
@@ -55,9 +55,9 @@ check_shunit2() {
 
     printf "Checking %35s:" shunit2
 
-    PROG=$(command -v shunit2 2> /dev/null)
-    if [ -z "${PROG}" ] ; then
-        if [ -x /usr/share/shunit2/shunit2 ] ; then
+    PROG=$(command -v shunit2 2>/dev/null)
+    if [ -z "${PROG}" ]; then
+        if [ -x /usr/share/shunit2/shunit2 ]; then
             PROG=/usr/share/shuni2/shunit2
         fi
     fi
@@ -112,7 +112,7 @@ check_perl_module Date::Parse
 
 echo
 
-if [ -n "${FAILED}" ] ; then
+if [ -n "${FAILED}" ]; then
     exit 1
 fi
 

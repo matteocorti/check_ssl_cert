@@ -70,12 +70,12 @@ cleanup_temporary_test_files() {
 }
 
 startLocalProxy() {
-    tinyproxy -c tinyproxy.conf -d  > /dev/null 2>&1
+    tinyproxy -c tinyproxy.conf -d >/dev/null 2>&1
     TINYPROXY=$!
 }
 
 stopLocalProxy() {
-    if [ -n "${TINYPROXY}" ] ; then
+    if [ -n "${TINYPROXY}" ]; then
         kill "${TINYPROXY}"
     fi
 }
@@ -179,7 +179,7 @@ oneTimeSetUp() {
     fi
 
     DIG_BIN=$(command -v dig)
-    NSLOOKUP_BIN=$( command -v nslookup )
+    NSLOOKUP_BIN=$(command -v nslookup)
     true # if the last variable is empty the setup will fail
 
 }
@@ -251,7 +251,7 @@ setUp() {
         # print the test number
         # shellcheck disable=SC2154
         echo "Running test ${COUNTER} of ${__shunit_testsTotal} (${PERCENT}%), ${REMAINING} remaining (${__shunit_testsFailed} failed, ${__shunit_assertsSkipped} skipped)"
-     fi
+    fi
     COUNTER=$((COUNTER + 1))
 }
 
@@ -533,7 +533,7 @@ testPOP3S() {
 
 testSMTP() {
     SMTP_HOST=smtp.gmail.com
-    if nc -zw1 "${SMTP_HOST}" 25 ; then
+    if nc -zw1 "${SMTP_HOST}" 25; then
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H smtp.gmail.com --protocol smtp --port 25 --timeout 60 --ignore-exp
         EXIT_CODE=$?
@@ -735,28 +735,28 @@ testCertificateWithEmptySubject() {
 # see #449
 testNotExistingHosts() {
 
-    if [ -n "${NSLOOKUP_BIN}" ] ; then
+    if [ -n "${NSLOOKUP_BIN}" ]; then
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain )
+        OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain)
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain --do-not-resolve )
+        OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nonexistinghostordomain --do-not-resolve)
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li )
+        OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li)
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot resolve"
 
         # shellcheck disable=SC2086
-        OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li --do-not-resolve )
+        OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --host nxdomain.corti.li --do-not-resolve)
         EXIT_CODE=$?
         assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
         assertContains "wrong error message" "${OUTPUT}" "Cannot connect"
@@ -772,27 +772,26 @@ testNotExistingHosts() {
 testResolveOverHTTP() {
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http --host github.com --warning 2 --critical 1 )
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http --host github.com --warning 2 --critical 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code (1)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.com --warning 2 --critical 1 )
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.com --warning 2 --critical 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code (2)" "${NAGIOS_OK}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.comm --warning 2 --critical 1 )
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.8 --host github.comm --warning 2 --critical 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code (3)" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
     # shellcheck disable=SC2086
-    OUTPUT=$( ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.9 --host github.com --timeout 2 --warning 2 --critical 1 )
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt --resolve-over-http 8.8.8.9 --host github.com --timeout 2 --warning 2 --critical 1)
     EXIT_CODE=$?
     assertEquals "wrong exit code (4)" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 
 }
-
 
 testResolveSameName() {
     # shellcheck disable=SC2086
@@ -851,7 +850,7 @@ testResolveIPv6() {
                         grep IPv6 |
                         head -n 1 |
                         sed 's/.* //'
-                        )
+                )
                 # shellcheck disable=SC2086
                 ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -H www.google.com --resolve "${RESOLVED}" --ignore-exp
                 EXIT_CODE=$?
@@ -875,9 +874,9 @@ testCiphersOK() {
     elif [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     elif [ -n "${http_proxy}" ] ||
-             [ -n "${https_proxy}" ] ||
-             [ -n "${HTTP_PROXY}" ] ||
-             [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
 
@@ -913,9 +912,9 @@ testCiphersNonStandardPort() {
     if [ -f /etc/redhat-release ] && grep -q '.*Linux.*release 6\.' /etc/redhat-release; then
         echo 'Skipping tests on CentOS and RedHat 6 since nmap is not delivering cipher strengths'
     elif [ -n "${http_proxy}" ] ||
-             [ -n "${https_proxy}" ] ||
-             [ -n "${HTTP_PROXY}" ] ||
-             [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
 
@@ -1005,9 +1004,9 @@ testAcceptableClientCertCAMissing() {
 
 testIgnoreConnectionStateOK() {
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
@@ -1019,9 +1018,9 @@ testIgnoreConnectionStateOK() {
 
 testIgnoreConnectionStateCRITICAL() {
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
@@ -1033,9 +1032,9 @@ testIgnoreConnectionStateCRITICAL() {
 
 testIgnoreConnectionStateWARNING() {
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
@@ -1047,9 +1046,9 @@ testIgnoreConnectionStateWARNING() {
 
 testIgnoreConnectionStateError() {
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
@@ -1061,9 +1060,9 @@ testIgnoreConnectionStateError() {
 
 testIgnoreConnectionStateHTTP() {
     if [ -n "${http_proxy}" ] ||
-           [ -n "${https_proxy}" ] ||
-           [ -n "${HTTP_PROXY}" ] ||
-           [ -n "${HTTPS_PROXY}" ]; then
+        [ -n "${https_proxy}" ] ||
+        [ -n "${HTTP_PROXY}" ] ||
+        [ -n "${HTTPS_PROXY}" ]; then
         echo 'Using a proxy: skipping tests'
     else
         # shellcheck disable=SC2086
@@ -1093,7 +1092,7 @@ testOrganizationFail() {
 
 testOrganizationOK() {
     host=microsoft.com
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -1105,7 +1104,7 @@ testOrganizationOK() {
 
 testOrganizationOKUmlaut() {
     host=zuerich.ch
-    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open' ; then
+    if ! nmap --unprivileged -Pn -p 443 "${host}" | grep -q '^443.*open'; then
         startSkipping
         echo "Skipping test: cannot connect to ${host}:443"
     fi
@@ -1222,7 +1221,7 @@ testPurpose() {
 }
 
 testDNSSECOk() {
-    if [ -n "${DIG_BIN}" ] ; then
+    if [ -n "${DIG_BIN}" ]; then
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} -H switch.ch --ignore-exp --require-dnssec
         EXIT_CODE=$?
@@ -1233,7 +1232,7 @@ testDNSSECOk() {
 }
 
 testDNSSECError() {
-    if [ -n "${DIG_BIN}" ] ; then
+    if [ -n "${DIG_BIN}" ]; then
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} -H corti.li --ignore-exp --require-dnssec
         EXIT_CODE=$?

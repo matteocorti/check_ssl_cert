@@ -147,7 +147,7 @@ oneTimeSetUp() {
     fi
     "${OPENSSL}" version
 
-    KEYTOOL=$( command -v keytool) # Java?
+    KEYTOOL=$(command -v keytool) # Java?
 
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN=$(command -v grep) # needed by openssl_version
@@ -244,7 +244,7 @@ testNumericCheck() {
         assertEquals " check_numeric_argument ${argument}" 1 $?
     done
 
-    for argument in a % %1 1.1.1 1%1 120% ; do
+    for argument in a % %1 1.1.1 1%1 120%; do
         echo "Checking numeric argument: ${argument}"
         check_numeric_argument "${argument}"
         assertEquals " check_numeric_argument ${argument}" 0 $?
@@ -616,7 +616,7 @@ testChainFailIgnored() {
 }
 
 testJavaKeyStore1() {
-    if [ -n "${KEYTOOL}" ] ; then
+    if [ -n "${KEYTOOL}" ]; then
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} --file ./keystore.jks --password changeit --jks-alias google-com --ignore-incomplete-chain --ignore-exp
         EXIT_CODE=$?
@@ -627,7 +627,7 @@ testJavaKeyStore1() {
 }
 
 testJavaKeyStore2() {
-    if [ -n "${KEYTOOL}" ] ; then
+    if [ -n "${KEYTOOL}" ]; then
         # shellcheck disable=SC2086
         ${SCRIPT} ${TEST_DEBUG} --file ./cacerts.jks --password changeit --jks-alias "verisignuniversalrootca [jdk]" --allow-empty-san --ignore-maximum-validity --selfsigned
         EXIT_CODE=$?
@@ -638,7 +638,7 @@ testJavaKeyStore2() {
 }
 
 testDirectoryAsAFile() {
-   # shellcheck disable=SC2086
+    # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} --file somedir
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"

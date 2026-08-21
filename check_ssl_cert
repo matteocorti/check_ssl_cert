@@ -71,7 +71,6 @@ SCALE=""
 ################################################################################
 # Functions
 
-
 # substituted the variables defined by the --format command line option
 format_template() {
 
@@ -137,7 +136,7 @@ check_option() {
     debuglog "Checking if ${text} was already specified (${variable}) (override: ${OVERRIDE})"
 
     if [ -n "${variable}" ] &&
-           [ -z "${OVERRIDE}" ] ; then
+        [ -z "${OVERRIDE}" ]; then
         unknown "${text} can be specified only once"
     fi
 
@@ -701,16 +700,16 @@ info() {
     VALUE=$2
 
     if [ -n "${INFO}" ] && [ -n "${VALUE}" ]; then
-        if [ -n "${INFO_OUTPUT}" ] ; then
-            INFO_OUTPUT="${INFO_OUTPUT}$( printf '\n%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32 )"
+        if [ -n "${INFO_OUTPUT}" ]; then
+            INFO_OUTPUT="${INFO_OUTPUT}$(printf '\n%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32)"
         else
-            INFO_OUTPUT="$( printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32 )"
+            INFO_OUTPUT="$(printf '%s\t%s\n' "${LABEL}" "${VALUE}" | expand -t 32)"
         fi
     elif [ -n "${INFO}" ]; then
-        if [ -n "${INFO_OUTPUT}" ] ; then
-            INFO_OUTPUT="${INFO_OUTPUT}$( printf '\n%s\n' "${LABEL}" )"
+        if [ -n "${INFO_OUTPUT}" ]; then
+            INFO_OUTPUT="${INFO_OUTPUT}$(printf '\n%s\n' "${LABEL}")"
         else
-            INFO_OUTPUT="$( printf '%s\n' "${LABEL}" )"
+            INFO_OUTPUT="$(printf '%s\n' "${LABEL}")"
         fi
     fi
 
@@ -886,8 +885,8 @@ hours_until() {
     # we simplify and consider a date invalid after 1.1.2038 instead of 19.1.2038
     # since date is not able to parse the date we do it manually with a little bit of
     # heuristics ...
-    LONG_BIT_TMP="$(getconf LONG_BIT 2> /dev/null)"
-    if [ -z "${LONG_BIT_TMP}" ] ; then
+    LONG_BIT_TMP="$(getconf LONG_BIT 2>/dev/null)"
+    if [ -z "${LONG_BIT_TMP}" ]; then
         debuglog "Cannot detect system architecture: no LONGBIT"
     else
         if [ "${LONG_BIT_TMP}" -eq 32 ]; then
@@ -968,7 +967,7 @@ hours_until() {
         ;;
     "PERL")
 
-        if ! perl -MDate::Parse -e '1;' > /dev/null 2>&1 ; then
+        if ! perl -MDate::Parse -e '1;' >/dev/null 2>&1; then
             unknown "Error computing the certificate validity with Perl: Date::Parse not installed"
         fi
 
@@ -1501,17 +1500,17 @@ check_numeric_argument() {
     value=$1
     message=$2
     if ! echo "${value}" | "${GREP_BIN}" -q -E '^[0-9][0-9]*([.][0-9][0-9]*)?[%]*$'; then
-        if [ -n "${UNIT_TEST}" ] ; then
+        if [ -n "${UNIT_TEST}" ]; then
             return 0
         else
             unknown "${message}"
         fi
     else
-        if  echo "${value}" | "${GREP_BIN}" -q -E '%$'; then
-            number=$( echo "${value}" | sed -e 's/%$//' ) # remove the % sign at the end
-            number=$( echo "${number}" | sed -e 's/[.].*//' ) # remove the decimal part
-            if [ "${number}" -gt 100 ] ; then
-                if [ -n "${UNIT_TEST}" ] ; then
+        if echo "${value}" | "${GREP_BIN}" -q -E '%$'; then
+            number=$(echo "${value}" | sed -e 's/%$//')     # remove the % sign at the end
+            number=$(echo "${number}" | sed -e 's/[.].*//') # remove the decimal part
+            if [ "${number}" -gt 100 ]; then
+                if [ -n "${UNIT_TEST}" ]; then
                     return 0
                 else
                     unknown "${message}"
@@ -1803,7 +1802,7 @@ exec_with_timeout() {
 
     NOW=$(date +%s)
     ELAPSED=$((NOW - START_TIME))
-    CURRENT_TIMEOUT=$(( TIMEOUT - ELAPSED))
+    CURRENT_TIMEOUT=$((TIMEOUT - ELAPSED))
 
     debuglog "exec_with_timeout: TIMEOUT=${TIMEOUT}, CURRENT_TIMEOUT=${CURRENT_TIMEOUT}, ELAPSED=${ELAPSED}"
 
@@ -2044,7 +2043,7 @@ fetch_issuer_cert() {
 
                 elif "${FILE_BIN}" -L -b "${ISSUER_CERT_TMP}" | "${GREP_BIN}" -E -q 'empty'; then
 
-                        # empty certs are allowed
+                    # empty certs are allowed
                     debuglog "Empty issuer certificate detected: skipping"
                     return
 
@@ -2111,7 +2110,7 @@ check_crl() {
     fi
 
     debuglog "Checking CRL for element ${el_number}"
-    subject=$( extract_cert_attribute 'subject' "${CERT_ELEMENT}")
+    subject=$(extract_cert_attribute 'subject' "${CERT_ELEMENT}")
     debuglog "Checking CRL for element ${el_number} (${subject})"
 
     create_temporary_file
@@ -2142,7 +2141,6 @@ check_crl() {
         fi
         unset TIMEOUT_REASON
 
-
         if "${FILE_BIN}" -L -b "${CRL_TMP}" | "${GREP_BIN}" -E -q '(data|Certificate)'; then
 
             # convert DER to PEM
@@ -2156,12 +2154,10 @@ check_crl() {
 
         fi
 
-
         SERIAL="$(extract_cert_attribute 'serial' "${CERT_ELEMENT}")"
         debuglog "Checking if the element serial number (${SERIAL}) is contained in the CRL"
 
-
-        if openssl crl -in "${CRL_TMP_PEM}" -text 2>/dev/null | grep -q "Serial Number: ${SERIAL}$" ; then
+        if openssl crl -in "${CRL_TMP_PEM}" -text 2>/dev/null | grep -q "Serial Number: ${SERIAL}$"; then
 
             prepend_critical_message "certificate element ${el_number} is revoked (CRL)"
 
@@ -2213,7 +2209,7 @@ check_ocsp() {
 
         fetch_issuer_cert "${CERT_ELEMENT}"
 
-        if ! [ -r "${ISSUER_CERT}" ] ; then
+        if ! [ -r "${ISSUER_CERT}" ]; then
             verboselog "Unable to fetch the issuer certificate: skipping OCSP check"
             return
         fi
@@ -2269,7 +2265,7 @@ check_ocsp() {
 
                         if [ -n "${KEYVALUE}" ]; then
 
-                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
+                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ]; then
                                 debuglog "executing (1) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT}  ${OCSP_HEADER} -header HOST=${OCSP_HOST} -proxy ${http_proxy} -url ${OCSP_URI}"
                                 OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header "HOST=${OCSP_HOST}" -proxy "${http_proxy}" -url "${OCSP_URI}" 2>&1)"
                             else
@@ -2279,7 +2275,7 @@ check_ocsp() {
 
                         else
 
-                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ];then
+                            if [ "${OPENSSL_VERSION_SHORT}" -ge 3 ]; then
                                 debuglog "executing (3) ${OPENSSL} ocsp -timeout \"${CURRENT_TIMEOUT}\" -no_nonce -issuer ${ISSUER_CERT} -cert ${CERT_ELEMENT} ${OCSP_HEADER} -header HOST ${OCSP_HOST} -host ${OCSP_PROXY_ARGUMENT} -path ${OCSP_URI}"
                                 OCSP_RESP="$(${OPENSSL} ocsp -timeout "${CURRENT_TIMEOUT}" -no_nonce -issuer "${ISSUER_CERT}" -cert "${CERT_ELEMENT}" -header HOST "${OCSP_HOST}" -host "${OCSP_PROXY_ARGUMENT}" -path "${OCSP_URI}" 2>&1)"
                             else
@@ -2385,13 +2381,13 @@ checkend() {
 
     # check if OpenSSL is buggy (see https://github.com/openssl/openssl/issues/28928)
     # the result is cached to check only once
-    if [ -z "${CHECKEND_BUGGY_CHECKED}" ] ; then
+    if [ -z "${CHECKEND_BUGGY_CHECKED}" ]; then
 
         debuglog "Checking if OpenSSL checkend is buggy"
 
         CHECKEND_BUGGY_CHECKED=1
 
-        if echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend 2147483647 >/dev/null  ; then
+        if echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend 2147483647 >/dev/null; then
 
             # exit status 0 but should be 1
 
@@ -2410,14 +2406,14 @@ checkend() {
 
     debuglog "${OPENSSL} x509 -in /dev/stdin -noout -checkend ${2}"
 
-    if [ -n "${CHECKEND_BUGGY}" ] ; then
+    if [ -n "${CHECKEND_BUGGY}" ]; then
 
         debuglog "Checking validity parsing the output of x509 -checkend (buggy)"
 
         #   we fall back to parse the text output
         if echo "${1}" |
-                ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" |
-                grep -q 'Certificate will not expire' ; then
+            ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" |
+            grep -q 'Certificate will not expire'; then
             debuglog "  Certificate will not expire"
             return 0
         else
@@ -2429,7 +2425,7 @@ checkend() {
 
         debuglog "Checking validity with x509 -checkend"
 
-        if echo "${1}" |  ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" >/dev/null ; then
+        if echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${2}" >/dev/null; then
             debuglog "  RES=0"
             return 0
         else
@@ -2440,8 +2436,6 @@ checkend() {
     fi
 
 }
-
-
 
 ################################################################################
 # Checks cert end date validity
@@ -2498,13 +2492,13 @@ check_cert_end_date() {
         # We always check expired certificates
         debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend 0 on cert element ${el_number} (${element_cn})"
 
-        if ! checkend "${1}" 0 ; then
+        if ! checkend "${1}" 0; then
 
             if compare "${ELEM_DAYS_VALID}" ">" -1 && compare "${ELEM_DAYS_VALID}" "<" 1; then
                 DAYS_AGO='less than a day ago'
             else
                 # remove decimals
-                ELEM_DAYS_VALID=$( echo "${ELEM_DAYS_VALID}" | sed -e 's/[.].*//' )
+                ELEM_DAYS_VALID=$(echo "${ELEM_DAYS_VALID}" | sed -e 's/[.].*//')
                 DAYS_AGO="$((-ELEM_DAYS_VALID)) days ago"
             fi
             debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) is expired (was valid until ${ELEM_END_DATE}, ${DAYS_AGO})"
@@ -2526,7 +2520,7 @@ ${CN_EXPIRED_TMP}"
 
             debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${CRITICAL_SECONDS} on cert element ${el_number} (${element_cn})"
 
-            if ! checkend "${1}" "${CRITICAL_SECONDS}" ; then
+            if ! checkend "${1}" "${CRITICAL_SECONDS}"; then
                 debuglog "CRITICAL: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_CRITICAL}" ]; then
@@ -2548,8 +2542,8 @@ ${CN_EXPIRED_TMP}"
 
             debuglog "executing: ${OPENSSL} x509 -in /dev/stdin -noout -checkend ${WARNING_SECONDS} on cert element ${el_number}"
 
-#            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
-            if ! checkend "${1}" "${WARNING_SECONDS}" ; then
+            #            if ! echo "${1}" | ${OPENSSL} x509 -in /dev/stdin -noout -checkend "${WARNING_SECONDS}" >/dev/null; then
+            if ! checkend "${1}" "${WARNING_SECONDS}"; then
                 debuglog "WARNING: certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 CN_EXPIRED_TMP="${element_cn}:${replace_current_message}:${OPENSSL_COMMAND} certificate element ${el_number} (${element_cn}) will expire in ${ELEM_DAYS_VALID} day(s) on ${ELEM_END_DATE}"
                 if [ -z "${CN_EXPIRED_WARNING}" ]; then
@@ -2757,10 +2751,10 @@ fetch_certificate() {
 
     # Check if a protocol was specified (if not HTTP switch to TLS)
     if [ -n "${PROTOCOL}" ] &&
-           [ "${PROTOCOL}" != 'http' ] &&
-           [ "${PROTOCOL}" != 'https' ] &&
-           [ "${PROTOCOL}" != 'h2' ] &&
-           [ "${PROTOCOL}" != 'h3' ]; then
+        [ "${PROTOCOL}" != 'http' ] &&
+        [ "${PROTOCOL}" != 'https' ] &&
+        [ "${PROTOCOL}" != 'h2' ] &&
+        [ "${PROTOCOL}" != 'h3' ]; then
 
         case "${PROTOCOL}" in
         pop3 | ftp)
@@ -2802,7 +2796,7 @@ fetch_certificate() {
             # we create a temporary file with the message content (because of quoting and special characters
             create_temporary_file
             MQTT_MESSAGE=${TEMPFILE}
-            printf "\\x10\\x0d\\x00\\x04MQTT\\x04\\x00\\x00\\x00\\x00\\x01a" > "${MQTT_MESSAGE}"
+            printf '\x10\x0d\x00\x04MQTT\x04\x00\x00\x00\x00\x01a' >"${MQTT_MESSAGE}"
 
             exec_with_timeout "cat ${MQTT_MESSAGE} | ${OPENSSL} s_client ${SECURITY_LEVEL} ${INETPROTO} ${CLIENT} ${CLIENTPASS} -showcerts -connect ${HOST_ADDR}:${PORT} ${SERVERNAME} ${SCLIENT_PROXY} ${SCLIENT_PROXY_ARGUMENT} -verify 6 ${ROOT_CA} ${SSL_VERSION} ${SSL_VERSION_DISABLED} ${SSL_AU} ${STATUS} ${DANE} ${IGNOREEOF} ${RENEGOTIATION} 2> ${ERROR} 1> ${CERT}"
             RET=$?
@@ -3156,9 +3150,9 @@ fetch_certificate() {
             prepend_critical_message "${ERROR}"
             critical "SSL_CERT_CRITICAL ${HOST_NAME}:${PORT}: ${ERROR}"
 
-        elif ascii_grep "certificate has expired" "${ERROR}" ; then
+        elif ascii_grep "certificate has expired" "${ERROR}"; then
 
-            if [ -z "${NOEXP}" ] ; then
+            if [ -z "${NOEXP}" ]; then
                 ERROR="Certificate has expired"
                 prepend_critical_message "${ERROR}"
                 critical "SSL_CERT_CRITICAL ${HOST_NAME}:${PORT}: ${ERROR}"
@@ -3252,7 +3246,7 @@ check_option_argument() {
 
     # the majority of the options is specided as '-s|--long'
     # but | is a problem for Nagios: we substitute it with ', '
-    option=$( echo "${1}" | sed 's/|/, /' )
+    option=$(echo "${1}" | sed 's/|/, /')
 
     # shellcheck disable=SC2295
     if [ -z "$2" ] || [ "${2%${2#?}}"x = '-x' ]; then
@@ -3338,7 +3332,7 @@ parse_command_line_options() {
             # start time
             DEBUG_TIME=$(date +%s)
             # --debug-time does not make any sense without -d
-            if [ "${DEBUG}" -le 1 ] ; then
+            if [ "${DEBUG}" -le 1 ]; then
                 DEBUG=1
             fi
             shift
@@ -3893,7 +3887,7 @@ parse_command_line_options() {
         --security-level)
             check_option_argument '--security-level' "$2"
             check_option "${SECURITY_LEVEL}" '--security-level'
-            if ! echo "$2" | "${GREP_BIN}" -q '^[0-5]$' ; then
+            if ! echo "$2" | "${GREP_BIN}" -q '^[0-5]$'; then
                 unknown 'Invalid secuirity level'
             fi
             SECURITY_LEVEL="-cipher DEFAULT@SECLEVEL=$2"
@@ -4061,7 +4055,7 @@ $2"
             PROTOCOL="$2"
 
             # set the protocol to lowercase
-            PROTOCOL=$( echo "${PROTOCOL}" | tr '[:upper:]' '[:lower:]' )
+            PROTOCOL=$(echo "${PROTOCOL}" | tr '[:upper:]' '[:lower:]')
 
             shift 2
             ;;
@@ -4450,7 +4444,7 @@ main() {
 
     parse_command_line_options "$@"
 
-    if ! [ -x "${GREP_BIN}" ] ; then
+    if ! [ -x "${GREP_BIN}" ]; then
         unknown "${GREP_BIN} in not executable"
     fi
 
@@ -4475,11 +4469,10 @@ main() {
         USER_TMP="$(whoami)"
         debuglog "User: ${USER_TMP}"
 
-
     fi
 
     # process the --ignore-host-cn option by removing __HOST__ from the list of checked names
-    if [ -n "${IGNORE_HOST_CN}" ] ; then
+    if [ -n "${IGNORE_HOST_CN}" ]; then
         NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed 's/__HOST__ *//')
     fi
 
@@ -4583,9 +4576,9 @@ main() {
 
         debuglog "grep: ${GREP_BIN}"
         GREP_VERSION=$(${GREP_BIN} --version 2>&1)
-        if echo "${GREP_VERSION}" | "${GREP_BIN}" -q BusyBox ; then
+        if echo "${GREP_VERSION}" | "${GREP_BIN}" -q BusyBox; then
             # BusyBox grep does not have a -version option
-            GREP_VERSION=$( echo "${GREP_VERSION}" | sed -e 's/.*BusyBox/BusyBox/' -e 's/\. Usage.*//' )
+            GREP_VERSION=$(echo "${GREP_VERSION}" | sed -e 's/.*BusyBox/BusyBox/' -e 's/\. Usage.*//')
         fi
         echo "${GREP_VERSION}" | sed 's/^/[DBG]   /' 1>&2
 
@@ -4624,7 +4617,7 @@ main() {
         fi
 
         # we check HTTP headers only with HTTP/HTTPS
-        if [ -z "${IGNORE_HTTP_HEADERS}" ] ; then
+        if [ -z "${IGNORE_HTTP_HEADERS}" ]; then
             if [ -z "${PROTOCOL}" ] || [ "${PROTOCOL}" = 'http' ] || [ "${PROTOCOL}" = 'https' ] || [ "${PROTOCOL}" = 'h2' ]; then
                 REQUIRED_HTTP_HEADERS="${DEFAULT_REQUIRED_HTTP_HEADERS}"
                 UNREQUIRED_HTTP_HEADERS="${DEFAULT_UNREQUIRED_HTTP_HEADERS}"
@@ -4665,7 +4658,7 @@ main() {
         if [ -n "${SSL_LAB_CRIT_ASSESSMENT}" ] ||
             [ -n "${OCSP}" ] ||
             [ -n "${CRL}" ] ||
-            [ -n  "${REQUIRED_HTTP_HEADERS}" ] ||
+            [ -n "${REQUIRED_HTTP_HEADERS}" ] ||
             [ -n "${IGNORE_CONNECTION_STATE}" ] ||
             [ -n "${FILE_URI}" ]; then
             debuglog "curl binary needed. SSL Labs = ${SSL_LAB_CRIT_ASSESSMENT}, OCSP = ${OCSP}, CURL = ${CRL}, IGNORE_CONNECTION_STATE=${IGNORE_CONNECTION_STATE}, FILE_URI=${FILE_URI}, REQUIRED_HTTP_HEADERS=${REQUIRED_HTTP_HEADERS}"
@@ -4698,7 +4691,7 @@ main() {
     check_required_prog "${OPENSSL}"
     OPENSSL=${PROG}
 
-    if [ -n "${QUIC}" ] ; then
+    if [ -n "${QUIC}" ]; then
 
         require_s_client_option '-quic'
 
@@ -4711,7 +4704,7 @@ main() {
         fi
 
         # check if curl supports HTTP/3
-        if curl --help all | grep -q -- --http3 ; then
+        if curl --help all | grep -q -- --http3; then
             debuglog 'curl supports HTTP/3'
             CURL_QUIC='--http3'
         fi
@@ -4742,7 +4735,7 @@ main() {
     CURL_PROXY_ARGUMENT=
     if [ -n "${http_proxy}" ] || [ -n "${HTTP_PROXY}" ]; then
 
-        debuglog "\$http_proxy is set: configuring the proxy settings"
+        debuglog '$http_proxy is set: configuring the proxy settings'
 
         if [ -n "${http_proxy}" ]; then
             HTTP_PROXY="${http_proxy}"
@@ -4808,7 +4801,7 @@ main() {
         [ -n "${HTTPS_PROXY}" ] ||
         [ -n "${SCLIENT_PROXY}" ] ||
         [ -n "${CURL_PROXY}" ]; then
-        if [ -z "${NMAP_WITH_PROXY}" ] ; then
+        if [ -z "${NMAP_WITH_PROXY}" ]; then
             DISABLE_NMAP=1
             USING_A_PROXY=1
             debuglog "A proxy is specified: nmap disabled"
@@ -4818,7 +4811,6 @@ main() {
             verboselog "A proxy is specified: nmap enabled because of --nmap-with-proxy"
         fi
     fi
-
 
     # Expect (optional)
     EXPECT="$(command -v expect 2>/dev/null)"
@@ -4853,38 +4845,38 @@ main() {
     ##############################################################################
     # Check if the host can be resolved
 
-    if [ -n "${DO_NOT_RESOLVE}" ] && [ -n "${RESOLVE_OVER_HTTP}" ] ; then
+    if [ -n "${DO_NOT_RESOLVE}" ] && [ -n "${RESOLVE_OVER_HTTP}" ]; then
         unknown "--do-not-resolve and --resolve-over-http cannot be specified at the same time"
     fi
 
     # we check only if
     # --do-not-resolve was not specified
     # --resolve was not specified (as the IP is supplied on the command line)
-    if [ -z "${DO_NOT_RESOLVE}" ] && [ -z "${RESOLVE}" ] ; then
+    if [ -z "${DO_NOT_RESOLVE}" ] && [ -z "${RESOLVE}" ]; then
 
-        if [ -z "${RESOLVE_OVER_HTTP}" ] ; then
+        if [ -z "${RESOLVE_OVER_HTTP}" ]; then
 
             ETC_HOSTS=
             debuglog "Checking if the host is listed in /etc/hosts"
 
-            if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts ; then
+            if "${GREP_BIN}" -q "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts; then
 
                 debuglog "Host listed in /etc/hosts as"
-                etc_hosts_entry=$( "${GREP_BIN}" "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts )
+                etc_hosts_entry=$("${GREP_BIN}" "[[:blank:]]${HOST}[[:blank:]]*$" /etc/hosts)
                 debuglog "${etc_hosts_entry}"
 
-                if [ "${INETPROTO}" = '-4' ] ; then
-                    if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                if [ "${INETPROTO}" = '-4' ]; then
+                    if grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts; then
                         ETC_HOSTS=4
                     fi
-                elif [ "${INETPROTO}" = '-6' ] ; then
-                    if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                elif [ "${INETPROTO}" = '-6' ]; then
+                    if grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts; then
                         ETC_HOSTS=6
                         NMAP_INETPROTO=-6
                     fi
-                elif grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                elif grep -q "^[0-9.]*[[:blank:]]*${HOST}" /etc/hosts; then
                     ETC_HOSTS=4
-                elif grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts ; then
+                elif grep -q "^[a-fA-F:0-9]*[[:blank:]]*${HOST}" /etc/hosts; then
                     ETC_HOSTS=6
                     NMAP_INETPROTO=-6
                 fi
@@ -4893,7 +4885,7 @@ main() {
 
             # if the host was not listed in /etc/hosts we check if there is a DNS record
 
-            if [ -z "${ETC_HOSTS}" ] ; then
+            if [ -z "${ETC_HOSTS}" ]; then
 
                 debuglog "Host not found in /etc/hosts: checking DNS"
 
@@ -4906,9 +4898,9 @@ main() {
                 RESOLVE_ERROR=
 
                 if ! echo "${HOST}" | "${GREP_BIN}" -q '[.]' &&
-                        [ -z "${FILE}" ] &&
-                        [ "${HOST}" != 'localhost' ] &&
-                        ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
+                    [ -z "${FILE}" ] &&
+                    [ "${HOST}" != 'localhost' ] &&
+                    ! echo "${HOST}" | "${GREP_BIN}" -q -F ':'; then
 
                     debuglog "Domain for ${HOST} missing"
                     DOMAIN=$(nslookup "${HOST}" | "${GREP_BIN}" ^Name: | head -n 1 | cut -d. -f2-)
@@ -4922,27 +4914,27 @@ main() {
 
                 fi
 
-                if [ -z "${RESOLVE_ERROR}" ] ; then
+                if [ -z "${RESOLVE_ERROR}" ]; then
 
                     # we do not check if localhost can be resolved since on some macOS installations
                     # host localhost will issue an error (Host localhost not found: 3(NXDOMAIN))
                     if ! echo "${HOST}" | grep -q ':' &&
-                            echo "${HOST}" | grep -q '[a-z]' &&
-                            [ "${HOST}" != 'localhost' ] ; then
+                        echo "${HOST}" | grep -q '[a-z]' &&
+                        [ "${HOST}" != 'localhost' ]; then
 
                         # we have an host name and not an IP address
 
                         debuglog "Checking if the host (${HOST}) exists"
-                        if [ "${INETPROTO}" = '-4' ] ; then
-                            if ! host -t a "${HOST}" | grep -q 'has address' ; then
+                        if [ "${INETPROTO}" = '-4' ]; then
+                            if ! host -t a "${HOST}" | grep -q 'has address'; then
                                 RESOLVE_ERROR="Cannot resolve ${HOST} (no A record)"
                             fi
-                        elif [ "${INETPROTO}" = '-6' ] ; then
-                            if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address' ; then
+                        elif [ "${INETPROTO}" = '-6' ]; then
+                            if ! host -t aaaa "${HOST}" | grep -q 'has IPv6 address'; then
                                 RESOLVE_ERROR="Cannot resolve ${HOST} (no AAAA record)"
                             fi
                         else
-                            if ! host "${HOST}" | grep -q 'has .*address' ; then
+                            if ! host "${HOST}" | grep -q 'has .*address'; then
                                 RESOLVE_ERROR="Cannot resolve ${HOST}"
                             fi
                         fi
@@ -4950,7 +4942,7 @@ main() {
 
                 fi
 
-                if [ -n "${RESOLVE_ERROR}" ] ; then
+                if [ -n "${RESOLVE_ERROR}" ]; then
 
                     debuglog "${RESOLVE_ERROR}"
                     critical "${SHORTNAME} CRITICAL: ${RESOLVE_ERROR}"
@@ -4973,10 +4965,10 @@ main() {
             exec_with_timeout "${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${CURL_QUIC} ${INETPROTO} --silent --user-agent '${HTTP_USER_AGENT}' -H 'Content-Type: application/dns-json' https://${RESOLVE_OVER_HTTP}/resolve?name=${HOST}\\&type=A" "${DNS_OVER_HTTP}"
 
             if [ "${DEBUG}" -ge 1 ]; then
-                jq < "${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
+                jq <"${DNS_OVER_HTTP}" | sed 's/^/[DBG]   /' 1>&2
             fi
 
-            if grep -q '"Status":0' "${DNS_OVER_HTTP}" ; then
+            if grep -q '"Status":0' "${DNS_OVER_HTTP}"; then
                 debuglog "Resolved via HTTP"
             else
                 critical "${SHORTNAME} CRITICAL: Cannot resolve ${HOST} over HTTP using ${RESOLVE_OVER_HTTP}"
@@ -5082,7 +5074,7 @@ main() {
     case ${NAMES_TO_BE_CHECKED} in
     *__HOST__*)
         # localhost is used for files to be checked: we ignore it
-        if [ "${HOST_NAME}" != 'localhost' ] ; then
+        if [ "${HOST_NAME}" != 'localhost' ]; then
             debuglog "Adding ${HOST_NAME} to NAMES_TO_BE_CHECKED"
             NAMES_TO_BE_CHECKED=$(echo "${NAMES_TO_BE_CHECKED}" | sed "s/__HOST__/${HOST_NAME}/")
         else
@@ -5301,10 +5293,9 @@ main() {
     BCBIN=${PROG}
 
     if [ -z "${DO_NOT_RESOLVE}" ] &&
-           [ -z "${RESOLVE}" ] ; then
+        [ -z "${RESOLVE}" ]; then
         check_required_prog 'host'
     fi
-
 
     check_required_prog 'hostname'
 
@@ -5468,7 +5459,7 @@ main() {
 
     if [ -n "${DISABLE_NMAP}" ]; then
         if [ -n "${IGNORE_CONNECTION_STATE}" ] &&
-           [ -z "${ASSUME_ONLINE}" ] ; then
+            [ -z "${ASSUME_ONLINE}" ]; then
             unknown "--ignore-connection-problems requires nmap"
         fi
     fi
@@ -5479,7 +5470,7 @@ main() {
         NMAP_HOST_ADDR=$(echo "${NMAP_HOST_ADDR}" | sed -e 's/^\[//' -e 's/\]$//')
     fi
 
-    if [ -z "${ETC_HOSTS}" ] && [ "${ETC_HOSTS}" != '-4' ] ; then
+    if [ -z "${ETC_HOSTS}" ] && [ "${ETC_HOSTS}" != '-4' ]; then
 
         # check if the host has an IPv6 address only (as nmap is not able to resolve without the -6 switch)
         debuglog "Checking IPs: host ${HOST_ADDR}"
@@ -5614,11 +5605,11 @@ main() {
 
     SERVERNAME=
 
-    if ${OPENSSL} version | grep -q -F 'LibreSSL' && [ "${HOST_IS_IP}" -eq 1 ] ; then
+    if ${OPENSSL} version | grep -q -F 'LibreSSL' && [ "${HOST_IS_IP}" -eq 1 ]; then
 
         verboselog 'LibreSSL does not support IP addresses as "servername": disabling virtual server support'
 
-    elif ${OPENSSL} version | grep -q -F 'LibreSSL' && echo "${HOST_NAME}" | grep -q '^_' ; then
+    elif ${OPENSSL} version | grep -q -F 'LibreSSL' && echo "${HOST_NAME}" | grep -q '^_'; then
 
         verboselog 'LibreSSL does not support a "servername" value beginning with an underscore: disabling virtual server support'
 
@@ -5630,7 +5621,7 @@ main() {
                 SERVERNAME="-servername ${SNI}"
             else
 
-                if [ "${HOST_IS_IP}" = 0 ] ; then
+                if [ "${HOST_IS_IP}" = 0 ]; then
                     SERVERNAME="-servername ${HOST_NAME}"
                 else
                     debuglog "disabling -servername (SNI) for IP addresses"
@@ -5658,7 +5649,7 @@ main() {
         fi
     fi
 
-    if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ] ; then
+    if [ -n "${PROXY}" ] && [ -n "${NO_PROXY}" ]; then
         unknown "Only one of --proxy or --no_proxy can be specified"
     fi
 
@@ -5868,7 +5859,7 @@ main() {
 
         if [ -n "${DISABLE_NMAP}" ]; then
 
-            if [ -n "${USING_A_PROXY}" ] ; then
+            if [ -n "${USING_A_PROXY}" ]; then
                 verboselog "Using a proxy: cannot check for disable protocols"
                 debuglog "Using a proxy: cannot check for disable protocols"
             fi
@@ -5877,7 +5868,7 @@ main() {
 
             # see https://github.com/matteocorti/check_ssl_cert/issues/378
 
-            if [ -n "${SNI}" ]; then  # https://github.com/matteocorti/check_ssl_cert/issues/505
+            if [ -n "${SNI}" ]; then # https://github.com/matteocorti/check_ssl_cert/issues/505
                 debuglog "Executing ${NMAP_BIN} -Pn -p \"${PORT}\" \"${NMAP_INETPROTO}\" --script +ssl-enum-ciphers --script-args=tls.servername=\"${SNI}\" \"${HOST_ADDR}\" 2>&1 | grep '^|'"
                 OFFERED_PROTOCOLS=$(${NMAP_BIN} -Pn -p "${PORT}" "${NMAP_INETPROTO}" --script +ssl-enum-ciphers --script-args=tls.servername="${SNI}" "${HOST_ADDR}" 2>&1 | grep '^|')
             else
@@ -5984,32 +5975,32 @@ main() {
     # Connection check
     if [ -z "${FILE}" ]; then
 
-        if [ -n "${DISABLE_NMAP}" ] ; then
+        if [ -n "${DISABLE_NMAP}" ]; then
 
-            if [ -n "${USING_A_PROXY}" ] ; then
+            if [ -n "${USING_A_PROXY}" ]; then
                 verboselog "Using a proxy: cannot test connection"
                 debuglog "Using a proxy: cannot test connection"
             elif [ -n "${IGNORE_CONNECTION_STATE}" ]; then
 
                 case "${IGNORE_CONNECTION_STATE}" in
-                    "${STATUS_OK}")
-                        echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_OK}"
-                        ;;
-                    "${STATUS_WARNING}")
-                        echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_WARNING}"
-                        ;;
-                    "${STATUS_CRITICAL}")
-                        echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                        exit "${STATUS_CRITICAL}"
-                        ;;
-                    "${STATUS_UNKNOWN}")
-                        critical "Cannot connect to ${HOST}:${PORT}"
-                        ;;
-                    *)
-                        debuglog "Ignoring connection test"
-                        ;;
+                "${STATUS_OK}")
+                    echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_OK}"
+                    ;;
+                "${STATUS_WARNING}")
+                    echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_WARNING}"
+                    ;;
+                "${STATUS_CRITICAL}")
+                    echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
+                    exit "${STATUS_CRITICAL}"
+                    ;;
+                "${STATUS_UNKNOWN}")
+                    critical "Cannot connect to ${HOST}:${PORT}"
+                    ;;
+                *)
+                    debuglog "Ignoring connection test"
+                    ;;
                 esac
 
             fi
@@ -6020,7 +6011,7 @@ main() {
 
             debuglog "Executing: '${NMAP_BIN} ${NMAP_INETPROTO} --unprivileged -Pn -p ${PORT} ${NMAP_HOST_ADDR}'"
 
-            NMAP_OUTPUT=$( ${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1 )
+            NMAP_OUTPUT=$(${NMAP_BIN} "${NMAP_INETPROTO}" --unprivileged -Pn -p "${PORT}" "${NMAP_HOST_ADDR}" 2>&1)
 
             if [ "${DEBUG}" -ge 1 ]; then
                 echo "${NMAP_OUTPUT}" | sed -e 's/^/[DBG]   /'
@@ -6146,8 +6137,8 @@ main() {
     # check HTTP headers
 
     if [ -n "${REQUIRED_HTTP_HEADERS}" ] ||
-           [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ||
-           [ -n "${DEBUG_HEADERS}" ] ; then
+        [ -n "${UNREQUIRED_HTTP_HEADERS}" ] ||
+        [ -n "${DEBUG_HEADERS}" ]; then
         fetch_http_headers
     fi
 
@@ -6497,7 +6488,6 @@ EOF
     SIGNATURE_ALGORITHM="$(extract_cert_attribute 'sig_algo' "${CERT}" | sed 's/.*: //')"
     info "Signature algorithm" "${SIGNATURE_ALGORITHM}"
 
-
     if [ "${DEBUG}" -ge 1 ]; then
         debuglog "${SUBJECT}"
         debuglog "CN         = ${CN}"
@@ -6595,7 +6585,6 @@ EOF
     for san in ${SUBJECT_ALTERNATIVE_NAME}; do
         info "Subject Alternative Name" "${san}"
     done
-
 
     ################################################################################
     # Check the names in the certificate
@@ -6699,7 +6688,7 @@ EOF
                         if echo "${name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
                             debuglog "      ${name} matches ^${alt_name}\$"
                             ok="true"
-                        elif echo "${name}" | "${GREP_BIN}" -q  "^\["; then
+                        elif echo "${name}" | "${GREP_BIN}" -q "^\["; then
 
                             debuglog "      ${name} is an IPv6"
 
@@ -6712,7 +6701,7 @@ EOF
                             # 4. do drop 0's at the start of a group, i.e. :aa: instead of :00aa:
 
                             # remove the brackets (see 1.)
-                            tmp_name=$( echo "${name}" | sed -e 's/^\[//' | sed -e 's/\]$//' )
+                            tmp_name=$(echo "${name}" | sed -e 's/^\[//' | sed -e 's/\]$//')
 
                             if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
                                 debuglog "      ${name} as ${tmp_name} matches ^${alt_name}\$"
@@ -6720,7 +6709,7 @@ EOF
                             else
 
                                 # remove 0s at the beginning of a group (see 4.)
-                                tmp_name=$( echo "${tmp_name}" | sed -e 's/::/:0:/' | sed -e 's/:$/:0/' )
+                                tmp_name=$(echo "${tmp_name}" | sed -e 's/::/:0:/' | sed -e 's/:$/:0/')
 
                                 if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${alt_name}$"; then
 
@@ -6735,14 +6724,14 @@ EOF
                                             sed -e 's/:0:/::/g' |
                                             sed 's/:::*/::/g' |
                                             sed -e 's/:0$/:/'
-                                                )
+                                    )
                                     tmp_name=$(
                                         echo "${tmp_name}" |
                                             sed -e 's/:0:/::/g' |
                                             sed -e 's/:0:/::/g' |
                                             sed 's/:::*/::/g' |
                                             sed -e 's/:0$/:/'
-                                            )
+                                    )
                                     if echo "${tmp_name}" | "${GREP_BIN}" -q -i "^${tmp_alt_name}$"; then
                                         debuglog "      ${name} as ${tmp_name} matches ^${alt_name} as ${tmp_alt_name}\$"
                                         ok="true"
@@ -6751,7 +6740,6 @@ EOF
                                 fi
 
                             fi
-
 
                         fi
 
@@ -7033,7 +7021,8 @@ INPUT
                 # check for -Pn warning
                 if
                     ! "${GREP_BIN}" -q "Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower." "${NMAP_ERR}" &&
-                        ! "${GREP_BIN}" -q "Warning:.*resolves to.*IPs" "${NMAP_ERR}" ; then
+                        ! "${GREP_BIN}" -q "Warning:.*resolves to.*IPs" "${NMAP_ERR}"
+                then
                     critical "nmap exited with error: ${NMAP_ERROR}"
                 fi
 
@@ -7130,12 +7119,11 @@ ${WARNING}"
 
             if [ "${CURL_RETURN_CODE}" -ne 0 ]; then
 
-                if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                if [ -n "${IGNORE_SSL_LABS_ERRORS}" ]; then
                     break
                 fi
 
                 if [ "${CURL_RETURN_CODE}" -eq 35 ]; then
-
 
                     debuglog "curl returned ${CURL_RETURN_CODE}: ${CURL_BIN} ${CURL_PROXY} ${CURL_PROXY_ARGUMENT} ${INETPROTO} --silent \"https://api.ssllabs.com/api/v2/analyze?host=${HOST_NAME}${IGNORE_SSL_LABS_CACHE}\""
 
@@ -7171,7 +7159,7 @@ ${WARNING}"
                 case "${SSL_LABS_HOST_STATUS}" in
                 'ERROR')
 
-                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ]; then
                         break
                     fi
 
@@ -7184,7 +7172,7 @@ ${WARNING}"
 
                         # Something went wrong
 
-                        if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                        if [ -n "${IGNORE_SSL_LABS_ERRORS}" ]; then
                             break
                         fi
 
@@ -7237,7 +7225,7 @@ ${WARNING}"
                 *)
                     # Try to extract a message
 
-                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ] ; then
+                    if [ -n "${IGNORE_SSL_LABS_ERRORS}" ]; then
                         break
                     fi
 
@@ -7444,7 +7432,7 @@ ${WARNING}"
 
     fi
 
-    if [ -n "${INFO_OUTPUT}" ] ; then
+    if [ -n "${INFO_OUTPUT}" ]; then
         echo "${INFO_OUTPUT}"
     fi
 
@@ -7534,7 +7522,7 @@ ${WARNING}"
         fi
 
         STATUS=OK
-        FORMAT=$( format_template "${FORMAT}" )
+        FORMAT=$(format_template "${FORMAT}")
 
         if [ -z "${PROMETHEUS}" ]; then
 
