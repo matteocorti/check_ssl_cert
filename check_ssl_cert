@@ -4735,6 +4735,7 @@ main() {
     CURL_PROXY_ARGUMENT=
     if [ -n "${http_proxy}" ] || [ -n "${HTTP_PROXY}" ]; then
 
+        # shellcheck disable=SC2016
         debuglog '$http_proxy is set: configuring the proxy settings'
 
         if [ -n "${http_proxy}" ]; then
