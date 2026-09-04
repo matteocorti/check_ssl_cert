@@ -1714,7 +1714,7 @@ extract_cert_attribute() {
         ;;
     crl_uri)
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -ext crlDistributionPoints |
-            "${GREP_BIN}" 'URI:' |
+            "${GREP_BIN}" 'URI:' | head -n 1 |
             sed 's/.*URI://'
         ;;
     version)
