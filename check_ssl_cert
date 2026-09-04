@@ -1713,11 +1713,9 @@ extract_cert_attribute() {
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -email
         ;;
     crl_uri)
-        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text |
-            "${GREP_BIN}" -A 4 'X509v3 CRL Distribution Points' |
+        echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -ext crlDistributionPoints |
             "${GREP_BIN}" 'URI:' |
-            sed 's/.*URI://' |
-            head -n 1
+            sed 's/.*URI://'
         ;;
     version)
         echo "${cert_content}" | "${OPENSSL}" x509 -in /dev/stdin -noout -text | "${GREP_BIN}" Version | head -n 1 | sed 's/.*Version: //'
