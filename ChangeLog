@@ -1,3 +1,10 @@
+2026-09-04  elacour https://github.com/elacour
+
+        * check_ssl_cert (extract_cert_attribute): Using
+        crlDistributionPoints ensure openssl returns only crl information
+        so we do not get any further like OCSP/CA Issuers/... which may
+        lead to parsing wrong URI by mistake.
+
 2026-08-20  Matteo Corti  <matteo@corti.li>
 
         * check_ssl_cert (check_attr): Fixed the organization check ignoring special characters
@@ -25,7 +32,7 @@
 
 2026-05-03  Matteo Corti  <matteo@corti.li>
 
-        * check_ssl_cert (main): Fixed a bug checking for the ```host``` binary
+        * check_ssl_cert (main): Fixed a bug checking for the ```host``` binaryx
 
 2026-05-01  Matteo Corti  <matteo@corti.li>
 

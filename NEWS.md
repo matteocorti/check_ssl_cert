@@ -1,5 +1,8 @@
 # News
 
+* 2026-09-04 Version 2.103.2
+  * Using crlDistributionPoints ensures that OpenSSL returns only CRL information, excluding entries
+    such as OCSP and CA Issuers. This prevents the wrong URI from being parsed accidentally.
 * 2026-08-20 Version 2.103.1
   * Ignore namp warning about more then one IP address while checking for the ciphers
   * Fixed the organization check when the string contains special characters

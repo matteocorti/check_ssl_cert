@@ -1,2 +1,3 @@
- * Ignore namp warning about more then one IP address while checking for the ciphers
- * Fixed the organization check when the string contains special characters
+Using crlDistributionPoints ensures that OpenSSL returns only CRL
+information, excluding entries such as OCSP and CA Issuers. This
+prevents the wrong URI from being parsed accidentally.

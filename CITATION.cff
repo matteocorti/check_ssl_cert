@@ -74,6 +74,8 @@ authors:
   website: https://github.com/eeertel
 - name: eimamagi
   website: https://github.com/eimamagi
+- name: elacour
+  website: https://github.com/elacour
 - family-names: "Ertel"
   given-names: "Emilian"
 - family-names: "Apolloner"
@@ -279,8 +281,8 @@ authors:
 - name: Zadkiel
   website: https://github.com/aslafy-z
 title: "check_ssl_cert"
-version: 2.103.1
-date-released: 2026-08-20
+version: 2.103.2
+date-released: 2026-09-04
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
