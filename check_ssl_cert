@@ -853,9 +853,9 @@ create_temporary_file() {
     #   but on some systems od -N4 -tu /dev/random takes seconds (?) to execute
 
     if [ -n "${MKTEMP}" ]; then
-        TEMPFILE="$(mktemp "${TMPDIR}/XXXXXX" 2>/dev/null)"
+        TEMPFILE="$(mktemp "${TMPDIR}/check_ssl_cert.XXXXXX" 2>/dev/null)"
     else
-        TEMPFILE=${TMPDIR}/XXX-$(od -N4 -tu /dev/random | head -n 1 | sed 's/ *$//' | sed 's/.* //')
+        TEMPFILE=${TMPDIR}/check_ssl_cert.$(od -N4 -tu /dev/random | head -n 1 | sed 's/ *$//' | sed 's/.* //')
         touch "${TEMPFILE}"
     fi
 
