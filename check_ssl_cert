@@ -6581,10 +6581,11 @@ EOF
         verboselog "The certificate for this site contains a Subject Alternative Name extension"
     fi
 
+    # shellcheck disable=SC2312
     while IFS= read -r san; do
         info "Subject Alternative Name" "${san}"
     done <<EOF
-$(printf '%s' "$SUBJECT_ALTERNATIVE_NAME" | tr ' ' '\n')
+$(printf '%s' "${SUBJECT_ALTERNATIVE_NAME}" | tr ' ' '\n')
 EOF
 
     ################################################################################
@@ -6649,6 +6650,7 @@ EOF
 
                 debuglog "    alternative names"
 
+                # shellcheck disable=SC2312
                 while IFS= read -r alt_name; do
 
                     debuglog "      check altname: ${alt_name} = ${name}?"
@@ -6747,7 +6749,7 @@ EOF
                     fi
 
                 done <<EOF
-$(printf '%s' "$SUBJECT_ALTERNATIVE_NAME" | tr ' ' '\n')
+$(printf '%s' "${SUBJECT_ALTERNATIVE_NAME}" | tr ' ' '\n')
 EOF
 
                 if [ -z "${ok}" ]; then

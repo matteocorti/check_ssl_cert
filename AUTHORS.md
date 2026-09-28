@@ -161,3 +161,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [onice](https://github.com/oiahoon) for the decimal thresholds patch
 * Many thanks to [elacour](https://github.com/elacour) for the CRL patch
 * Many thanks to [Benjamin Renard](https://github.com/brenard) for the temporary files patch
+* Many thanks to [ppayne](https://github.com/ppayne) for the wildcard patch
