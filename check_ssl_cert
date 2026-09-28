@@ -6581,9 +6581,11 @@ EOF
         verboselog "The certificate for this site contains a Subject Alternative Name extension"
     fi
 
-    for san in ${SUBJECT_ALTERNATIVE_NAME}; do
+    while IFS= read -r san; do
         info "Subject Alternative Name" "${san}"
-    done
+    done <<EOF
+$(printf '%s' "$SUBJECT_ALTERNATIVE_NAME" | tr ' ' '\n')
+EOF
 
     ################################################################################
     # Check the names in the certificate
@@ -6647,7 +6649,7 @@ EOF
 
                 debuglog "    alternative names"
 
-                for alt_name in ${SUBJECT_ALTERNATIVE_NAME}; do
+                while IFS= read -r alt_name; do
 
                     debuglog "      check altname: ${alt_name} = ${name}?"
 
@@ -6744,7 +6746,9 @@ EOF
 
                     fi
 
-                done
+                done <<EOF
+$(printf '%s' "$SUBJECT_ALTERNATIVE_NAME" | tr ' ' '\n')
+EOF
 
                 if [ -z "${ok}" ]; then
                     prepend_critical_message "'${name}' does not match the CN nor an alternative name"
