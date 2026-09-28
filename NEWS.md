@@ -1,5 +1,7 @@
 # News
 
+* 2026-09-28 Version 2.103.3
+  * Fixed a bug with wildcard certificates
 * 2026-09-04 Version 2.103.2
   * Using crlDistributionPoints ensures that OpenSSL returns only CRL information, excluding entries
     such as OCSP and CA Issuers. This prevents the wrong URI from being parsed accidentally.

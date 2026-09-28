@@ -29,6 +29,9 @@ authors:
 - family-names: "Byrne"
   given-names: "Ben"
   website: https://github.com/benbyr
+- family-names: "Renard"
+  given-names: "Benjamin"
+  website: https://github.com/brenard
 - family-names: "Strößenreuther"
   given-names: "Bernd"
   website: https://github.com/booboo-at-gluga-de
@@ -191,6 +194,8 @@ authors:
 - family-names: "Rupert"
   given-names: "Pim"
   website: https://github.com/prupert
+- name: ppayne
+  website: https://github.com/ppayne
 - name: PSSGCSim
   website: https://github.com/PSSGCSim
 - family-names: "Thoma"
@@ -281,8 +286,8 @@ authors:
 - name: Zadkiel
   website: https://github.com/aslafy-z
 title: "check_ssl_cert"
-version: 2.103.2
-date-released: 2026-09-04
+version: 2.103.3
+date-released: 2026-09-28
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
