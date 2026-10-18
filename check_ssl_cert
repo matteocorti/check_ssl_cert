@@ -2008,13 +2008,20 @@ fetch_issuer_cert() {
             TYPE_TMP="$(${FILE_BIN} -L -b "${ISSUER_CERT_TMP}" | sed 's/.*://')"
             debuglog "Issuer certificate type (1): ${TYPE_TMP}"
 
-            if echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -F -q 'p7c'; then
+            if echo "${ELEMENT_ISSUER_URI}" | "${GREP_BIN}" -E -q 'p7[bc]'; then
                 debuglog "Converting issuer certificate from PKCS #7 to PEM"
 
                 open_for_writing "${ISSUER_CERT_TMP2}"
                 cp "${ISSUER_CERT_TMP}" "${ISSUER_CERT_TMP2}"
 
-                ${OPENSSL} pkcs7 -print_certs -inform DER -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
+                # the bundle can be PEM or DER encoded
+                if "${GREP_BIN}" -q -- '-----BEGIN' "${ISSUER_CERT_TMP2}"; then
+                    PKCS7_INFORM=PEM
+                else
+                    PKCS7_INFORM=DER
+                fi
+
+                ${OPENSSL} pkcs7 -print_certs -inform "${PKCS7_INFORM}" -outform PEM -in "${ISSUER_CERT_TMP2}" -out "${ISSUER_CERT_TMP}"
 
             fi
 

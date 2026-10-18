@@ -1,3 +1,10 @@
+2026-10-18  Sai Asish Y  <say.apm35@gmail.com>
+
+        * check_ssl_cert (fetch_issuer_cert): Convert PKCS #7 issuer
+        certificates with a .p7b extension (PEM or DER encoded) before
+        the OCSP check
+        * test/unit_tests.sh (testIssuerP7B): Add a regression test
+
 2026-09-04  elacour https://github.com/elacour
 
         * check_ssl_cert (extract_cert_attribute): Using
