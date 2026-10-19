@@ -148,6 +148,7 @@ oneTimeSetUp() {
     "${OPENSSL}" version
 
     KEYTOOL=$(command -v keytool) # Java?
+    PYTHON3=$(command -v python3) # web server for the issuer certificate test
 
     if [ -z "${GREP_BIN}" ]; then
         GREP_BIN=$(command -v grep) # needed by openssl_version
@@ -439,6 +440,65 @@ testDERCertSymbolicLink() {
     ${SCRIPT} ${TEST_DEBUG} --rootcert-file cabundle.crt -f ./derlink.cer --ignore-sct --ignore-exp --allow-empty-san -s
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+}
+
+testIssuerP7B() {
+    # the CA Issuers URI points to a PEM encoded PKCS #7 bundle (#574)
+    if [ -n "${PYTHON3}" ]; then
+
+        create_temporary_test_file
+        CA_KEY=${TEMPFILE}
+        create_temporary_test_file
+        CA_CERT=${TEMPFILE}
+        create_temporary_test_file
+        CONFIGURATION=${TEMPFILE}
+        create_temporary_test_file
+        KEY=${TEMPFILE}
+        create_temporary_test_file
+        CSR=${TEMPFILE}
+        create_temporary_test_file
+        CERTIFICATE=${TEMPFILE}
+        create_temporary_test_file
+        INDEX=${TEMPFILE}
+        WWW=$(mktemp -d "${TMPDIR}/XXXXXX")
+
+        cat <<'EOT' >"${CONFIGURATION}"
+[ req ]
+prompt = no
+distinguished_name=req_distinguished_name
+
+[ req_distinguished_name ]
+commonName=localhost
+
+[ v3_req ]
+subjectAltName = DNS:localhost
+authorityInfoAccess = caIssuers;URI:http://127.0.0.1:18080/issuer.p7b,OCSP;URI:http://127.0.0.1:18081
+EOT
+
+        ${OPENSSL} req -new -x509 -newkey rsa:2048 -nodes -subj '/CN=p7b test CA' -keyout "${CA_KEY}" -out "${CA_CERT}" -days 30 >/dev/null 2>&1
+        ${OPENSSL} req -new -newkey rsa:2048 -nodes -keyout "${KEY}" -out "${CSR}" -config "${CONFIGURATION}" >/dev/null 2>&1
+        ${OPENSSL} x509 -req -in "${CSR}" -CA "${CA_CERT}" -CAkey "${CA_KEY}" -set_serial 1 -days 30 -extfile "${CONFIGURATION}" -extensions v3_req -out "${CERTIFICATE}" >/dev/null 2>&1
+        ${OPENSSL} crl2pkcs7 -nocrl -certfile "${CA_CERT}" -out "${WWW}/issuer.p7b"
+        printf 'V\t351231235959Z\t\t01\tunknown\t/CN=localhost\n' >"${INDEX}"
+
+        "${PYTHON3}" -m http.server --bind 127.0.0.1 --directory "${WWW}" 18080 >/dev/null 2>&1 &
+        WWW_PID=$!
+        ${OPENSSL} ocsp -index "${INDEX}" -CA "${CA_CERT}" -rsigner "${CA_CERT}" -rkey "${CA_KEY}" -port 18081 -nrequest 1 >/dev/null 2>&1 &
+        OCSP_PID=$!
+        sleep 1
+
+        # shellcheck disable=SC2086
+        ${SCRIPT} ${TEST_DEBUG} --file "${CERTIFICATE}" --rootcert-file "${CA_CERT}" --ignore-sct --ignore-maximum-validity
+        EXIT_CODE=$?
+
+        kill "${WWW_PID}" "${OCSP_PID}" 2>/dev/null
+        rm -rf "${WWW}"
+
+        assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
+
+    else
+        echo "Python 3 not installed: skipping PKCS #7 issuer test"
+    fi
 }
 
 testCertificateWithEmptySAN() {
