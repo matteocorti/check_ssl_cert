@@ -1,5 +1,7 @@
 # News
 
+* 2026-10-19 Version 2.103.4
+ * Convert PKCS #7 issuer certificates with a .p7b extension (PEM or DER encoded) before the OCSP check
 * 2026-09-28 Version 2.103.3
   * Fixed a bug with wildcard certificates
 * 2026-09-04 Version 2.103.2

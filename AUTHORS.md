@@ -162,3 +162,4 @@ Maintainer: [Matteo Corti](https://github.com/matteocorti) <[matteo@corti.li](ma
 * Many thanks to [elacour](https://github.com/elacour) for the CRL patch
 * Many thanks to [Benjamin Renard](https://github.com/brenard) for the temporary files patch
 * Many thanks to [ppayne](https://github.com/ppayne) for the wildcard patch
+* Many thanks to [Sai Asish Y](https://github.com/SAY-5) and [michaje-gsc](https://github.com/michaje-gsc) for the p7b patch

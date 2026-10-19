@@ -217,6 +217,8 @@ authors:
 - name: Rolf Eike Beer
 - family-names: "Nowakowski"
   given-names: "Ryan"
+- name: Sai Asish Y
+  website: https://github.com/michaje-gsc
 - family-names: "Richards"
   given-names: "Sam"
 - family-names: "Cornelissen"
@@ -286,8 +288,8 @@ authors:
 - name: Zadkiel
   website: https://github.com/aslafy-z
 title: "check_ssl_cert"
-version: 2.103.3
-date-released: 2026-09-28
+version: 2.103.4
+date-released: 2026-10-19
 url: "https://github.com/matteocorti/check_ssl_cert"
 repository-code: "https://github.com/matteocorti/check_ssl_cert"
 keywords:
