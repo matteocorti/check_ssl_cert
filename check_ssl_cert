@@ -5981,35 +5981,11 @@ main() {
     # Connection check
     if [ -z "${FILE}" ]; then
 
+        debuglog "Checking an host and not a file"
+
         if [ -n "${DISABLE_NMAP}" ]; then
 
-            if [ -n "${USING_A_PROXY}" ]; then
-                verboselog "Using a proxy: cannot test connection"
-                debuglog "Using a proxy: cannot test connection"
-            elif [ -n "${IGNORE_CONNECTION_STATE}" ]; then
-
-                case "${IGNORE_CONNECTION_STATE}" in
-                "${STATUS_OK}")
-                    echo "${SHORTNAME} OK: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_OK}"
-                    ;;
-                "${STATUS_WARNING}")
-                    echo "${SHORTNAME} WARNING: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_WARNING}"
-                    ;;
-                "${STATUS_CRITICAL}")
-                    echo "${SHORTNAME} CRITICAL: Cannot connect to ${HOST}:${PORT}"
-                    exit "${STATUS_CRITICAL}"
-                    ;;
-                "${STATUS_UNKNOWN}")
-                    critical "Cannot connect to ${HOST}:${PORT}"
-                    ;;
-                *)
-                    debuglog "Ignoring connection test"
-                    ;;
-                esac
-
-            fi
+            debuglog "nmap disabled: Ignoring connection test"
 
         else
 

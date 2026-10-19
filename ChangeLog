@@ -1,3 +1,7 @@
+2026-10-19  Matteo Corti  <matteo@corti.li>
+
+        * check_ssl_cert (main): Fixed an issue when --assume-online and --ignore-connection-problems are both specified
+
 2026-10-18  Sai Asish Y  <say.apm35@gmail.com>
 
         * check_ssl_cert (fetch_issuer_cert): Convert PKCS #7 issuer
