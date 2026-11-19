@@ -1,1 +1,1 @@
-Do not print the OpenSSL "No extensions in certificate" message when a certificate has no CRL distribution point
+Use the host hostname instead of the address for DANE DNS lookups

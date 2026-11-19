@@ -1,5 +1,7 @@
 # News
 
+* 2026-11-19 Version 2.103.6
+ * Use the host hostname instead of the address for DANE DNS lookups
 * 2026-11-19 Version 2.103.5
  * Do not print the OpenSSL "No extensions in certificate" message when a certificate has no CRL distribution point
 * 2026-10-19 Version 2.103.4
