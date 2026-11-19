@@ -618,6 +618,18 @@ testMaxDateOn32BitSystems() {
 
 }
 
+testNoCRLDistributionPoint() {
+
+    CERT=$(createSelfSignedCertificate)
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q 'No extensions in certificate'
+    EXIT_CODE=$?
+
+    assertEquals "OpenSSL message in the output" 1 "${EXIT_CODE}"
+
+}
+
 testMaximumValidityFailed() {
     # generate a cert expiring in 400 days
     CERT=$(createSelfSignedCertificate 400)
