@@ -673,6 +673,21 @@ testChainOK() {
     assertEquals "wrong exit code" "${NAGIOS_OK}" "${EXIT_CODE}"
 }
 
+testSkipElementDate() {
+    CERT_SHORT=$(createSelfSignedCertificate 30)
+    CERT_LONG=$(createSelfSignedCertificate 100)
+    create_temporary_test_file
+    CHAIN=${TEMPFILE}
+    cat "${CERT_SHORT}" "${CERT_LONG}" >"${CHAIN}"
+    END_DATE=$(${OPENSSL} x509 -in "${CERT_LONG}" -noout -enddate | sed -e 's/^notAfter=//')
+
+    # shellcheck disable=SC2086
+    ${SCRIPT} ${TEST_DEBUG} -f "${CHAIN}" --skip-element 1 --selfsigned --allow-empty-san --ignore-sig-alg 2>&1 | grep -q "valid until ${END_DATE} ("
+    EXIT_CODE=$?
+
+    assertEquals "end date of the skipped element in the output" 0 "${EXIT_CODE}"
+}
+
 testChainFail() {
     # shellcheck disable=SC2086
     ${SCRIPT} ${TEST_DEBUG} -f ./incomplete_chain.pem --allow-empty-san --ignore-sct --ignore-exp

@@ -44,6 +44,7 @@ LC_ALL=C
 ALL_MSG=""
 CONFIGURATION_FILE="${HOME}/.check_ssl_certrc"
 CRITICAL_MSG=""
+DAYS_VALID_END_DATE=""
 DEBUG=0
 DEBUG_FILE=""
 DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
@@ -2486,6 +2487,7 @@ check_cert_end_date() {
 
     if [ -z "${DAYS_VALID}" ] || compare "${ELEM_DAYS_VALID}" "<" "${DAYS_VALID}"; then
         DAYS_VALID="${ELEM_DAYS_VALID}"
+        DAYS_VALID_END_DATE="${ELEM_END_DATE}"
         debuglog "    DAYS_VALID=${DAYS_VALID}"
     fi
 
@@ -7448,6 +7450,11 @@ ${WARNING}"
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
         elif [ -n "${NAMES_TO_BE_CHECKED}" ] && echo "${CN}" | "${GREP_BIN}" -q -i '^\*\.'; then
             CHECKEDNAMES="(${NAMES_TO_BE_CHECKED}) "
+        fi
+
+        # show the end date of the element the remaining days refer to
+        if [ -n "${DAYS_VALID_END_DATE}" ]; then
+            DATE="${DAYS_VALID_END_DATE}"
         fi
 
         if [ -n "${DAYS_VALID}" ]; then
