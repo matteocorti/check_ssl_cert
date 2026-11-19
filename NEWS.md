@@ -1,5 +1,7 @@
 # News
 
+* 2026-11-19 Version 2.103.5
+ * Do not print the OpenSSL "No extensions in certificate" message when a certificate has no CRL distribution point
 * 2026-10-19 Version 2.103.4
  * Convert PKCS #7 issuer certificates with a .p7b extension (PEM or DER encoded) before the OCSP check
  * Fixed an issue when assume-online and --ignore-connection-problems are both specified

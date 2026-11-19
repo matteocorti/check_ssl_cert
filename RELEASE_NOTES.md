@@ -1,2 +1,1 @@
-Convert PKCS #7 issuer certificates with a .p7b extension (PEM or DER encoded) before the OCSP check
-Fixed an issue when assume-online and --ignore-connection-problems are both specified
+Do not print the OpenSSL "No extensions in certificate" message when a certificate has no CRL distribution point
