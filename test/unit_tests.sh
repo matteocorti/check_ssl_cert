@@ -553,10 +553,10 @@ case "$1" in
         echo 'date (GNU coreutils) 9.0'
         ;;
     +%s)
-        echo 1428886799
+        echo 1748312553
         ;;
     -d)
-        echo 1428883199
+        echo 1748308953
         ;;
     *)
         exit 1
@@ -565,9 +565,15 @@ esac
 EOT
     chmod +x "${FAKE_DATE}"
 
-    # The fake date reports one hour after the certificate's expiry.
+    create_temporary_test_file
+    EXPIRED_CERT=${TEMPFILE}
+    # Keep only the leaf so --ignore-incomplete-chain reaches the expiry check.
+    "${OPENSSL}" x509 -in ./corti.li.pem -out "${EXPIRED_CERT}"
+
+    # The fake date reports one hour after corti.li.pem's expiry.
+    # Use the local fixture so connection failures cannot hide the expiry message.
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -H expired.badssl.com --warning 1.0 --critical 0 --date "${FAKE_DATE}" --first-element-only 2>&1)
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -f "${EXPIRED_CERT}" --ignore-incomplete-chain --ignore-ocsp --ignore-crl --ignore-sct --warning 1.0 --critical 0 --date "${FAKE_DATE}" --first-element-only 2>&1)
     EXIT_CODE=$?
     echo "${OUTPUT}"
 
@@ -719,7 +725,7 @@ testDirectoryAsAFile() {
 # Keep the clock deterministic while exercising the real threshold checks.
 # Subshells isolate the clock and OpenSSL stubs from other tests.
 # Variables and function stubs are consumed by the sourced plugin.
-# shellcheck disable=SC2034,SC2329,SC2030
+# shellcheck disable=SC2034,SC2329,SC2030,SC2317
 testPercentageThresholds() (
     BCBIN=$(command -v bc)
     GREP_BIN=$(command -v grep)
