@@ -1,1 +1,1 @@
-Use the host hostname instead of the address for DANE DNS lookups
+Fixed mismatched expiry dates and remaining days when skipping certificate chain elements (#552)

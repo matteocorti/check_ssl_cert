@@ -1,5 +1,7 @@
 # News
 
+* 2026-11-19 Version 2.103.7
+ * Fixed mismatched expiry dates and remaining days when skipping certificate chain elements (#552)
 * 2026-11-19 Version 2.103.6
  * Use the host hostname instead of the address for DANE DNS lookups
 * 2026-11-19 Version 2.103.5

@@ -26,7 +26,7 @@
 ################################################################################
 # Constants
 
-VERSION=2.103.6
+VERSION=2.103.7
 SHORTNAME="SSL_CERT"
 
 # reset possibly set variables
@@ -46,8 +46,11 @@ CONFIGURATION_FILE="${HOME}/.check_ssl_certrc"
 CRITICAL_MSG=""
 DEBUG=0
 DEBUG_FILE=""
+DAYS_VALID=""
 DEFAULT_REQUIRED_HTTP_HEADERS="strict-transport-security,Content-Security-Policy,X-Content-Type-Options,Referrer-Policy,Permissions-Policy"
 DEFAULT_UNREQUIRED_HTTP_HEADERS="X-Powered-By,X-Aspnet-Version,X-XSS-Protection,X-AspNetMvc-Version"
+EARLIEST_VALIDITY_DATE=""
+EARLIEST_VALIDITY_ELEMENT=1
 EARLIEST_VALIDITY_HOURS=""
 HOST_CACHE="${HOME}/.check_ssl_cert-cache"
 REQUIRED_HTTP_HEADERS=""
@@ -61,7 +64,9 @@ TEMPFILE=""
 WARNING_MSG=""
 FINGERPRINT_ALG=sha1
 
-DEFAULT_FORMAT="%SHORTNAME% %STATUS% - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%' valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+DEFAULT_FORMAT_PREFIX="%SHORTNAME% %STATUS% - %HOST%:%PORT%, %PROTOCOL%, %OPENSSL_COMMAND% %SELFSIGNEDCERT%certificate %DISPLAY_CN%%CHECKEDNAMES%from '%CA_ISSUER_MATCHED%'"
+DEFAULT_FORMAT_SUFFIX=" valid until %DATE%%DAYS_VALID%%OCSP_EXPIRES_IN_HOURS%%SSL_LABS_HOST_GRADE%"
+DEFAULT_FORMAT="${DEFAULT_FORMAT_PREFIX}${DEFAULT_FORMAT_SUFFIX}"
 
 # if --critical or --warning are floating point then switch to floating point output, otherwise integer
 
@@ -2480,12 +2485,11 @@ check_cert_end_date() {
 
     if [ -z "${EARLIEST_VALIDITY_HOURS}" ] || compare "${HOURS_UNTIL}" "<" "${EARLIEST_VALIDITY_HOURS}"; then
         EARLIEST_VALIDITY_HOURS="${HOURS_UNTIL}"
+        EARLIEST_VALIDITY_DATE="${ELEM_END_DATE}"
+        EARLIEST_VALIDITY_ELEMENT="${el_number}"
+        DAYS_VALID="${ELEM_DAYS_VALID}"
         replace_current_message='yes'
         debuglog "    EARLIEST_VALIDITY_HOURS=${EARLIEST_VALIDITY_HOURS}"
-    fi
-
-    if [ -z "${DAYS_VALID}" ] || compare "${ELEM_DAYS_VALID}" "<" "${DAYS_VALID}"; then
-        DAYS_VALID="${ELEM_DAYS_VALID}"
         debuglog "    DAYS_VALID=${DAYS_VALID}"
     fi
 
@@ -7451,6 +7455,8 @@ ${WARNING}"
         fi
 
         if [ -n "${DAYS_VALID}" ]; then
+            DATE="${EARLIEST_VALIDITY_DATE}"
+
             # nicer formatting
             if compare "${DAYS_VALID}" '>=' 1; then
                 DAYS_VALID=" (expires in ${DAYS_VALID} days)"
@@ -7490,6 +7496,8 @@ ${WARNING}"
         if [ -z "${FORMAT}" ]; then
             if [ -n "${TERSE}" ]; then
                 FORMAT="%SHORTNAME% OK %CN% %DAYS_VALID%"
+            elif [ "${EARLIEST_VALIDITY_ELEMENT}" -gt 1 ]; then
+                FORMAT="${DEFAULT_FORMAT_PREFIX}, chain element ${EARLIEST_VALIDITY_ELEMENT}${DEFAULT_FORMAT_SUFFIX}"
             else
                 FORMAT="${DEFAULT_FORMAT}"
             fi
