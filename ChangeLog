@@ -1,3 +1,18 @@
+2026-11-26  Robin H. Johnson
+
+        * test/unit_tests.sh (testPercentageThresholdsFromFile): Wait until
+        after certificate issuance before checking 100% expiration thresholds.
+
+        * test/unit_tests.sh (testFloatingPointThresholdsRecentlyExpired):
+        Use a local expired certificate instead of a public TLS endpoint.
+        (testPercentageThresholds): Support older ShellCheck versions that
+        report indirectly invoked test stubs as unreachable (SC2317).
+
+        * check_ssl_cert: Support --warning and --critical as percentages
+        of each certificate or CRL lifetime remaining, including mixed day
+        and percentage thresholds and numeric performance data.
+        * test/unit_tests.sh: Test percentage expiration thresholds.
+
 2026-11-19  Sai Asish Y  <say.apm35@gmail.com>
 
         * check_ssl_cert (extract_cert_attribute): Do not print the
