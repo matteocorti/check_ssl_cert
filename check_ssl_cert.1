@@ -39,7 +39,7 @@ Allow certificates without Subject Alternative Names (SANs)
 Use client certificate to authenticate
 .TP
 .BR "-c,--critical" " days"
-Minimum number of days a certificate has to be valid to issue a critical status. Can be a floating point number, e.g., 0.5. Default: 15
+Minimum number of days a certificate has to be valid to issue a critical status. Can be fractional days, e.g., 0.5, or a percentage of lifetime remaining, e.g., 10%. Default: 15
 .TP
 .BR "   --check-chain"
 The certificate chain cannot contain double or root certificates
@@ -496,7 +496,7 @@ Verbose output (can be specified more than once)
 Version
 .TP
 .BR "-w,--warning" " days"
-Minimum number of days a certificate has to be valid to issue a warning status. Might be a floating point number, e.g., 0.5. Default: 20
+Minimum number of days a certificate has to be valid to issue a warning status. Can be fractional days, e.g., 0.5, or a percentage of lifetime remaining, e.g., 20%. Default: 20
 .TP
 .BR "   --xmpphost" " name"
 Specify the host for the 'to' attribute of the stream element

@@ -239,13 +239,13 @@ testNumericCheck() {
 
     export UNIT_TEST=1
 
-    for argument in 0 1 01 10 100 0.1 1.1 11.1 0% 10% 100% 0.1% 3.3% 100.1%; do
+    for argument in 0 1 01 10 100 0.1 1.1 11.1 0% 10% 100% 0.1% 3.3% 100.0%; do
         echo "Checking numeric argument: ${argument}"
         check_numeric_argument "${argument}"
         assertEquals " check_numeric_argument ${argument}" 1 $?
     done
 
-    for argument in a % %1 1.1.1 1%1 120%; do
+    for argument in a % %1 1.1.1 1%1 120% 100.1% 10%% -1%; do
         echo "Checking numeric argument: ${argument}"
         check_numeric_argument "${argument}"
         assertEquals " check_numeric_argument ${argument}" 0 $?
@@ -553,10 +553,10 @@ case "$1" in
         echo 'date (GNU coreutils) 9.0'
         ;;
     +%s)
-        echo 1428886799
+        echo 1748312553
         ;;
     -d)
-        echo 1428883199
+        echo 1748308953
         ;;
     *)
         exit 1
@@ -565,9 +565,15 @@ esac
 EOT
     chmod +x "${FAKE_DATE}"
 
-    # The fake date reports one hour after the certificate's expiry.
+    create_temporary_test_file
+    EXPIRED_CERT=${TEMPFILE}
+    # Keep only the leaf so --ignore-incomplete-chain reaches the expiry check.
+    "${OPENSSL}" x509 -in ./corti.li.pem -out "${EXPIRED_CERT}"
+
+    # The fake date reports one hour after corti.li.pem's expiry.
+    # Use the local fixture so connection failures cannot hide the expiry message.
     # shellcheck disable=SC2086
-    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -H expired.badssl.com --warning 1.0 --critical 0 --date "${FAKE_DATE}" --first-element-only 2>&1)
+    OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -f "${EXPIRED_CERT}" --ignore-incomplete-chain --ignore-ocsp --ignore-crl --ignore-sct --warning 1.0 --critical 0 --date "${FAKE_DATE}" --first-element-only 2>&1)
     EXIT_CODE=$?
     echo "${OUTPUT}"
 
@@ -715,6 +721,147 @@ testDirectoryAsAFile() {
     EXIT_CODE=$?
     assertEquals "wrong exit code" "${NAGIOS_CRITICAL}" "${EXIT_CODE}"
 }
+
+# Keep the clock deterministic while exercising the real threshold checks.
+# Subshells isolate the clock and OpenSSL stubs from other tests.
+# Variables and function stubs are consumed by the sourced plugin.
+# shellcheck disable=SC2034,SC2329,SC2030,SC2317
+testPercentageThresholds() (
+    BCBIN=$(command -v bc)
+    GREP_BIN=$(command -v grep)
+    SCALE=0
+    VERBOSE=0
+    DEBUG=0
+
+    extract_cert_attribute() {
+        case "$1" in
+        cn) echo 'test certificate' ;;
+        enddate) echo "$((remaining_days * 86400))" ;;
+        startdate) echo "$(((remaining_days - lifetime_days) * 86400))" ;;
+        *) return 1 ;;
+        esac
+    }
+    hours_until() {
+        DATE_SECONDS=$1
+        HOURS_UNTIL=$((DATE_SECONDS / 3600))
+    }
+    checkend() {
+        [ "$((remaining_days * 86400))" -gt "$2" ]
+    }
+    unknown() {
+        echo "$1"
+        exit 3
+    }
+
+    for OPENSSL_COMMAND in x509 crl; do
+        # lifetime, remaining, warning, critical, expected status, resolved days
+        # Consecutive elements exercise percentage preservation across a chain.
+        for scenario in \
+            '100 15 20% 10% 1 20 10' \
+            '200 15 20% 10% 2 40 20' \
+            '100 30 20% 10% 0 20 10' \
+            '100 15 20 10% 1 20 10' \
+            '100 15 20% 10 1 20 10' \
+            '100 15 20.5% 10.5% 1 20.5 10.5' \
+            '100 15 100% 0% 1 100 0' \
+            '100 15 0% 0% 0 0 0' \
+            '100 -1 0% 0% 2 0 0' \
+            '100 15 20 10 1 20 10'; do
+            # shellcheck disable=SC2086
+            set -- ${scenario}
+            lifetime_days=$1
+            remaining_days=$2
+            WARNING_DAYS=$3
+            CRITICAL_DAYS=$4
+            WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
+            CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
+            PERFORMANCE_DATA=''
+            check_cert_end_date 'test certificate' 1
+            status=$?
+            assertEquals "${OPENSSL_COMMAND}: ${scenario}" "$5" "${status}" || exit 1
+            compare "${ELEM_WARNING_DAYS}" '==' "$6"
+            assertEquals "resolved warning: ${scenario}" 0 $? || exit 1
+            compare "${ELEM_CRITICAL_DAYS}" '==' "$7"
+            assertEquals "resolved critical: ${scenario}" 0 $? || exit 1
+            echo "${PERFORMANCE_DATA}" | grep -q '%'
+            assertEquals 'performance thresholds must be numeric days' 1 $? || exit 1
+        done
+    done
+
+    for scenario in '100 10% 20' '200 20 15%'; do
+        # shellcheck disable=SC2086
+        set -- ${scenario}
+        lifetime_days=$1
+        remaining_days=15
+        WARNING_DAYS=$2
+        CRITICAL_DAYS=$3
+        WARNING_SECONDS=$(days_to_seconds "${WARNING_DAYS}")
+        CRITICAL_SECONDS=$(days_to_seconds "${CRITICAL_DAYS}")
+        (check_cert_end_date 'test certificate' 1)
+        assertEquals "inverted mixed thresholds: ${scenario}" 3 $? || exit 1
+    done
+)
+
+testPercentageThresholdsFromFile() {
+    createSelfSignedCertificate 90 >/dev/null
+    CERT=${CERTIFICATE}
+    # A 100% threshold must be checked after the certificate's issue time.
+    sleep 1
+
+    for thresholds in '20% 10% 0' '100% 10% 1' '100% 100% 2' '20 10% 0' '20% 10 0'; do
+        # shellcheck disable=SC2086
+        set -- ${thresholds}
+        # shellcheck disable=SC2086
+        OUTPUT=$(${SCRIPT} ${TEST_DEBUG} -f "${CERT}" --warning "$1" --critical "$2" --selfsigned --allow-empty-san --ignore-sig-alg)
+        EXIT_CODE=$?
+        echo "${OUTPUT}"
+        assertEquals "file thresholds: ${thresholds}" "$3" "${EXIT_CODE}"
+        if [ "$1:$2" = '20%:10%' ]; then
+            echo "${OUTPUT}" | grep -q ';18[.]00000000;9[.]00000000;;'
+            assertEquals 'percentage thresholds use the full 90-day lifetime' 0 $?
+        fi
+    done
+}
+
+testPercentageThresholdsFromCRL() {
+    createSelfSignedCertificate 90 >/dev/null
+    create_temporary_test_file
+    CRL_DATABASE=${TEMPFILE}
+    create_temporary_test_file
+    CRL_CONFIG=${TEMPFILE}
+    create_temporary_test_file
+    CRL_FILE=${TEMPFILE}
+    cat >"${CRL_CONFIG}" <<EOF
+[ ca ]
+default_ca = test
+[ test ]
+database = ${CRL_DATABASE}
+certificate = ${CERTIFICATE}
+private_key = ${KEY}
+default_md = sha256
+default_crl_days = 90
+EOF
+    "${OPENSSL}" ca -gencrl -config "${CRL_CONFIG}" -out "${CRL_FILE}" 2>/dev/null
+    assertEquals 'generate test CRL' 0 $?
+    # A 100% threshold must be checked after the CRL's issue time.
+    sleep 1
+    for thresholds in '20% 10% 0' '100% 100% 2'; do
+        # shellcheck disable=SC2086
+        set -- ${thresholds}
+        ${SCRIPT} -f "${CRL_FILE}" --warning "$1" --critical "$2" --ignore-maximum-validity
+        assertEquals "CRL thresholds: ${thresholds}" "$3" $?
+    done
+}
+
+testPercentageThresholdsInvalidInput() (
+    unset UNIT_TEST
+    for threshold in '100.1%' '101%' '-1%' '10%%' '%' 'ten%'; do
+        for option in --warning --critical; do
+            ${SCRIPT} -H localhost "${option}" "${threshold}"
+            assertEquals "invalid threshold: ${option} ${threshold}" 3 $? || exit 1
+        done
+    done
+)
 
 # the script will exit without executing main
 export SOURCE_ONLY='test'
