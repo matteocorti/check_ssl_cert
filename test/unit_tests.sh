@@ -805,6 +805,8 @@ testPercentageThresholds() (
 testPercentageThresholdsFromFile() {
     createSelfSignedCertificate 90 >/dev/null
     CERT=${CERTIFICATE}
+    # A 100% threshold must be checked after the certificate's issue time.
+    sleep 1
 
     for thresholds in '20% 10% 0' '100% 10% 1' '100% 100% 2' '20 10% 0' '20% 10 0'; do
         # shellcheck disable=SC2086

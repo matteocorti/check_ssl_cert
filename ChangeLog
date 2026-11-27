@@ -1,5 +1,8 @@
 2026-11-26  Robin H. Johnson
 
+        * test/unit_tests.sh (testPercentageThresholdsFromFile): Wait until
+        after certificate issuance before checking 100% expiration thresholds.
+
         * test/unit_tests.sh (testFloatingPointThresholdsRecentlyExpired):
         Use a local expired certificate instead of a public TLS endpoint.
         (testPercentageThresholds): Support older ShellCheck versions that
